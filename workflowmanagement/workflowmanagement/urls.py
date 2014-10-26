@@ -20,6 +20,10 @@ urlpatterns = patterns('',
     url(r'^', include('rest_framework_swagger.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
+
+    # oauth2 provider
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/workflow/', include('workflow.urls')),
     url(r'^api/process/', include('process.urls')),

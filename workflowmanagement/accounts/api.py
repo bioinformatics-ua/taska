@@ -3,8 +3,11 @@ from rest_framework import renderers, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework import permissions
 
 from django.contrib.auth.models import User
+
+from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -16,6 +19,7 @@ def root(request, format=None):
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         model = User
         fields = ('url', 'username', 'email', 'is_staff')
 
