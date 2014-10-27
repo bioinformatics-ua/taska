@@ -12,7 +12,7 @@ router = routers.DefaultRouter()
 router.register(r'', api.UserViewSet)
 
 # trick to add root to the router generated urls
-router_tricks = router.urls + [url(r'^', api.root)]
+router_tricks = router.urls
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
