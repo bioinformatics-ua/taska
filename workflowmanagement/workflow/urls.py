@@ -10,8 +10,10 @@ import api
 
 router = routers.DefaultRouter()
 
+router.register(r'', api.WorkflowViewSet)
+
 # trick to add root to the router generated urls
-router_tricks = router.urls + [url(r'^', api.root)]
+router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),

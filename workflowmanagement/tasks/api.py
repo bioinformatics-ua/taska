@@ -1,13 +1,13 @@
 # coding=utf-8
 from rest_framework import renderers, serializers, viewsets, permissions, mixins
-from rest_framework.decorators import api_view, detail_route, list_route
+from rest_framework.decorators import api_view, detail_route, list_route, action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from django.contrib.auth.models import User
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
-from process.models import Process
+from tasks.models import *
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -16,27 +16,25 @@ def root(request, format=None):
     })
 
 # Serializers define the API representation.
-class ProcessSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Process
+        model = Task
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 # ViewSets define the view behavior.
-class ProcessViewSet(  mixins.CreateModelMixin,
-                        mixins.ListModelMixin,
-                        mixins.RetrieveModelMixin,
-                        mixins.DestroyModelMixin,
-                        viewsets.GenericViewSet):
+class TaskViewSet(  mixins.CreateModelMixin,
+                    mixins.ListModelMixin,
+                    mixins.RetrieveModelMixin,
+                    viewsets.GenericViewSet):
     """
-    API for Process manipulation
+    API for Task manipulation
 
-        Note: All methods on this class pertain to user owned processes
     """
-    queryset = Process.objects.all()
-    serializer_class = ProcessSerializer
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
     def list(self, request, *args, **kwargs):
         """
-        Return a list of user-owned processes
+        Return a list of user-attributed tasks
 
         TODO: Implement
 
@@ -45,7 +43,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     def create(self, request, *args, **kwargs):
         """
-        Insert/Update a new process
+        Add a result as a response to a task
 
         TODO: Implement
 
@@ -54,24 +52,16 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     def retrieve(self, request, *args, **kwargs):
         """
-        Retrieve a process, by id
+        Retrieve a task details, by id
 
         TODO: Implement
         """
         return Response({})
 
-    def destroy(self, request, *args, **kwargs):
-        """
-        Delete a process, by id
-
-        TODO: Implement
-        """
-        return Response({})
-
-    @list_route(methods=['get'])
+    @detail_route(methods=['post'])
     def requests(self, request):
         """
-        Show user-attributed requests, related with owned processes
+        Make a request related to a task, by id.
         Request can be of several types, such as Clarification, or reassignment
 
         TODO: Implement

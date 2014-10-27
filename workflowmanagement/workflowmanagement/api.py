@@ -12,13 +12,11 @@ import accounts
 def root(request, format=None):
 
     """
-    This text is the description for this API
-    param1 -- A first parameter
-    param2 -- A second parameter
+    Lists all listings available directly without parameters in the API
     """
     return Response({
-        'workflow': reverse(workflow.api.root,  request=request, format=format),
-        'process':  reverse(process.api.root,   request=request, format=format),
-        'history':  reverse(history.api.root,   request=request, format=format),
-        'accounts': reverse(accounts.api.root,  request=request, format=format),
+        'workflow': reverse('workflow-list',  request=request, format=format),
+        'process':  reverse('process-list',   request=request, format=format),
+        'history':  reverse('history-list',   request=request, format=format),
+        'accounts': reverse('user-list',  request=request, format=format),
     })

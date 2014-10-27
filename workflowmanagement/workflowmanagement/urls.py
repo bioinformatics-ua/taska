@@ -25,10 +25,11 @@ urlpatterns = patterns('',
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/workflow/', include('workflow.urls')),
-    url(r'^api/process/', include('process.urls')),
-    url(r'^api/history/', include('history.urls')),
-    url(r'^api/accounts/', include('accounts.urls')),
+    url(r'^api/workflow', include('workflow.urls')),
+    url(r'^api/process', include('process.urls')),
+    url(r'^api/history', include('history.urls')),
+    url(r'^api/account', include('accounts.urls')),
+    url(r'^api/task', include('tasks.urls')),
     url(r'^api/index', api.root),
 
 )
