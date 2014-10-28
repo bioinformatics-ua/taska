@@ -9,9 +9,12 @@ Welcome to Workflow-Management's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-
+    Introduction <intro>
+    Installation <install>
+    API <api>
+    Contributing <contributing>
 
 Indices and tables
 ==================
