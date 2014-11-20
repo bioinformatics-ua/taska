@@ -14,6 +14,7 @@ Contents:
     Introduction <intro>
     Installation <install>
     API <api>
+    Models <modules/models>
     Contributing <contributing>
 
 Indices and tables

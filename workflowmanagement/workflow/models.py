@@ -1,51 +1,51 @@
 from django.db import models
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
-from hashids import Hashids
+from utils import hashes
 
 class Workflow(models.Model):
-    '''This models represents generically an Workflow, created by a Researcher.
+    '''Represents generically an repeatable workflow, created by a Researcher.
 
     It's essentially the main block of the workflow management system.
 
     Attributes:
-        id (int): Private sequential identificator
-        hash (str): Public hash that identifies the workflow instance publicly
-        title (str): Short title that describes the workflow
-        create_date (datetime): Creation date
-        latest_update (datetime): Date this instance was last updated
+        :id (int): Private sequential identificator
+        :owner (User): :class:`django.contrib.auth.models.User` instance that created this workflow
+        :hash (str): Public hash that identifies the workflow instance publicly
+        :title (str): Short title that describes the workflow
+        :create_date (datetime): Creation date
+        :latest_update (datetime): Date this instance was last updated
+        :removed (boolean): Logical indicator of removal status of this workflow
     '''
-    hash          = models.CharField(max_length=10)
-    title         = models.CharField(max_length=100)
-    create_date   = models.DateTimeField(auto_now_add=True)
-    latest_update = models.DateTimeField(auto_now=True)
-    removed       = models.BooleanField(default=False)
+    owner           = models.ForeignKey(User)
+    hash            = models.CharField(max_length=50, unique=True)
+    title           = models.CharField(max_length=100)
+    create_date     = models.DateTimeField(auto_now_add=True)
+    latest_update   = models.DateTimeField(auto_now=True)
+    removed         = models.BooleanField(default=False)
 
 @receiver(models.signals.post_save, sender=Workflow)
-def generate_workflow(sender, instance, created, *args, **kwargs):
-    '''Generator of public hash keys for the workflow instances.
-
-    This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an workflow.
-    This is done to introduce identificator obfuscation and to stop URL snooping attempts.
+def __generate_workflow_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an workflow.
     '''
     if created:
-        hashids = Hashids(salt="esh2YTBZesh2YTBZ", min_length=5)
-        self.hash=hashids.encrypt(self.id)
+        self.hash   = createHash(self.id)
         self.save()
 
-class Task(models.Model):
-    '''This models represents a Task, executed in relation to an Workflow instance.
+class WorkflowPermission(models.Model):
+    '''Represents generic permissions of a Workflow
 
-    Each workflow instance consists of one or more Tasks
+    This model allows users to specify global such as public availability, listing on search and forkability
+    restrictions over a owned workflow.
 
     Attributes:
-        id (int): Private sequential identificator
-        sortid (int): Integer value that describes the order (inside the workflow) that this task is to be executed in
-        title (str): Short title that describes the task
-        description (str): Description of the task at hand, and how it should be executed
-        workflow(Workflow): Workflow instance this task inserted into
+        :workflow (Workflow): :class:`Workflow` instance this permissions pertain to
+        :public (boolean): Indicates the public visibility of the workflow instance
+        :searchable (boolean): Indicates if the workflow instance is to be listed on searches
+        :forkable (boolean): Indicates if the workflow instance can be forked by other users
     '''
-    sortid          = models.IntegerField()
-    title           = models.CharField(max_length=100)
-    description     = models.TextField()
     workflow        = models.ForeignKey(Workflow)
+    public          = models.BooleanField(default=True)
+    searchable      = models.BooleanField(default=True)
+    forkable        = models.BooleanField(default=True)
