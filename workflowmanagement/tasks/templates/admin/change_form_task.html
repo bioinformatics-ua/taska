@@ -1,0 +1,70 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript">
+
+        // Reading a cookie, reference from: http://stackoverflow.com/questions/1599287/create-read-and-erase-cookies-with-jquery
+        function readCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // We need to configure this to be able to send requests by json with the csrftoken
+        var csrftoken = readCookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        django.jQuery.ajaxSetup({
+            crossDomain: false, // obviates need for sameOrigin test
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        django.jQuery(function(){
+
+            django.jQuery('#id_workflow').change(function(){
+
+                django.jQuery('input[name="_continue"]').click();
+                /*var deps = {};
+
+                var taskid = parseInt(django.jQuery('.grp-readonly:first-child').text());
+
+                if(!isNaN(taskid)){
+                    deps['task'] = taskid
+                }
+
+                deps['workflow'] = parseInt(django.jQuery('#id_workflow').val());
+
+                django.jQuery('#id_dependencies').prop('disabled', true);
+
+                django.jQuery.post( "/api/task/__possibledeps/", deps)
+                .done(function(data) {
+                    var str="";
+                    for(i=0; i<data.dependencies.length;i++){
+                        data.dependencies[i]
+                        str+='<option value="'+data.dependencies[i]['id']+'">'+data.dependencies[i]['title']+'</option>';
+                    }
+                    django.jQuery('#id_dependencies').html(str);
+                    django.jQuery('#id_dependencies').prop('disabled', false);
+                })
+                .fail(function(data) {
+                    alert( "Error while refreshing possible dependencies." );
+                    django.jQuery('#id_dependencies').prop('disabled', false);
+                });
+
+    */
+            });
+        });
+    </script>
+{% endblock %}

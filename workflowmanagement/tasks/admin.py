@@ -1,3 +1,41 @@
 from django.contrib import admin
+from django import forms
+from django.core.exceptions import ValidationError
 
-# Register your models here.
+from .models import *
+
+def dummy_validator(value):
+    return True
+
+class TaskForm(forms.ModelForm):
+    dependencies = forms.ModelMultipleChoiceField(queryset=Task.objects.none(), required=False)
+    def __init__(self, *args, **kwargs):
+        super(TaskForm, self).__init__(*args, **kwargs)
+        try:
+            initial_dependencies = TaskDependency.objects.filter(maintask=self.instance)
+
+            self.fields['dependencies'].queryset = Task.objects.filter(workflow=self.instance.workflow).exclude(id=self.instance.id)
+            self.fields['dependencies'].initial = [task.dependency.id for task in initial_dependencies]
+
+        except:
+            pass
+
+    class Meta:
+        model = Task
+
+    def save(self, commit=True):
+        dependencies = self.cleaned_data.get('dependencies', None)
+        self.instance.replaceDependencies(dependencies)
+
+        return super(TaskForm, self).save(commit=commit)
+
+
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    change_form_template='admin/change_form_task.html'
+    form = TaskForm
+    list_display = ('title', 'workflow', 'sortid', 'description', 'id')
+    readonly_fields = ('id',)
+    ordering = ('workflow','sortid', 'title')
+

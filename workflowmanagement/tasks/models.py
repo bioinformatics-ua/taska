@@ -22,6 +22,57 @@ class Task(models.Model):
     description     = models.TextField()
     workflow        = models.ForeignKey(Workflow)
 
+    def __str__(self):
+        ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
+        '''
+        if self.title:
+            return self.title
+
+        return 'Unnamed'
+
+    def replaceDependencies(self, dependencies):
+        '''
+        '''
+        all_deps = TaskDependency.objects.filter(maintask=self)
+
+        removed_deps = all_deps.exclude(dependency__in=dependencies)
+
+        print dependencies
+
+        print all_deps
+
+        print removed_deps
+
+        removed_deps.delete()
+
+        for dep in dependencies:
+            TaskDependency.objects.get_or_create(maintask=self, dependency=dep)
+
+
+    @staticmethod
+    def getPossibleDependencies(workflow, task=None):
+        ''' Gives the possible dependencies for a Task, given a workflow.
+
+        Optionally is possible the define the point of origin, to be excluded from the results, using `task`
+
+        Args:
+            :workflow (Workflow): :class:`workflow.models.Workflow` instance to get dependencies possible from.
+        Kwargs:
+            :task (Task, optional) :class:`Task` instance indicating point of origin (will be excluded from results)
+
+        Returns
+            QuerySet of Tasks that can be used as dependencies
+        '''
+        possibilities = Task.objects.filter(workflow=workflow)
+
+        if task != None:
+            possibilities=possibilities.exclude(id=task.id)
+
+        return possibilities
+
+
+
+
 class TaskDependency(models.Model):
     '''Represents a dependency a Task instance may have over other tasks.
 
@@ -32,8 +83,16 @@ class TaskDependency(models.Model):
         :maintask (Task): :class:`Task` instance this dependency refers to
         :dependency (Task): :class:`Task` instance the maintask depends upon to be executed
     '''
-    maintask        = models.ForeignKey(Task)
-    dependency      = models.ForeignKey(Task)
+    maintask        = models.ForeignKey(Task, related_name='maintask')
+    dependency      = models.ForeignKey(Task, related_name='dependency')
+
+    class Meta:
+        verbose_name_plural = "Task dependencies"
+
+    def __str__(self):
+        '''
+        '''
+        return "TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))
 
 class SimpleTask(Task):
     '''Basic concretization of a generic task.

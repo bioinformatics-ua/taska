@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from workflow.models import Workflow
 from tasks.models import Task
 
+from utils.hashes import createHash
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -46,8 +48,8 @@ def __generate_process_hash(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an process.
     '''
     if created:
-        self.hash   = createHash(self.id)
-        self.save()
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class ProcessTask(models.Model):
     '''A task assignment, in the context of a Process.

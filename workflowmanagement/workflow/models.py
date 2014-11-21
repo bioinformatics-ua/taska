@@ -2,7 +2,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
-from utils import hashes
+from utils.hashes import createHash
 
 class Workflow(models.Model):
     '''Represents generically an repeatable workflow, created by a Researcher.
@@ -25,13 +25,21 @@ class Workflow(models.Model):
     latest_update   = models.DateTimeField(auto_now=True)
     removed         = models.BooleanField(default=False)
 
+    def __str__(self):
+        '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
+        '''
+        if self.title:
+            return self.title
+
+        return 'Unnamed'
+
 @receiver(models.signals.post_save, sender=Workflow)
 def __generate_workflow_hash(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an workflow.
     '''
     if created:
-        self.hash   = createHash(self.id)
-        self.save()
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class WorkflowPermission(models.Model):
     '''Represents generic permissions of a Workflow
@@ -49,3 +57,10 @@ class WorkflowPermission(models.Model):
     public          = models.BooleanField(default=True)
     searchable      = models.BooleanField(default=True)
     forkable        = models.BooleanField(default=True)
+
+    def __str__(self):
+        '''Returns a certain workflow permissions on a string
+        '''
+
+        return str(self.workflow)+' Permissions[ Public='+str(self.public)+', Searchable='+str(self.searchable)+', Forkable='+str(self.forkable)+']'
+

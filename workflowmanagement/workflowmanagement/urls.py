@@ -8,6 +8,8 @@ import workflow
 import process
 import history
 
+from tasks.api import TaskDependenciesView
+
 #router = routers.DefaultRouter()
 #router.register(r'workflow', include('workflow.urls'))
 
@@ -29,7 +31,12 @@ urlpatterns = patterns('',
     url(r'^api/process', include('process.urls')),
     url(r'^api/history', include('history.urls')),
     url(r'^api/account', include('accounts.urls')),
+
+    # For some ridiculous reason the rest routers remove my ability to set post methods... after the ones defined by it on the same domain
+    # Since i will have different kinds of authentication in this and the router, i cant add it as a list_route
+    # i will have to think of a better approach
+    url(r'^api/task/__possibledeps/$', TaskDependenciesView.as_view(), name='__possibledeps'),
+
     url(r'^api/task', include('tasks.urls')),
     url(r'^api/index', api.root),
-
 )

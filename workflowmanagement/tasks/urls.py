@@ -17,3 +17,4 @@ router_tricks = router.urls #+ [url(r'^', api.root)]
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
 )
+

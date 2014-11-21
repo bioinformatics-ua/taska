@@ -61,6 +61,12 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'rest_framework',
     'rest_framework_swagger',
+    'workflow',
+    'tasks',
+    'process',
+    'result',
+    'history',
+    'accounts'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -147,3 +153,10 @@ REST_FRAMEWORK = {
 # this will be needed on production server
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True
+TEMPLATE_LOADERS = (
+
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+
+)
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates')]
