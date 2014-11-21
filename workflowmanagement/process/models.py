@@ -116,6 +116,6 @@ class Request(models.Model):
         )
     processtaskuser = models.ForeignKey(ProcessTaskUser)
     type            = models.PositiveSmallIntegerField(choices=TYPES, default=CLARIFICATION)
-    title           = models.CharField(max_length=100)
-    message         = models.TextField()
+    title           = models.CharField(max_length=100, null=True)
+    message         = models.TextField(null=True)
     date            = models.DateTimeField(auto_now_add=True)
