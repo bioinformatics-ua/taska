@@ -1,6 +1,7 @@
 from django.db import models
 
 from process.models import ProcessTaskUser
+from model_utils.managers import InheritanceManager
 
 class Result(models.Model):
     ''' Generic representation of a result for a given ProcessTask, given by a given User.
@@ -15,6 +16,9 @@ class Result(models.Model):
     processtaskuser = models.ForeignKey(ProcessTaskUser)
     date            = models.DateTimeField(auto_now_add=True)
     comment         = models.TextField()
+
+    # We need this to be able to properly guess the type
+    objects         = InheritanceManager()
 
 class SimpleResult(Result):
     '''Basic concretization of a result for a ProcessTask.

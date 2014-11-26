@@ -41,3 +41,6 @@ class History(models.Model):
     object_type     = models.ForeignKey(ContentType)
     object_id       = models.PositiveIntegerField()
     object          = generic.GenericForeignKey('object_type', 'object_id')
+
+    class Meta:
+        verbose_name_plural = "Historic"

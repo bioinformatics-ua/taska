@@ -8,3 +8,4 @@ Sphinx==1.2.3
 sphinx_rtd_theme==0.1.5
 django-oauth-toolkit==0.7.2
 hashids==1.0.1
+django-model-utils==2.2

@@ -22,6 +22,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
+        fields = "__all__"
 
     def save(self, commit=True):
         dependencies = self.cleaned_data.get('dependencies', None)
@@ -29,13 +30,29 @@ class TaskForm(forms.ModelForm):
 
         return super(TaskForm, self).save(commit=commit)
 
-
-
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
+    change_list_template='admin/change_list_task.html'
+    change_form_template='admin/change_form_task.html'
+    form = TaskForm
+    list_display = ('title', 'workflow', 'sortid', 'description', 'id', 'task_type')
+    readonly_fields = ('id',)
+    ordering = ('workflow','sortid', 'title')
+
+    help_text = "This is meant to be used as a generic overview of all tasks, not as a place to add/edit/delete tasks. Tasks can be of different kinds, and should be added through they're respective models (such as SimpleTask, or other implementations)"
+    def has_add_permission(self, request):
+        return False
+    def task_type(self, obj):
+        return obj.__class__.__name__
+
+    def get_queryset(self, request):
+        qs = super(TaskAdmin, self).queryset(request)
+        return qs.select_subclasses()
+
+@admin.register(SimpleTask)
+class SimpleTaskAdmin(admin.ModelAdmin):
     change_form_template='admin/change_form_task.html'
     form = TaskForm
     list_display = ('title', 'workflow', 'sortid', 'description', 'id')
     readonly_fields = ('id',)
     ordering = ('workflow','sortid', 'title')
-

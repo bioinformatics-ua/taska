@@ -1,0 +1,8 @@
+{% extends "admin/change_list.html" %}
+
+
+
+{% block content %}
+<h3>This table is not meant to be used to add new or edit results! This is meant to be used as a overall of all existing results, across all types. It doesnt show all fields each result has. Only the common generic model. To add / edit results, please use the proper table inside each type (for example SimpleResult, or other implementations)</h3>
+    {{ block.super }}
+{% endblock %}

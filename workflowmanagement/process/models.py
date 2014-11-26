@@ -39,9 +39,15 @@ class Process(models.Model):
     executioner     = models.ForeignKey(User)
     hash            = models.CharField(max_length=50, unique=True)
     start_date      = models.DateTimeField(auto_now_add=True)
-    end_date        = models.DateTimeField()
+    end_date        = models.DateTimeField(null=True)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     removed         = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s (executed on %s by %s)' % (self.workflow, self.start_date, self.executioner)
+
+    class Meta:
+        verbose_name_plural = "Processes"
 
 @receiver(models.signals.post_save, sender=Process)
 def __generate_process_hash(sender, instance, created, *args, **kwargs):
@@ -78,6 +84,9 @@ class ProcessTask(models.Model):
     task            = models.ForeignKey(Task)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     deadline        = models.DateTimeField()
+
+    def __str__(self):
+        return '%s - %s' % (self.task, self.process)
 
 class ProcessTaskUser(models.Model):
     '''Model that connects a ProcessTask and a User

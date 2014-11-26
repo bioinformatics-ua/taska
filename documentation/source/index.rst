@@ -3,18 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Workflow-Management's documentation!
+Welcome to Workflow-Management documentation!
 ===============================================
 
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
     Introduction <intro>
     Installation <install>
     API <api>
     Models <modules/models>
+    Packages <packages>
     Contributing <contributing>
 
 Indices and tables

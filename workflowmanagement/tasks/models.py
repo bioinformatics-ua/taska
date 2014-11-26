@@ -2,6 +2,8 @@ from django.db import models
 
 from workflow.models import Workflow
 
+from model_utils.managers import InheritanceManager
+
 class Task(models.Model):
     '''Represents generically a task, executed in relation to an Workflow instance.
 
@@ -21,6 +23,9 @@ class Task(models.Model):
     title           = models.CharField(max_length=100)
     description     = models.TextField()
     workflow        = models.ForeignKey(Workflow)
+
+    # We need this to be able to properly guess the type
+    objects         = InheritanceManager()
 
     def __str__(self):
         ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
