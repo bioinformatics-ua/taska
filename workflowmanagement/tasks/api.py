@@ -1,6 +1,6 @@
 # coding=utf-8
 from rest_framework import renderers, serializers, viewsets, permissions, mixins, status
-from rest_framework.decorators import api_view, detail_route, list_route, action
+from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -15,16 +15,79 @@ from tasks.models import *
 
 from workflow.models import Workflow
 
+from django.apps import apps
+
 #@api_view(('GET',))
 #def root(request, format=None):
 #    return Response({
 #        #'User Listing   ': reverse('user-list', request=request, format=format),
 #    })
+class TaskDepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskDependency
+        exclude = ('id', 'maintask')
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
-# Serializers define the API representation.
-class TaskSerializer(serializers.HyperlinkedModelSerializer):
+class GenericTaskSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(write_only=True)
+
+    def to_representation(self, obj):
+        return obj.to_representation(obj)
+
+    def create(self, data):
+        serializer = data.pop('serializer')
+
+        return serializer.create(data)
+
+    def update(self, instance, validated_attrs):
+        pass
+    def to_internal_value(self, data):
+        if(data['type'] != None):
+            this_model = apps.get_model(data.pop('type'))
+
+            serializer = this_model.init_serializer()
+            validated = serializer.to_internal_value(data)
+            validated['serializer'] = serializer
+
+            return validated
+
+        raise Exception('Found invalid task type to be processed.')
+
+    # override to suport
+    #def to_internal_value(self, data):
+    #    return obj.to_internal_value(obj)
+
+    #def create(self, validated_data):
+    #    return HighScore.objects.create(**validated_data)
     class Meta:
         model = Task
+
+# Serializers define the API representation.
+class TaskSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    dependencies = TaskDepSerializer(many=True)
+
+    def get_type(self, obj):
+        return obj.type()
+    def create (self, data):
+        dependencies = data.pop('dependencies')
+        # this is generically, some custom tasks can override this behaviour
+        task =  self.Meta.model.objects.create(**data)
+
+        for dep in dependencies:
+            TaskDependency.objects.create(maintask=task, **dep)
+
+        return task
+
+    class Meta:
+        model = Task
+        exclude = ('workflow',)
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
+class SimpleTaskSerializer(TaskSerializer):
+    class Meta:
+        model = SimpleTask
+        #exclude = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 # ViewSets define the view behavior.
@@ -36,16 +99,18 @@ class TaskViewSet(  mixins.CreateModelMixin,
     API for Task manipulation
 
     """
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+    queryset = Task.objects.none()
+    serializer_class = GenericTaskSerializer
+    # we must override queryset to filter by authenticated user
+    def get_queryset(self):
+        return Task.objects.all().select_subclasses()
+
     def list(self, request, *args, **kwargs):
         """
         Return a list of user-attributed tasks
 
-        TODO: Implement
-
         """
-        return Response({})
+        return super(TaskViewSet, self).list(request, args, kwargs)
 
     def create(self, request, *args, **kwargs):
         """
@@ -54,7 +119,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
         TODO: Implement
 
         """
-        return Response({})
+        return super(TaskViewSet, self).create(request, args, kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         """

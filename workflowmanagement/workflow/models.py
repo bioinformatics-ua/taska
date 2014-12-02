@@ -25,6 +25,34 @@ class Workflow(models.Model):
     latest_update   = models.DateTimeField(auto_now=True)
     removed         = models.BooleanField(default=False)
 
+    def permissions(self):
+        (wp, new) = WorkflowPermission.objects.get_or_create(workflow=self)
+
+        if new:
+            wp.save()
+
+        return wp
+
+    def tasks(self):
+        from tasks.models import Task
+
+        val = Task.objects.filter(workflow=self).select_subclasses()
+
+        return val
+
+    @staticmethod
+    def all(user=None):
+        ''' Returns all valid workflow instances (excluding logically removed workflows)
+
+        Also allows to filter by user allowed workflows
+        '''
+        tmp = Workflow.objects.filter(removed=False)
+
+        if user != None:
+            tmp.filter(owner=tmp)
+        # else
+        return tmp.filter(workflowpermission__public=True)
+
     def __str__(self):
         '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
         '''
@@ -53,7 +81,7 @@ class WorkflowPermission(models.Model):
         :searchable (boolean): Indicates if the workflow instance is to be listed on searches
         :forkable (boolean): Indicates if the workflow instance can be forked by other users
     '''
-    workflow        = models.ForeignKey(Workflow)
+    workflow        = models.OneToOneField(Workflow)
     public          = models.BooleanField(default=True)
     searchable      = models.BooleanField(default=True)
     forkable        = models.BooleanField(default=True)

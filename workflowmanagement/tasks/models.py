@@ -27,6 +27,9 @@ class Task(models.Model):
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
 
+    def type(self):
+        return self._meta.app_label + '.' +self.__class__.__name__
+
     def __str__(self):
         ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
         '''
@@ -41,12 +44,6 @@ class Task(models.Model):
         all_deps = TaskDependency.objects.filter(maintask=self)
 
         removed_deps = all_deps.exclude(dependency__in=dependencies)
-
-        print dependencies
-
-        print all_deps
-
-        print removed_deps
 
         removed_deps.delete()
 
@@ -74,6 +71,35 @@ class Task(models.Model):
             possibilities=possibilities.exclude(id=task.id)
 
         return possibilities
+
+    @staticmethod
+    def init_serializer():
+        from .api import TaskSerializer
+        return TaskSerializer()
+
+    def __get_serializer(self):
+        serializer_name = '__%s'%(self.type())
+        serializer = None
+        if hasattr(Task, serializer_name):
+            serializer = getattr(Task, serializer_name)
+        else:
+            serializer = Task.init_serializer()
+            setattr(Task, serializer_name, serializer)
+
+        return serializer
+
+    def to_representation(self, instance):
+        serializer = self.__get_serializer()
+
+        return serializer.to_representation(instance)
+
+    def to_internal_value(self, instance):
+        serializer = self.__get_serializer()
+
+        return serializer.to_internal_value(instance)
+
+    def dependencies(self):
+        return TaskDependency.objects.filter(maintask=self)
 
 
 
@@ -106,4 +132,12 @@ class SimpleTask(Task):
     Is meant to be used for simple check tasks, that are executed outside of the system and can not be ascertained through it.
 
     '''
+    @staticmethod
+    def init_serializer():
+        ''' This method must override default init_serializer behaviour for a task.
+
+        Without init_serializer() wouldnt be possible using to process the MTI.
+        '''
+        from .api import SimpleTaskSerializer
+        return SimpleTaskSerializer()
     pass

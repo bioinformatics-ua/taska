@@ -4,16 +4,20 @@ from django.core.exceptions import ValidationError
 
 from .models import *
 
-def dummy_validator(value):
-    return True
-
 class TaskForm(forms.ModelForm):
+    ''' The ModelForm used on the Task ModelAdmin page.
+
+    The ModelAdmin for Tasks's can't rely on the automatic generated form, since we also should account for the
+    dependencies that are on a separated table. This dependencies also have a workflow restriction and must be custom
+    populated. This custom form takes care of it.
+    '''
     dependencies = forms.ModelMultipleChoiceField(queryset=Task.objects.none(), required=False)
     def __init__(self, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
         try:
             initial_dependencies = TaskDependency.objects.filter(maintask=self.instance)
 
+            # dependencies can only be already existing tasks on the same workflow.
             self.fields['dependencies'].queryset = Task.objects.filter(workflow=self.instance.workflow).exclude(id=self.instance.id)
             self.fields['dependencies'].initial = [task.dependency.id for task in initial_dependencies]
 
@@ -23,7 +27,7 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = "__all__"
-
+    # we must have a custom save handler, since we need to process the dependencies values as they are not processed by the usual cycle
     def save(self, commit=True):
         dependencies = self.cleaned_data.get('dependencies', None)
         self.instance.replaceDependencies(dependencies)
@@ -32,7 +36,13 @@ class TaskForm(forms.ModelForm):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
+    ''' Django-Admin page for listing generic :class:`tasks.models.Task` entries.
+
+    This aggregates all types of Tasks in a unique list.
+    '''
+    # we must have a custom template to warn about not being able to add tasks directly since this generically shows all tasks
     change_list_template='admin/change_list_task.html'
+    # we must have a custom template to the add/edit form since we have javascript behaviour, because of the dependency list.
     change_form_template='admin/change_form_task.html'
     form = TaskForm
     list_display = ('title', 'workflow', 'sortid', 'description', 'id', 'task_type')
@@ -51,6 +61,8 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(SimpleTask)
 class SimpleTaskAdmin(admin.ModelAdmin):
+    ''' Django-Admin page for listing, adding and editing :class:`tasls.models.SimpleTask` entries.
+    '''
     change_form_template='admin/change_form_task.html'
     form = TaskForm
     list_display = ('title', 'workflow', 'sortid', 'description', 'id')

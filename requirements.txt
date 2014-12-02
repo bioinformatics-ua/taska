@@ -1,6 +1,6 @@
 psycopg2==2.5.4
 django-grappelli==2.6.2
-djangorestframework==2.4.2
+djangorestframework==3.0
 markdown==2.5.1
 django-filter=0.8
 django-rest-swagger=0.1.14
