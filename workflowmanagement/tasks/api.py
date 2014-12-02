@@ -16,6 +16,7 @@ from tasks.models import *
 from workflow.models import Workflow
 
 from django.apps import apps
+from django.db import transaction
 
 #@api_view(('GET',))
 #def root(request, format=None):
@@ -40,7 +41,12 @@ class GenericTaskSerializer(serializers.ModelSerializer):
         return serializer.create(data)
 
     def update(self, instance, validated_attrs):
+        print "UPDATING"
+        print instance
+        print validated_attrs
+        print "..."
         pass
+
     def to_internal_value(self, data):
         if(data['type'] != None):
             this_model = apps.get_model(data.pop('type'))
@@ -65,23 +71,56 @@ class GenericTaskSerializer(serializers.ModelSerializer):
 # Serializers define the API representation.
 class TaskSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-    dependencies = TaskDepSerializer(many=True)
+    dependencies = TaskDepSerializer(many=True, required=False)
 
     def get_type(self, obj):
         return obj.type()
-    def create (self, data):
-        dependencies = data.pop('dependencies')
-        # this is generically, some custom tasks can override this behaviour
-        task =  self.Meta.model.objects.create(**data)
 
+    def __create_tasks(self, task, dependencies):
         for dep in dependencies:
             TaskDependency.objects.create(maintask=task, **dep)
 
+    @transaction.atomic
+    def create (self, data):
+        dependencies = []
+        try:
+            dependencies = data.pop('dependencies')
+        except KeyError:
+            pass
+        # this is generically, some custom tasks can override this behaviour
+        task =  self.Meta.model.objects.create(**data)
+
+        self.__create_tasks(task, dependencies)
+
         return task
+
+    @transaction.atomic
+    def update(self, instance, data):
+        dependencies = []
+        try:
+            dependencies = data.pop('dependencies')
+        except KeyError:
+            pass
+
+        for attr, value in data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        # Since they are nested, we wont now if we should remove a entry or not
+        # so we presume when somebody passes the deps nested array this will
+        # replace the old ones
+        TaskDependency.objects.filter(maintask=instance).delete()
+
+        self.__create_tasks(instance, dependencies)
+
+        return instance
+
+
 
     class Meta:
         model = Task
-        exclude = ('workflow',)
+        #write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 class SimpleTaskSerializer(TaskSerializer):
@@ -92,6 +131,7 @@ class SimpleTaskSerializer(TaskSerializer):
 
 # ViewSets define the view behavior.
 class TaskViewSet(  mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
                     mixins.ListModelMixin,
                     mixins.RetrieveModelMixin,
                     viewsets.GenericViewSet):
@@ -103,7 +143,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
     serializer_class = GenericTaskSerializer
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
-        return Task.objects.all().select_subclasses()
+        return Task.objects.filter(workflow__owner=self.request.user).select_subclasses()
 
     def list(self, request, *args, **kwargs):
         """
@@ -121,13 +161,25 @@ class TaskViewSet(  mixins.CreateModelMixin,
         """
         return super(TaskViewSet, self).create(request, args, kwargs)
 
+    def update(self, request, *args, **kwargs):
+        """
+        Update a task
+
+        """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        serializer = instance.init_serializer(instance=instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+        #return super(TaskViewSet, self).partial_update(request, args, kwargs)
+
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve a task details, by id
-
-        TODO: Implement
         """
-        return Response({})
+        return super(TaskViewSet, self).retrieve(request, args, kwargs)
 
     @detail_route(methods=['post'])
     def requests(self, request):

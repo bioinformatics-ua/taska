@@ -73,11 +73,11 @@ class Task(models.Model):
         return possibilities
 
     @staticmethod
-    def init_serializer():
+    def init_serializer(instance=None, data=None, many=False, partial=False):
         from .api import TaskSerializer
-        return TaskSerializer()
+        return TaskSerializer(instance=instance, data=data, many=many, partial=partial)
 
-    def __get_serializer(self):
+    def get_serializer(self):
         serializer_name = '__%s'%(self.type())
         serializer = None
         if hasattr(Task, serializer_name):
@@ -89,12 +89,12 @@ class Task(models.Model):
         return serializer
 
     def to_representation(self, instance):
-        serializer = self.__get_serializer()
+        serializer = self.get_serializer()
 
         return serializer.to_representation(instance)
 
     def to_internal_value(self, instance):
-        serializer = self.__get_serializer()
+        serializer = self.get_serializer()
 
         return serializer.to_internal_value(instance)
 
@@ -133,11 +133,11 @@ class SimpleTask(Task):
 
     '''
     @staticmethod
-    def init_serializer():
+    def init_serializer(instance=None, data=None, many=False, partial=False):
         ''' This method must override default init_serializer behaviour for a task.
 
         Without init_serializer() wouldnt be possible using to process the MTI.
         '''
         from .api import SimpleTaskSerializer
-        return SimpleTaskSerializer()
+        return SimpleTaskSerializer(instance=instance, data=data, many=many, partial=partial)
     pass
