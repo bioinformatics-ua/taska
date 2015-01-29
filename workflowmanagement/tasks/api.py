@@ -18,6 +18,10 @@ from workflow.models import Workflow
 from django.apps import apps
 from django.db import transaction
 
+from history.models import History
+
+from utils.api_related import create_serializer
+
 #@api_view(('GET',))
 #def root(request, format=None):
 #    return Response({
@@ -143,7 +147,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
     serializer_class = GenericTaskSerializer
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
-        return Task.objects.filter(workflow__owner=self.request.user).select_subclasses()
+        return Task.all(owner=self.request.user)
 
     def list(self, request, *args, **kwargs):
         """
@@ -156,10 +160,12 @@ class TaskViewSet(  mixins.CreateModelMixin,
         """
         Add a result as a response to a task
 
-        TODO: Implement
-
         """
-        return super(TaskViewSet, self).create(request, args, kwargs)
+        serializer, headers = create_serializer(self, request)
+
+        History.new(event=History.ADD, actor=request.user, object=serializer.instance)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
         """
@@ -172,6 +178,9 @@ class TaskViewSet(  mixins.CreateModelMixin,
         serializer = instance.init_serializer(instance=instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        History.new(event=History.UPDATE, actor=request.user, object=instance)
+
         return Response(serializer.data)
         #return super(TaskViewSet, self).partial_update(request, args, kwargs)
 
@@ -179,6 +188,8 @@ class TaskViewSet(  mixins.CreateModelMixin,
         """
         Retrieve a task details, by id
         """
+        History.new(event=History.ACCESS, actor=request.user, object=self.get_object())
+
         return super(TaskViewSet, self).retrieve(request, args, kwargs)
 
     @detail_route(methods=['post'])
@@ -190,6 +201,22 @@ class TaskViewSet(  mixins.CreateModelMixin,
         TODO: Implement
         """
         return Response({})
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete a task, by id
+
+        """
+        instance = self.get_object()
+
+        instance.removed = True
+        instance.save()
+
+        History.new(event=History.DELETE, actor=request.user, object=instance)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 ############################################################
 ##### Gets possible dependencies for a Task - Private Web service only for administrators

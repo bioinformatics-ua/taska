@@ -26,11 +26,13 @@ class History(models.Model):
     ADD             = 1
     EDIT            = 2
     DELETE          = 3
+    ACCESS          = 4
 
     EVENTS          = (
             (ADD,       'Add'),
             (EDIT,      'Edit'),
             (DELETE,    'Delete'),
+            (ACCESS,    'Access')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
@@ -44,3 +46,11 @@ class History(models.Model):
 
     class Meta:
         verbose_name_plural = "Historic"
+
+    @staticmethod
+    def new(event, actor, object):
+        action = History(event=History.ADD, actor=request.user, object=serializer.instance)
+        action.save()
+
+        return action
+

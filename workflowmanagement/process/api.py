@@ -7,7 +7,11 @@ from rest_framework.reverse import reverse
 from django.contrib.auth.models import User
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
-from process.models import Process
+from process.models import Process, ProcessTask
+
+from history.models import History
+
+from utils.api_related import create_serializer
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -15,10 +19,27 @@ def root(request, format=None):
         #'User Listing   ': reverse('user-list', request=request, format=format),
     })
 
+class ProcessTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessTask
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        exclude = ('removed',)
+
 # Serializers define the API representation.
-class ProcessSerializer(serializers.HyperlinkedModelSerializer):
+class ProcessSerializer(serializers.ModelSerializer):
+    tasks = ProcessTaskSerializer(many=True, write_only=True)
+
     class Meta:
         model = Process
+        exclude = ('id', 'removed')
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
+class DetailProcessSerializer(serializers.ModelSerializer):
+    tasks = ProcessTaskSerializer(many=True)
+
+    class Meta:
+        model = Process
+        exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 # ViewSets define the view behavior.
@@ -32,33 +53,38 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         Note: All methods on this class pertain to user owned processes
     """
-    queryset = Process.objects.all()
+    queryset = Process.all()
     serializer_class = ProcessSerializer
+    lookup_field = 'hash'
+
     def list(self, request, *args, **kwargs):
         """
         Return a list of user-owned processes
 
-        TODO: Implement
-
         """
-        return Response({})
+        return super(ProcessViewSet, self).list(request, args, kwargs)
+
 
     def create(self, request, *args, **kwargs):
         """
         Insert/Update a new process
 
-        TODO: Implement
-
         """
-        return Response({})
+        serializer, headers = create_serializer(self, request)
+
+        History.new(event=History.ADD, actor=request.user, object=serializer.instance)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve a process, by id
 
-        TODO: Implement
         """
-        return Response({})
+        instance = self.get_object()
+        History.new(event=History.ACCESS, actor=request.user, object=instance)
+
+        return Response(DetailProcessSerializer(instance)).data
 
     def destroy(self, request, *args, **kwargs):
         """

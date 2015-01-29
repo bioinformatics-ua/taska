@@ -27,6 +27,11 @@ class Task(models.Model):
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
 
+    removed         = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-id']
+
     def type(self):
         return self._meta.app_label + '.' +self.__class__.__name__
 
@@ -50,6 +55,24 @@ class Task(models.Model):
         for dep in dependencies:
             TaskDependency.objects.get_or_create(maintask=self, dependency=dep)
 
+
+    @staticmethod
+    def all(workflow=None, subclasses=True, owner=None):
+        ''' Returns all valid task instances (excluding logically removed tasks)
+
+        '''
+        tmp = Task.objects.filter(removed=False)
+
+        if workflow != None:
+            tmp.filter(workflow=workflow)
+
+        if owner != None:
+            tmp.filter(workflow__owner=owner)
+        # else
+        if subclasses:
+            return tmp.select_subclasses()
+
+        return tmp
 
     @staticmethod
     def getPossibleDependencies(workflow, task=None):

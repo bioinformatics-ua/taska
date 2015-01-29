@@ -36,7 +36,7 @@ class Workflow(models.Model):
     def tasks(self):
         from tasks.models import Task
 
-        val = Task.objects.filter(workflow=self).select_subclasses()
+        val = Task.all(workflow=self)
 
         return val
 
@@ -49,7 +49,7 @@ class Workflow(models.Model):
         tmp = Workflow.objects.filter(removed=False)
 
         if user != None:
-            tmp.filter(owner=tmp)
+            tmp.filter(owner=user)
         # else
         return tmp.filter(workflowpermission__public=True)
 

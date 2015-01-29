@@ -46,8 +46,22 @@ class Process(models.Model):
     def __str__(self):
         return '%s (executed on %s by %s)' % (self.workflow, self.start_date, self.executioner)
 
+    def tasks(self):
+        return ProcessTask.all(process=self)
+
     class Meta:
         verbose_name_plural = "Processes"
+
+    @staticmethod
+    def all(executioner=None):
+        ''' Returns all valid process instances (excluding logically removed processes)
+        '''
+        tmp = Process.objects.filter(removed=False)
+
+        if executioner != None:
+            tmp.filter(executioner=executioner)
+        # else
+        return tmp
 
 @receiver(models.signals.post_save, sender=Process)
 def __generate_process_hash(sender, instance, created, *args, **kwargs):
@@ -84,9 +98,22 @@ class ProcessTask(models.Model):
     task            = models.ForeignKey(Task)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     deadline        = models.DateTimeField()
+    removed         = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s - %s' % (self.task, self.process)
+
+    @staticmethod
+    def all(process=None):
+        ''' Returns all valid process task instances (excluding logically removed process tasks)
+
+        '''
+        tmp = ProcessTask.objects.filter(removed=False)
+
+        if process != None:
+            tmp.filter(process=process)
+
+        return tmp
 
 class ProcessTaskUser(models.Model):
     '''Model that connects a ProcessTask and a User
