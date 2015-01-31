@@ -4,6 +4,10 @@ from workflow.models import Workflow
 
 from model_utils.managers import InheritanceManager
 
+from django.dispatch import receiver
+
+from utils.hashes import createHash
+
 class Task(models.Model):
     '''Represents generically a task, executed in relation to an Workflow instance.
 
@@ -19,6 +23,7 @@ class Task(models.Model):
         :description (str): Description of the task at hand, and how it should be executed
         :workflow (Workflow): :class:`workflow.models.Workflow` instance this task is inserted into
     '''
+    hash            = models.CharField(max_length=50)
     sortid          = models.IntegerField()
     title           = models.CharField(max_length=100)
     description     = models.TextField()
@@ -64,10 +69,10 @@ class Task(models.Model):
         tmp = Task.objects.filter(removed=False)
 
         if workflow != None:
-            tmp.filter(workflow=workflow)
+            tmp=tmp.filter(workflow=workflow)
 
         if owner != None:
-            tmp.filter(workflow__owner=owner)
+            tmp=tmp.filter(workflow__owner=owner)
         # else
         if subclasses:
             return tmp.select_subclasses()
@@ -125,7 +130,16 @@ class Task(models.Model):
         return TaskDependency.objects.filter(maintask=self)
 
 
+@receiver(models.signals.post_save)
+def __generate_task_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an task.
+    '''
+    if not isinstance(instance, Task):
+         return
 
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class TaskDependency(models.Model):
     '''Represents a dependency a Task instance may have over other tasks.

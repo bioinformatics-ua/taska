@@ -25,6 +25,9 @@ class Workflow(models.Model):
     latest_update   = models.DateTimeField(auto_now=True)
     removed         = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-id']
+
     def permissions(self):
         (wp, new) = WorkflowPermission.objects.get_or_create(workflow=self)
 
@@ -41,7 +44,7 @@ class Workflow(models.Model):
         return val
 
     @staticmethod
-    def all(user=None):
+    def all(user=None, workflow=None):
         ''' Returns all valid workflow instances (excluding logically removed workflows)
 
         Also allows to filter by user allowed workflows
@@ -49,7 +52,10 @@ class Workflow(models.Model):
         tmp = Workflow.objects.filter(removed=False)
 
         if user != None:
-            tmp.filter(owner=user)
+            tmp=tmp.filter(owner=user)
+
+        if workflow != None:
+            tmp=tmp.filter(workflow=workflow)
         # else
         return tmp.filter(workflowpermission__public=True)
 

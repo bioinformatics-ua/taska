@@ -32,24 +32,81 @@ class WorkflowPermissionSerializer(serializers.ModelSerializer):
 # Serializers define the API representation.
 class WorkflowSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
-    tasks = GenericTaskSerializer(many=True, write_only=True)
+    tasks = GenericTaskSerializer(many=True, required=False)
 
     class Meta:
         model = Workflow
         exclude = ('id', 'removed')
         read_only_fields = ('create_date', 'latest_update')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        extra_kwargs = {'hash': {'required': False}}
 
     @transaction.atomic
-    def update(self, instance, data):
-        tasks = []
+    def create(self, validated_data):
+        permissions_data = None
+        tasks_data = None
+
         try:
-            tasks = data.pop('tasks')
-            print "-- ERROR: Ignoring tasks, they have to be inserted through task web-services not workflow"
+            permissions_data = validated_data.pop('permissions')
         except KeyError:
             pass
 
-        for attr, value in data.items():
+        try:
+            tasks_data = validated_data.pop('tasks')
+        except KeyError:
+            pass
+
+        workflow = Workflow.objects.create(**validated_data)
+
+        # create workflow permissions
+        if permissions_data:
+            WorkflowPermission.objects.create(workflow=workflow, **permissions_data)
+
+        # create tasks (if any are passed by this webservice)
+        if tasks_data:
+            for task_data in tasks_data:
+                task_serializer = task_data.pop('serializer')
+                task_data['workflow'] = workflow
+                task_serializer.create(task_data)
+
+        return workflow
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        permissions_data = None
+        tasks_data = None
+
+        try:
+            permissions_data = validated_data.pop('permissions')
+        except KeyError:
+            pass
+
+        try:
+            tasks_data = validated_data.pop('tasks')
+        except KeyError:
+            pass
+
+        if permissions_data:
+            p_instance = instance.permissions()
+            serializer = WorkflowPermissionSerializer(p_instance, partial=True)
+
+            serializer.update(p_instance, permissions_data)
+
+        if tasks_data:
+            for task_data in tasks_data:
+                task_serializer = task_data.pop('serializer')
+                task_data['workflow'] = instance
+
+                try:
+                    t_instance = Task.objects.get_subclass(hash=task_data['hash'])
+
+                    task_serializer.update(t_instance, task_data)
+
+                except (Task.DoesNotExist, KeyError):
+                    task_serializer.create(task_data)
+
+
+        for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
@@ -58,7 +115,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 class WorkflowDetailSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
-    tasks =     GenericTaskSerializer(many=True)
+    tasks = GenericTaskSerializer(many=True)
 
     class Meta:
         model = Workflow
@@ -99,6 +156,8 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         Insert a new workflow
 
         """
+        request.data[u'owner'] = request.user.id
+
         serializer, headers = create_serializer(self, request)
 
         History.new(event=History.ADD, actor=request.user, object=serializer.instance)

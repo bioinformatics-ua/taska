@@ -53,13 +53,16 @@ class Process(models.Model):
         verbose_name_plural = "Processes"
 
     @staticmethod
-    def all(executioner=None):
+    def all(workflow=None, executioner=None):
         ''' Returns all valid process instances (excluding logically removed processes)
         '''
         tmp = Process.objects.filter(removed=False)
 
+        if workflow != None:
+            tmp=tmp.filter(workflow=workflow)
+
         if executioner != None:
-            tmp.filter(executioner=executioner)
+            tmp=tmp.filter(executioner=executioner)
         # else
         return tmp
 
@@ -103,6 +106,9 @@ class ProcessTask(models.Model):
     def __str__(self):
         return '%s - %s' % (self.task, self.process)
 
+    def users(self):
+        return ProcessTaskUser.all(processtask=self)
+
     @staticmethod
     def all(process=None):
         ''' Returns all valid process task instances (excluding logically removed process tasks)
@@ -111,7 +117,7 @@ class ProcessTask(models.Model):
         tmp = ProcessTask.objects.filter(removed=False)
 
         if process != None:
-            tmp.filter(process=process)
+            tmp=tmp.filter(process=process)
 
         return tmp
 
@@ -131,6 +137,18 @@ class ProcessTaskUser(models.Model):
     processtask     = models.ForeignKey(ProcessTask)
     reassigned      = models.BooleanField(default=False)
     reassign_date   = models.DateTimeField(null=True)
+
+    @staticmethod
+    def all(processtask=None):
+        ''' Returns all valid processtask instances
+
+        '''
+        tmp = ProcessTaskUser.objects.all()
+
+        if processtask != None:
+            tmp=tmp.filter(processtask=processtask)
+
+        return tmp
 
 class Request(models.Model):
     '''Represents a request made over a ProcessTask assignment.

@@ -28,6 +28,8 @@ from utils.api_related import create_serializer
 #        #'User Listing   ': reverse('user-list', request=request, format=format),
 #    })
 class TaskDepSerializer(serializers.ModelSerializer):
+    dependency = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
+
     class Meta:
         model = TaskDependency
         exclude = ('id', 'maintask')
@@ -55,7 +57,7 @@ class GenericTaskSerializer(serializers.ModelSerializer):
         if(data['type'] != None):
             this_model = apps.get_model(data.pop('type'))
 
-            serializer = this_model.init_serializer()
+            serializer = this_model.init_serializer(partial=True)
             validated = serializer.to_internal_value(data)
             validated['serializer'] = serializer
 
@@ -72,6 +74,7 @@ class GenericTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
 
+
 # Serializers define the API representation.
 class TaskSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
@@ -81,8 +84,10 @@ class TaskSerializer(serializers.ModelSerializer):
         return obj.type()
 
     def __create_tasks(self, task, dependencies):
-        for dep in dependencies:
-            TaskDependency.objects.create(maintask=task, **dep)
+        if dependencies != None:
+            for dep in dependencies:
+                print dep
+                TaskDependency.objects.create(maintask=task, **dep)
 
     @transaction.atomic
     def create (self, data):
@@ -100,7 +105,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, data):
-        dependencies = []
+        dependencies = None
         try:
             dependencies = data.pop('dependencies')
         except KeyError:
@@ -126,12 +131,15 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         #write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        exclude = ('id', 'removed', 'workflow')
+        extra_kwargs = {'hash': {'required': False}}
 
 class SimpleTaskSerializer(TaskSerializer):
     class Meta:
         model = SimpleTask
         #exclude = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        read_only_fields = ('workflow',)
 
 # ViewSets define the view behavior.
 class TaskViewSet(  mixins.CreateModelMixin,
@@ -145,6 +153,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
     """
     queryset = Task.objects.none()
     serializer_class = GenericTaskSerializer
+
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
         return Task.all(owner=self.request.user)
@@ -179,7 +188,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        History.new(event=History.UPDATE, actor=request.user, object=instance)
+        History.new(event=History.EDIT, actor=request.user, object=instance)
 
         return Response(serializer.data)
         #return super(TaskViewSet, self).partial_update(request, args, kwargs)

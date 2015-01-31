@@ -49,7 +49,7 @@ class History(models.Model):
 
     @staticmethod
     def new(event, actor, object):
-        action = History(event=History.ADD, actor=request.user, object=serializer.instance)
+        action = History(event=event, actor=actor, object=object)
         action.save()
 
         return action
