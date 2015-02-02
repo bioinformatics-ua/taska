@@ -50,6 +50,7 @@ class Process(models.Model):
         return ProcessTask.all(process=self)
 
     class Meta:
+        ordering = ["-id"]
         verbose_name_plural = "Processes"
 
     @staticmethod
@@ -136,7 +137,7 @@ class ProcessTaskUser(models.Model):
     user            = models.ForeignKey(User)
     processtask     = models.ForeignKey(ProcessTask)
     reassigned      = models.BooleanField(default=False)
-    reassign_date   = models.DateTimeField(null=True)
+    reassign_date   = models.DateTimeField(null=True, blank=True)
 
     @staticmethod
     def all(processtask=None):
@@ -170,8 +171,40 @@ class Request(models.Model):
             (REASSIGN,   'Ask for reassignment of task'),
             (CLARIFICATION,  'Ask for task clarification'),
         )
+    hash            = models.CharField(max_length=50, default="ERROR")
     processtaskuser = models.ForeignKey(ProcessTaskUser)
     type            = models.PositiveSmallIntegerField(choices=TYPES, default=CLARIFICATION)
     title           = models.CharField(max_length=100, null=True)
     message         = models.TextField(null=True)
     date            = models.DateTimeField(auto_now_add=True)
+    resolved        = models.BooleanField(default=False)
+    removed         = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-id']
+
+    def process(self):
+        return self.processtaskuser.processtask.process.hash
+
+    def task(self):
+        return self.processtaskuser.processtask.task.hash
+
+    @staticmethod
+    def all(executioner=None, requester=None):
+        tmp = Request.objects.filter(removed=False)
+
+        if executioner != None:
+            tmp = tmp.filter(processtaskuser__processtask__process__executioner=executioner)
+
+        if requester != None:
+            tmp = tmp.filter(processtaskuser__user=requester)
+
+        return tmp
+
+@receiver(models.signals.post_save, sender=Request)
+def __generate_request_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an request.
+    '''
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()

@@ -87,7 +87,7 @@ class ProcessTaskUserAdmin(admin.ModelAdmin):
 class RequestAdmin(admin.ModelAdmin):
     ''' Django-Admin page for listing, adding and editing :class:`process.models.Request` entries.
     '''
-    def ptask(self, obj):
+    def ptask(obj):
         ''' Custom ModelAdmin field that displays the related ProcessTask
         '''
         return obj.processtaskuser.processtask

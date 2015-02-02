@@ -9,7 +9,9 @@ from rest_framework import routers
 import api
 
 router = routers.DefaultRouter()
+router.register(r'/requests', api.RequestsViewSet)
 router.register(r'', api.ProcessViewSet)
+
 
 # trick to add root to the router generated urls
 router_tricks = router.urls #+ [url(r'^', api.root)]
