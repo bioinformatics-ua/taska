@@ -5,7 +5,7 @@ from .models import *
 from utils.admin import reverse_link
 
 def ptasklink(obj):
-    ''' Custom AdminModel field that displays a link to the django-admin change page for an certain task from a ProcessTask instance.
+    ''' Custom AdminModel field that displays a link to the django-admin change page for an certain ProcessTask instance.
 
     Args:
         :obj (ProcessTask): An :class:`process.models.ProcessTask` instance to create the actor link to
@@ -14,6 +14,17 @@ def ptasklink(obj):
 
 ptasklink.allow_tags = True
 ptasklink.short_description = "Process Task"
+
+def tasklink(obj):
+    ''' Custom AdminModel field that displays a link to the django-admin change page for an certain task from a ProcessTask instance.
+
+    Args:
+        :obj (ProcessTask): An :class:`process.models.ProcessTask` instance to create the actor link to
+    '''
+    return reverse_link(obj.task, name=obj.task)
+
+tasklink.allow_tags = True
+tasklink.short_description = "Task"
 
 def prequest(obj):
     ''' Custom AdminModel field that displays a link to the django-admin change page for an certain task from a ProcessTaskUser instance.
@@ -32,8 +43,8 @@ class ProcessTaskInline(admin.TabularInline):
     '''
     model = ProcessTask
 
-    fields = [ptasklink, 'status', 'deadline']
-    readonly_fields = [ptasklink, 'status', 'deadline']
+    fields = [ptasklink, tasklink, 'status', 'deadline']
+    readonly_fields = [ptasklink, tasklink, 'status', 'deadline']
 
     def has_add_permission(self, request):
         return False

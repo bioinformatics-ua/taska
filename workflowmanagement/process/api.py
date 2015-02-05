@@ -306,6 +306,25 @@ class RequestSerializer(serializers.ModelSerializer):
 
         return request
 
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        tasks_data = None
+
+        try:
+            process = validated_data.pop('process')
+            task    = validated_data.pop('task')
+            user    = validated_data.pop('user')
+            processtaskuser = validated_data.pop('processtaskuser')
+        except KeyError:
+            pass
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        return instance
+
     class Meta:
         model = Request
         exclude = ('id', 'removed')
@@ -347,9 +366,6 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         """
         request.data[u'user'] = request.user.id
 
-        print "GOT HERE"
-        print request.data
-
         serializer, headers = create_serializer(self, request)
 
         History.new(event=History.ADD, actor=request.user, object=serializer.instance)
@@ -358,14 +374,14 @@ class RequestsViewSet(  mixins.CreateModelMixin,
 
     def update(self, request, *args, **kwargs):
         """
-        Update an already existing process
+        Update an already existing request
 
         """
-        request.data[u'executioner'] = request.user.id
+        request.data[u'user'] = request.user.id
 
         instance = self.get_object()
 
-        serializer = ProcessSerializer(instance=instance, data=request.data, partial=True)
+        serializer = RequestSerializer(instance=instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 

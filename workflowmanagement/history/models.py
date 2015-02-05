@@ -46,11 +46,36 @@ class History(models.Model):
 
     class Meta:
         verbose_name_plural = "Historic"
+        ordering = ["-id"]
 
     @staticmethod
     def new(event, actor, object):
+        """
+        Generates a new generic history object
+        """
         action = History(event=event, actor=actor, object=object)
         action.save()
 
         return action
 
+    @staticmethod
+    def type(Model, pk):
+        """
+        Retrieves all history objects for a given Model
+        """
+        try:
+            req = None
+            try:
+                # since i have models with MTI, i have to try it first, otherwise i could not retrieve all historic
+                req = Model.objects.get_subclass(hash=pk)
+
+            except AttributeError:
+                req = Model.objects.get(hash=pk)
+
+            type = ContentType.objects.get_for_model(req)
+
+            return History.objects.filter(object_type=type, object_id=req.id)
+        except Model.DoesNotExist:
+            pass
+
+        return History.objects.none()
