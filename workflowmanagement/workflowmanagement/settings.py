@@ -66,7 +66,8 @@ INSTALLED_APPS = (
     'process',
     'result',
     'history',
-    'accounts'
+    'accounts',
+    'ui'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -126,6 +127,14 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
 )
 
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath('../node_modules'),
+    os.path.abspath('ui/static'),
+)
+
 # Template configurations
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -166,4 +175,4 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 
 )
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates')]
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates'), os.path.join(BASE_DIR, 'ui/templates')]

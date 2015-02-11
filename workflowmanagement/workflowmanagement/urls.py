@@ -15,11 +15,11 @@ from tasks.api import TaskDependenciesView
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'workflowmanagement.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+    url(r'^', include('ui.urls')),
+
     (r'^grappelli/', include('grappelli.urls')), # grappelli URLS
 
-    url(r'^', include('rest_framework_swagger.urls')),
+    url(r'^swagger/', include('rest_framework_swagger.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
 

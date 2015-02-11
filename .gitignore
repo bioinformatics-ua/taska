@@ -1,3 +1,4 @@
 /.project
 documentation/build
 *.pyc
+/node_modules
