@@ -1,9 +1,11 @@
 # coding=utf-8
+import django_filters
+
 from rest_framework import renderers, serializers, viewsets, permissions, mixins
 from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import status
+from rest_framework import status, filters
 
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -15,7 +17,7 @@ from history.models import History
 from workflow.models import Workflow
 from tasks.models import Task
 
-from utils.api_related import create_serializer
+from utils.api_related import create_serializer, AliasOrderingFilter
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -45,7 +47,7 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProcessTask
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        exclude = ('id', 'process', 'removed')
+        exclude = ('process', 'removed')
 
     @transaction.atomic
     def create(self, validated_data):
@@ -168,6 +170,11 @@ class DetailProcessSerializer(serializers.ModelSerializer):
         exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
+class ProcessFilter(django_filters.FilterSet):
+    class Meta:
+        model = Process
+        fields = ['workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner']
+
 # ViewSets define the view behavior.
 class ProcessViewSet(  mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
@@ -183,6 +190,11 @@ class ProcessViewSet(  mixins.CreateModelMixin,
     queryset = Process.objects.none()
     serializer_class = ProcessSerializer
     lookup_field = 'hash'
+
+    filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
+    filter_class = ProcessFilter
+
+    ordering_fields = ('workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner')
 
     def get_queryset(self):
         return Process.all(executioner=self.request.user)
@@ -249,25 +261,11 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-    '''@list_route(methods=['get'])
-    def requests(self, request):
-        """
-        Show user-attributed requests, related with owned processes
-        Request can be of several types, such as Clarification, or reassignment
-
-        TODO: Implement
-        """
-        return Response({})
-    '''
-
-'''
 #############################################################################################
-
-Request related api calls available
-
+###
+### Request related api calls available
+###
 #############################################################################################
-'''
 
 class RequestSerializer(serializers.ModelSerializer):
     processtaskuser = ProcessTaskUserSerializer(read_only=True)
@@ -331,6 +329,16 @@ class RequestSerializer(serializers.ModelSerializer):
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 
+class RequestFilter(django_filters.FilterSet):
+    process = django_filters.CharFilter(name="processtaskuser__processtask__process__hash")
+    task = django_filters.CharFilter(name="processtaskuser__processtask__task__hash")
+    user = django_filters.CharFilter(name="processtaskuser__user")
+
+    class Meta:
+        model = Request
+        fields = ('hash', 'type', 'title', 'message', 'date', 'resolved', 'process', 'task', 'user')
+
+
 # ViewSets define the view behavior.
 class RequestsViewSet(  mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
@@ -346,6 +354,18 @@ class RequestsViewSet(  mixins.CreateModelMixin,
     queryset = Request.objects.none()
     serializer_class = RequestSerializer
     lookup_field = 'hash'
+
+    filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
+    filter_class = RequestFilter
+
+    ordering_fields = ('hash', 'type', 'title', 'message', 'date', 'resolved', 'process', 'task', 'user')
+
+    ordering_map = {
+        'process': 'processtaskuser__processtask__process__hash',
+        'task': 'processtaskuser__processtask__task__hash',
+        'user': 'processtaskuser__user',
+
+    }
 
     # we must override queryset to filter by authenticated user
     def get_queryset(self):

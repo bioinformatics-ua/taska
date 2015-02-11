@@ -151,7 +151,10 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'PAGINATE_BY': 10,
+    'PAGINATE_BY_PARAM': 'page',
+    'MAX_PAGINATE_BY': 100
 }
 
 # this will be needed on production server

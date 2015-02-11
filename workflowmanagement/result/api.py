@@ -12,7 +12,7 @@ from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasS
 
 from result.models import *
 
-from utils.api_related import create_serializer
+from utils.api_related import create_serializer, AliasOrderingFilter
 
 from process.models import Process, ProcessTaskUser
 from tasks.models import Task
@@ -27,9 +27,7 @@ class GenericResultSerializer(serializers.ModelSerializer):
         return obj.to_representation(obj)
 
     def create(self, data):
-        print "GOT HERE"
         serializer = data.pop('serializer')
-        print serializer
 
         return serializer.create(data)
 
@@ -112,8 +110,7 @@ class ResultFilter(django_filters.FilterSet):
     task = django_filters.CharFilter(name="processtaskuser__processtask__task__hash")
     class Meta:
         model = Result
-        fields = ['id', 'processtaskuser', 'date', 'comment', 'hash', 'process', 'task']
-
+        fields = ['processtaskuser', 'date', 'comment', 'hash', 'process', 'task']
 
 # ViewSets define the view behavior.
 class ResultViewSet(    mixins.CreateModelMixin,
@@ -130,8 +127,14 @@ class ResultViewSet(    mixins.CreateModelMixin,
     serializer_class = GenericResultSerializer
     lookup_field= 'hash'
 
-    filter_backends = [ filters.DjangoFilterBackend,]
+    filter_backends = [ filters.DjangoFilterBackend, AliasOrderingFilter]
     filter_class = ResultFilter
+
+    ordering_fields = ('date', 'comment', 'hash', 'process', 'task')
+    ordering_map = {
+        'process': 'processtaskuser__processtask__process__hash',
+        'task': 'processtaskuser__processtask__task__hash'
+    }
 
     def get_queryset(self):
         """

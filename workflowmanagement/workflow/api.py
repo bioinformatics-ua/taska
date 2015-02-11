@@ -1,9 +1,10 @@
 # coding=utf-8
+import django_filters
 from rest_framework import renderers, serializers, viewsets, permissions, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework.decorators import detail_route, list_route
 
 from django.contrib.auth.models import User
@@ -15,7 +16,7 @@ from tasks.models import Task, TaskDependency
 from tasks.api import GenericTaskSerializer
 
 from history.models import History
-from utils.api_related import create_serializer
+from utils.api_related import create_serializer, AliasOrderingFilter
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -123,6 +124,14 @@ class WorkflowDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('create_date', 'latest_update')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
+class WorkflowFilter(django_filters.FilterSet):
+    public = django_filters.BooleanFilter(name="workflowpermission__public")
+    searchable = django_filters.BooleanFilter(name="workflowpermission__searchable")
+    forkable = django_filters.BooleanFilter(name="workflowpermission__forkable")
+    class Meta:
+        model = Workflow
+        fields = ['owner', 'hash', 'title', 'create_date', 'latest_update', 'public', 'searchable', 'forkable']
+
 # ViewSets define the view behavior.
 class WorkflowViewSet(  mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
@@ -139,6 +148,15 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
     serializer_class = WorkflowSerializer
     lookup_field = 'hash'
 
+    filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
+    filter_class = WorkflowFilter
+
+    ordering_fields = ['owner', 'hash', 'title', 'create_date', 'latest_update', 'public', 'searchable', 'forkable']
+    ordering_map = {
+        'public': 'workflowpermission__public',
+        'searchable': 'workflowpermission__searchable',
+        'forkable': 'workflowpermission__forkable'
+    }
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
         return Workflow.all(user=self.request.user)

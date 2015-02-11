@@ -1,8 +1,10 @@
 # coding=utf-8
+import django_filters
 from rest_framework import renderers, serializers, viewsets, permissions, mixins, status
 from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework import status, filters
 
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -20,7 +22,7 @@ from django.db import transaction
 
 from history.models import History
 
-from utils.api_related import create_serializer
+from utils.api_related import create_serializer, AliasOrderingFilter
 
 #@api_view(('GET',))
 #def root(request, format=None):
@@ -131,7 +133,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         #write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        exclude = ('id', 'removed', 'workflow')
+        exclude = ('id', 'removed', 'workflow', 'ttype')
         extra_kwargs = {'hash': {'required': False}}
 
 class SimpleTaskSerializer(TaskSerializer):
@@ -140,6 +142,13 @@ class SimpleTaskSerializer(TaskSerializer):
         #exclude = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         read_only_fields = ('workflow',)
+
+class TaskFilter(django_filters.FilterSet):
+    type = django_filters.CharFilter(name="ttype")
+    class Meta:
+        model = Task
+        fields = ['workflow', 'hash', 'sortid', 'title', 'description',"type"]
+
 
 # ViewSets define the view behavior.
 class TaskViewSet(  mixins.CreateModelMixin,
@@ -153,6 +162,14 @@ class TaskViewSet(  mixins.CreateModelMixin,
     """
     queryset = Task.objects.none()
     serializer_class = GenericTaskSerializer
+
+    filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
+    filter_class = TaskFilter
+
+    ordering_fields = ['workflow', 'hash', 'sortid', 'title', 'description', 'type']
+    ordering_map = {
+        'type': 'ttype'
+    }
 
     # we must override queryset to filter by authenticated user
     def get_queryset(self):

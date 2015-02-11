@@ -34,6 +34,8 @@ class Task(models.Model):
 
     removed         = models.BooleanField(default=False)
 
+    ttype          = models.CharField(max_length=100)
+
     class Meta:
         ordering = ['-id']
 
@@ -139,6 +141,7 @@ def __generate_task_hash(sender, instance, created, *args, **kwargs):
 
     if created:
         instance.hash=createHash(instance.id)
+        instance.ttype = instance.type()
         instance.save()
 
 class TaskDependency(models.Model):
