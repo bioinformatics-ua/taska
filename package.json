@@ -8,10 +8,16 @@
     "bootstrap": "~3.3.2",
     "react": "~0.12.2",
     "react-bootstrap": "~0.14.0",
-    "envify": "~3.2.0"
+    "envify": "~3.2.0",
+    "reflux": "~0.2.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "browserify-shim": "~3.8.2",
+    "browserify": "~8.1.3",
+    "watchify": "~2.3.0"
+  },
   "scripts": {
+    "start": "parcelify workflowmanagement/ui/static/main.js -c workflowmanagement/ui/static/bundle.css -j workflowmanagement/ui/static/bundle.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
