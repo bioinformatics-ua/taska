@@ -44,7 +44,7 @@ class Process(models.Model):
     removed         = models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s (executed on %s by %s)' % (self.workflow, self.start_date, self.executioner)
+        return '%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -200,6 +200,11 @@ class Request(models.Model):
             tmp = tmp.filter(processtaskuser__user=requester)
 
         return tmp
+
+    def __str__(self):
+        ptask = self.processtaskuser.processtask
+        return "Request for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
+
 
 @receiver(models.signals.post_save, sender=Request)
 def __generate_request_hash(sender, instance, created, *args, **kwargs):

@@ -9,6 +9,18 @@ module.exports = (
 
         <Route name="about" handler={require('./components/about.jsx')} />
 
+        <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} />
+
+        <Route name="Process" path="process/:object" handler={require('./components/process.jsx')} />
+
+        <Route name="Request" path="request/:object" handler={require('./components/request.jsx')} />
+
+        <Route name="SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
+        <Route name="Result" path="result/:object" handler={require('./components/result/simple.jsx')} />
+
+        <Route name="SimpleTask" path="simpletask/:object" handler={require('./components/task/simple.jsx')} />
+        <Route name="Task" path="task/:object" handler={require('./components/task/simple.jsx')} />
+
         <NotFoundRoute handler={require('./components/404.jsx')}/>
     </Route>
 );

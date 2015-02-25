@@ -33,9 +33,11 @@ class HistorySerializer(serializers.ModelSerializer):
     event = serializers.SerializerMethodField()
     object_type = serializers.SerializerMethodField()
     object_repr = serializers.SerializerMethodField()
+    actor_repr = serializers.SerializerMethodField()
+
     class Meta:
         model = History
-        exclude = ['object_id']
+        exclude = ['object_id', 'authorized']
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
     def get_object_repr(self, obj):
@@ -46,6 +48,10 @@ class HistorySerializer(serializers.ModelSerializer):
 
     def get_object_type(self, obj):
         return obj.object.__class__.__name__
+
+    def get_actor_repr(self, obj):
+        return obj.actor.get_full_name()
+
 # ViewSets define the view behavior.
 class HistoryViewSet(   mixins.ListModelMixin,
                         viewsets.GenericViewSet):
@@ -53,8 +59,13 @@ class HistoryViewSet(   mixins.ListModelMixin,
     API for History manipulation
 
     """
-    queryset = History.objects.all()
+    queryset = History.objects.none()
     serializer_class = HistorySerializer
+
+    # we must override queryset to filter by authenticated user
+    def get_queryset(self):
+        return History.all(user=self.request.user)
+
     def list(self, request, *args, **kwargs):
         """
         Return a list of history over all system

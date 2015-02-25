@@ -388,7 +388,9 @@ class RequestsViewSet(  mixins.CreateModelMixin,
 
         serializer, headers = create_serializer(self, request)
 
-        History.new(event=History.ADD, actor=request.user, object=serializer.instance)
+        process_owner = serializer.instance.processtaskuser.processtask.process.executioner
+
+        History.new(event=History.ADD, actor=request.user, object=serializer.instance, authorized=[process_owner])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 

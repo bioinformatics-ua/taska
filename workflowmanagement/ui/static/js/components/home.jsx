@@ -12,15 +12,6 @@ export default React.createClass({
             <div className="col-md-6 no-padding-left">
               <HistoryTable />
             </div>
-            <div className="col-md-6 no-padding-right">
-              <HistoryTable />
-            </div>
-            <div className="col-md-6 no-padding-left">
-              <HistoryTable />
-            </div>
-            <div className="col-md-6 no-padding-right">
-              <HistoryTable />
-            </div>
         </div>
     );
   }

@@ -4,17 +4,16 @@ import Reflux from 'reflux';
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 const HistoryActions = Reflux.createActions([
-    'load',
-    'loadSuccess'
+    'loadSuccess',
+    'load'
 ]);
 
-HistoryActions.load.listen(function () {
+HistoryActions.load.listen(function (page) {
         $.ajax({
-          url: 'api/history/',
+          url: `api/history/?page=${page+1}`,
           dataType: 'json',
           success: function(data) {
-
-            HistoryActions.loadSuccess(data);
+            HistoryActions.loadSuccess(data, page);
 
           }.bind(this),
           error: function(xhr, status, err) {

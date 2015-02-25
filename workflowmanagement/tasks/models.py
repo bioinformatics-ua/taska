@@ -34,7 +34,7 @@ class Task(models.Model):
 
     removed         = models.BooleanField(default=False)
 
-    ttype          = models.CharField(max_length=100)
+    ttype           = models.CharField(max_length=100)
 
     class Meta:
         ordering = ['-id']

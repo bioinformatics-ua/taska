@@ -1,12 +1,29 @@
 @import url("../font-awesome/css/font-awesome.min.css");
 
+@font-face {
+    font-family: opensans;
+    src: url("../fonts/OpenSans-Regular.ttf");
+}
+@font-face {
+    font-family: opensansbold;
+    src: url("../fonts/OpenSans-Bold.ttf");
+}
+
 html {
     position: relative;
     min-height: 100%;
 }
 body {
+    font-family: opensans;
+    font-size: 140%;
     margin: 0 0 50px; /* bottom = footer height */
     padding-top: 70px;
+}
+h1, h2, h3, h4, h5, h6, h7{
+    font-family: opensansbold;
+}
+strong{
+    font-family: opensansbold;
 }
 footer {
     position: absolute;
@@ -64,4 +81,27 @@ footer {
 }
 .no-padding-right{
     padding-right: 0;
+}
+
+.thumb {
+    font-size: 40px;
+}
+
+.panel-overflow{
+    height: 380px;
+    overflow-y: auto;
+}
+
+.panel-overflow > .panel-heading{
+    position: absolute;
+    width: 97%;
+    z-index: 1000;
+}
+
+.panel-overflow table{
+    margin-top: 38px;
+}
+
+.event-td{
+    width: 50px;
 }

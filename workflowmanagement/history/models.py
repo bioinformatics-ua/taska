@@ -19,8 +19,11 @@ class History(models.Model):
     Attributes:
         :event (smallint): Event realized over the generic object
         :actor (User):  :class:`django.contrib.auth.models.User` that realized the action
+        :object_owner (User):  :class:`django.contrib.auth.models.User` that owns the object
         :date (datetime): Date the action was realized
         :object (Model): Any model that inherits from :class:`django.models.Model`
+        :authorized (User[]): :class:`django.contrib.auth.models.User` authorized users with acccess to this history
+
     '''
     # Event literals, representing the translation to the possible events the history log can be in
     ADD             = 1
@@ -44,6 +47,8 @@ class History(models.Model):
     object_id       = models.PositiveIntegerField()
     object          = generic.GenericForeignKey('object_type', 'object_id')
 
+    authorized      = models.ManyToManyField(User, related_name='authorized')
+
     class Meta:
         verbose_name_plural = "Historic"
         ordering = ["-id"]
@@ -52,12 +57,32 @@ class History(models.Model):
         return str(self.object)
 
     @staticmethod
-    def new(event, actor, object):
+    def all(user=None):
+        """
+            Returns user history
+        """
+
+        history = History.objects.all()
+
+        if user != None:
+            history = history.filter(authorized=user)
+
+        return history
+
+
+    @staticmethod
+    def new(event, actor, object, authorized=None):
         """
         Generates a new generic history object
         """
         action = History(event=event, actor=actor, object=object)
+
         action.save()
+
+        action.authorized.add(actor)
+        if authorized != None:
+            for elem in authorized:
+                action.authorized.add(elem)
 
         return action
 

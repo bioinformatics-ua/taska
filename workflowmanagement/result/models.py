@@ -76,6 +76,10 @@ class Result(models.Model):
 
         return serializer.to_internal_value(instance)
 
+    def __str__(self):
+        ptask = self.processtaskuser.processtask
+        return "Result for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
+
 @receiver(models.signals.post_save, sender=Result)
 def __generate_result_hash(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an result.
