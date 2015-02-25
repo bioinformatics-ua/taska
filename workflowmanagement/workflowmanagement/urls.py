@@ -14,9 +14,6 @@ from tasks.api import TaskDependenciesView
 #router.register(r'workflow', include('workflow.urls'))
 
 urlpatterns = patterns('',
-    # Examples:
-    url(r'^', include('ui.urls')),
-
     (r'^grappelli/', include('grappelli.urls')), # grappelli URLS
 
     url(r'^swagger/', include('rest_framework_swagger.urls')),
@@ -40,4 +37,6 @@ urlpatterns = patterns('',
 
     url(r'^api/task', include('tasks.urls')),
     url(r'^api/index', api.root),
+
+    url(r'^', include('ui.urls')),
 )

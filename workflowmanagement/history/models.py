@@ -48,6 +48,9 @@ class History(models.Model):
         verbose_name_plural = "Historic"
         ordering = ["-id"]
 
+    def obj_repr(self):
+        return str(self.object)
+
     @staticmethod
     def new(event, actor, object):
         """

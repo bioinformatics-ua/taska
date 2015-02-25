@@ -1,0 +1,67 @@
+@import url("../font-awesome/css/font-awesome.min.css");
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    margin: 0 0 50px; /* bottom = footer height */
+    padding-top: 70px;
+}
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+    border: 1px solid #e7e7e7;
+    padding: 15px 0px;
+    text-align: center;
+    background-color: #f8f8f8;
+}
+
+.breadcrumbs {
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    list-style: none;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.breadcrumbs {
+    color: #777;
+}
+
+.breadcrumbs a:after{
+    padding: 0 0 0 8px;
+    color: #ccc;
+    content: "/\00a0";
+}
+
+.breadcrumbs a:hover:after{
+    text-decoration: none !important;
+}
+
+.user-login{
+    min-width: 200px;
+}
+.user-details{
+    padding: 10px 10px 0 10px;
+}
+.user-details strong{
+    font-size: 12px;
+}
+
+.user-details hr{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.no-padding-left{
+    padding-left: 0;
+}
+.no-padding-right{
+    padding-right: 0;
+}

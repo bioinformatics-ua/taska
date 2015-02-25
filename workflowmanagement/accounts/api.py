@@ -1,6 +1,7 @@
 # coding=utf-8
 from rest_framework import renderers, serializers, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, detail_route, list_route
+
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework import permissions
@@ -20,11 +21,24 @@ def root(request, format=None):
 
 
 # Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField(required=False)
+    last_login = serializers.SerializerMethodField(required=False)
+
     class Meta:
         permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, TokenHasScope]
         model = User
-        fields = ('url', 'username', 'email', 'is_staff')
+        fields = ('url', 'username', 'email', 'is_staff', 'last_login', 'fullname')
+
+    def get_fullname(self, obj):
+        tmp = obj.get_full_name()
+
+        if tmp == "":
+            return obj.email
+        return tmp
+
+    def get_last_login(self, obj):
+        return obj.last_login.strftime("%Y-%m-%d %H:%M")
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
@@ -70,3 +84,11 @@ class UserViewSet(viewsets.ModelViewSet):
         Delete a user, by id
         """
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
+
+    @list_route(methods=['get'])
+    def me(self, request):
+        """
+        Get personal account details
+        """
+        serializer = UserSerializer(instance = request.user, context={'request': request})
+        return Response(serializer.data)

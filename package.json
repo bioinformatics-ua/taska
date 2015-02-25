@@ -8,14 +8,20 @@
     "bootstrap": "~3.3.2",
     "react": "~0.12.2",
     "react-bootstrap": "~0.14.0",
+    "react-router": "~0.12.2",
     "envify": "~3.2.0",
-    "reflux": "~0.2.5"
+    "reflux": "~0.2.5",
+    "font-awesome": "~4.3.0",
+    "react-breadcrumbs": "~0.2.9"
   },
+  "style": "./workflowmanagement/ui/css/main.css",
   "devDependencies": {
-    "parcelify": "~0.12.5"
+    "parcelify": "~0.12.5",
+    "babelify": "~5.0.3",
+    "duplexer": "~0.1.1"
   },
   "scripts": {
-    "start": "parcelify workflowmanagement/ui/static/main.js -c workflowmanagement/ui/static/bundle.css -j workflowmanagement/ui/static/bundle.js -w",
+    "start": "watchify -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

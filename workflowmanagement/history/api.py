@@ -32,10 +32,14 @@ class HistorySerializer(serializers.ModelSerializer):
     object = GenericObjectField(read_only=True)
     event = serializers.SerializerMethodField()
     object_type = serializers.SerializerMethodField()
+    object_repr = serializers.SerializerMethodField()
     class Meta:
         model = History
-        exclude = ['id', 'object_id']
+        exclude = ['object_id']
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
+    def get_object_repr(self, obj):
+        return obj.obj_repr()
 
     def get_event(self, obj):
         return dict(History.EVENTS)[obj.event]
