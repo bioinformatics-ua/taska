@@ -40397,6 +40397,28 @@ UserActions.loadUser.listen(function (page) {
 
 module.exports = UserActions;
 
+},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var ListLoader = require("./api.jsx").ListLoader;
+
+// Each action is like an event channel for one specific event. Actions are called by components.
+// The store is listening to all actions, and the components in turn are listening to the store.
+// Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
+var WorkflowActions = Reflux.createActions(["loadSuccess", "load"]);
+
+var loader = new ListLoader({ model: "workflow" });
+
+WorkflowActions.load.listen(function (page) {
+    loader.load(WorkflowActions.loadSuccess, page);
+});
+
+module.exports = WorkflowActions;
+
 },{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx":[function(require,module,exports){
 "use strict";
 
@@ -40629,6 +40651,8 @@ var React = _interopRequire(require("react"));
 
 var HistoryTable = require("./reusable/history.jsx").HistoryTable;
 
+var WorkflowTable = require("./reusable/workflow.jsx").WorkflowTable;
+
 module.exports = React.createClass({
   displayName: "",
   render: function render() {
@@ -40639,12 +40663,17 @@ module.exports = React.createClass({
         "div",
         { className: "col-md-6 no-padding-left" },
         React.createElement(HistoryTable, null)
+      ),
+      React.createElement(
+        "div",
+        { className: "col-md-6 no-padding-left" },
+        React.createElement(WorkflowTable, null)
       )
     );
   }
 });
 
-},{"./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
+},{"./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41117,7 +41146,233 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
+},{"../../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var React = _interopRequire(require("react"));
+
+var _reactRouter = require("react-router");
+
+var RouteHandler = _reactRouter.RouteHandler;
+var Link = _reactRouter.Link;
+
+var WorkflowActions = _interopRequire(require("../../actions/WorkflowActions.jsx"));
+
+var WorkflowStore = _interopRequire(require("../../stores/WorkflowStore.jsx"));
+
+var Griddle = _interopRequire(require("griddle-react"));
+
+var Loading = require("./component.jsx").Loading;
+
+var WorkflowItem = React.createClass({
+  displayName: "WorkflowItem",
+
+  render: function render() {
+    function translateAction(entry) {
+      var link = React.createElement(
+        Link,
+        { to: entry.object_type, params: entry },
+        entry.object_repr
+      );
+      var text;
+      switch (entry.event) {
+        case "Access":
+          text = "" + entry.actor_repr + " has accessed";
+          return React.createElement(
+            "span",
+            null,
+            text,
+            " ",
+            link
+          );
+        case "Add":
+          text = "" + entry.actor_repr + " has added";
+          return React.createElement(
+            "span",
+            null,
+            text,
+            " ",
+            link
+          );
+        case "Edit":
+          text = "" + entry.actor_repr + " has made changes to";
+          return React.createElement(
+            "span",
+            null,
+            text,
+            " ",
+            link
+          );
+        case "Delete":
+          text = "" + entry.actor_repr + " has removed";
+          return React.createElement(
+            "span",
+            null,
+            text,
+            " ",
+            React.createElement(
+              "strong",
+              null,
+              entry.object_repr
+            )
+          );
+        default:
+          return event;
+      }
+    }
+    return React.createElement(
+      "span",
+      null,
+      translateAction(this.props.rowData),
+      React.createElement("br", null),
+      React.createElement(
+        "small",
+        null,
+        "On ",
+        this.props.rowData.date
+      )
+    );
+  }
+});
+
+var WorkflowEventIcon = React.createClass({
+  displayName: "WorkflowEventIcon",
+
+  render: function render() {
+    function translateEvent(event) {
+      switch (event) {
+        case "Access":
+          return React.createElement("i", { className: "fa fa-folder-open thumb" });
+        case "Add":
+          return React.createElement("i", { className: "fa fa-plus thumb" });
+        case "Edit":
+          return React.createElement("i", { className: "fa fa-pencil thumb" });
+        case "Delete":
+          return React.createElement("i", { className: "fa fa-trash-o thumb" });
+        default:
+          return event;
+      }
+    }
+    return React.createElement(
+      "span",
+      null,
+      translateEvent(this.props.rowData.event)
+    );
+  }
+});
+var WorkflowTable = React.createClass({
+  displayName: "WorkflowTable",
+
+  mixins: [Reflux.listenTo(WorkflowStore, "update")],
+
+  __getState: function __getState() {
+    return {
+      entries: WorkflowStore.getList(),
+      currentPage: WorkflowStore.getPage(),
+      maxPages: WorkflowStore.getMaxPage(),
+      externalResultsPerPage: WorkflowStore.getPageSize()
+    };
+  },
+  getInitialState: function getInitialState() {
+    return {
+      entries: WorkflowStore.getList(),
+      currentPage: WorkflowStore.getPage(),
+      maxPages: WorkflowStore.getMaxPage(),
+      externalResultsPerPage: WorkflowStore.getPageSize(),
+      externalSortColumn: null,
+      externalSortAscending: true
+    };
+  },
+  componentDidMount: function componentDidMount() {
+    this.setPage(0);
+  },
+  update: function update(data) {
+    this.setState(this.__getState());
+  },
+  loadUserData: function loadUserData() {
+    WorkflowActions.load();
+  },
+  //what page is currently viewed
+  setPage: function setPage(index) {
+    console.log("Set page " + index);
+    WorkflowActions.load(index);
+  },
+  //this will handle how the data is sorted
+  sortData: function sortData(sort, sortAscending, data) {},
+  //this changes whether data is sorted in ascending or descending order
+  changeSortDirection: function changeSortDirection(sort, sortAscending) {},
+  //this method handles the filtering of the data
+  setFilter: function setFilter(filter) {},
+  //this method handles determining the page size
+  setPageSize: function setPageSize(size) {},
+  //this method handles change sort field
+  changeSort: function changeSort(sort) {},
+  render: function render() {
+    if (!this.state.maxPages) {
+      return React.createElement("span", null);
+    }
+
+    var columnMeta = [{
+      columnName: "object",
+      order: 1,
+      locked: false,
+      visible: true,
+      customComponent: WorkflowItem
+    }, {
+      columnName: "event",
+      order: 2,
+      locked: false,
+      visible: true,
+      customComponent: WorkflowEventIcon,
+      cssClassName: "event-td"
+    }];
+
+    return React.createElement(
+      "div",
+      { className: "panel panel-default panel-overflow" },
+      React.createElement(
+        "div",
+        { className: "panel-heading" },
+        React.createElement(
+          "center",
+          null,
+          React.createElement("i", { className: "fa fa-Workflow pull-left" }),
+          " ",
+          React.createElement(
+            "h3",
+            { className: "panel-title" },
+            "My Studies"
+          )
+        )
+      ),
+      React.createElement(Griddle, { useExternal: true, externalSetPage: this.setPage,
+        externalChangeSort: this.changeSort, externalSetFilter: this.setFilter,
+        externalSetPageSize: this.setPageSize, externalMaxPage: this.state.maxPages,
+        externalCurrentPage: this.state.currentPage,
+        resultsPerPage: this.state.externalResultsPerPage,
+        externalSortColumn: this.state.externalSortColumn,
+        externalSortAscending: this.state.externalSortAscending,
+        enableInfiniteScroll: true,
+        bodyHeight: 375,
+        tableClassName: "table table-striped", showTableHeading: false,
+        columns: ["title"], results: this.state.entries,
+        useGriddleStyles: false,
+        columnMetadata: columnMeta })
+    );
+  }
+
+});
+
+exports.WorkflowTable = WorkflowTable;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+},{"../../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41194,7 +41449,44 @@ Router.run(routes, Router.HistoryLocation, function (Handler) {
     return React.render(React.createElement(Handler, null), content);
 });
 
-},{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx":[function(require,module,exports){
+},{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/TableStoreMixin.jsx":[function(require,module,exports){
+"use strict";
+
+var TableStoreMixin = {
+    init: function init() {
+        this.__list = [];
+        this.__page = 0;
+        this.__page_size = 5;
+        this.__max_page = 0;
+        this.__count = 0;
+    },
+    onLoadSuccess: function onLoadSuccess(data) {
+        var page = arguments[1] === undefined ? 0 : arguments[1];
+
+        this.__list = $.merge(this.__list, data.results);
+        this.__page = page;
+        this.__count = data.count;
+        this.__max_page = Math.ceil(this.__count / this.__page_size);
+
+        this.trigger();
+    },
+    getList: function getList() {
+        return this.__list;
+    },
+    getPage: function getPage() {
+        return this.__page;
+    },
+    getPageSize: function getPageSize() {
+        return this.__page_size;
+    },
+    getMaxPage: function getMaxPage() {
+        return this.__max_page;
+    }
+};
+
+module.exports = { TableStoreMixin: TableStoreMixin };
+
+},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41290,7 +41582,23 @@ module.exports = Reflux.createStore({
     }
 });
 
-},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var WorkflowActions = _interopRequire(require("../actions/WorkflowActions.jsx"));
+
+var TableStoreMixin = require("../mixins/TableStoreMixin.jsx").TableStoreMixin;
+
+module.exports = Reflux.createStore({
+    mixins: [TableStoreMixin],
+    listenables: [WorkflowActions]
+});
+
+},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/TableStoreMixin.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/TableStoreMixin.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
