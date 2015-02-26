@@ -1,7 +1,10 @@
 'use strict';
-
+import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link, State} from 'react-router';
+
+import UserActions from '../../actions/UserActions.jsx';
+import UserStore from '../../stores/UserStore.jsx';
 
 var Tab = React.createClass({
 
@@ -19,25 +22,20 @@ var Tab = React.createClass({
 });
 
 var UserDropdown = React.createClass({
+      mixins: [Reflux.listenTo(UserStore, 'update')],
+    __getState: function(){
+      return {
+        user: UserStore.getUser()
+      }
+    },
     getInitialState: function() {
-        return {user: {}};
+      return this.__getState();
     },
     componentDidMount: function() {
-        this.loadUserData();
+      UserActions.loadUser();
     },
-    loadUserData: function() {
-        $.ajax({
-          url: this.props.url,
-          dataType: 'json',
-          success: function(data) {
-            if (this.isMounted()) {
-                this.setState({user: data});
-            }
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(this.props.url, status, err.toString());
-          }.bind(this)
-        });
+    update: function(){
+      this.setState(this.__getState());
     },
   render: function () {
 

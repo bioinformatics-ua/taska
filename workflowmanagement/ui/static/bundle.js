@@ -40372,6 +40372,31 @@ HistoryActions.load.listen(function (page) {
 
 module.exports = HistoryActions;
 
+},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var _apiJsx = require("./api.jsx");
+
+var ListLoader = _apiJsx.ListLoader;
+var DetailLoader = _apiJsx.DetailLoader;
+
+// Each action is like an event channel for one specific event. Actions are called by components.
+// The store is listening to all actions, and the components in turn are listening to the store.
+// Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
+var UserActions = Reflux.createActions(["loadSuccess", "loadUser"]);
+
+var loader = new DetailLoader({ model: "account", hash: "me" });
+
+UserActions.loadUser.listen(function (page) {
+    loader.load(UserActions.loadSuccess);
+});
+
+module.exports = UserActions;
+
 },{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx":[function(require,module,exports){
 "use strict";
 
@@ -40380,40 +40405,71 @@ var _prototypeProperties = function (child, staticProps, instanceProps) { if (st
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var ListLoader = (function () {
-  function ListLoader(options) {
-    _classCallCheck(this, ListLoader);
+    function ListLoader(options) {
+        _classCallCheck(this, ListLoader);
 
-    this.__loaded = {};
-    this.model = options.model;
-  }
-
-  _prototypeProperties(ListLoader, null, {
-    load: {
-      value: function load(callback, page) {
-        if (this.__loaded[page] === undefined) {
-          this.__loaded[page] = true;
-          $.ajax({
-            url: "api/" + this.model + "/?page=" + (page + 1),
-            dataType: "json",
-            success: (function (data) {
-
-              callback(data, page);
-            }).bind(this),
-            error: (function (xhr, status, err) {
-              console.error(status, err.toString());
-            }).bind(this)
-          });
-        }
-      },
-      writable: true,
-      configurable: true
+        this.__loaded = {};
+        this.model = options.model;
     }
-  });
 
-  return ListLoader;
+    _prototypeProperties(ListLoader, null, {
+        load: {
+            value: function load(callback, page) {
+                if (this.__loaded[page] === undefined) {
+                    this.__loaded[page] = true;
+                    $.ajax({
+                        url: "api/" + this.model + "/?page=" + (page + 1),
+                        dataType: "json",
+                        success: (function (data) {
+
+                            callback(data, page);
+                        }).bind(this),
+                        error: (function (xhr, status, err) {
+                            console.error(status, err.toString());
+                        }).bind(this)
+                    });
+                }
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return ListLoader;
 })();
 
-module.exports = { ListLoader: ListLoader };
+var DetailLoader = (function () {
+    function DetailLoader(options) {
+        _classCallCheck(this, DetailLoader);
+
+        this.model = options.model;
+        this.hash = options.hash;
+    }
+
+    _prototypeProperties(DetailLoader, null, {
+        load: {
+            value: function load(callback) {
+                console.log("api/" + this.model + "/" + this.hash + "/");
+                $.ajax({
+                    url: "api/" + this.model + "/" + this.hash + "/",
+                    dataType: "json",
+                    success: (function (data) {
+                        callback(data);
+                    }).bind(this),
+                    error: (function (xhr, status, err) {
+                        console.error("Unable to load \"api/" + this.model + "/" + this.hash + "/\"");
+                    }).bind(this)
+                });
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return DetailLoader;
+})();
+
+module.exports = { ListLoader: ListLoader, DetailLoader: DetailLoader };
 
 },{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx":[function(require,module,exports){
 "use strict";
@@ -40946,6 +41002,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var Reflux = _interopRequire(require("reflux"));
+
 var React = _interopRequire(require("react"));
 
 var _reactRouter = require("react-router");
@@ -40953,6 +41011,10 @@ var _reactRouter = require("react-router");
 var RouteHandler = _reactRouter.RouteHandler;
 var Link = _reactRouter.Link;
 var State = _reactRouter.State;
+
+var UserActions = _interopRequire(require("../../actions/UserActions.jsx"));
+
+var UserStore = _interopRequire(require("../../stores/UserStore.jsx"));
 
 var Tab = React.createClass({
   displayName: "Tab",
@@ -40975,25 +41037,20 @@ var Tab = React.createClass({
 var UserDropdown = React.createClass({
   displayName: "UserDropdown",
 
+  mixins: [Reflux.listenTo(UserStore, "update")],
+  __getState: function __getState() {
+    return {
+      user: UserStore.getUser()
+    };
+  },
   getInitialState: function getInitialState() {
-    return { user: {} };
+    return this.__getState();
   },
   componentDidMount: function componentDidMount() {
-    this.loadUserData();
+    UserActions.loadUser();
   },
-  loadUserData: function loadUserData() {
-    $.ajax({
-      url: this.props.url,
-      dataType: "json",
-      success: (function (data) {
-        if (this.isMounted()) {
-          this.setState({ user: data });
-        }
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }).bind(this)
-    });
+  update: function update() {
+    this.setState(this.__getState());
   },
   render: function render() {
 
@@ -41060,7 +41117,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
+},{"../../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41208,7 +41265,32 @@ module.exports = Reflux.createStore({
     }
 });
 
-},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
+},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
+
+module.exports = Reflux.createStore({
+    listenables: [UserActions],
+
+    init: function init() {
+        this.__user = {};
+    },
+    onLoadSuccess: function onLoadSuccess(data) {
+        this.__user = data;
+
+        this.trigger();
+    },
+    getUser: function getUser() {
+        return this.__user;
+    }
+});
+
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
