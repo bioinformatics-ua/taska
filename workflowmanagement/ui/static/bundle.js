@@ -40357,27 +40357,65 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var Reflux = _interopRequire(require("reflux"));
 
+var ListLoader = require("./api.jsx").ListLoader;
+
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 var HistoryActions = Reflux.createActions(["loadSuccess", "load"]);
 
+var loader = new ListLoader({ model: "history" });
+
 HistoryActions.load.listen(function (page) {
-  $.ajax({
-    url: "api/history/?page=" + (page + 1),
-    dataType: "json",
-    success: (function (data) {
-      HistoryActions.loadSuccess(data, page);
-    }).bind(this),
-    error: (function (xhr, status, err) {
-      console.error(status, err.toString());
-    }).bind(this)
-  });
+    loader.load(HistoryActions.loadSuccess, page);
 });
 
 module.exports = HistoryActions;
 
-},{"reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx":[function(require,module,exports){
+},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx":[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var ListLoader = (function () {
+  function ListLoader(options) {
+    _classCallCheck(this, ListLoader);
+
+    this.__loaded = {};
+    this.model = options.model;
+  }
+
+  _prototypeProperties(ListLoader, null, {
+    load: {
+      value: function load(callback, page) {
+        if (this.__loaded[page] === undefined) {
+          this.__loaded[page] = true;
+          $.ajax({
+            url: "api/" + this.model + "/?page=" + (page + 1),
+            dataType: "json",
+            success: (function (data) {
+
+              callback(data, page);
+            }).bind(this),
+            error: (function (xhr, status, err) {
+              console.error(status, err.toString());
+            }).bind(this)
+          });
+        }
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return ListLoader;
+})();
+
+module.exports = { ListLoader: ListLoader };
+
+},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -40648,9 +40686,13 @@ var Loading = React.createClass({
 
   render: function render() {
     return React.createElement(
-      "span",
-      null,
-      "Loading"
+      "div",
+      { className: "loading" },
+      React.createElement(
+        "center",
+        null,
+        React.createElement("i", { className: "fa fa-3x fa-refresh fa-spin" })
+      )
     );
   }
 });
@@ -40886,7 +40928,6 @@ var HistoryTable = React.createClass({
         enableInfiniteScroll: true,
         bodyHeight: 375,
         tableClassName: "table table-striped", showTableHeading: false,
-        loadingComponent: Loading,
         columns: ["object", "event"], results: this.state.entries,
         useGriddleStyles: false,
         columnMetadata: columnMeta })

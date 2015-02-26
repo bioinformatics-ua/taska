@@ -161,7 +161,6 @@ const HistoryTable = React.createClass({
                         enableInfiniteScroll={true}
                         bodyHeight={375}
               tableClassName={"table table-striped"} showTableHeading={false}
-              loadingComponent={Loading}
               columns={["object", "event"]} results={this.state.entries}
               useGriddleStyles={false}
               columnMetadata={columnMeta} />
