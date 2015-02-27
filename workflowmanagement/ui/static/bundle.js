@@ -40364,10 +40364,10 @@ var ListLoader = require("./api.jsx").ListLoader;
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 var HistoryActions = Reflux.createActions(["loadSuccess", "load"]);
 
-var loader = new ListLoader({ model: "history" });
+var loader = new ListLoader({ model: "history", dontrepeat: true });
 
-HistoryActions.load.listen(function (page) {
-    loader.load(HistoryActions.loadSuccess, page);
+HistoryActions.load.listen(function (state) {
+    loader.load(HistoryActions.loadSuccess, state);
 });
 
 module.exports = HistoryActions;
@@ -40413,8 +40413,8 @@ var WorkflowActions = Reflux.createActions(["loadSuccess", "load"]);
 
 var loader = new ListLoader({ model: "workflow" });
 
-WorkflowActions.load.listen(function (page) {
-    loader.load(WorkflowActions.loadSuccess, page);
+WorkflowActions.load.listen(function (state) {
+    loader.load(WorkflowActions.loadSuccess, state);
 });
 
 module.exports = WorkflowActions;
@@ -40432,19 +40432,22 @@ var ListLoader = (function () {
 
         this.__loaded = {};
         this.model = options.model;
+        this.dontrepeat = options.dontrepeat || false;
     }
 
     _prototypeProperties(ListLoader, null, {
         load: {
-            value: function load(callback, page) {
-                if (this.__loaded[page] === undefined) {
-                    this.__loaded[page] = true;
+            value: function load(callback, state) {
+                if (!this.dontrepeat || this.__loaded[state.currentPage] === undefined) {
+                    this.__loaded[state.currentPage] = true;
+
+                    var order = state.externalSortAscending ? "" : "-";
                     $.ajax({
-                        url: "api/" + this.model + "/?page=" + (page + 1),
+                        url: "api/" + this.model + "/?page=" + (state.currentPage + 1) + "&ordering=" + order + "" + state.externalSortColumn,
                         dataType: "json",
                         success: (function (data) {
 
-                            callback(data, page);
+                            callback(data, state);
                         }).bind(this),
                         error: (function (xhr, status, err) {
                             console.error(status, err.toString());
@@ -40792,6 +40795,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Reflux = _interopRequire(require("reflux"));
 
 var React = _interopRequire(require("react"));
@@ -40924,10 +40929,6 @@ var HistoryTable = React.createClass({
     this.setState(this.getState());
   },
   render: function render() {
-    if (!this.state.maxPages) {
-      return React.createElement("span", null);
-    }
-
     var columnMeta = [{
       columnName: "object",
       order: 1,
@@ -40942,7 +40943,6 @@ var HistoryTable = React.createClass({
       customComponent: EventIcon,
       cssClassName: "event-td"
     }];
-
     return React.createElement(
       "div",
       { className: "panel panel-default panel-overflow" },
@@ -40953,7 +40953,6 @@ var HistoryTable = React.createClass({
           "center",
           null,
           React.createElement("i", { className: "fa fa-history pull-left" }),
-          " ",
           React.createElement(
             "h3",
             { className: "panel-title" },
@@ -40961,19 +40960,9 @@ var HistoryTable = React.createClass({
           )
         )
       ),
-      React.createElement(Griddle, { useExternal: true, externalSetPage: this.setPage,
-        externalChangeSort: this.changeSort, externalSetFilter: this.setFilter,
-        externalSetPageSize: this.setPageSize, externalMaxPage: this.state.maxPages,
-        externalCurrentPage: this.state.currentPage,
-        resultsPerPage: this.state.externalResultsPerPage,
-        externalSortColumn: this.state.externalSortColumn,
-        externalSortAscending: this.state.externalSortAscending,
-        enableInfiniteScroll: true,
-        bodyHeight: 375,
-        tableClassName: "table table-striped", showTableHeading: false,
-        columns: ["object", "event"], results: this.state.entries,
-        useGriddleStyles: false,
-        columnMetadata: columnMeta })
+      React.createElement(Griddle, _extends({}, this.commonTableSettings(), { enableInfiniteScroll: true,
+        showTableHeading: false, columns: ["object", "event"],
+        columnMetadata: columnMeta }))
     );
   }
 });
@@ -41108,6 +41097,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Reflux = _interopRequire(require("reflux"));
 
 var React = _interopRequire(require("react"));
@@ -41127,102 +41118,52 @@ var Loading = require("./component.jsx").Loading;
 
 var TableComponentMixin = require("../../mixins/component.jsx").TableComponentMixin;
 
-var WorkflowItem = React.createClass({
-  displayName: "WorkflowItem",
+var WorkflowManage = React.createClass({
+  displayName: "WorkflowManage",
 
   render: function render() {
-    function translateAction(entry) {
-      var link = React.createElement(
-        Link,
-        { to: entry.object_type, params: entry },
-        entry.object_repr
-      );
-      var text;
-      switch (entry.event) {
-        case "Access":
-          text = "" + entry.actor_repr + " has accessed";
-          return React.createElement(
-            "span",
-            null,
-            text,
-            " ",
-            link
-          );
-        case "Add":
-          text = "" + entry.actor_repr + " has added";
-          return React.createElement(
-            "span",
-            null,
-            text,
-            " ",
-            link
-          );
-        case "Edit":
-          text = "" + entry.actor_repr + " has made changes to";
-          return React.createElement(
-            "span",
-            null,
-            text,
-            " ",
-            link
-          );
-        case "Delete":
-          text = "" + entry.actor_repr + " has removed";
-          return React.createElement(
-            "span",
-            null,
-            text,
-            " ",
-            React.createElement(
-              "strong",
-              null,
-              entry.object_repr
-            )
-          );
-        default:
-          return event;
-      }
-    }
+    var row = this.props.rowData;
+    var object = { object: row.hash };
     return React.createElement(
-      "span",
-      null,
-      translateAction(this.props.rowData),
-      React.createElement("br", null),
+      "div",
+      { className: "btn-group", role: "group", "aria-label": "..." },
       React.createElement(
-        "small",
-        null,
-        "On ",
-        this.props.rowData.date
+        Link,
+        { className: "btn btn-primary", to: "Workflow", params: object },
+        "Run"
+      ),
+      React.createElement(
+        Link,
+        { className: "btn btn-warning", to: "Workflow", params: object },
+        "Edit"
+      ),
+      React.createElement(
+        Link,
+        { className: "btn btn-danger", to: "Workflow", params: object },
+        "Delete"
       )
     );
   }
 });
 
-var WorkflowEventIcon = React.createClass({
-  displayName: "WorkflowEventIcon",
+var WorkflowLink = React.createClass({
+  displayName: "WorkflowLink",
 
   render: function render() {
-    function translateEvent(event) {
-      switch (event) {
-        case "Access":
-          return React.createElement("i", { className: "fa fa-folder-open thumb" });
-        case "Add":
-          return React.createElement("i", { className: "fa fa-plus thumb" });
-        case "Edit":
-          return React.createElement("i", { className: "fa fa-pencil thumb" });
-        case "Delete":
-          return React.createElement("i", { className: "fa fa-trash-o thumb" });
-        default:
-          return event;
-      }
-    }
+    var row = this.props.rowData;
+    var object = { object: row.hash };
     return React.createElement(
-      "span",
+      "small",
       null,
-      translateEvent(this.props.rowData.event)
+      React.createElement(
+        Link,
+        { to: "Workflow", params: object },
+        row.title
+      )
     );
   }
 });
+
 var WorkflowTable = React.createClass({
   displayName: "WorkflowTable",
 
@@ -41236,23 +41177,21 @@ var WorkflowTable = React.createClass({
     this.setState(this.getState());
   },
   render: function render() {
-    if (!this.state.maxPages) {
-      return React.createElement("span", null);
-    }
-
     var columnMeta = [{
-      columnName: "object",
+      columnName: "title",
       order: 1,
       locked: false,
       visible: true,
-      customComponent: WorkflowItem
+      customComponent: WorkflowLink,
+      displayName: "Title"
     }, {
-      columnName: "event",
+      columnName: "hash",
       order: 2,
-      locked: false,
+      locked: true,
       visible: true,
-      customComponent: WorkflowEventIcon,
-      cssClassName: "event-td"
+      customComponent: WorkflowManage,
+      cssClassName: "manage-td",
+      displayName: " "
     }];
     return React.createElement(
       "div",
@@ -41271,19 +41210,9 @@ var WorkflowTable = React.createClass({
           )
         )
       ),
-      React.createElement(Griddle, { useExternal: true, externalSetPage: this.setPage,
-        externalChangeSort: this.changeSort, externalSetFilter: this.setFilter,
-        externalSetPageSize: this.setPageSize, externalMaxPage: this.state.maxPages,
-        externalCurrentPage: this.state.currentPage,
-        resultsPerPage: this.state.externalResultsPerPage,
-        externalSortColumn: this.state.externalSortColumn,
-        externalSortAscending: this.state.externalSortAscending,
-        enableInfiniteScroll: true,
-        bodyHeight: 375,
-        tableClassName: "table table-striped", showTableHeading: false,
-        columns: ["title"], results: this.state.entries,
-        useGriddleStyles: false,
-        columnMetadata: columnMeta })
+      React.createElement(Griddle, _extends({}, this.commonTableSettings(), {
+        columns: ["title", "hash"],
+        columnMetadata: columnMeta }))
     );
   }
 
@@ -41374,6 +41303,10 @@ Router.run(routes, Router.HistoryLocation, function (Handler) {
 },{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
 "use strict";
 
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var React = _interopRequire(require("react"));
+
 var TableComponentMixin = {
     componentDidMount: function componentDidMount() {
         this.setPage(0);
@@ -41394,23 +41327,62 @@ var TableComponentMixin = {
     //what page is currently viewed
     setPage: function setPage(index) {
         console.log("Set page " + index);
-        this.tableAction(index);
+        this.tableAction($.extend(this.getState(), { currentPage: index }));
     },
     //this will handle how the data is sorted
-    sortData: function sortData(sort, sortAscending, data) {},
-    //this changes whether data is sorted in ascending or descending order
-    changeSortDirection: function changeSortDirection(sort, sortAscending) {},
+    sortData: function sortData(sort, sortAscending, data) {
+        console.log("sortData");
+        console.log(sort);
+        console.log(sortAscending);
+        console.log(data);
+    },
     //this method handles the filtering of the data
-    setFilter: function setFilter(filter) {},
+    setFilter: function setFilter(filter) {
+        console.log("setFilter");
+    },
     //this method handles determining the page size
-    setPageSize: function setPageSize(size) {},
+    setPageSize: function setPageSize(size) {
+        console.log("setPageSize");
+    },
     //this method handles change sort field
-    changeSort: function changeSort(sort) {}
+    changeSort: function changeSort(sort) {
+        console.log("Sort by " + sort + " " + this.state.externalSortAscending);
+
+        var order = this.state.externalSortAscending;
+        order = this.state.externalSortColumn === sort ? !order : true;
+
+        this.tableAction($.extend(this.getState(), {
+            externalSortColumn: sort,
+            externalSortAscending: order
+        }));
+    },
+    commonTableSettings: function commonTableSettings() {
+        return {
+            useExternal: true,
+            externalSetPage: this.setPage,
+            externalChangeSort: this.changeSort,
+            externalSetFilter: this.setFilter,
+            externalSetPageSize: this.setPageSize,
+            externalMaxPage: this.state.maxPages,
+            externalCurrentPage: this.state.currentPage,
+            resultsPerPage: this.state.externalResultsPerPage,
+            externalSortColumn: this.state.externalSortColumn,
+            externalSortAscending: this.state.externalSortAscending,
+            bodyHeight: 375,
+            tableClassName: "table table-striped",
+            results: this.state.entries,
+            useGriddleStyles: false,
+            nextClassName: "table-prev",
+            previousClassName: "table-next",
+            sortAscendingComponent: React.createElement("i", { className: "pull-right fa fa-sort-asc" }),
+            sortDescendingComponent: React.createElement("i", { className: "pull-right fa fa-sort-desc" })
+        };
+    }
 };
 
 module.exports = { TableComponentMixin: TableComponentMixin };
 
-},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
+},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
 "use strict";
 
 var TableStoreMixin = {
@@ -41424,10 +41396,14 @@ var TableStoreMixin = {
         this.__sortascending = true;
     },
     onLoadSuccess: function onLoadSuccess(data) {
-        var page = arguments[1] === undefined ? 0 : arguments[1];
+        var state = arguments[1] === undefined ? {} : arguments[1];
 
-        this.__list = $.merge(this.__list, data.results);
-        this.__page = page;
+        if (this.merge) this.__list = $.merge(this.__list, data.results);else this.__list = data.results;
+
+        this.__page = state.currentPage;
+        this.__sortcolumn = state.externalSortColumn;
+        this.__sortascending = state.externalSortAscending;
+
         this.__count = data.count;
         this.__max_page = Math.ceil(this.__count / this.__page_size);
 
@@ -41495,6 +41471,7 @@ var HistoryActions = _interopRequire(require("../actions/HistoryActions.jsx"));
 var TableStoreMixin = require("../mixins/store.jsx").TableStoreMixin;
 
 module.exports = Reflux.createStore({
+    merge: true,
     mixins: [TableStoreMixin],
     listenables: [HistoryActions] });
 

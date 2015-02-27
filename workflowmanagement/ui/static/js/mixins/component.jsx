@@ -1,3 +1,5 @@
+import React from 'react';
+
 const TableComponentMixin = {
     componentDidMount: function() {
         this.setPage(0);
@@ -18,23 +20,62 @@ const TableComponentMixin = {
     //what page is currently viewed
     setPage: function(index){
       console.log(`Set page ${index}`);
-      this.tableAction(index);
+      this.tableAction($.extend(this.getState(), {currentPage: index}));
     },
     //this will handle how the data is sorted
     sortData: function(sort, sortAscending, data){
-    },
-    //this changes whether data is sorted in ascending or descending order
-    changeSortDirection: function(sort, sortAscending){
+        console.log(`sortData`);
+        console.log(sort);
+        console.log(sortAscending);
+        console.log(data);
     },
     //this method handles the filtering of the data
     setFilter: function(filter){
+        console.log('setFilter');
     },
     //this method handles determining the page size
     setPageSize: function(size){
+        console.log('setPageSize');
     },
     //this method handles change sort field
     changeSort: function(sort){
+        console.log(`Sort by ${sort} ${this.state.externalSortAscending}`);
+
+        let order = this.state.externalSortAscending;
+        order = (this.state.externalSortColumn === sort)? !order:true;
+
+        this.tableAction(
+            $.extend(this.getState(), {
+                externalSortColumn: sort,
+                externalSortAscending: order
+            })
+        );
+
+    },
+    commonTableSettings: function(){
+        return {
+            useExternal: true,
+            externalSetPage: this.setPage,
+            externalChangeSort: this.changeSort,
+            externalSetFilter: this.setFilter,
+            externalSetPageSize:this.setPageSize,
+            externalMaxPage:this.state.maxPages,
+            externalCurrentPage:this.state.currentPage,
+            resultsPerPage:this.state.externalResultsPerPage,
+            externalSortColumn:this.state.externalSortColumn,
+            externalSortAscending:this.state.externalSortAscending,
+            bodyHeight:375,
+            tableClassName: "table table-striped",
+            results: this.state.entries,
+            useGriddleStyles: false,
+            nextClassName: "table-prev",
+            previousClassName: "table-next",
+            sortAscendingComponent: <i className="pull-right fa fa-sort-asc"></i>,
+            sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>
+        }
     }
 };
 
 export default {TableComponentMixin}
+
+

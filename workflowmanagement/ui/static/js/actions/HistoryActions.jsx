@@ -9,10 +9,10 @@ const HistoryActions = Reflux.createActions([
     'load'
 ]);
 
-let loader = new ListLoader({model: 'history'});
+let loader = new ListLoader({model: 'history', dontrepeat: true});
 
-HistoryActions.load.listen(function (page) {
-    loader.load(HistoryActions.loadSuccess, page);
+HistoryActions.load.listen(function (state) {
+    loader.load(HistoryActions.loadSuccess, state);
 });
 
 export default HistoryActions;

@@ -73,47 +73,35 @@ const HistoryTable = React.createClass({
     update: function(data){
         this.setState(this.getState());
     },
-  render: function () {
-    if (!this.state.maxPages) {
-        return <span/>;
-    }
-
-    const columnMeta = [
-      {
-      "columnName": "object",
-      "order": 1,
-      "locked": false,
-      "visible": true,
-      "customComponent": HistoryItem
-      },
-      {
-      "columnName": "event",
-      "order": 2,
-      "locked": false,
-      "visible": true,
-      "customComponent": EventIcon,
-      "cssClassName": "event-td"
-      }
-    ];
-
-    return  <div className="panel panel-default panel-overflow">
-              <div className="panel-heading">
-                <center><i className="fa fa-history pull-left"></i> <h3 className="panel-title"> History</h3></center>
-              </div>
-              <Griddle  useExternal={true} externalSetPage={this.setPage}
-                        externalChangeSort={this.changeSort} externalSetFilter={this.setFilter}
-                        externalSetPageSize={this.setPageSize} externalMaxPage={this.state.maxPages}
-                        externalCurrentPage={this.state.currentPage}
-                        resultsPerPage={this.state.externalResultsPerPage}
-                        externalSortColumn={this.state.externalSortColumn}
-                        externalSortAscending={this.state.externalSortAscending}
-                        enableInfiniteScroll={true}
-                        bodyHeight={375}
-              tableClassName={"table table-striped"} showTableHeading={false}
-              columns={["object", "event"]} results={this.state.entries}
-              useGriddleStyles={false}
-              columnMetadata={columnMeta} />
-            </div>;
+    render: function () {
+      const columnMeta = [
+        {
+        "columnName": "object",
+        "order": 1,
+        "locked": false,
+        "visible": true,
+        "customComponent": HistoryItem
+        },
+        {
+        "columnName": "event",
+        "order": 2,
+        "locked": false,
+        "visible": true,
+        "customComponent": EventIcon,
+        "cssClassName": "event-td"
+        }
+      ];
+      return  <div className="panel panel-default panel-overflow">
+                <div className="panel-heading">
+                  <center>
+                    <i className="fa fa-history pull-left"></i>
+                    <h3 className="panel-title"> History</h3>
+                  </center>
+                </div>
+                <Griddle {...this.commonTableSettings()} enableInfiniteScroll={true}
+                showTableHeading={false} columns={["object", "event"]}
+                columnMetadata={columnMeta} />
+              </div>;
   }
 });
 

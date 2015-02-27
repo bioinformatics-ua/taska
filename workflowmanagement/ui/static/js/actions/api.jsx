@@ -2,17 +2,21 @@ class ListLoader{
     constructor(options) {
         this.__loaded = {};
         this.model = options.model;
+        this.dontrepeat = options.dontrepeat || false;
+
     }
 
-    load(callback, page){
-        if(this.__loaded[page] === undefined){
-                this.__loaded[page] = true;
+    load(callback, state){
+        if(!this.dontrepeat || this.__loaded[state.currentPage] === undefined){
+                this.__loaded[state.currentPage] = true;
+
+                let order = (state.externalSortAscending)? '':'-';
                 $.ajax({
-                  url: `api/${this.model}/?page=${page+1}`,
+                  url: `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
                   dataType: 'json',
                   success: function(data) {
 
-                    callback(data, page);
+                    callback(data, state);
 
                   }.bind(this),
                   error: function(xhr, status, err) {

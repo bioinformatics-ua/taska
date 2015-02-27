@@ -11,53 +11,28 @@ import Griddle from 'griddle-react';
 import {Loading} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
-var WorkflowItem = React.createClass({
+const WorkflowManage = React.createClass({
   render: function(){
-    function translateAction(entry){
-      const link = <Link to={entry.object_type} params={entry}>{entry.object_repr}</Link>;
-      var text;
-      switch(entry.event){
-        case 'Access':
-          text = `${entry.actor_repr} has accessed`;
-          return <span>{text} {link}</span>;
-        case 'Add':
-          text = `${entry.actor_repr} has added`;
-          return <span>{text} {link}</span>;
-        case 'Edit':
-          text = `${entry.actor_repr} has made changes to`;
-          return <span>{text} {link}</span>;
-        case 'Delete':
-          text = `${entry.actor_repr} has removed`;
-          return <span>{text} <strong>{entry.object_repr}</strong></span>;
-        default: return event;
-      }
-    }
-    return (
-            <span>
-              {translateAction(this.props.rowData)}
-              <br />
-              <small>On {this.props.rowData.date}</small>
-            </span>
-      );
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <div className="btn-group" role="group" aria-label="...">
+            <Link className="btn btn-primary" to="Workflow" params={object}>Run</Link>
+            <Link className="btn btn-warning" to="Workflow" params={object}>Edit</Link>
+            <Link className="btn btn-danger" to="Workflow" params={object}>Delete</Link>
+           </div>;
   }
 });
 
-var WorkflowEventIcon = React.createClass({
+const WorkflowLink = React.createClass({
   render: function(){
-    function translateEvent(event){
-      switch(event){
-        case 'Access': return <i className="fa fa-folder-open thumb"></i>;
-        case 'Add': return <i className="fa fa-plus thumb"></i>;
-        case 'Edit': return <i className="fa fa-pencil thumb"></i>;
-        case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
-        default: return event;
-      }
-    }
-    return <span>
-              {translateEvent(this.props.rowData.event)}
-            </span>;
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <small>
+            <Link to="Workflow" params={object}>{row.title}</Link>
+           </small>;
   }
 });
+
 const WorkflowTable = React.createClass({
     tableAction: WorkflowActions.load,
     tableStore: WorkflowStore,
@@ -69,44 +44,33 @@ const WorkflowTable = React.createClass({
         this.setState(this.getState());
     },
   render: function () {
-    if (!this.state.maxPages) {
-        return <span/>;
-    }
-
     const columnMeta = [
       {
-      "columnName": "object",
+      "columnName": "title",
       "order": 1,
       "locked": false,
       "visible": true,
-      "customComponent": WorkflowItem
+      "customComponent": WorkflowLink,
+      "displayName": "Title"
       },
       {
-      "columnName": "event",
+      "columnName": "hash",
       "order": 2,
-      "locked": false,
+      "locked": true,
       "visible": true,
-      "customComponent": WorkflowEventIcon,
-      "cssClassName": "event-td"
+      "customComponent": WorkflowManage,
+      "cssClassName": "manage-td",
+      "displayName": " "
       }
     ];
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
                 <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Studies</h3></center>
               </div>
-              <Griddle  useExternal={true} externalSetPage={this.setPage}
-                        externalChangeSort={this.changeSort} externalSetFilter={this.setFilter}
-                        externalSetPageSize={this.setPageSize} externalMaxPage={this.state.maxPages}
-                        externalCurrentPage={this.state.currentPage}
-                        resultsPerPage={this.state.externalResultsPerPage}
-                        externalSortColumn={this.state.externalSortColumn}
-                        externalSortAscending={this.state.externalSortAscending}
-                        enableInfiniteScroll={true}
-                        bodyHeight={375}
-              tableClassName={"table table-striped"} showTableHeading={false}
-              columns={["title"]} results={this.state.entries}
-              useGriddleStyles={false}
-              columnMetadata={columnMeta} />
+              <Griddle
+                  {...this.commonTableSettings()}
+                  columns={["title", "hash"]}
+                  columnMetadata={columnMeta} />
             </div>;
   }
 

@@ -11,8 +11,8 @@ const WorkflowActions = Reflux.createActions([
 
 let loader = new ListLoader({model: 'workflow'});
 
-WorkflowActions.load.listen(function (page) {
-    loader.load(WorkflowActions.loadSuccess, page);
+WorkflowActions.load.listen(function (state) {
+    loader.load(WorkflowActions.loadSuccess, state);
 });
 
 export default WorkflowActions;

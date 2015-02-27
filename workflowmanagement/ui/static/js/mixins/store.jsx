@@ -8,9 +8,16 @@ const TableStoreMixin = {
         this.__sortcolumn = null;
         this.__sortascending = true;
     },
-    onLoadSuccess: function (data, page = 0) {
-        this.__list = $.merge(this.__list, data.results);
-        this.__page = page;
+    onLoadSuccess: function (data, state = {}) {
+        if(this.merge)
+            this.__list = $.merge(this.__list, data.results);
+        else
+            this.__list = data.results;
+
+        this.__page = state.currentPage;
+        this.__sortcolumn = state.externalSortColumn;
+        this.__sortascending = state.externalSortAscending;
+
         this.__count = data.count;
         this.__max_page = Math.ceil(this.__count / this.__page_size);
 
