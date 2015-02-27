@@ -40372,6 +40372,28 @@ HistoryActions.load.listen(function (state) {
 
 module.exports = HistoryActions;
 
+},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/ProcessActions.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var ListLoader = require("./api.jsx").ListLoader;
+
+// Each action is like an event channel for one specific event. Actions are called by components.
+// The store is listening to all actions, and the components in turn are listening to the store.
+// Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
+var ProcessActions = Reflux.createActions(["loadSuccess", "load"]);
+
+var loader = new ListLoader({ model: "process" });
+
+ProcessActions.load.listen(function (state) {
+    loader.load(ProcessActions.loadSuccess, state);
+});
+
+module.exports = ProcessActions;
+
 },{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx":[function(require,module,exports){
 "use strict";
 
@@ -40656,6 +40678,8 @@ var HistoryTable = require("./reusable/history.jsx").HistoryTable;
 
 var WorkflowTable = require("./reusable/workflow.jsx").WorkflowTable;
 
+var ProcessTable = require("./reusable/process.jsx").ProcessTable;
+
 module.exports = React.createClass({
   displayName: "",
   render: function render() {
@@ -40671,12 +40695,17 @@ module.exports = React.createClass({
         "div",
         { className: "col-md-6" },
         React.createElement(HistoryTable, null)
+      ),
+      React.createElement(
+        "div",
+        { className: "col-md-6" },
+        React.createElement(ProcessTable, null)
       )
     );
   }
 });
 
-},{"./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
+},{"./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41092,7 +41121,155 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
+},{"../../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var React = _interopRequire(require("react"));
+
+var _reactRouter = require("react-router");
+
+var RouteHandler = _reactRouter.RouteHandler;
+var Link = _reactRouter.Link;
+
+var ProcessActions = _interopRequire(require("../../actions/ProcessActions.jsx"));
+
+var ProcessStore = _interopRequire(require("../../stores/ProcessStore.jsx"));
+
+var Griddle = _interopRequire(require("griddle-react"));
+
+var Loading = require("./component.jsx").Loading;
+
+var TableComponentMixin = require("../../mixins/component.jsx").TableComponentMixin;
+
+var ProcessManage = React.createClass({
+  displayName: "ProcessManage",
+
+  render: function render() {
+    var row = this.props.rowData;
+    var object = { object: row.hash };
+
+    return React.createElement(
+      "span",
+      null,
+      React.createElement(
+        "div",
+        { className: "progress progressbar-process" },
+        React.createElement(
+          "div",
+          { className: "progress-bar progress-bar-success progress-bar-striped", role: "progressbar",
+            "aria-valuenow": row.progress, "aria-valuemin": "0",
+            "aria-valuemax": "100", style: { width: "" + row.progress + "%" } },
+          React.createElement(
+            "span",
+            { className: "sr-only" },
+            row.progress,
+            "% Complete"
+          )
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "btn-group", role: "group", "aria-label": "..." },
+        React.createElement(
+          Link,
+          { className: "btn btn-danger", to: "Process", params: object },
+          "Delete"
+        )
+      )
+    );
+  }
+});
+
+var ProcessLink = React.createClass({
+  displayName: "ProcessLink",
+
+  render: function render() {
+    var row = this.props.rowData;
+    var object = { object: row.hash };
+    return React.createElement(
+      "small",
+      null,
+      React.createElement(
+        Link,
+        { to: "Process", params: object },
+        row.object_repr
+      )
+    );
+  }
+});
+
+var ProcessTable = React.createClass({
+  displayName: "ProcessTable",
+
+  tableAction: ProcessActions.load,
+  tableStore: ProcessStore,
+  mixins: [Reflux.listenTo(ProcessStore, "update"), TableComponentMixin],
+  getInitialState: function getInitialState() {
+    return {};
+  },
+  update: function update(data) {
+    this.setState(this.getState());
+  },
+  render: function render() {
+    var columnMeta = [{
+      columnName: "object_repr",
+      order: 1,
+      locked: false,
+      visible: true,
+      customComponent: ProcessLink,
+      displayName: "Title"
+    }, {
+      columnName: "start_date",
+      order: 1,
+      locked: false,
+      visible: true,
+      displayName: "Start Date"
+    }, {
+      columnName: "hash",
+      order: 2,
+      locked: true,
+      visible: true,
+      customComponent: ProcessManage,
+      cssClassName: "process-td",
+      displayName: " "
+    }];
+    return React.createElement(
+      "div",
+      { className: "panel panel-default panel-overflow" },
+      React.createElement(
+        "div",
+        { className: "panel-heading" },
+        React.createElement(
+          "center",
+          null,
+          React.createElement("i", { className: "fa fa-cogs pull-left" }),
+          React.createElement(
+            "h3",
+            { className: "panel-title" },
+            "My Processes"
+          )
+        )
+      ),
+      React.createElement(Griddle, _extends({}, this.commonTableSettings(), {
+        columns: ["object_repr", "start_date", "hash"],
+        columnMetadata: columnMeta }))
+    );
+  }
+
+});
+
+exports.ProcessTable = ProcessTable;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+},{"../../actions/ProcessActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/ProcessActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/ProcessStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/ProcessStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41475,7 +41652,23 @@ module.exports = Reflux.createStore({
     mixins: [TableStoreMixin],
     listenables: [HistoryActions] });
 
-},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
+},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/ProcessStore.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var ProcessActions = _interopRequire(require("../actions/ProcessActions.jsx"));
+
+var TableStoreMixin = require("../mixins/store.jsx").TableStoreMixin;
+
+module.exports = Reflux.createStore({
+    mixins: [TableStoreMixin],
+    listenables: [ProcessActions]
+});
+
+},{"../actions/ProcessActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/ProcessActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };

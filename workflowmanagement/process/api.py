@@ -104,11 +104,24 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
 class ProcessSerializer(serializers.ModelSerializer):
     tasks = ProcessTaskSerializer(many=True, required=False)
     workflow = serializers.SlugRelatedField(slug_field='hash', queryset=Workflow.objects)
+    start_date = serializers.SerializerMethodField()
+    object_repr = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
+
     class Meta:
         model = Process
         exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         extra_kwargs = {'hash': {'required': False}}
+
+    def get_progress(self, obj):
+        return obj.progress()
+
+    def get_start_date(self, obj):
+        return obj.start_date.strftime("%Y-%m-%d %H:%M")
+
+    def get_object_repr(self, obj):
+        return str(obj.workflow)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -193,8 +206,11 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
     filter_class = ProcessFilter
+    ordering_map = {
+        'object_repr': 'workflow__title'
+    }
 
-    ordering_fields = ('workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner')
+    ordering_fields = ('workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner', 'object_repr')
 
     def get_queryset(self):
         return Process.all(executioner=self.request.user)

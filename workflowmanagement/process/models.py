@@ -49,6 +49,20 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
+    def progress(self):
+        all = ProcessTask.all(process=self).count()
+        missing = ProcessTask.all(process=self).filter(status=ProcessTask.RUNNING).count()
+
+        print "ALL:"
+        print all
+        print "missing"
+        print missing
+
+        try:
+            return (all-missing)*100 / all
+        except ZeroDivisionError:
+            return 0
+
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Processes"
