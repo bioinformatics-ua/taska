@@ -5,6 +5,8 @@ const TableStoreMixin = {
         this.__page_size = 5;
         this.__max_page = 0;
         this.__count = 0;
+        this.__sortcolumn = null;
+        this.__sortascending = true;
     },
     onLoadSuccess: function (data, page = 0) {
         this.__list = $.merge(this.__list, data.results);
@@ -25,6 +27,12 @@ const TableStoreMixin = {
     },
     getMaxPage: function(){
         return this.__max_page;
+    },
+    getSortColumn: function(){
+        return this.__sortcolumn;
+    },
+    getSortAscending: function(){
+        return this.__sortascending;
     }
 };
 

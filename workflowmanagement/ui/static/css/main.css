@@ -12,6 +12,10 @@
 html {
     position: relative;
     min-height: 100%;
+    min-width: 480px;
+}
+.navbar{
+    min-width: 480px;
 }
 body {
     font-family: opensans;
@@ -90,11 +94,12 @@ footer {
 .panel-overflow{
     height: 380px;
     overflow-y: auto;
+    position: relative;
 }
 
 .panel-overflow > .panel-heading{
     position: absolute;
-    width: 97%;
+    width: 100%;
     z-index: 1000;
 }
 

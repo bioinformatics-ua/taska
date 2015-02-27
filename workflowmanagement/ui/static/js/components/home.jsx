@@ -10,12 +10,12 @@ export default React.createClass({
   displayName: "",
   render: function () {
     return (
-        <div>
-            <div className="col-md-6 no-padding-left">
-              <HistoryTable />
-            </div>
-            <div className="col-md-6 no-padding-left">
+        <div className="row">
+            <div className="col-md-6">
               <WorkflowTable />
+            </div>
+            <div className="col-md-6">
+              <HistoryTable />
             </div>
         </div>
     );

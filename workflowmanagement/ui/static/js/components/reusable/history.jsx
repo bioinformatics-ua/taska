@@ -10,6 +10,8 @@ import Griddle from 'griddle-react';
 
 import {Loading} from './component.jsx'
 
+import {TableComponentMixin} from '../../mixins/component.jsx';
+
 var HistoryItem = React.createClass({
   render: function(){
     function translateAction(entry){
@@ -41,7 +43,7 @@ var HistoryItem = React.createClass({
   }
 });
 
-var HistoryEventIcon = React.createClass({
+var EventIcon = React.createClass({
   render: function(){
     function translateEvent(event){
       switch(event){
@@ -58,76 +60,25 @@ var HistoryEventIcon = React.createClass({
   }
 });
 const HistoryTable = React.createClass({
+    // This is requires by the mixin, to know where to throw the action on events, i realize
+    // the best case scenario for a mixin is be independently detachable, but I couldnt find a way to guess
+    // the action destiny without explicitly identifying it
+    tableAction: HistoryActions.load,
+    tableStore: HistoryStore,
+    mixins: [Reflux.listenTo(HistoryStore, 'update'), TableComponentMixin],
 
-    mixins: [Reflux.listenTo(HistoryStore, 'update')],
-
-    __getState: function(){
-      return {
-            entries: HistoryStore.getHistory(),
-            currentPage: HistoryStore.getPage(),
-            maxPages: HistoryStore.getMaxPage(),
-            externalResultsPerPage: HistoryStore.getPageSize()
-      }
-    },
     getInitialState: function() {
-        return {
-            entries: HistoryStore.getHistory(),
-            currentPage: HistoryStore.getPage(),
-            maxPages: HistoryStore.getMaxPage(),
-            externalResultsPerPage: HistoryStore.getPageSize(),
-            externalSortColumn: null,
-            externalSortAscending: true
-        };
-    },
-    componentDidMount: function() {
-        this.setPage(0);
+        return {};
     },
     update: function(data){
-        this.setState(this.__getState());
-    },
-    loadUserData: function() {
-      HistoryActions.load();
-    },
-    //what page is currently viewed
-    setPage: function(index){
-      console.log(`Set page ${index}`);
-      HistoryActions.load(index);
-    },
-    //this will handle how the data is sorted
-    sortData: function(sort, sortAscending, data){
-    },
-    //this changes whether data is sorted in ascending or descending order
-    changeSortDirection: function(sort, sortAscending){
-    },
-    //this method handles the filtering of the data
-    setFilter: function(filter){
-    },
-    //this method handles determining the page size
-    setPageSize: function(size){
-    },
-    //this method handles change sort field
-    changeSort: function(sort){
+        this.setState(this.getState());
     },
   render: function () {
     if (!this.state.maxPages) {
         return <span/>;
     }
 
-
- /*const entries = this.state.entries.results.map(function (entry) {
-      return (
-        <tr key={entry.id}>
-          <td>
-            {translateAction(entry)}
-            <br />
-            <small>On {entry.date}</small>
-          </td>
-          <td>{translateEvent(entry.event)}</td>
-        </tr>
-      );
-    });*/
-
-    var columnMeta = [
+    const columnMeta = [
       {
       "columnName": "object",
       "order": 1,
@@ -140,12 +91,10 @@ const HistoryTable = React.createClass({
       "order": 2,
       "locked": false,
       "visible": true,
-      "customComponent": HistoryEventIcon,
+      "customComponent": EventIcon,
       "cssClassName": "event-td"
       }
     ];
-
-
 
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
@@ -166,7 +115,6 @@ const HistoryTable = React.createClass({
               columnMetadata={columnMeta} />
             </div>;
   }
-
 });
 
 export {HistoryTable}

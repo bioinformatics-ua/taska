@@ -40658,16 +40658,16 @@ module.exports = React.createClass({
   render: function render() {
     return React.createElement(
       "div",
-      null,
+      { className: "row" },
       React.createElement(
         "div",
-        { className: "col-md-6 no-padding-left" },
-        React.createElement(HistoryTable, null)
+        { className: "col-md-6" },
+        React.createElement(WorkflowTable, null)
       ),
       React.createElement(
         "div",
-        { className: "col-md-6 no-padding-left" },
-        React.createElement(WorkflowTable, null)
+        { className: "col-md-6" },
+        React.createElement(HistoryTable, null)
       )
     );
   }
@@ -40809,6 +40809,8 @@ var Griddle = _interopRequire(require("griddle-react"));
 
 var Loading = require("./component.jsx").Loading;
 
+var TableComponentMixin = require("../../mixins/component.jsx").TableComponentMixin;
+
 var HistoryItem = React.createClass({
   displayName: "HistoryItem",
 
@@ -40880,8 +40882,8 @@ var HistoryItem = React.createClass({
   }
 });
 
-var HistoryEventIcon = React.createClass({
-  displayName: "HistoryEventIcon",
+var EventIcon = React.createClass({
+  displayName: "EventIcon",
 
   render: function render() {
     function translateEvent(event) {
@@ -40908,67 +40910,23 @@ var HistoryEventIcon = React.createClass({
 var HistoryTable = React.createClass({
   displayName: "HistoryTable",
 
-  mixins: [Reflux.listenTo(HistoryStore, "update")],
+  // This is requires by the mixin, to know where to throw the action on events, i realize
+  // the best case scenario for a mixin is be independently detachable, but I couldnt find a way to guess
+  // the action destiny without explicitly identifying it
+  tableAction: HistoryActions.load,
+  tableStore: HistoryStore,
+  mixins: [Reflux.listenTo(HistoryStore, "update"), TableComponentMixin],
 
-  __getState: function __getState() {
-    return {
-      entries: HistoryStore.getHistory(),
-      currentPage: HistoryStore.getPage(),
-      maxPages: HistoryStore.getMaxPage(),
-      externalResultsPerPage: HistoryStore.getPageSize()
-    };
-  },
   getInitialState: function getInitialState() {
-    return {
-      entries: HistoryStore.getHistory(),
-      currentPage: HistoryStore.getPage(),
-      maxPages: HistoryStore.getMaxPage(),
-      externalResultsPerPage: HistoryStore.getPageSize(),
-      externalSortColumn: null,
-      externalSortAscending: true
-    };
-  },
-  componentDidMount: function componentDidMount() {
-    this.setPage(0);
+    return {};
   },
   update: function update(data) {
-    this.setState(this.__getState());
+    this.setState(this.getState());
   },
-  loadUserData: function loadUserData() {
-    HistoryActions.load();
-  },
-  //what page is currently viewed
-  setPage: function setPage(index) {
-    console.log("Set page " + index);
-    HistoryActions.load(index);
-  },
-  //this will handle how the data is sorted
-  sortData: function sortData(sort, sortAscending, data) {},
-  //this changes whether data is sorted in ascending or descending order
-  changeSortDirection: function changeSortDirection(sort, sortAscending) {},
-  //this method handles the filtering of the data
-  setFilter: function setFilter(filter) {},
-  //this method handles determining the page size
-  setPageSize: function setPageSize(size) {},
-  //this method handles change sort field
-  changeSort: function changeSort(sort) {},
   render: function render() {
     if (!this.state.maxPages) {
       return React.createElement("span", null);
     }
-
-    /*const entries = this.state.entries.results.map(function (entry) {
-         return (
-           <tr key={entry.id}>
-             <td>
-               {translateAction(entry)}
-               <br />
-               <small>On {entry.date}</small>
-             </td>
-             <td>{translateEvent(entry.event)}</td>
-           </tr>
-         );
-       });*/
 
     var columnMeta = [{
       columnName: "object",
@@ -40981,7 +40939,7 @@ var HistoryTable = React.createClass({
       order: 2,
       locked: false,
       visible: true,
-      customComponent: HistoryEventIcon,
+      customComponent: EventIcon,
       cssClassName: "event-td"
     }];
 
@@ -41018,7 +40976,6 @@ var HistoryTable = React.createClass({
         columnMetadata: columnMeta })
     );
   }
-
 });
 
 exports.HistoryTable = HistoryTable;
@@ -41026,7 +40983,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","../../stores/HistoryStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/HistoryStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx":[function(require,module,exports){
+},{"../../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/HistoryStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/HistoryStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41168,6 +41125,8 @@ var Griddle = _interopRequire(require("griddle-react"));
 
 var Loading = require("./component.jsx").Loading;
 
+var TableComponentMixin = require("../../mixins/component.jsx").TableComponentMixin;
+
 var WorkflowItem = React.createClass({
   displayName: "WorkflowItem",
 
@@ -41267,50 +41226,15 @@ var WorkflowEventIcon = React.createClass({
 var WorkflowTable = React.createClass({
   displayName: "WorkflowTable",
 
-  mixins: [Reflux.listenTo(WorkflowStore, "update")],
-
-  __getState: function __getState() {
-    return {
-      entries: WorkflowStore.getList(),
-      currentPage: WorkflowStore.getPage(),
-      maxPages: WorkflowStore.getMaxPage(),
-      externalResultsPerPage: WorkflowStore.getPageSize()
-    };
-  },
+  tableAction: WorkflowActions.load,
+  tableStore: WorkflowStore,
+  mixins: [Reflux.listenTo(WorkflowStore, "update"), TableComponentMixin],
   getInitialState: function getInitialState() {
-    return {
-      entries: WorkflowStore.getList(),
-      currentPage: WorkflowStore.getPage(),
-      maxPages: WorkflowStore.getMaxPage(),
-      externalResultsPerPage: WorkflowStore.getPageSize(),
-      externalSortColumn: null,
-      externalSortAscending: true
-    };
-  },
-  componentDidMount: function componentDidMount() {
-    this.setPage(0);
+    return {};
   },
   update: function update(data) {
-    this.setState(this.__getState());
+    this.setState(this.getState());
   },
-  loadUserData: function loadUserData() {
-    WorkflowActions.load();
-  },
-  //what page is currently viewed
-  setPage: function setPage(index) {
-    console.log("Set page " + index);
-    WorkflowActions.load(index);
-  },
-  //this will handle how the data is sorted
-  sortData: function sortData(sort, sortAscending, data) {},
-  //this changes whether data is sorted in ascending or descending order
-  changeSortDirection: function changeSortDirection(sort, sortAscending) {},
-  //this method handles the filtering of the data
-  setFilter: function setFilter(filter) {},
-  //this method handles determining the page size
-  setPageSize: function setPageSize(size) {},
-  //this method handles change sort field
-  changeSort: function changeSort(sort) {},
   render: function render() {
     if (!this.state.maxPages) {
       return React.createElement("span", null);
@@ -41330,7 +41254,6 @@ var WorkflowTable = React.createClass({
       customComponent: WorkflowEventIcon,
       cssClassName: "event-td"
     }];
-
     return React.createElement(
       "div",
       { className: "panel panel-default panel-overflow" },
@@ -41340,8 +41263,7 @@ var WorkflowTable = React.createClass({
         React.createElement(
           "center",
           null,
-          React.createElement("i", { className: "fa fa-Workflow pull-left" }),
-          " ",
+          React.createElement("i", { className: "fa fa-cogs pull-left" }),
           React.createElement(
             "h3",
             { className: "panel-title" },
@@ -41372,7 +41294,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
+},{"../../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41449,7 +41371,46 @@ Router.run(routes, Router.HistoryLocation, function (Handler) {
     return React.render(React.createElement(Handler, null), content);
 });
 
-},{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/TableStoreMixin.jsx":[function(require,module,exports){
+},{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
+"use strict";
+
+var TableComponentMixin = {
+    componentDidMount: function componentDidMount() {
+        this.setPage(0);
+    },
+    getState: function getState() {
+        return {
+            entries: this.tableStore.getList(),
+            currentPage: this.tableStore.getPage(),
+            maxPages: this.tableStore.getMaxPage(),
+            externalResultsPerPage: this.tableStore.getPageSize(),
+            externalSortColumn: this.tableStore.getSortColumn(),
+            externalSortAscending: this.tableStore.getSortAscending()
+        };
+    },
+    getInitialState: function getInitialState() {
+        return this.getState();
+    },
+    //what page is currently viewed
+    setPage: function setPage(index) {
+        console.log("Set page " + index);
+        this.tableAction(index);
+    },
+    //this will handle how the data is sorted
+    sortData: function sortData(sort, sortAscending, data) {},
+    //this changes whether data is sorted in ascending or descending order
+    changeSortDirection: function changeSortDirection(sort, sortAscending) {},
+    //this method handles the filtering of the data
+    setFilter: function setFilter(filter) {},
+    //this method handles determining the page size
+    setPageSize: function setPageSize(size) {},
+    //this method handles change sort field
+    changeSort: function changeSort(sort) {}
+};
+
+module.exports = { TableComponentMixin: TableComponentMixin };
+
+},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
 "use strict";
 
 var TableStoreMixin = {
@@ -41459,6 +41420,8 @@ var TableStoreMixin = {
         this.__page_size = 5;
         this.__max_page = 0;
         this.__count = 0;
+        this.__sortcolumn = null;
+        this.__sortascending = true;
     },
     onLoadSuccess: function onLoadSuccess(data) {
         var page = arguments[1] === undefined ? 0 : arguments[1];
@@ -41481,6 +41444,12 @@ var TableStoreMixin = {
     },
     getMaxPage: function getMaxPage() {
         return this.__max_page;
+    },
+    getSortColumn: function getSortColumn() {
+        return this.__sortcolumn;
+    },
+    getSortAscending: function getSortAscending() {
+        return this.__sortascending;
     }
 };
 
@@ -41523,41 +41492,13 @@ var Reflux = _interopRequire(require("reflux"));
 
 var HistoryActions = _interopRequire(require("../actions/HistoryActions.jsx"));
 
+var TableStoreMixin = require("../mixins/store.jsx").TableStoreMixin;
+
 module.exports = Reflux.createStore({
-    listenables: [HistoryActions],
+    mixins: [TableStoreMixin],
+    listenables: [HistoryActions] });
 
-    init: function init() {
-        this.__history = [];
-        this.__page = 0;
-        this.__page_size = 5;
-        this.__max_page = 0;
-        this.__count = 0;
-    },
-    onLoadSuccess: function onLoadSuccess(data) {
-        var page = arguments[1] === undefined ? 0 : arguments[1];
-
-        this.__history = $.merge(this.__history, data.results);
-        this.__page = page;
-        this.__count = data.count;
-        this.__max_page = Math.ceil(this.__count / this.__page_size);
-
-        this.trigger();
-    },
-    getHistory: function getHistory() {
-        return this.__history;
-    },
-    getPage: function getPage() {
-        return this.__page;
-    },
-    getPageSize: function getPageSize() {
-        return this.__page_size;
-    },
-    getMaxPage: function getMaxPage() {
-        return this.__max_page;
-    }
-});
-
-},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
+},{"../actions/HistoryActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/HistoryActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41591,14 +41532,14 @@ var Reflux = _interopRequire(require("reflux"));
 
 var WorkflowActions = _interopRequire(require("../actions/WorkflowActions.jsx"));
 
-var TableStoreMixin = require("../mixins/TableStoreMixin.jsx").TableStoreMixin;
+var TableStoreMixin = require("../mixins/store.jsx").TableStoreMixin;
 
 module.exports = Reflux.createStore({
     mixins: [TableStoreMixin],
     listenables: [WorkflowActions]
 });
 
-},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/TableStoreMixin.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/TableStoreMixin.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
+},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *

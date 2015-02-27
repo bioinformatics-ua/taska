@@ -9,6 +9,7 @@ import WorkflowStore from '../../stores/WorkflowStore.jsx';
 import Griddle from 'griddle-react';
 
 import {Loading} from './component.jsx'
+import {TableComponentMixin} from '../../mixins/component.jsx';
 
 var WorkflowItem = React.createClass({
   render: function(){
@@ -58,62 +59,21 @@ var WorkflowEventIcon = React.createClass({
   }
 });
 const WorkflowTable = React.createClass({
-
-    mixins: [Reflux.listenTo(WorkflowStore, 'update')],
-
-    __getState: function(){
-      return {
-            entries: WorkflowStore.getList(),
-            currentPage: WorkflowStore.getPage(),
-            maxPages: WorkflowStore.getMaxPage(),
-            externalResultsPerPage: WorkflowStore.getPageSize()
-      }
-    },
+    tableAction: WorkflowActions.load,
+    tableStore: WorkflowStore,
+    mixins: [Reflux.listenTo(WorkflowStore, 'update'), TableComponentMixin],
     getInitialState: function() {
-        return {
-            entries: WorkflowStore.getList(),
-            currentPage: WorkflowStore.getPage(),
-            maxPages: WorkflowStore.getMaxPage(),
-            externalResultsPerPage: WorkflowStore.getPageSize(),
-            externalSortColumn: null,
-            externalSortAscending: true
-        };
-    },
-    componentDidMount: function() {
-        this.setPage(0);
+        return {};
     },
     update: function(data){
-        this.setState(this.__getState());
-    },
-    loadUserData: function() {
-      WorkflowActions.load();
-    },
-    //what page is currently viewed
-    setPage: function(index){
-      console.log(`Set page ${index}`);
-      WorkflowActions.load(index);
-    },
-    //this will handle how the data is sorted
-    sortData: function(sort, sortAscending, data){
-    },
-    //this changes whether data is sorted in ascending or descending order
-    changeSortDirection: function(sort, sortAscending){
-    },
-    //this method handles the filtering of the data
-    setFilter: function(filter){
-    },
-    //this method handles determining the page size
-    setPageSize: function(size){
-    },
-    //this method handles change sort field
-    changeSort: function(sort){
+        this.setState(this.getState());
     },
   render: function () {
     if (!this.state.maxPages) {
         return <span/>;
     }
 
-    var columnMeta = [
+    const columnMeta = [
       {
       "columnName": "object",
       "order": 1,
@@ -130,12 +90,9 @@ const WorkflowTable = React.createClass({
       "cssClassName": "event-td"
       }
     ];
-
-
-
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
-                <center><i className="fa fa-Workflow pull-left"></i> <h3 className="panel-title">My Studies</h3></center>
+                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Studies</h3></center>
               </div>
               <Griddle  useExternal={true} externalSetPage={this.setPage}
                         externalChangeSort={this.changeSort} externalSetFilter={this.setFilter}
