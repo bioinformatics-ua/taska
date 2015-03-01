@@ -43,6 +43,14 @@ class Process(models.Model):
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     removed         = models.BooleanField(default=False)
 
+    @staticmethod
+    def statusCode(interpret_code):
+        for code, translation in Process.STATUS:
+            if code == interpret_code:
+                return translation
+
+        return "Unknown"
+
     def __str__(self):
         return '%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
 

@@ -112,7 +112,7 @@ footer {
     width: 50px;
 }
 .manage-td{
-    width: 200px;
+    width: 130px;
 }
 
 .table-prev{
@@ -179,12 +179,38 @@ footer {
 .progressbar-process{
     width: 50px;
     display: inline-block;
-    margin-right:5px;
+    margin-top:7px;
     margin-bottom: 0;
     vertical-align: middle;
     border: 1px solid rgb(203, 203, 203);
 }
 
 .process-td{
-    width: 150px;
+    width: 57px;
+}
+
+.circle {
+    margin-top: 4px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    background-color: grey;
+}
+
+.circle-success{
+    background-color: #5cb85c;
+}
+
+.circle-danger{
+    background-color: #D9534F;
+}
+.circle-warning{
+    background-color: #F0AD4E;
+}
+.circle-grey{
+    background-color: grey;
+}
+
+.request-td{
+    width: 70px;
 }

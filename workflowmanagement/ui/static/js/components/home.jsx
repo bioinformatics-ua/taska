@@ -5,6 +5,7 @@ import React from 'react';
 import {HistoryTable} from './reusable/history.jsx';
 import {WorkflowTable} from './reusable/workflow.jsx';
 import {ProcessTable} from './reusable/process.jsx';
+import {RequestTable} from './reusable/request.jsx';
 
 
 export default React.createClass({
@@ -16,10 +17,13 @@ export default React.createClass({
               <WorkflowTable />
             </div>
             <div className="col-md-6">
-              <HistoryTable />
+              <ProcessTable />
             </div>
             <div className="col-md-6">
-              <ProcessTable />
+              <RequestTable />
+            </div>
+            <div className="col-md-6">
+              <HistoryTable />
             </div>
         </div>
     );

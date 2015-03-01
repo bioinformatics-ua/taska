@@ -34,11 +34,15 @@ Process related api calls available
 '''
 
 class ProcessTaskUserSerializer(serializers.ModelSerializer):
+    user_repr = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessTaskUser
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('id', 'processtask')
+
+    def get_user_repr(self, obj):
+        return obj.user.get_full_name()
 
 class ProcessTaskSerializer(serializers.ModelSerializer):
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
@@ -107,6 +111,7 @@ class ProcessSerializer(serializers.ModelSerializer):
     start_date = serializers.SerializerMethodField()
     object_repr = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    status_repr = serializers.SerializerMethodField()
 
     class Meta:
         model = Process
@@ -122,6 +127,9 @@ class ProcessSerializer(serializers.ModelSerializer):
 
     def get_object_repr(self, obj):
         return str(obj.workflow)
+
+    def get_status_repr(self, obj):
+        return Process.statusCode(obj.status)
 
     @transaction.atomic
     def create(self, validated_data):

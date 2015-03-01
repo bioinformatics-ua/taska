@@ -16,9 +16,10 @@ const WorkflowManage = React.createClass({
     const row = this.props.rowData;
     const object = {object: row.hash}
     return <div className="btn-group" role="group" aria-label="...">
-            <Link className="btn btn-primary" to="Workflow" params={object}>Run</Link>
-            <Link className="btn btn-warning" to="Workflow" params={object}>Edit</Link>
-            <Link className="btn btn-danger" to="Workflow" params={object}>Delete</Link>
+            <Link className="btn btn-primary" to="Workflow" params={object}><i className="fa fa-play"></i></Link>
+            <Link className="btn btn-warning" to="Workflow" params={object}><i className="fa fa-pencil"></i></Link>
+            <Link className="btn btn-danger" to="Workflow" params={object}><i className="fa fa-times"></i>
+</Link>
            </div>;
   }
 });
