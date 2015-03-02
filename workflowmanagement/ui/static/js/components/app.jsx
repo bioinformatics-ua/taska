@@ -6,8 +6,8 @@ import Breadcrumbs from 'react-breadcrumbs';
 import {Tab, UserDropdown} from './reusable/navigation.jsx';
 
 export default React.createClass({
-    displayName: "Home",
-  render() {
+  displayName: "Home",
+  render: function(){
     return (
       <div>
         <header>

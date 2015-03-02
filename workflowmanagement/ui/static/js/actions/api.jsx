@@ -47,4 +47,34 @@ class DetailLoader{
     }
 }
 
-export default {ListLoader, DetailLoader}
+class Login{
+  constructor(options){
+    this.data = {
+      csrfmiddlewaretoken: Django.csrf_token(),
+      username: options.username,
+      password: options.password,
+      remember: options.remember
+    }
+  }
+
+  // Get and csrf token to use on a post form
+  authenticate(callback, unsuccessful_callback=null){
+      $.ajax({
+            url: 'api/account/login/',
+            type: "POST",
+            data: this.data,
+            dataType: 'json',
+            success: function(data) {
+              callback(data);
+            }.bind(this),
+            error: function(xhr, status, err) {
+                if(unsuccessful_callback != null)
+                    unsuccessful_callback();
+
+                console.error(`Unable to load 'api/account/login/'`);
+            }.bind(this)
+      });
+  }
+}
+
+export default {ListLoader, DetailLoader, Login}

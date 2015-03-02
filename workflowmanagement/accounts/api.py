@@ -10,6 +10,9 @@ from django.contrib.auth.models import User
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
+from django.contrib.auth import authenticate, login, logout
+
+
 @api_view(('GET',))
 def root(request, format=None):
     '''
@@ -85,10 +88,54 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=[permissions.AllowAny])
     def me(self, request):
         """
         Get personal account details
         """
-        serializer = UserSerializer(instance = request.user, context={'request': request})
-        return Response(serializer.data)
+        if request.user.is_authenticated():
+            serializer = UserSerializer(instance = request.user, context={'request': request})
+
+            return Response(serializer.data)
+        else:
+            return Response({'authenticated': False})
+
+    @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
+    def login(self, request):
+        """
+            Login user
+        """
+        if not request.user.is_authenticated():
+            print request.POST
+            username = request.POST.get('username', None)
+            password = request.POST.get('password', None)
+
+            if request.POST.get('remember', False):
+                request.session.set_expiry(1296000) # if set to remember, keep for 2 weeks
+
+
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                else:
+                    return Response({
+                            'authenticated': False,
+                            'error': 'This account is disabled, please contact an administrator'
+                        })
+            else:
+                return Response({
+                        'authenticated': False,
+                        'error': 'This login username and password are invalid'
+                    })
+
+        return Response({'authenticated': True})
+
+    @list_route(methods=['get'])
+    def logout(self, request):
+        """
+            Logout a logged in user
+        """
+        logout(request)
+
+        return Response({'authenticated': False})

@@ -6,7 +6,14 @@ import {ListLoader, DetailLoader} from './api.jsx'
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 const UserActions = Reflux.createActions([
     'loadSuccess',
-    'loadUser'
+    'loadUser',
+    'setUsername',
+    'setPassword',
+    'login',
+    'logout',
+    'loginFailed',
+    'setRememberMe',
+    'loginSuccess'
 ]);
 
 let loader = new DetailLoader({model: 'account', hash: 'me'});

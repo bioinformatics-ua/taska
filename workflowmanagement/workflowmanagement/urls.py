@@ -38,5 +38,7 @@ urlpatterns = patterns('',
     url(r'^api/task', include('tasks.urls')),
     url(r'^api/index', api.root),
 
-    url(r'^', include('ui.urls')),
+    url(r'^djangojs/', include('djangojs.urls')),
+
+    url(r'^', include('ui.urls'))
 )

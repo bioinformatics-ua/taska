@@ -1,3 +1,4 @@
+{% load js %}
 {% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +16,7 @@
 
 <body>
     <div id="playground"></div>
+    {% django_js %}
     <script src="{% static "bundle.js" %}"></script>
 </body>
 </html>

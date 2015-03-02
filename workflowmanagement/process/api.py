@@ -296,6 +296,10 @@ class RequestSerializer(serializers.ModelSerializer):
     process = serializers.CharField(max_length=50)
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField(write_only=True)
+    date = serializers.SerializerMethodField()
+
+    def get_date(self, obj):
+        return obj.date.strftime("%Y-%m-%d %H:%M")
 
     @transaction.atomic
     def create(self, validated_data):

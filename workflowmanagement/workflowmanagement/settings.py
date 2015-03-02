@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     'result',
     'history',
     'accounts',
+    'djangojs',
     'ui'
 )
 
@@ -176,3 +177,6 @@ TEMPLATE_LOADERS = (
 
 )
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates'), os.path.join(BASE_DIR, 'ui/templates')]
+
+# by default it never expires
+SESSION_COOKIE_AGE = 12*3600

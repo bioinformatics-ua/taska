@@ -40431,7 +40431,7 @@ var DetailLoader = _apiJsx.DetailLoader;
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var UserActions = Reflux.createActions(["loadSuccess", "loadUser"]);
+var UserActions = Reflux.createActions(["loadSuccess", "loadUser", "setUsername", "setPassword", "login", "logout", "loginFailed", "setRememberMe", "loginSuccess"]);
 
 var loader = new DetailLoader({ model: "account", hash: "me" });
 
@@ -40471,74 +40471,117 @@ var _prototypeProperties = function (child, staticProps, instanceProps) { if (st
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var ListLoader = (function () {
-    function ListLoader(options) {
-        _classCallCheck(this, ListLoader);
+  function ListLoader(options) {
+    _classCallCheck(this, ListLoader);
 
-        this.__loaded = {};
-        this.model = options.model;
-        this.dontrepeat = options.dontrepeat || false;
-    }
+    this.__loaded = {};
+    this.model = options.model;
+    this.dontrepeat = options.dontrepeat || false;
+  }
 
-    _prototypeProperties(ListLoader, null, {
-        load: {
-            value: function load(callback, state) {
-                if (!this.dontrepeat || this.__loaded[state.currentPage] === undefined) {
-                    this.__loaded[state.currentPage] = true;
+  _prototypeProperties(ListLoader, null, {
+    load: {
+      value: function load(callback, state) {
+        if (!this.dontrepeat || this.__loaded[state.currentPage] === undefined) {
+          this.__loaded[state.currentPage] = true;
 
-                    var order = state.externalSortAscending ? "" : "-";
-                    $.ajax({
-                        url: "api/" + this.model + "/?page=" + (state.currentPage + 1) + "&ordering=" + order + "" + state.externalSortColumn,
-                        dataType: "json",
-                        success: (function (data) {
+          var order = state.externalSortAscending ? "" : "-";
+          $.ajax({
+            url: "api/" + this.model + "/?page=" + (state.currentPage + 1) + "&ordering=" + order + "" + state.externalSortColumn,
+            dataType: "json",
+            success: (function (data) {
 
-                            callback(data, state);
-                        }).bind(this),
-                        error: (function (xhr, status, err) {
-                            console.error(status, err.toString());
-                        }).bind(this)
-                    });
-                }
-            },
-            writable: true,
-            configurable: true
+              callback(data, state);
+            }).bind(this),
+            error: (function (xhr, status, err) {
+              console.error(status, err.toString());
+            }).bind(this)
+          });
         }
-    });
+      },
+      writable: true,
+      configurable: true
+    }
+  });
 
-    return ListLoader;
+  return ListLoader;
 })();
 
 var DetailLoader = (function () {
-    function DetailLoader(options) {
-        _classCallCheck(this, DetailLoader);
+  function DetailLoader(options) {
+    _classCallCheck(this, DetailLoader);
 
-        this.model = options.model;
-        this.hash = options.hash;
+    this.model = options.model;
+    this.hash = options.hash;
+  }
+
+  _prototypeProperties(DetailLoader, null, {
+    load: {
+      value: function load(callback) {
+        console.log("api/" + this.model + "/" + this.hash + "/");
+        $.ajax({
+          url: "api/" + this.model + "/" + this.hash + "/",
+          dataType: "json",
+          success: (function (data) {
+            callback(data);
+          }).bind(this),
+          error: (function (xhr, status, err) {
+            console.error("Unable to load \"api/" + this.model + "/" + this.hash + "/\"");
+          }).bind(this)
+        });
+      },
+      writable: true,
+      configurable: true
     }
+  });
 
-    _prototypeProperties(DetailLoader, null, {
-        load: {
-            value: function load(callback) {
-                console.log("api/" + this.model + "/" + this.hash + "/");
-                $.ajax({
-                    url: "api/" + this.model + "/" + this.hash + "/",
-                    dataType: "json",
-                    success: (function (data) {
-                        callback(data);
-                    }).bind(this),
-                    error: (function (xhr, status, err) {
-                        console.error("Unable to load \"api/" + this.model + "/" + this.hash + "/\"");
-                    }).bind(this)
-                });
-            },
-            writable: true,
-            configurable: true
-        }
-    });
-
-    return DetailLoader;
+  return DetailLoader;
 })();
 
-module.exports = { ListLoader: ListLoader, DetailLoader: DetailLoader };
+var Login = (function () {
+  function Login(options) {
+    _classCallCheck(this, Login);
+
+    this.data = {
+      csrfmiddlewaretoken: Django.csrf_token(),
+      username: options.username,
+      password: options.password,
+      remember: options.remember
+    };
+  }
+
+  _prototypeProperties(Login, null, {
+    authenticate: {
+
+      // Get and csrf token to use on a post form
+
+      value: function authenticate(callback) {
+        var unsuccessful_callback = arguments[1] === undefined ? null : arguments[1];
+
+        $.ajax({
+          url: "api/account/login/",
+          type: "POST",
+          data: this.data,
+          dataType: "json",
+          success: (function (data) {
+            callback(data);
+          }).bind(this),
+          error: (function (xhr, status, err) {
+            if (unsuccessful_callback != null) unsuccessful_callback();
+
+            console.error("Unable to load 'api/account/login/'");
+          }).bind(this)
+        });
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return Login;
+})();
+
+module.exports = { ListLoader: ListLoader, DetailLoader: DetailLoader, Login: Login };
 
 },{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx":[function(require,module,exports){
 "use strict";
@@ -40696,6 +40739,8 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var React = _interopRequire(require("react"));
 
+var Reflux = _interopRequire(require("reflux"));
+
 var HistoryTable = require("./reusable/history.jsx").HistoryTable;
 
 var WorkflowTable = require("./reusable/workflow.jsx").WorkflowTable;
@@ -40704,8 +40749,105 @@ var ProcessTable = require("./reusable/process.jsx").ProcessTable;
 
 var RequestTable = require("./reusable/request.jsx").RequestTable;
 
+var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
+
+var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
+
 module.exports = React.createClass({
   displayName: "",
+  mixins: [Reflux.listenTo(UserStore, "update")],
+  __getState: function __getState() {
+    return {
+      user: UserStore.getUser(),
+      username: UserStore.getUsername(),
+      password: UserStore.getPassword(),
+      remember_me: UserStore.getRememberMe(),
+      failed: UserStore.getFailed()
+    };
+  },
+  getInitialState: function getInitialState() {
+    return this.__getState();
+  },
+  update: function update(data) {
+    this.setState(this.__getState());
+  },
+  __login: function __login() {
+
+    if (this.refs.usr != "" && this.refs.pwd != "") {
+      UserActions.login({
+        username: this.refs.usr.getDOMNode().value.trim(),
+        password: this.refs.pwd.getDOMNode().value.trim(),
+        remember: this.refs.rmb.getDOMNode().checked
+      });
+    }
+  },
+  render: function render() {
+    console.log(this.state.user.authenticated);
+    if (this.state.user.authenticated === false) {
+      return React.createElement(
+        "div",
+        { className: "container" },
+        React.createElement(
+          "div",
+          { className: "row" },
+          React.createElement(
+            "div",
+            { className: "col-sm-6 col-md-4 col-md-offset-4" },
+            React.createElement(
+              "div",
+              { className: "account-wall" },
+              React.createElement(
+                "h1",
+                { className: "text-center login-title" },
+                "Please login"
+              ),
+              React.createElement("img", { className: "profile-img", src: "static/images/user.png",
+                alt: "" }),
+              React.createElement(
+                "form",
+                { className: "form-signin" },
+                React.createElement("input", { name: "username", ref: "usr", type: "text", className: "form-control", placeholder: "Email", required: true, autofocus: true }),
+                React.createElement("input", { name: "password", ref: "pwd", type: "password", className: "form-control", placeholder: "Password", required: true }),
+                this.state.failed ? React.createElement(
+                  "div",
+                  { className: "alert alert-danger", role: "alert" },
+                  "Login failed"
+                ) : "",
+                React.createElement("input", { value: "Sign in", onClick: this.__login,
+                  className: "btn btn-lg btn-primary btn-block",
+                  type: "button" }),
+                React.createElement(
+                  "label",
+                  { className: "checkbox pull-left" },
+                  React.createElement("input", { defaultChecked: "true", ref: "rmb",
+                    name: "remember_me", type: "checkbox", value: "remember-me" }),
+                  "Remember me"
+                ),
+                React.createElement(
+                  "a",
+                  { href: "#", className: "pull-right need-help" },
+                  "Forgot password? "
+                ),
+                React.createElement("span", { className: "clearfix" })
+              )
+            ),
+            React.createElement(
+              "a",
+              { href: "#", className: "text-center new-account" },
+              "Create an account "
+            )
+          )
+        )
+      );
+    }
+    // else
+    return React.createElement(LoggedInHome, null);
+  }
+});
+
+var LoggedInHome = React.createClass({
+  displayName: "LoggedInHome",
+
   render: function render() {
     return React.createElement(
       "div",
@@ -40733,8 +40875,11 @@ module.exports = React.createClass({
     );
   }
 });
+/*value={this.state.username}*/
+/*onChange={this.setUsername}*/ /*value={this.state.password}*/
+/*onChange={this.setPassword}*/ /*onChange={this.setRememberMe}*/
 
-},{"./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -40840,6 +40985,17 @@ var Loading = React.createClass({
         React.createElement("i", { className: "fa fa-3x fa-refresh fa-spin" })
       )
     );
+  }
+});
+
+var DjangoCSRFToken = React.createClass({
+  displayName: "DjangoCSRFToken",
+
+  render: function render() {
+
+    var csrfToken = Django.csrf_token();
+
+    return React.DOM.input({ type: "hidden", name: "csrfmiddlewaretoken", value: csrfToken });
   }
 });
 
@@ -41086,7 +41242,9 @@ var UserDropdown = React.createClass({
     this.setState(this.__getState());
   },
   render: function render() {
-
+    if (this.state.user.authenticated === false) {
+      return React.createElement("span", null);
+    }
     return React.createElement(
       "ul",
       { className: "nav navbar-nav navbar-right" },
@@ -41432,6 +41590,18 @@ var RequestUser = React.createClass({
   }
 });
 
+var RequestDate = React.createClass({
+  displayName: "RequestDate",
+
+  render: function render() {
+    return React.createElement(
+      "small",
+      null,
+      this.props.rowData.date
+    );
+  }
+});
+
 var RequestTable = React.createClass({
   displayName: "RequestTable",
 
@@ -41460,8 +41630,15 @@ var RequestTable = React.createClass({
       customComponent: RequestUser,
       displayName: "User"
     }, {
-      columnName: "type",
+      columnName: "date",
       order: 3,
+      locked: true,
+      visible: true,
+      displayName: "Date",
+      customComponent: RequestDate
+    }, {
+      columnName: "type",
+      order: 4,
       locked: true,
       visible: true,
       customComponent: RequestStatus,
@@ -41486,7 +41663,7 @@ var RequestTable = React.createClass({
         )
       ),
       React.createElement(Griddle, _extends({}, this.commonTableSettings(), {
-        columns: ["title", "processtaskuser", "type"],
+        columns: ["title", "processtaskuser", "date", "type"],
         columnMetadata: columnMeta }))
     );
   }
@@ -41922,23 +42099,81 @@ var Reflux = _interopRequire(require("reflux"));
 
 var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
 
+var Login = require("../actions/api.jsx").Login;
+
 module.exports = Reflux.createStore({
     listenables: [UserActions],
 
     init: function init() {
-        this.__user = {};
+        this.__userdata = {};
+
+        // Username for login porpuses
+        this.__username = "";
+        this.__password = "";
+        this.__remember_me = false;
+        this.__failed = false;
     },
-    onLoadSuccess: function onLoadSuccess(data) {
-        this.__user = data;
+    getUser: function getUser() {
+        return this.__userdata;
+    },
+    getUsername: function getUsername() {
+        return this.__username;
+    },
+    getPassword: function getPassword() {
+        return this.__password;
+    },
+    getRememberMe: function getRememberMe() {
+        return this.__remember_me;
+    },
+    getFailed: function getFailed() {
+        return this.__failed;
+    },
+    onLoginFailed: function onLoginFailed() {
+        this.__failed = true;
 
         this.trigger();
     },
-    getUser: function getUser() {
-        return this.__user;
+    // Actions handlers (declared on UserActions, and implemented here)
+    onLoadSuccess: function onLoadSuccess(data) {
+        this.__userdata = data;
+        this.trigger();
+    },
+    onSetUsername: function onSetUsername(username) {
+        console.log(username);
+        this.__username = username;
+
+        this.trigger();
+    },
+    onSetPassword: function onSetPassword(password) {
+        this.__password = password;
+        this.trigger();
+    },
+    onSetRememberMe: function onSetRememberMe(remember) {
+        this.__remember_me = remember;
+
+        this.trigger();
+    },
+    onLogin: function onLogin(data) {
+        var log = new Login({
+            username: data.username,
+            password: data.password,
+            remember: data.remember
+        });
+        console.log("ON LOGIN");
+        console.log(log);
+        log.authenticate(UserActions.loginSuccess, UserActions.loginFailed);
+    },
+    onLoginSuccess: function onLoginSuccess(data) {
+        if (data.authenticated) {
+            this.__userdata.authenticated = true;
+            UserActions.loadUser();
+        } else {
+            UserActions.loginFailed();
+        }
     }
 });
 
-},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };

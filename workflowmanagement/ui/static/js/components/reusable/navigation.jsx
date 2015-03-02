@@ -38,7 +38,9 @@ var UserDropdown = React.createClass({
       this.setState(this.__getState());
     },
   render: function () {
-
+    if(this.state.user.authenticated === false){
+      return <span></span>;
+    }
     return <ul className="nav navbar-nav navbar-right">
                     <li className="dropdown">
                       <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
