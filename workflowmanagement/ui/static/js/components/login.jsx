@@ -1,15 +1,18 @@
 'use strict';
 
 import Reflux from 'reflux';
-
 import React from 'react';
+import {RouteHandler, Link, State} from 'react-router';
+import Router from 'react-router';
 
 import UserActions from '../actions/UserActions.jsx';
 import UserStore from '../stores/UserStore.jsx';
 
+import {CheckLog} from '../mixins/component.jsx';
+
 export default React.createClass({
     displayName: "Login",
-    mixins: [Reflux.listenTo(UserStore, 'update')],
+    mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State, CheckLog],
     __getState: function(){
       return {
         failed: UserStore.getFailed()
@@ -22,12 +25,20 @@ export default React.createClass({
         this.setState(this.__getState());
     },
     __login: function(){
-
       if(this.refs.usr != "" && this.refs.pwd != ""){
+        var nextPath = this.getQuery().nextPath;
+        let self = this;
         UserActions.login({
           username: this.refs.usr.getDOMNode().value.trim(),
           password: this.refs.pwd.getDOMNode().value.trim(),
-          remember: this.refs.rmb.getDOMNode().checked
+          remember: this.refs.rmb.getDOMNode().checked,
+          callback: function(){
+                if (nextPath) {
+                    self.transitionTo(nextPath);
+                } else {
+                    self.replaceWith('/');
+                }
+          }
         });
       }
     },
@@ -56,10 +67,10 @@ export default React.createClass({
                         /*onChange={this.setRememberMe}*/ name="remember_me" type="checkbox" value="remember-me" />
                             Remember me
                         </label>
-                        <a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span>
+                        <!--a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span-->
                         </form>
                     </div>
-                    <a href="#" className="text-center new-account">Create an account </a>
+                    <!--a href="#" className="text-center new-account">Create an account </a-->
                 </div>
             </div>
         </div>);

@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link, State} from 'react-router';
-
+import Router from 'react-router';
 import UserActions from '../../actions/UserActions.jsx';
 import UserStore from '../../stores/UserStore.jsx';
 
@@ -22,7 +22,7 @@ var Tab = React.createClass({
 });
 
 var UserDropdown = React.createClass({
-      mixins: [Reflux.listenTo(UserStore, 'update')],
+      mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State],
     __getState: function(){
       return {
         user: UserStore.getUser()
@@ -37,7 +37,10 @@ var UserDropdown = React.createClass({
       this.setState(this.__getState());
     },
     logout: function(){
-      UserActions.logout();
+      let self = this;
+      UserActions.logout(function(){
+        self.replaceWith('/login');
+      });
     },
   render: function () {
     if(this.state.user.authenticated === false){

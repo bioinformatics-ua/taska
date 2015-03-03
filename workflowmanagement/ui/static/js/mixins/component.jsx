@@ -1,19 +1,37 @@
 import React from 'react';
 import UserStore from '../stores/UserStore.jsx';
 import {Login} from '../actions/api.jsx'
+import UserActions from '../actions/UserActions.jsx';
 
 const Authentication = {
     statics: {
-        willTransitionTo: function (transition, params, query, callback=doRoute) {
-            console.log('transition');
-
+        willTransitionTo: function (transition, params, query, callback) {
             var nextPath = transition.path;
-                if (!UserStore.loggedIn()) {
+
+            UserActions.loadIfNecessary((user_data) => {
+                if(user_data.email === undefined)
                     transition.redirect('/login',{}, {'nextPath' : nextPath });
-                }
+
+                callback();
+            });
         }
     }
 };
+
+const CheckLog = {
+    statics: {
+        willTransitionTo: function (transition, params, query, callback) {
+            var nextPath = transition.path;
+            UserActions.loadIfNecessary((user_data) => {
+                if(user_data.email != undefined)
+                    transition.redirect('/');
+
+                callback();
+            });
+        }
+    }
+};
+
 
 const TableComponentMixin = {
     componentDidMount: function() {
@@ -91,6 +109,6 @@ const TableComponentMixin = {
     }
 };
 
-export default {Authentication, TableComponentMixin}
+export default {Authentication, CheckLog, TableComponentMixin}
 
 

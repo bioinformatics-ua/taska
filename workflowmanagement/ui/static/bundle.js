@@ -42117,30 +42117,14 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var Reflux = _interopRequire(require("reflux"));
 
-var _apiJsx = require("./api.jsx");
-
-var ListLoader = _apiJsx.ListLoader;
-var DetailLoader = _apiJsx.DetailLoader;
-
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var UserActions = Reflux.createActions(["loadSuccess", "loadUser", "setUsername", "setPassword", "login", "logout", "loginFailed", "setRememberMe", "loginSuccess"]);
-
-var loader = new DetailLoader({ model: "account", hash: "me" });
-
-UserActions.loadUser.listen(function () {
-    var callback = arguments[0] === undefined ? null : arguments[0];
-
-    if (callback != null) loader.load(function (data) {
-        UserActions.loadSuccess(data);
-        callback(data);
-    });else loader.load(UserActions.loadSuccess);
-});
+var UserActions = Reflux.createActions(["loadSuccess", "loadUser", "loadIfNecessary", "setUsername", "setPassword", "login", "logout", "logoutSuccess", "loginFailed", "setRememberMe", "loginSuccess"]);
 
 module.exports = UserActions;
 
-},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx":[function(require,module,exports){
+},{"reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -42390,8 +42374,6 @@ var _reusableNavigationJsx = require("./reusable/navigation.jsx");
 var Tab = _reusableNavigationJsx.Tab;
 var UserDropdown = _reusableNavigationJsx.UserDropdown;
 
-var TransitionGroup = _interopRequire(require("react/lib/ReactCSSTransitionGroup"));
-
 var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
 
 var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
@@ -42410,14 +42392,15 @@ module.exports = React.createClass({
       loading: StateStore.isLoading() };
   },
   getInitialState: function getInitialState() {
-    console.log("initial state");
     return this.__getState();
   },
   update: function update(data) {
     this.setState(this.__getState());
   },
-  componentDidMount: function componentDidMount() {},
   render: function render() {
+    var test = function test() {
+      console.log("hello world");
+    };
     return React.createElement(
       "div",
       null,
@@ -42477,11 +42460,7 @@ module.exports = React.createClass({
         { className: "container" },
         React.createElement(Breadcrumbs, { separator: "" }),
         this.state.loading ? React.createElement("i", { className: "fa fa-4x fa-cog fa-spin" }) : "",
-        React.createElement(
-          TransitionGroup,
-          { component: "div", transitionName: "example" },
-          React.createElement(RouteHandler, { key: name })
-        )
+        React.createElement(RouteHandler, { key: name, callback: test })
       ),
       React.createElement(
         "footer",
@@ -42496,10 +42475,12 @@ module.exports = React.createClass({
 // /.navbar-collapse -->
 // /.container-fluid -->
 
-},{"../actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/StateStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/StateStore.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","./reusable/navigation.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-breadcrumbs":"/home/ribeiro/git/workflow-management/node_modules/react-breadcrumbs/index.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","react/lib/ReactCSSTransitionGroup":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroup.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx":[function(require,module,exports){
+},{"../actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/StateStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/StateStore.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","./reusable/navigation.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-breadcrumbs":"/home/ribeiro/git/workflow-management/node_modules/react-breadcrumbs/index.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Router = _interopRequire(require("react-router"));
 
 var React = _interopRequire(require("react/addons"));
 
@@ -42517,8 +42498,7 @@ var Authentication = require("../mixins/component.jsx").Authentication;
 
 module.exports = React.createClass({
   displayName: "",
-  mixins: [Authentication],
-
+  mixins: [Router.Navigation, Authentication],
   render: function render() {
     return React.createElement(LoggedInHome, null);
   }
@@ -42555,7 +42535,7 @@ var LoggedInHome = React.createClass({
   }
 });
 
-},{"../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react/addons":"/home/ribeiro/git/workflow-management/node_modules/react/addons.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/login.jsx":[function(require,module,exports){
+},{"../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","react/addons":"/home/ribeiro/git/workflow-management/node_modules/react/addons.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/login.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -42564,13 +42544,23 @@ var Reflux = _interopRequire(require("reflux"));
 
 var React = _interopRequire(require("react"));
 
+var _reactRouter = require("react-router");
+
+var RouteHandler = _reactRouter.RouteHandler;
+var Link = _reactRouter.Link;
+var State = _reactRouter.State;
+
+var Router = _interopRequire(_reactRouter);
+
 var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
 
 var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
 
+var CheckLog = require("../mixins/component.jsx").CheckLog;
+
 module.exports = React.createClass({
     displayName: "Login",
-    mixins: [Reflux.listenTo(UserStore, "update")],
+    mixins: [Reflux.listenTo(UserStore, "update"), Router.Navigation, State, CheckLog],
     __getState: function __getState() {
         return {
             failed: UserStore.getFailed()
@@ -42583,13 +42573,28 @@ module.exports = React.createClass({
         this.setState(this.__getState());
     },
     __login: function __login() {
+        var _this = this;
 
         if (this.refs.usr != "" && this.refs.pwd != "") {
-            UserActions.login({
-                username: this.refs.usr.getDOMNode().value.trim(),
-                password: this.refs.pwd.getDOMNode().value.trim(),
-                remember: this.refs.rmb.getDOMNode().checked
-            });
+            var nextPath;
+
+            (function () {
+                nextPath = _this.getQuery().nextPath;
+
+                var self = _this;
+                UserActions.login({
+                    username: _this.refs.usr.getDOMNode().value.trim(),
+                    password: _this.refs.pwd.getDOMNode().value.trim(),
+                    remember: _this.refs.rmb.getDOMNode().checked,
+                    callback: function callback() {
+                        if (nextPath) {
+                            self.transitionTo(nextPath);
+                        } else {
+                            self.replaceWith("/");
+                        }
+                    }
+                });
+            })();
         }
     },
     render: function render() {
@@ -42631,19 +42636,8 @@ module.exports = React.createClass({
                                 React.createElement("input", { defaultChecked: "true", ref: "rmb",
                                     name: "remember_me", type: "checkbox", value: "remember-me" }),
                                 "Remember me"
-                            ),
-                            React.createElement(
-                                "a",
-                                { href: "#", className: "pull-right need-help" },
-                                "Forgot password? "
-                            ),
-                            React.createElement("span", { className: "clearfix" })
+                            )
                         )
-                    ),
-                    React.createElement(
-                        "a",
-                        { href: "#", className: "text-center new-account" },
-                        "Create an account "
                     )
                 )
             )
@@ -42652,9 +42646,10 @@ module.exports = React.createClass({
 });
 /*value={this.state.username}*/
 /*onChange={this.setUsername}*/ /*value={this.state.password}*/
-/*onChange={this.setPassword}*/ /*onChange={this.setRememberMe}*/
+/*onChange={this.setPassword}*/ /*onChange={this.setRememberMe}*/ //a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span-->
+//a href="#" className="text-center new-account">Create an account </a-->
 
-},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -42976,6 +42971,8 @@ var RouteHandler = _reactRouter.RouteHandler;
 var Link = _reactRouter.Link;
 var State = _reactRouter.State;
 
+var Router = _interopRequire(_reactRouter);
+
 var UserActions = _interopRequire(require("../../actions/UserActions.jsx"));
 
 var UserStore = _interopRequire(require("../../stores/UserStore.jsx"));
@@ -43001,7 +42998,7 @@ var Tab = React.createClass({
 var UserDropdown = React.createClass({
   displayName: "UserDropdown",
 
-  mixins: [Reflux.listenTo(UserStore, "update")],
+  mixins: [Reflux.listenTo(UserStore, "update"), Router.Navigation, State],
   __getState: function __getState() {
     return {
       user: UserStore.getUser()
@@ -43015,7 +43012,10 @@ var UserDropdown = React.createClass({
     this.setState(this.__getState());
   },
   logout: function logout() {
-    UserActions.logout();
+    var self = this;
+    UserActions.logout(function () {
+      self.replaceWith("/login");
+    });
   },
   render: function render() {
     if (this.state.user.authenticated === false) {
@@ -43655,24 +43655,13 @@ var bootstrap = _interopRequire(require("bootstrap"));
 
 var Login = require("./actions/api.jsx").Login;
 
-var UserActions = _interopRequire(require("./actions/UserActions.jsx"));
-
-var UserStore = _interopRequire(require("./stores/UserStore.jsx"));
-
-var StateActions = _interopRequire(require("./actions/StateActions.jsx"));
-
 var content = document.getElementById("playground");
-var lgn = new Login({});
 
 Router.run(routes, Router.HistoryLocation, function (Handler) {
-    UserActions.loadUser(function (user_data) {
-
-        console.log("render page");
-        React.render(React.createElement(Handler, null), content);
-    });
+    React.render(React.createElement(Handler, null), content);
 });
 
-},{"./actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","./actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","./actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","./stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
+},{"./actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -43683,17 +43672,31 @@ var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
 
 var Login = require("../actions/api.jsx").Login;
 
+var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
+
 var Authentication = {
     statics: {
-        willTransitionTo: function willTransitionTo(transition, params, query) {
-            var callback = arguments[3] === undefined ? doRoute : arguments[3];
-
-            console.log("transition");
-
+        willTransitionTo: function willTransitionTo(transition, params, query, callback) {
             var nextPath = transition.path;
-            if (!UserStore.loggedIn()) {
-                transition.redirect("/login", {}, { nextPath: nextPath });
-            }
+
+            UserActions.loadIfNecessary(function (user_data) {
+                if (user_data.email === undefined) transition.redirect("/login", {}, { nextPath: nextPath });
+
+                callback();
+            });
+        }
+    }
+};
+
+var CheckLog = {
+    statics: {
+        willTransitionTo: function willTransitionTo(transition, params, query, callback) {
+            var nextPath = transition.path;
+            UserActions.loadIfNecessary(function (user_data) {
+                if (user_data.email != undefined) transition.redirect("/");
+
+                callback();
+            });
         }
     }
 };
@@ -43771,9 +43774,9 @@ var TableComponentMixin = {
     }
 };
 
-module.exports = { Authentication: Authentication, TableComponentMixin: TableComponentMixin };
+module.exports = { Authentication: Authentication, CheckLog: CheckLog, TableComponentMixin: TableComponentMixin };
 
-},{"../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
 "use strict";
 
 var TableStoreMixin = {
@@ -43940,14 +43943,20 @@ var Reflux = _interopRequire(require("reflux"));
 
 var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
 
-var Login = require("../actions/api.jsx").Login;
+var _actionsApiJsx = require("../actions/api.jsx");
+
+var ListLoader = _actionsApiJsx.ListLoader;
+var DetailLoader = _actionsApiJsx.DetailLoader;
+var Login = _actionsApiJsx.Login;
+
+var loader = new DetailLoader({ model: "account", hash: "me" });
 
 module.exports = Reflux.createStore({
     listenables: [UserActions],
 
     init: function init() {
         this.__userdata = {};
-
+        this.__loaded = false;
         this.__failed = false;
     },
     getUser: function getUser() {
@@ -43957,7 +43966,7 @@ module.exports = Reflux.createStore({
         return this.__failed;
     },
     loggedIn: function loggedIn() {
-        return this.__userdata.email;
+        return this.__userdata.email != undefined;
     },
     onLoginFailed: function onLoginFailed() {
         this.__failed = true;
@@ -43965,9 +43974,28 @@ module.exports = Reflux.createStore({
         this.trigger();
     },
     // Actions handlers (declared on UserActions, and implemented here)
+    onLoadUser: function onLoadUser() {
+        var callback = arguments[0] === undefined ? null : arguments[0];
+
+        if (callback != null) loader.load(function (data) {
+            UserActions.loadSuccess(data);
+            callback(data);
+        });else loader.load(UserActions.loadSuccess);
+    },
+    onLoadIfNecessary: function onLoadIfNecessary() {
+        var callback = arguments[0] === undefined ? null : arguments[0];
+
+        if (this.loaded) {
+            if (callback != null) callback(this.__userdata);
+        } else {
+            this.onLoadUser(callback);
+        }
+    },
     onLoadSuccess: function onLoadSuccess(data) {
-        console.log(data);
         this.__userdata = data;
+        if (data.email != undefined) {
+            this.loaded = true;
+        }
         this.trigger();
     },
     onLogin: function onLogin(data) {
@@ -43976,18 +44004,35 @@ module.exports = Reflux.createStore({
             password: data.password,
             remember: data.remember
         });
+        var callback = data.callback;
+        var success = function success(data) {
+            UserActions.loginSuccess(data);
+            callback();
+        };
 
-        log.authenticate(UserActions.loginSuccess, UserActions.loginFailed);
+        log.authenticate(success, UserActions.loginFailed);
     },
     onLoginSuccess: function onLoginSuccess(data) {
         if (data.authenticated) {
-            this.__userdata.authenticated = true;
             UserActions.loadUser();
         } else {
             UserActions.loginFailed();
         }
     },
-    onLogout: function onLogout(data) {}
+    onLogout: function onLogout(callback) {
+        var log = new Login({});
+        var self = this;
+        log.logout(function (data) {
+            self.__loaded = false;
+            self.__userdata = {};
+
+            UserActions.logoutSuccess(data);
+            if (callback) callback();
+        });
+    },
+    onLogoutSuccess: function onLogoutSuccess(data) {
+        if (data.authenticated === false) UserActions.loadUser();
+    }
 });
 
 },{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx":[function(require,module,exports){
