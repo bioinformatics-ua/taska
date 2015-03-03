@@ -15,7 +15,23 @@
 </head>
 
 <body>
-    <div id="playground"></div>
+    <div id="playground">
+      <div style="text-align: center;">
+        <i id="infiniteloader" class="fa fa-5x fa-cog fa-spin"></i><br />
+       <h3 id="infinitemessage"> Loading, please wait...</h3>
+
+       <script type="text/javascript">
+          setTimeout(function(){
+            var im = document.getElementById('infinitemessage');
+            if(im){
+                var ld = document.getElementById('infiniteloader');
+                ld.className ='fa fa-5x fa-exclamation-triangle';
+                im.innerHTML = 'Error, please try again later.<br/><small>If the problem persists, please contact the administrator.</small>';
+            }
+          }, 10000);
+       </script>
+      </div>
+    </div>
     {% django_js %}
     <script src="{% static "bundle.js" %}"></script>
 </body>

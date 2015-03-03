@@ -5,6 +5,9 @@ import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
 
 module.exports = (
     <Route name='app' path='/' handler={require('./components/app.jsx')}>
+
+        <Route name="login" path="login" handler={require('./components/login.jsx')}/>
+
         <Route name="home" path="/" handler={require('./components/home.jsx')}/>
 
         <Route name="about" handler={require('./components/about.jsx')} />

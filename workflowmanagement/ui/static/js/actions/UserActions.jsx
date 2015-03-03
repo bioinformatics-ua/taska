@@ -18,8 +18,16 @@ const UserActions = Reflux.createActions([
 
 let loader = new DetailLoader({model: 'account', hash: 'me'});
 
-UserActions.loadUser.listen(function (page) {
-    loader.load(UserActions.loadSuccess);
+UserActions.loadUser.listen(function (callback=null) {
+    if(callback != null)
+        loader.load(
+            function(data){
+                UserActions.loadSuccess(data);
+                callback(data);
+            }
+        );
+    else
+        loader.load(UserActions.loadSuccess);
 });
 
 export default UserActions;

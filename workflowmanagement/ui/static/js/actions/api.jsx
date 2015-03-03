@@ -1,4 +1,27 @@
-class ListLoader{
+class Loader{
+    constructor(options) {
+    }
+
+    load(url, callback, unsuccessful_callback=null, type="GET", serialized={}){
+      $.ajax({
+            url: url,
+            type: type,
+            data: serialized,
+            dataType: 'json',
+            success: function(data) {
+              callback(data);
+            }.bind(this),
+            error: function(xhr, status, err) {
+                if(unsuccessful_callback != null)
+                    unsuccessful_callback();
+
+                console.error(`Unable to load ${url}`);
+            }.bind(this)
+      });
+    }
+}
+
+class ListLoader extends Loader{
     constructor(options) {
         this.__loaded = {};
         this.model = options.model;
@@ -11,43 +34,26 @@ class ListLoader{
                 this.__loaded[state.currentPage] = true;
 
                 let order = (state.externalSortAscending)? '':'-';
-                $.ajax({
-                  url: `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
-                  dataType: 'json',
-                  success: function(data) {
 
-                    callback(data, state);
-
-                  }.bind(this),
-                  error: function(xhr, status, err) {
-                    console.error(status, err.toString());
-                  }.bind(this)
-                });
+                super.load(
+                    `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
+                    callback
+                    );
         }
     }
 }
 
-class DetailLoader{
+class DetailLoader extends Loader{
     constructor(options) {
         this.model = options.model;
         this.hash = options.hash;
     }
     load(callback){
-        console.log(`api/${this.model}/${this.hash}/`);
-            $.ajax({
-                  url: `api/${this.model}/${this.hash}/`,
-                  dataType: 'json',
-                  success: function(data) {
-                    callback(data);
-                  }.bind(this),
-                  error: function(xhr, status, err) {
-                    console.error(`Unable to load "api/${this.model}/${this.hash}/"`);
-                  }.bind(this)
-            });
+        super.load(`api/${this.model}/${this.hash}/`, callback);
     }
 }
 
-class Login{
+class Login extends Loader{
   constructor(options){
     this.data = {
       csrfmiddlewaretoken: Django.csrf_token(),
@@ -57,23 +63,21 @@ class Login{
     }
   }
 
+  // Check if user is logged in returns a promise
+  waitForData(){
+    return $.ajax('api/account/me/');
+  }
+
   // Get and csrf token to use on a post form
   authenticate(callback, unsuccessful_callback=null){
-      $.ajax({
-            url: 'api/account/login/',
-            type: "POST",
-            data: this.data,
-            dataType: 'json',
-            success: function(data) {
-              callback(data);
-            }.bind(this),
-            error: function(xhr, status, err) {
-                if(unsuccessful_callback != null)
-                    unsuccessful_callback();
 
-                console.error(`Unable to load 'api/account/login/'`);
-            }.bind(this)
-      });
+    super.load('api/account/login/', callback,
+        unsuccessful_callback, "POST", this.data);
+  }
+
+  logout(callback, unsuccessful_callback=null){
+    super.load('api/account/logout/', callback,
+        unsuccessful_callback=unsuccessful_callback);
   }
 }
 

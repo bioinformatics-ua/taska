@@ -14,7 +14,8 @@
     "font-awesome": "~4.3.0",
     "react-breadcrumbs": "~0.2.9",
     "underscore": "~1.8.2",
-    "griddle-react": "~0.2.4"
+    "griddle-react": "~0.2.4",
+    "events": "~1.0.2"
   },
   "style": "./workflowmanagement/ui/css/main.css",
   "devDependencies": {

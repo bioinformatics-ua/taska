@@ -1,12 +1,40 @@
 'use strict';
 
+import Reflux from 'reflux';
+
 import React from 'react';
 import {RouteHandler, Link, State} from 'react-router';
 import Breadcrumbs from 'react-breadcrumbs';
 import {Tab, UserDropdown} from './reusable/navigation.jsx';
 
+import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+
+import UserActions from '../actions/UserActions.jsx';
+import UserStore from '../stores/UserStore.jsx';
+
+import StateActions from '../actions/StateActions.jsx';
+import StateStore from '../stores/StateStore.jsx';
+
+
 export default React.createClass({
   displayName: "Home",
+    mixins: [Reflux.listenTo(UserStore, 'update'), Reflux.listenTo(StateStore, 'update')],
+    __getState: function(){
+      return {
+        user: UserStore.getUser(),
+        failed: UserStore.getFailed(),
+        loading: StateStore.isLoading(),
+      }
+    },
+    getInitialState: function() {
+      console.log('initial state');
+      return this.__getState();
+    },
+    update: function(data){
+        this.setState(this.__getState());
+    },
+    componentDidMount(){
+    },
   render: function(){
     return (
       <div>
@@ -38,7 +66,10 @@ export default React.createClass({
         </header>
         <div className="container">
           <Breadcrumbs separator='' />
-          <RouteHandler/>
+          {this.state.loading ?<i className="fa fa-4x fa-cog fa-spin"></i>:''}
+          <TransitionGroup component="div" transitionName="example">
+            <RouteHandler key={name}/>
+          </TransitionGroup>
         </div>
         <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
       </div>

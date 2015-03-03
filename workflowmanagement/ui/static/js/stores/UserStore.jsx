@@ -10,26 +10,16 @@ export default Reflux.createStore({
     init: function () {
         this.__userdata = {};
 
-        // Username for login porpuses
-        this.__username = "";
-        this.__password = "";
-        this.__remember_me = false;
         this.__failed = false;
     },
     getUser: function(){
         return this.__userdata;
     },
-    getUsername: function(){
-        return this.__username;
-    },
-    getPassword: function(){
-        return this.__password;
-    },
-    getRememberMe: function(){
-        return this.__remember_me;
-    },
     getFailed: function(){
         return this.__failed;
+    },
+    loggedIn: function(){
+        return this.__userdata.email;
     },
     onLoginFailed: function(){
         this.__failed = true;
@@ -38,22 +28,8 @@ export default Reflux.createStore({
     },
     // Actions handlers (declared on UserActions, and implemented here)
     onLoadSuccess: function (data) {
+        console.log(data);
         this.__userdata = data;
-        this.trigger();
-    },
-    onSetUsername: function(username){
-        console.log(username);
-        this.__username = username;
-
-        this.trigger();
-    },
-    onSetPassword: function(password){
-        this.__password = password;
-        this.trigger();
-    },
-    onSetRememberMe: function(remember){
-        this.__remember_me = remember;
-
         this.trigger();
     },
     onLogin: function(data){
@@ -62,8 +38,7 @@ export default Reflux.createStore({
             'password': data.password,
             'remember': data.remember
         });
-        console.log("ON LOGIN");
-        console.log(log);
+
         log.authenticate(UserActions.loginSuccess, UserActions.loginFailed)
     },
     onLoginSuccess: function(data){
@@ -73,6 +48,9 @@ export default Reflux.createStore({
         } else {
             UserActions.loginFailed()
         }
+
+    },
+    onLogout: function(data){
 
     }
 });

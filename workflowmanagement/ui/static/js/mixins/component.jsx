@@ -1,4 +1,19 @@
 import React from 'react';
+import UserStore from '../stores/UserStore.jsx';
+import {Login} from '../actions/api.jsx'
+
+const Authentication = {
+    statics: {
+        willTransitionTo: function (transition, params, query, callback=doRoute) {
+            console.log('transition');
+
+            var nextPath = transition.path;
+                if (!UserStore.loggedIn()) {
+                    transition.redirect('/login',{}, {'nextPath' : nextPath });
+                }
+        }
+    }
+};
 
 const TableComponentMixin = {
     componentDidMount: function() {
@@ -76,6 +91,6 @@ const TableComponentMixin = {
     }
 };
 
-export default {TableComponentMixin}
+export default {Authentication, TableComponentMixin}
 
 

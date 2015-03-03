@@ -19261,7 +19261,10 @@ exports.isBuffer = function (obj) {
         obj.constructor.isBuffer(obj));
 };
 
-},{}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
+},{}],"/home/ribeiro/git/workflow-management/node_modules/react/addons.js":[function(require,module,exports){
+module.exports = require('./lib/ReactWithAddons');
+
+},{"./lib/ReactWithAddons":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactWithAddons.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -19510,7 +19513,119 @@ var BeforeInputEventPlugin = {
 
 module.exports = BeforeInputEventPlugin;
 
-},{"./EventConstants":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventConstants.js","./EventPropagators":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ExecutionEnvironment.js","./SyntheticInputEvent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/SyntheticInputEvent.js","./keyOf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/keyOf.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/CSSProperty.js":[function(require,module,exports){
+},{"./EventConstants":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventConstants.js","./EventPropagators":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ExecutionEnvironment.js","./SyntheticInputEvent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/SyntheticInputEvent.js","./keyOf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/keyOf.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/CSSCore.js":[function(require,module,exports){
+(function (process){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule CSSCore
+ * @typechecks
+ */
+
+var invariant = require("./invariant");
+
+/**
+ * The CSSCore module specifies the API (and implements most of the methods)
+ * that should be used when dealing with the display of elements (via their
+ * CSS classes and visibility on screen. It is an API focused on mutating the
+ * display and not reading it as no logical state should be encoded in the
+ * display of elements.
+ */
+
+var CSSCore = {
+
+  /**
+   * Adds the class passed in to the element if it doesn't already have it.
+   *
+   * @param {DOMElement} element the element to set the class on
+   * @param {string} className the CSS className
+   * @return {DOMElement} the element passed in
+   */
+  addClass: function(element, className) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      !/\s/.test(className),
+      'CSSCore.addClass takes only a single class name. "%s" contains ' +
+      'multiple classes.', className
+    ) : invariant(!/\s/.test(className)));
+
+    if (className) {
+      if (element.classList) {
+        element.classList.add(className);
+      } else if (!CSSCore.hasClass(element, className)) {
+        element.className = element.className + ' ' + className;
+      }
+    }
+    return element;
+  },
+
+  /**
+   * Removes the class passed in from the element
+   *
+   * @param {DOMElement} element the element to set the class on
+   * @param {string} className the CSS className
+   * @return {DOMElement} the element passed in
+   */
+  removeClass: function(element, className) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      !/\s/.test(className),
+      'CSSCore.removeClass takes only a single class name. "%s" contains ' +
+      'multiple classes.', className
+    ) : invariant(!/\s/.test(className)));
+
+    if (className) {
+      if (element.classList) {
+        element.classList.remove(className);
+      } else if (CSSCore.hasClass(element, className)) {
+        element.className = element.className
+          .replace(new RegExp('(^|\\s)' + className + '(?:\\s|$)', 'g'), '$1')
+          .replace(/\s+/g, ' ') // multiple spaces to one
+          .replace(/^\s*|\s*$/g, ''); // trim the ends
+      }
+    }
+    return element;
+  },
+
+  /**
+   * Helper to add or remove a class from an element based on a condition.
+   *
+   * @param {DOMElement} element the element to set the class on
+   * @param {string} className the CSS className
+   * @param {*} bool condition to whether to add or remove the class
+   * @return {DOMElement} the element passed in
+   */
+  conditionClass: function(element, className, bool) {
+    return (bool ? CSSCore.addClass : CSSCore.removeClass)(element, className);
+  },
+
+  /**
+   * Tests whether the element has the class specified.
+   *
+   * @param {DOMNode|DOMWindow} element the element to set the class on
+   * @param {string} className the CSS className
+   * @return {boolean} true if the element has the class, false if not
+   */
+  hasClass: function(element, className) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      !/\s/.test(className),
+      'CSS.hasClass takes only a single class name.'
+    ) : invariant(!/\s/.test(className)));
+    if (element.classList) {
+      return !!className && element.classList.contains(className);
+    }
+    return (' ' + element.className + ' ').indexOf(' ' + className + ' ') > -1;
+  }
+
+};
+
+module.exports = CSSCore;
+
+}).call(this,require('_process'))
+},{"./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/CSSProperty.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -22885,7 +23000,48 @@ var HTMLDOMPropertyConfig = {
 
 module.exports = HTMLDOMPropertyConfig;
 
-},{"./DOMProperty":"/home/ribeiro/git/workflow-management/node_modules/react/lib/DOMProperty.js","./ExecutionEnvironment":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ExecutionEnvironment.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/LinkedValueUtils.js":[function(require,module,exports){
+},{"./DOMProperty":"/home/ribeiro/git/workflow-management/node_modules/react/lib/DOMProperty.js","./ExecutionEnvironment":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ExecutionEnvironment.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/LinkedStateMixin.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule LinkedStateMixin
+ * @typechecks static-only
+ */
+
+"use strict";
+
+var ReactLink = require("./ReactLink");
+var ReactStateSetters = require("./ReactStateSetters");
+
+/**
+ * A simple mixin around ReactLink.forState().
+ */
+var LinkedStateMixin = {
+  /**
+   * Create a ReactLink that's linked to part of this component's state. The
+   * ReactLink will have the current value of this.state[key] and will call
+   * setState() when a change is requested.
+   *
+   * @param {string} key state key to update. Note: you may want to use keyOf()
+   * if you're using Google Closure Compiler advanced mode.
+   * @return {ReactLink} ReactLink instance linking to the state.
+   */
+  linkState: function(key) {
+    return new ReactLink(
+      this.state[key],
+      ReactStateSetters.createStateKeySetter(this, key)
+    );
+  }
+};
+
+module.exports = LinkedStateMixin;
+
+},{"./ReactLink":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactLink.js","./ReactStateSetters":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactStateSetters.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/LinkedValueUtils.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -23898,7 +24054,209 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
 
 module.exports = ReactBrowserEventEmitter;
 
-},{"./EventConstants":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPluginHub.js","./EventPluginRegistry":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPluginRegistry.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./ReactEventEmitterMixin":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactEventEmitterMixin.js","./ViewportMetrics":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ViewportMetrics.js","./isEventSupported":"/home/ribeiro/git/workflow-management/node_modules/react/lib/isEventSupported.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactChildren.js":[function(require,module,exports){
+},{"./EventConstants":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPluginHub.js","./EventPluginRegistry":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPluginRegistry.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./ReactEventEmitterMixin":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactEventEmitterMixin.js","./ViewportMetrics":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ViewportMetrics.js","./isEventSupported":"/home/ribeiro/git/workflow-management/node_modules/react/lib/isEventSupported.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroup.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @typechecks
+ * @providesModule ReactCSSTransitionGroup
+ */
+
+"use strict";
+
+var React = require("./React");
+
+var assign = require("./Object.assign");
+
+var ReactTransitionGroup = React.createFactory(
+  require("./ReactTransitionGroup")
+);
+var ReactCSSTransitionGroupChild = React.createFactory(
+  require("./ReactCSSTransitionGroupChild")
+);
+
+var ReactCSSTransitionGroup = React.createClass({
+  displayName: 'ReactCSSTransitionGroup',
+
+  propTypes: {
+    transitionName: React.PropTypes.string.isRequired,
+    transitionEnter: React.PropTypes.bool,
+    transitionLeave: React.PropTypes.bool
+  },
+
+  getDefaultProps: function() {
+    return {
+      transitionEnter: true,
+      transitionLeave: true
+    };
+  },
+
+  _wrapChild: function(child) {
+    // We need to provide this childFactory so that
+    // ReactCSSTransitionGroupChild can receive updates to name, enter, and
+    // leave while it is leaving.
+    return ReactCSSTransitionGroupChild(
+      {
+        name: this.props.transitionName,
+        enter: this.props.transitionEnter,
+        leave: this.props.transitionLeave
+      },
+      child
+    );
+  },
+
+  render: function() {
+    return (
+      ReactTransitionGroup(
+        assign({}, this.props, {childFactory: this._wrapChild})
+      )
+    );
+  }
+});
+
+module.exports = ReactCSSTransitionGroup;
+
+},{"./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js","./ReactCSSTransitionGroupChild":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroupChild.js","./ReactTransitionGroup":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionGroup.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroupChild.js":[function(require,module,exports){
+(function (process){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @typechecks
+ * @providesModule ReactCSSTransitionGroupChild
+ */
+
+"use strict";
+
+var React = require("./React");
+
+var CSSCore = require("./CSSCore");
+var ReactTransitionEvents = require("./ReactTransitionEvents");
+
+var onlyChild = require("./onlyChild");
+
+// We don't remove the element from the DOM until we receive an animationend or
+// transitionend event. If the user screws up and forgets to add an animation
+// their node will be stuck in the DOM forever, so we detect if an animation
+// does not start and if it doesn't, we just call the end listener immediately.
+var TICK = 17;
+var NO_EVENT_TIMEOUT = 5000;
+
+var noEventListener = null;
+
+
+if ("production" !== process.env.NODE_ENV) {
+  noEventListener = function() {
+    console.warn(
+      'transition(): tried to perform an animation without ' +
+      'an animationend or transitionend event after timeout (' +
+      NO_EVENT_TIMEOUT + 'ms). You should either disable this ' +
+      'transition in JS or add a CSS animation/transition.'
+    );
+  };
+}
+
+var ReactCSSTransitionGroupChild = React.createClass({
+  displayName: 'ReactCSSTransitionGroupChild',
+
+  transition: function(animationType, finishCallback) {
+    var node = this.getDOMNode();
+    var className = this.props.name + '-' + animationType;
+    var activeClassName = className + '-active';
+    var noEventTimeout = null;
+
+    var endListener = function(e) {
+      if (e && e.target !== node) {
+        return;
+      }
+      if ("production" !== process.env.NODE_ENV) {
+        clearTimeout(noEventTimeout);
+      }
+
+      CSSCore.removeClass(node, className);
+      CSSCore.removeClass(node, activeClassName);
+
+      ReactTransitionEvents.removeEndEventListener(node, endListener);
+
+      // Usually this optional callback is used for informing an owner of
+      // a leave animation and telling it to remove the child.
+      finishCallback && finishCallback();
+    };
+
+    ReactTransitionEvents.addEndEventListener(node, endListener);
+
+    CSSCore.addClass(node, className);
+
+    // Need to do this to actually trigger a transition.
+    this.queueClass(activeClassName);
+
+    if ("production" !== process.env.NODE_ENV) {
+      noEventTimeout = setTimeout(noEventListener, NO_EVENT_TIMEOUT);
+    }
+  },
+
+  queueClass: function(className) {
+    this.classNameQueue.push(className);
+
+    if (!this.timeout) {
+      this.timeout = setTimeout(this.flushClassNameQueue, TICK);
+    }
+  },
+
+  flushClassNameQueue: function() {
+    if (this.isMounted()) {
+      this.classNameQueue.forEach(
+        CSSCore.addClass.bind(CSSCore, this.getDOMNode())
+      );
+    }
+    this.classNameQueue.length = 0;
+    this.timeout = null;
+  },
+
+  componentWillMount: function() {
+    this.classNameQueue = [];
+  },
+
+  componentWillUnmount: function() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  },
+
+  componentWillEnter: function(done) {
+    if (this.props.enter) {
+      this.transition('enter', done);
+    } else {
+      done();
+    }
+  },
+
+  componentWillLeave: function(done) {
+    if (this.props.leave) {
+      this.transition('leave', done);
+    } else {
+      done();
+    }
+  },
+
+  render: function() {
+    return onlyChild(this.props.children);
+  }
+});
+
+module.exports = ReactCSSTransitionGroupChild;
+
+}).call(this,require('_process'))
+},{"./CSSCore":"/home/ribeiro/git/workflow-management/node_modules/react/lib/CSSCore.js","./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js","./ReactTransitionEvents":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionEvents.js","./onlyChild":"/home/ribeiro/git/workflow-management/node_modules/react/lib/onlyChild.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactChildren.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -24613,7 +24971,56 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require('_process'))
-},{"./ReactDOMIDOperations":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactDOMIDOperations.js","./ReactMarkupChecksum":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMarkupChecksum.js","./ReactMount":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMount.js","./ReactPerf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPerf.js","./ReactReconcileTransaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactReconcileTransaction.js","./getReactRootElementInContainer":"/home/ribeiro/git/workflow-management/node_modules/react/lib/getReactRootElementInContainer.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./setInnerHTML":"/home/ribeiro/git/workflow-management/node_modules/react/lib/setInnerHTML.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCompositeComponent.js":[function(require,module,exports){
+},{"./ReactDOMIDOperations":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactDOMIDOperations.js","./ReactMarkupChecksum":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMarkupChecksum.js","./ReactMount":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMount.js","./ReactPerf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPerf.js","./ReactReconcileTransaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactReconcileTransaction.js","./getReactRootElementInContainer":"/home/ribeiro/git/workflow-management/node_modules/react/lib/getReactRootElementInContainer.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./setInnerHTML":"/home/ribeiro/git/workflow-management/node_modules/react/lib/setInnerHTML.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactComponentWithPureRenderMixin.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+* @providesModule ReactComponentWithPureRenderMixin
+*/
+
+"use strict";
+
+var shallowEqual = require("./shallowEqual");
+
+/**
+ * If your React component's render function is "pure", e.g. it will render the
+ * same result given the same props and state, provide this Mixin for a
+ * considerable performance boost.
+ *
+ * Most React components have pure render functions.
+ *
+ * Example:
+ *
+ *   var ReactComponentWithPureRenderMixin =
+ *     require('ReactComponentWithPureRenderMixin');
+ *   React.createClass({
+ *     mixins: [ReactComponentWithPureRenderMixin],
+ *
+ *     render: function() {
+ *       return <div className={this.props.className}>foo</div>;
+ *     }
+ *   });
+ *
+ * Note: This only checks shallow equality for props and state. If these contain
+ * complex data structures this mixin may have false-negatives for deeper
+ * differences. Only mixin to components which have simple props and state, or
+ * use `forceUpdate()` when you know deep data structures have changed.
+ */
+var ReactComponentWithPureRenderMixin = {
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return !shallowEqual(this.props, nextProps) ||
+           !shallowEqual(this.state, nextState);
+  }
+};
+
+module.exports = ReactComponentWithPureRenderMixin;
+
+},{"./shallowEqual":"/home/ribeiro/git/workflow-management/node_modules/react/lib/shallowEqual.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCompositeComponent.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -30230,7 +30637,80 @@ ReactLegacyElementFactory._isLegacyCallWarningEnabled = true;
 module.exports = ReactLegacyElementFactory;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCurrentOwner.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./monitorCodeUse":"/home/ribeiro/git/workflow-management/node_modules/react/lib/monitorCodeUse.js","./warning":"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMarkupChecksum.js":[function(require,module,exports){
+},{"./ReactCurrentOwner":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCurrentOwner.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./monitorCodeUse":"/home/ribeiro/git/workflow-management/node_modules/react/lib/monitorCodeUse.js","./warning":"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactLink.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactLink
+ * @typechecks static-only
+ */
+
+"use strict";
+
+/**
+ * ReactLink encapsulates a common pattern in which a component wants to modify
+ * a prop received from its parent. ReactLink allows the parent to pass down a
+ * value coupled with a callback that, when invoked, expresses an intent to
+ * modify that value. For example:
+ *
+ * React.createClass({
+ *   getInitialState: function() {
+ *     return {value: ''};
+ *   },
+ *   render: function() {
+ *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
+ *     return <input valueLink={valueLink} />;
+ *   },
+ *   this._handleValueChange: function(newValue) {
+ *     this.setState({value: newValue});
+ *   }
+ * });
+ *
+ * We have provided some sugary mixins to make the creation and
+ * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
+ */
+
+var React = require("./React");
+
+/**
+ * @param {*} value current value of the link
+ * @param {function} requestChange callback to request a change
+ */
+function ReactLink(value, requestChange) {
+  this.value = value;
+  this.requestChange = requestChange;
+}
+
+/**
+ * Creates a PropType that enforces the ReactLink API and optionally checks the
+ * type of the value being passed inside the link. Example:
+ *
+ * MyComponent.propTypes = {
+ *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
+ * }
+ */
+function createLinkTypeChecker(linkType) {
+  var shapes = {
+    value: typeof linkType === 'undefined' ?
+      React.PropTypes.any.isRequired :
+      linkType.isRequired,
+    requestChange: React.PropTypes.func.isRequired
+  };
+  return React.PropTypes.shape(shapes);
+}
+
+ReactLink.PropTypes = {
+  link: createLinkTypeChecker
+};
+
+module.exports = ReactLink;
+
+},{"./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMarkupChecksum.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32779,7 +33259,525 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./CallbackQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./PooledClass":"/home/ribeiro/git/workflow-management/node_modules/react/lib/PooledClass.js","./ReactPutListenerQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Transaction.js","./emptyFunction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/emptyFunction.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTextComponent.js":[function(require,module,exports){
+},{"./CallbackQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./PooledClass":"/home/ribeiro/git/workflow-management/node_modules/react/lib/PooledClass.js","./ReactPutListenerQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Transaction.js","./emptyFunction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/emptyFunction.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactStateSetters.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactStateSetters
+ */
+
+"use strict";
+
+var ReactStateSetters = {
+  /**
+   * Returns a function that calls the provided function, and uses the result
+   * of that to set the component's state.
+   *
+   * @param {ReactCompositeComponent} component
+   * @param {function} funcReturningState Returned callback uses this to
+   *                                      determine how to update state.
+   * @return {function} callback that when invoked uses funcReturningState to
+   *                    determined the object literal to setState.
+   */
+  createStateSetter: function(component, funcReturningState) {
+    return function(a, b, c, d, e, f) {
+      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
+      if (partialState) {
+        component.setState(partialState);
+      }
+    };
+  },
+
+  /**
+   * Returns a single-argument callback that can be used to update a single
+   * key in the component's state.
+   *
+   * Note: this is memoized function, which makes it inexpensive to call.
+   *
+   * @param {ReactCompositeComponent} component
+   * @param {string} key The key in the state that you should update.
+   * @return {function} callback of 1 argument which calls setState() with
+   *                    the provided keyName and callback argument.
+   */
+  createStateKeySetter: function(component, key) {
+    // Memoize the setters.
+    var cache = component.__keySetters || (component.__keySetters = {});
+    return cache[key] || (cache[key] = createStateKeySetter(component, key));
+  }
+};
+
+function createStateKeySetter(component, key) {
+  // Partial state is allocated outside of the function closure so it can be
+  // reused with every call, avoiding memory allocation when this function
+  // is called.
+  var partialState = {};
+  return function stateKeySetter(value) {
+    partialState[key] = value;
+    component.setState(partialState);
+  };
+}
+
+ReactStateSetters.Mixin = {
+  /**
+   * Returns a function that calls the provided function, and uses the result
+   * of that to set the component's state.
+   *
+   * For example, these statements are equivalent:
+   *
+   *   this.setState({x: 1});
+   *   this.createStateSetter(function(xValue) {
+   *     return {x: xValue};
+   *   })(1);
+   *
+   * @param {function} funcReturningState Returned callback uses this to
+   *                                      determine how to update state.
+   * @return {function} callback that when invoked uses funcReturningState to
+   *                    determined the object literal to setState.
+   */
+  createStateSetter: function(funcReturningState) {
+    return ReactStateSetters.createStateSetter(this, funcReturningState);
+  },
+
+  /**
+   * Returns a single-argument callback that can be used to update a single
+   * key in the component's state.
+   *
+   * For example, these statements are equivalent:
+   *
+   *   this.setState({x: 1});
+   *   this.createStateKeySetter('x')(1);
+   *
+   * Note: this is memoized function, which makes it inexpensive to call.
+   *
+   * @param {string} key The key in the state that you should update.
+   * @return {function} callback of 1 argument which calls setState() with
+   *                    the provided keyName and callback argument.
+   */
+  createStateKeySetter: function(key) {
+    return ReactStateSetters.createStateKeySetter(this, key);
+  }
+};
+
+module.exports = ReactStateSetters;
+
+},{}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTestUtils.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactTestUtils
+ */
+
+"use strict";
+
+var EventConstants = require("./EventConstants");
+var EventPluginHub = require("./EventPluginHub");
+var EventPropagators = require("./EventPropagators");
+var React = require("./React");
+var ReactElement = require("./ReactElement");
+var ReactBrowserEventEmitter = require("./ReactBrowserEventEmitter");
+var ReactMount = require("./ReactMount");
+var ReactTextComponent = require("./ReactTextComponent");
+var ReactUpdates = require("./ReactUpdates");
+var SyntheticEvent = require("./SyntheticEvent");
+
+var assign = require("./Object.assign");
+
+var topLevelTypes = EventConstants.topLevelTypes;
+
+function Event(suffix) {}
+
+/**
+ * @class ReactTestUtils
+ */
+
+/**
+ * Todo: Support the entire DOM.scry query syntax. For now, these simple
+ * utilities will suffice for testing purposes.
+ * @lends ReactTestUtils
+ */
+var ReactTestUtils = {
+  renderIntoDocument: function(instance) {
+    var div = document.createElement('div');
+    // None of our tests actually require attaching the container to the
+    // DOM, and doing so creates a mess that we rely on test isolation to
+    // clean up, so we're going to stop honoring the name of this method
+    // (and probably rename it eventually) if no problems arise.
+    // document.documentElement.appendChild(div);
+    return React.render(instance, div);
+  },
+
+  isElement: function(element) {
+    return ReactElement.isValidElement(element);
+  },
+
+  isElementOfType: function(inst, convenienceConstructor) {
+    return (
+      ReactElement.isValidElement(inst) &&
+      inst.type === convenienceConstructor.type
+    );
+  },
+
+  isDOMComponent: function(inst) {
+    return !!(inst && inst.mountComponent && inst.tagName);
+  },
+
+  isDOMComponentElement: function(inst) {
+    return !!(inst &&
+              ReactElement.isValidElement(inst) &&
+              !!inst.tagName);
+  },
+
+  isCompositeComponent: function(inst) {
+    return typeof inst.render === 'function' &&
+           typeof inst.setState === 'function';
+  },
+
+  isCompositeComponentWithType: function(inst, type) {
+    return !!(ReactTestUtils.isCompositeComponent(inst) &&
+             (inst.constructor === type.type));
+  },
+
+  isCompositeComponentElement: function(inst) {
+    if (!ReactElement.isValidElement(inst)) {
+      return false;
+    }
+    // We check the prototype of the type that will get mounted, not the
+    // instance itself. This is a future proof way of duck typing.
+    var prototype = inst.type.prototype;
+    return (
+      typeof prototype.render === 'function' &&
+      typeof prototype.setState === 'function'
+    );
+  },
+
+  isCompositeComponentElementWithType: function(inst, type) {
+    return !!(ReactTestUtils.isCompositeComponentElement(inst) &&
+             (inst.constructor === type));
+  },
+
+  isTextComponent: function(inst) {
+    return inst instanceof ReactTextComponent.type;
+  },
+
+  findAllInRenderedTree: function(inst, test) {
+    if (!inst) {
+      return [];
+    }
+    var ret = test(inst) ? [inst] : [];
+    if (ReactTestUtils.isDOMComponent(inst)) {
+      var renderedChildren = inst._renderedChildren;
+      var key;
+      for (key in renderedChildren) {
+        if (!renderedChildren.hasOwnProperty(key)) {
+          continue;
+        }
+        ret = ret.concat(
+          ReactTestUtils.findAllInRenderedTree(renderedChildren[key], test)
+        );
+      }
+    } else if (ReactTestUtils.isCompositeComponent(inst)) {
+      ret = ret.concat(
+        ReactTestUtils.findAllInRenderedTree(inst._renderedComponent, test)
+      );
+    }
+    return ret;
+  },
+
+  /**
+   * Finds all instance of components in the rendered tree that are DOM
+   * components with the class name matching `className`.
+   * @return an array of all the matches.
+   */
+  scryRenderedDOMComponentsWithClass: function(root, className) {
+    return ReactTestUtils.findAllInRenderedTree(root, function(inst) {
+      var instClassName = inst.props.className;
+      return ReactTestUtils.isDOMComponent(inst) && (
+        instClassName &&
+        (' ' + instClassName + ' ').indexOf(' ' + className + ' ') !== -1
+      );
+    });
+  },
+
+  /**
+   * Like scryRenderedDOMComponentsWithClass but expects there to be one result,
+   * and returns that one result, or throws exception if there is any other
+   * number of matches besides one.
+   * @return {!ReactDOMComponent} The one match.
+   */
+  findRenderedDOMComponentWithClass: function(root, className) {
+    var all =
+      ReactTestUtils.scryRenderedDOMComponentsWithClass(root, className);
+    if (all.length !== 1) {
+      throw new Error('Did not find exactly one match for class:' + className);
+    }
+    return all[0];
+  },
+
+
+  /**
+   * Finds all instance of components in the rendered tree that are DOM
+   * components with the tag name matching `tagName`.
+   * @return an array of all the matches.
+   */
+  scryRenderedDOMComponentsWithTag: function(root, tagName) {
+    return ReactTestUtils.findAllInRenderedTree(root, function(inst) {
+      return ReactTestUtils.isDOMComponent(inst) &&
+            inst.tagName === tagName.toUpperCase();
+    });
+  },
+
+  /**
+   * Like scryRenderedDOMComponentsWithTag but expects there to be one result,
+   * and returns that one result, or throws exception if there is any other
+   * number of matches besides one.
+   * @return {!ReactDOMComponent} The one match.
+   */
+  findRenderedDOMComponentWithTag: function(root, tagName) {
+    var all = ReactTestUtils.scryRenderedDOMComponentsWithTag(root, tagName);
+    if (all.length !== 1) {
+      throw new Error('Did not find exactly one match for tag:' + tagName);
+    }
+    return all[0];
+  },
+
+
+  /**
+   * Finds all instances of components with type equal to `componentType`.
+   * @return an array of all the matches.
+   */
+  scryRenderedComponentsWithType: function(root, componentType) {
+    return ReactTestUtils.findAllInRenderedTree(root, function(inst) {
+      return ReactTestUtils.isCompositeComponentWithType(
+        inst,
+        componentType
+      );
+    });
+  },
+
+  /**
+   * Same as `scryRenderedComponentsWithType` but expects there to be one result
+   * and returns that one result, or throws exception if there is any other
+   * number of matches besides one.
+   * @return {!ReactComponent} The one match.
+   */
+  findRenderedComponentWithType: function(root, componentType) {
+    var all = ReactTestUtils.scryRenderedComponentsWithType(
+      root,
+      componentType
+    );
+    if (all.length !== 1) {
+      throw new Error(
+        'Did not find exactly one match for componentType:' + componentType
+      );
+    }
+    return all[0];
+  },
+
+  /**
+   * Pass a mocked component module to this method to augment it with
+   * useful methods that allow it to be used as a dummy React component.
+   * Instead of rendering as usual, the component will become a simple
+   * <div> containing any provided children.
+   *
+   * @param {object} module the mock function object exported from a
+   *                        module that defines the component to be mocked
+   * @param {?string} mockTagName optional dummy root tag name to return
+   *                              from render method (overrides
+   *                              module.mockTagName if provided)
+   * @return {object} the ReactTestUtils object (for chaining)
+   */
+  mockComponent: function(module, mockTagName) {
+    mockTagName = mockTagName || module.mockTagName || "div";
+
+    var ConvenienceConstructor = React.createClass({displayName: "ConvenienceConstructor",
+      render: function() {
+        return React.createElement(
+          mockTagName,
+          null,
+          this.props.children
+        );
+      }
+    });
+
+    module.mockImplementation(ConvenienceConstructor);
+
+    module.type = ConvenienceConstructor.type;
+    module.isReactLegacyFactory = true;
+
+    return this;
+  },
+
+  /**
+   * Simulates a top level event being dispatched from a raw event that occured
+   * on an `Element` node.
+   * @param topLevelType {Object} A type from `EventConstants.topLevelTypes`
+   * @param {!Element} node The dom to simulate an event occurring on.
+   * @param {?Event} fakeNativeEvent Fake native event to use in SyntheticEvent.
+   */
+  simulateNativeEventOnNode: function(topLevelType, node, fakeNativeEvent) {
+    fakeNativeEvent.target = node;
+    ReactBrowserEventEmitter.ReactEventListener.dispatchEvent(
+      topLevelType,
+      fakeNativeEvent
+    );
+  },
+
+  /**
+   * Simulates a top level event being dispatched from a raw event that occured
+   * on the `ReactDOMComponent` `comp`.
+   * @param topLevelType {Object} A type from `EventConstants.topLevelTypes`.
+   * @param comp {!ReactDOMComponent}
+   * @param {?Event} fakeNativeEvent Fake native event to use in SyntheticEvent.
+   */
+  simulateNativeEventOnDOMComponent: function(
+      topLevelType,
+      comp,
+      fakeNativeEvent) {
+    ReactTestUtils.simulateNativeEventOnNode(
+      topLevelType,
+      comp.getDOMNode(),
+      fakeNativeEvent
+    );
+  },
+
+  nativeTouchData: function(x, y) {
+    return {
+      touches: [
+        {pageX: x, pageY: y}
+      ]
+    };
+  },
+
+  Simulate: null,
+  SimulateNative: {}
+};
+
+/**
+ * Exports:
+ *
+ * - `ReactTestUtils.Simulate.click(Element/ReactDOMComponent)`
+ * - `ReactTestUtils.Simulate.mouseMove(Element/ReactDOMComponent)`
+ * - `ReactTestUtils.Simulate.change(Element/ReactDOMComponent)`
+ * - ... (All keys from event plugin `eventTypes` objects)
+ */
+function makeSimulator(eventType) {
+  return function(domComponentOrNode, eventData) {
+    var node;
+    if (ReactTestUtils.isDOMComponent(domComponentOrNode)) {
+      node = domComponentOrNode.getDOMNode();
+    } else if (domComponentOrNode.tagName) {
+      node = domComponentOrNode;
+    }
+
+    var fakeNativeEvent = new Event();
+    fakeNativeEvent.target = node;
+    // We don't use SyntheticEvent.getPooled in order to not have to worry about
+    // properly destroying any properties assigned from `eventData` upon release
+    var event = new SyntheticEvent(
+      ReactBrowserEventEmitter.eventNameDispatchConfigs[eventType],
+      ReactMount.getID(node),
+      fakeNativeEvent
+    );
+    assign(event, eventData);
+    EventPropagators.accumulateTwoPhaseDispatches(event);
+
+    ReactUpdates.batchedUpdates(function() {
+      EventPluginHub.enqueueEvents(event);
+      EventPluginHub.processEventQueue();
+    });
+  };
+}
+
+function buildSimulators() {
+  ReactTestUtils.Simulate = {};
+
+  var eventType;
+  for (eventType in ReactBrowserEventEmitter.eventNameDispatchConfigs) {
+    /**
+     * @param {!Element || ReactDOMComponent} domComponentOrNode
+     * @param {?object} eventData Fake event data to use in SyntheticEvent.
+     */
+    ReactTestUtils.Simulate[eventType] = makeSimulator(eventType);
+  }
+}
+
+// Rebuild ReactTestUtils.Simulate whenever event plugins are injected
+var oldInjectEventPluginOrder = EventPluginHub.injection.injectEventPluginOrder;
+EventPluginHub.injection.injectEventPluginOrder = function() {
+  oldInjectEventPluginOrder.apply(this, arguments);
+  buildSimulators();
+};
+var oldInjectEventPlugins = EventPluginHub.injection.injectEventPluginsByName;
+EventPluginHub.injection.injectEventPluginsByName = function() {
+  oldInjectEventPlugins.apply(this, arguments);
+  buildSimulators();
+};
+
+buildSimulators();
+
+/**
+ * Exports:
+ *
+ * - `ReactTestUtils.SimulateNative.click(Element/ReactDOMComponent)`
+ * - `ReactTestUtils.SimulateNative.mouseMove(Element/ReactDOMComponent)`
+ * - `ReactTestUtils.SimulateNative.mouseIn/ReactDOMComponent)`
+ * - `ReactTestUtils.SimulateNative.mouseOut(Element/ReactDOMComponent)`
+ * - ... (All keys from `EventConstants.topLevelTypes`)
+ *
+ * Note: Top level event types are a subset of the entire set of handler types
+ * (which include a broader set of "synthetic" events). For example, onDragDone
+ * is a synthetic event. Except when testing an event plugin or React's event
+ * handling code specifically, you probably want to use ReactTestUtils.Simulate
+ * to dispatch synthetic events.
+ */
+
+function makeNativeSimulator(eventType) {
+  return function(domComponentOrNode, nativeEventData) {
+    var fakeNativeEvent = new Event(eventType);
+    assign(fakeNativeEvent, nativeEventData);
+    if (ReactTestUtils.isDOMComponent(domComponentOrNode)) {
+      ReactTestUtils.simulateNativeEventOnDOMComponent(
+        eventType,
+        domComponentOrNode,
+        fakeNativeEvent
+      );
+    } else if (!!domComponentOrNode.tagName) {
+      // Will allow on actual dom nodes.
+      ReactTestUtils.simulateNativeEventOnNode(
+        eventType,
+        domComponentOrNode,
+        fakeNativeEvent
+      );
+    }
+  };
+}
+
+var eventType;
+for (eventType in topLevelTypes) {
+  // Event type is stored as 'topClick' - we transform that to 'click'
+  var convenienceName = eventType.indexOf('top') === 0 ?
+    eventType.charAt(3).toLowerCase() + eventType.substr(4) : eventType;
+  /**
+   * @param {!Element || ReactDOMComponent} domComponentOrNode
+   * @param {?Event} nativeEventData Fake native event to use in SyntheticEvent.
+   */
+  ReactTestUtils.SimulateNative[convenienceName] =
+    makeNativeSimulator(eventType);
+}
+
+module.exports = ReactTestUtils;
+
+},{"./EventConstants":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPluginHub.js","./EventPropagators":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventPropagators.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js","./ReactBrowserEventEmitter":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./ReactMount":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactMount.js","./ReactTextComponent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTextComponent.js","./ReactUpdates":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactUpdates.js","./SyntheticEvent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/SyntheticEvent.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTextComponent.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -32885,7 +33883,408 @@ ReactTextComponentFactory.type = ReactTextComponent;
 
 module.exports = ReactTextComponentFactory;
 
-},{"./DOMPropertyOperations":"/home/ribeiro/git/workflow-management/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./ReactComponent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactComponent.js","./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./escapeTextForBrowser":"/home/ribeiro/git/workflow-management/node_modules/react/lib/escapeTextForBrowser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactUpdates.js":[function(require,module,exports){
+},{"./DOMPropertyOperations":"/home/ribeiro/git/workflow-management/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./ReactComponent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactComponent.js","./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./escapeTextForBrowser":"/home/ribeiro/git/workflow-management/node_modules/react/lib/escapeTextForBrowser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionChildMapping.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @typechecks static-only
+ * @providesModule ReactTransitionChildMapping
+ */
+
+"use strict";
+
+var ReactChildren = require("./ReactChildren");
+
+var ReactTransitionChildMapping = {
+  /**
+   * Given `this.props.children`, return an object mapping key to child. Just
+   * simple syntactic sugar around ReactChildren.map().
+   *
+   * @param {*} children `this.props.children`
+   * @return {object} Mapping of key to child
+   */
+  getChildMapping: function(children) {
+    return ReactChildren.map(children, function(child) {
+      return child;
+    });
+  },
+
+  /**
+   * When you're adding or removing children some may be added or removed in the
+   * same render pass. We want to show *both* since we want to simultaneously
+   * animate elements in and out. This function takes a previous set of keys
+   * and a new set of keys and merges them with its best guess of the correct
+   * ordering. In the future we may expose some of the utilities in
+   * ReactMultiChild to make this easy, but for now React itself does not
+   * directly have this concept of the union of prevChildren and nextChildren
+   * so we implement it here.
+   *
+   * @param {object} prev prev children as returned from
+   * `ReactTransitionChildMapping.getChildMapping()`.
+   * @param {object} next next children as returned from
+   * `ReactTransitionChildMapping.getChildMapping()`.
+   * @return {object} a key set that contains all keys in `prev` and all keys
+   * in `next` in a reasonable order.
+   */
+  mergeChildMappings: function(prev, next) {
+    prev = prev || {};
+    next = next || {};
+
+    function getValueForKey(key) {
+      if (next.hasOwnProperty(key)) {
+        return next[key];
+      } else {
+        return prev[key];
+      }
+    }
+
+    // For each key of `next`, the list of keys to insert before that key in
+    // the combined list
+    var nextKeysPending = {};
+
+    var pendingKeys = [];
+    for (var prevKey in prev) {
+      if (next.hasOwnProperty(prevKey)) {
+        if (pendingKeys.length) {
+          nextKeysPending[prevKey] = pendingKeys;
+          pendingKeys = [];
+        }
+      } else {
+        pendingKeys.push(prevKey);
+      }
+    }
+
+    var i;
+    var childMapping = {};
+    for (var nextKey in next) {
+      if (nextKeysPending.hasOwnProperty(nextKey)) {
+        for (i = 0; i < nextKeysPending[nextKey].length; i++) {
+          var pendingNextKey = nextKeysPending[nextKey][i];
+          childMapping[nextKeysPending[nextKey][i]] = getValueForKey(
+            pendingNextKey
+          );
+        }
+      }
+      childMapping[nextKey] = getValueForKey(nextKey);
+    }
+
+    // Finally, add the keys which didn't appear before any key in `next`
+    for (i = 0; i < pendingKeys.length; i++) {
+      childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
+    }
+
+    return childMapping;
+  }
+};
+
+module.exports = ReactTransitionChildMapping;
+
+},{"./ReactChildren":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactChildren.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionEvents.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactTransitionEvents
+ */
+
+"use strict";
+
+var ExecutionEnvironment = require("./ExecutionEnvironment");
+
+/**
+ * EVENT_NAME_MAP is used to determine which event fired when a
+ * transition/animation ends, based on the style property used to
+ * define that event.
+ */
+var EVENT_NAME_MAP = {
+  transitionend: {
+    'transition': 'transitionend',
+    'WebkitTransition': 'webkitTransitionEnd',
+    'MozTransition': 'mozTransitionEnd',
+    'OTransition': 'oTransitionEnd',
+    'msTransition': 'MSTransitionEnd'
+  },
+
+  animationend: {
+    'animation': 'animationend',
+    'WebkitAnimation': 'webkitAnimationEnd',
+    'MozAnimation': 'mozAnimationEnd',
+    'OAnimation': 'oAnimationEnd',
+    'msAnimation': 'MSAnimationEnd'
+  }
+};
+
+var endEvents = [];
+
+function detectEvents() {
+  var testEl = document.createElement('div');
+  var style = testEl.style;
+
+  // On some platforms, in particular some releases of Android 4.x,
+  // the un-prefixed "animation" and "transition" properties are defined on the
+  // style object but the events that fire will still be prefixed, so we need
+  // to check if the un-prefixed events are useable, and if not remove them
+  // from the map
+  if (!('AnimationEvent' in window)) {
+    delete EVENT_NAME_MAP.animationend.animation;
+  }
+
+  if (!('TransitionEvent' in window)) {
+    delete EVENT_NAME_MAP.transitionend.transition;
+  }
+
+  for (var baseEventName in EVENT_NAME_MAP) {
+    var baseEvents = EVENT_NAME_MAP[baseEventName];
+    for (var styleName in baseEvents) {
+      if (styleName in style) {
+        endEvents.push(baseEvents[styleName]);
+        break;
+      }
+    }
+  }
+}
+
+if (ExecutionEnvironment.canUseDOM) {
+  detectEvents();
+}
+
+// We use the raw {add|remove}EventListener() call because EventListener
+// does not know how to remove event listeners and we really should
+// clean up. Also, these events are not triggered in older browsers
+// so we should be A-OK here.
+
+function addEventListener(node, eventName, eventListener) {
+  node.addEventListener(eventName, eventListener, false);
+}
+
+function removeEventListener(node, eventName, eventListener) {
+  node.removeEventListener(eventName, eventListener, false);
+}
+
+var ReactTransitionEvents = {
+  addEndEventListener: function(node, eventListener) {
+    if (endEvents.length === 0) {
+      // If CSS transitions are not supported, trigger an "end animation"
+      // event immediately.
+      window.setTimeout(eventListener, 0);
+      return;
+    }
+    endEvents.forEach(function(endEvent) {
+      addEventListener(node, endEvent, eventListener);
+    });
+  },
+
+  removeEndEventListener: function(node, eventListener) {
+    if (endEvents.length === 0) {
+      return;
+    }
+    endEvents.forEach(function(endEvent) {
+      removeEventListener(node, endEvent, eventListener);
+    });
+  }
+};
+
+module.exports = ReactTransitionEvents;
+
+},{"./ExecutionEnvironment":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ExecutionEnvironment.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionGroup.js":[function(require,module,exports){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactTransitionGroup
+ */
+
+"use strict";
+
+var React = require("./React");
+var ReactTransitionChildMapping = require("./ReactTransitionChildMapping");
+
+var assign = require("./Object.assign");
+var cloneWithProps = require("./cloneWithProps");
+var emptyFunction = require("./emptyFunction");
+
+var ReactTransitionGroup = React.createClass({
+  displayName: 'ReactTransitionGroup',
+
+  propTypes: {
+    component: React.PropTypes.any,
+    childFactory: React.PropTypes.func
+  },
+
+  getDefaultProps: function() {
+    return {
+      component: 'span',
+      childFactory: emptyFunction.thatReturnsArgument
+    };
+  },
+
+  getInitialState: function() {
+    return {
+      children: ReactTransitionChildMapping.getChildMapping(this.props.children)
+    };
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    var nextChildMapping = ReactTransitionChildMapping.getChildMapping(
+      nextProps.children
+    );
+    var prevChildMapping = this.state.children;
+
+    this.setState({
+      children: ReactTransitionChildMapping.mergeChildMappings(
+        prevChildMapping,
+        nextChildMapping
+      )
+    });
+
+    var key;
+
+    for (key in nextChildMapping) {
+      var hasPrev = prevChildMapping && prevChildMapping.hasOwnProperty(key);
+      if (nextChildMapping[key] && !hasPrev &&
+          !this.currentlyTransitioningKeys[key]) {
+        this.keysToEnter.push(key);
+      }
+    }
+
+    for (key in prevChildMapping) {
+      var hasNext = nextChildMapping && nextChildMapping.hasOwnProperty(key);
+      if (prevChildMapping[key] && !hasNext &&
+          !this.currentlyTransitioningKeys[key]) {
+        this.keysToLeave.push(key);
+      }
+    }
+
+    // If we want to someday check for reordering, we could do it here.
+  },
+
+  componentWillMount: function() {
+    this.currentlyTransitioningKeys = {};
+    this.keysToEnter = [];
+    this.keysToLeave = [];
+  },
+
+  componentDidUpdate: function() {
+    var keysToEnter = this.keysToEnter;
+    this.keysToEnter = [];
+    keysToEnter.forEach(this.performEnter);
+
+    var keysToLeave = this.keysToLeave;
+    this.keysToLeave = [];
+    keysToLeave.forEach(this.performLeave);
+  },
+
+  performEnter: function(key) {
+    this.currentlyTransitioningKeys[key] = true;
+
+    var component = this.refs[key];
+
+    if (component.componentWillEnter) {
+      component.componentWillEnter(
+        this._handleDoneEntering.bind(this, key)
+      );
+    } else {
+      this._handleDoneEntering(key);
+    }
+  },
+
+  _handleDoneEntering: function(key) {
+    var component = this.refs[key];
+    if (component.componentDidEnter) {
+      component.componentDidEnter();
+    }
+
+    delete this.currentlyTransitioningKeys[key];
+
+    var currentChildMapping = ReactTransitionChildMapping.getChildMapping(
+      this.props.children
+    );
+
+    if (!currentChildMapping || !currentChildMapping.hasOwnProperty(key)) {
+      // This was removed before it had fully entered. Remove it.
+      this.performLeave(key);
+    }
+  },
+
+  performLeave: function(key) {
+    this.currentlyTransitioningKeys[key] = true;
+
+    var component = this.refs[key];
+    if (component.componentWillLeave) {
+      component.componentWillLeave(this._handleDoneLeaving.bind(this, key));
+    } else {
+      // Note that this is somewhat dangerous b/c it calls setState()
+      // again, effectively mutating the component before all the work
+      // is done.
+      this._handleDoneLeaving(key);
+    }
+  },
+
+  _handleDoneLeaving: function(key) {
+    var component = this.refs[key];
+
+    if (component.componentDidLeave) {
+      component.componentDidLeave();
+    }
+
+    delete this.currentlyTransitioningKeys[key];
+
+    var currentChildMapping = ReactTransitionChildMapping.getChildMapping(
+      this.props.children
+    );
+
+    if (currentChildMapping && currentChildMapping.hasOwnProperty(key)) {
+      // This entered again before it fully left. Add it again.
+      this.performEnter(key);
+    } else {
+      var newChildren = assign({}, this.state.children);
+      delete newChildren[key];
+      this.setState({children: newChildren});
+    }
+  },
+
+  render: function() {
+    // TODO: we could get rid of the need for the wrapper node
+    // by cloning a single child
+    var childrenToRender = {};
+    for (var key in this.state.children) {
+      var child = this.state.children[key];
+      if (child) {
+        // You may need to apply reactive updates to a child as it is leaving.
+        // The normal React way to do it won't work since the child will have
+        // already been removed. In case you need this behavior you can provide
+        // a childFactory function to wrap every child, even the ones that are
+        // leaving.
+        childrenToRender[key] = cloneWithProps(
+          this.props.childFactory(child),
+          {ref: key}
+        );
+      }
+    }
+    return React.createElement(
+      this.props.component,
+      this.props,
+      childrenToRender
+    );
+  }
+});
+
+module.exports = ReactTransitionGroup;
+
+},{"./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js","./ReactTransitionChildMapping":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionChildMapping.js","./cloneWithProps":"/home/ribeiro/git/workflow-management/node_modules/react/lib/cloneWithProps.js","./emptyFunction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/emptyFunction.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactUpdates.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -33175,7 +34574,61 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require('_process'))
-},{"./CallbackQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./PooledClass":"/home/ribeiro/git/workflow-management/node_modules/react/lib/PooledClass.js","./ReactCurrentOwner":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCurrentOwner.js","./ReactPerf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPerf.js","./Transaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Transaction.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./warning":"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/SVGDOMPropertyConfig.js":[function(require,module,exports){
+},{"./CallbackQueue":"/home/ribeiro/git/workflow-management/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./PooledClass":"/home/ribeiro/git/workflow-management/node_modules/react/lib/PooledClass.js","./ReactCurrentOwner":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCurrentOwner.js","./ReactPerf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPerf.js","./Transaction":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Transaction.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./warning":"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactWithAddons.js":[function(require,module,exports){
+(function (process){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ReactWithAddons
+ */
+
+/**
+ * This module exists purely in the open source project, and is meant as a way
+ * to create a separate standalone build of React. This build has "addons", or
+ * functionality we've built and think might be useful but doesn't have a good
+ * place to live inside React core.
+ */
+
+"use strict";
+
+var LinkedStateMixin = require("./LinkedStateMixin");
+var React = require("./React");
+var ReactComponentWithPureRenderMixin =
+  require("./ReactComponentWithPureRenderMixin");
+var ReactCSSTransitionGroup = require("./ReactCSSTransitionGroup");
+var ReactTransitionGroup = require("./ReactTransitionGroup");
+var ReactUpdates = require("./ReactUpdates");
+
+var cx = require("./cx");
+var cloneWithProps = require("./cloneWithProps");
+var update = require("./update");
+
+React.addons = {
+  CSSTransitionGroup: ReactCSSTransitionGroup,
+  LinkedStateMixin: LinkedStateMixin,
+  PureRenderMixin: ReactComponentWithPureRenderMixin,
+  TransitionGroup: ReactTransitionGroup,
+
+  batchedUpdates: ReactUpdates.batchedUpdates,
+  classSet: cx,
+  cloneWithProps: cloneWithProps,
+  update: update
+};
+
+if ("production" !== process.env.NODE_ENV) {
+  React.addons.Perf = require("./ReactDefaultPerf");
+  React.addons.TestUtils = require("./ReactTestUtils");
+}
+
+module.exports = React;
+
+}).call(this,require('_process'))
+},{"./LinkedStateMixin":"/home/ribeiro/git/workflow-management/node_modules/react/lib/LinkedStateMixin.js","./React":"/home/ribeiro/git/workflow-management/node_modules/react/lib/React.js","./ReactCSSTransitionGroup":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroup.js","./ReactComponentWithPureRenderMixin":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactComponentWithPureRenderMixin.js","./ReactDefaultPerf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactDefaultPerf.js","./ReactTestUtils":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTestUtils.js","./ReactTransitionGroup":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactTransitionGroup.js","./ReactUpdates":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactUpdates.js","./cloneWithProps":"/home/ribeiro/git/workflow-management/node_modules/react/lib/cloneWithProps.js","./cx":"/home/ribeiro/git/workflow-management/node_modules/react/lib/cx.js","./update":"/home/ribeiro/git/workflow-management/node_modules/react/lib/update.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/SVGDOMPropertyConfig.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -35084,7 +36537,66 @@ function camelizeStyleName(string) {
 
 module.exports = camelizeStyleName;
 
-},{"./camelize":"/home/ribeiro/git/workflow-management/node_modules/react/lib/camelize.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/containsNode.js":[function(require,module,exports){
+},{"./camelize":"/home/ribeiro/git/workflow-management/node_modules/react/lib/camelize.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/cloneWithProps.js":[function(require,module,exports){
+(function (process){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @typechecks
+ * @providesModule cloneWithProps
+ */
+
+"use strict";
+
+var ReactElement = require("./ReactElement");
+var ReactPropTransferer = require("./ReactPropTransferer");
+
+var keyOf = require("./keyOf");
+var warning = require("./warning");
+
+var CHILDREN_PROP = keyOf({children: null});
+
+/**
+ * Sometimes you want to change the props of a child passed to you. Usually
+ * this is to add a CSS class.
+ *
+ * @param {object} child child component you'd like to clone
+ * @param {object} props props you'd like to modify. They will be merged
+ * as if you used `transferPropsTo()`.
+ * @return {object} a clone of child with props merged in.
+ */
+function cloneWithProps(child, props) {
+  if ("production" !== process.env.NODE_ENV) {
+    ("production" !== process.env.NODE_ENV ? warning(
+      !child.ref,
+      'You are calling cloneWithProps() on a child with a ref. This is ' +
+      'dangerous because you\'re creating a new child which will not be ' +
+      'added as a ref to its parent.'
+    ) : null);
+  }
+
+  var newProps = ReactPropTransferer.mergeProps(props, child.props);
+
+  // Use `child.props.children` if it is provided.
+  if (!newProps.hasOwnProperty(CHILDREN_PROP) &&
+      child.props.hasOwnProperty(CHILDREN_PROP)) {
+    newProps.children = child.props.children;
+  }
+
+  // The current API doesn't retain _owner and _context, which is why this
+  // doesn't use ReactElement.cloneAndReplaceProps.
+  return ReactElement.createElement(child.type, newProps);
+}
+
+module.exports = cloneWithProps;
+
+}).call(this,require('_process'))
+},{"./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./ReactPropTransferer":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactPropTransferer.js","./keyOf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/keyOf.js","./warning":"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/containsNode.js":[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -37480,7 +38992,175 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactInstanceHandles.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js":[function(require,module,exports){
+},{"./ReactElement":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactInstanceHandles.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/update.js":[function(require,module,exports){
+(function (process){
+/**
+ * Copyright 2013-2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule update
+ */
+
+"use strict";
+
+var assign = require("./Object.assign");
+var keyOf = require("./keyOf");
+var invariant = require("./invariant");
+
+function shallowCopy(x) {
+  if (Array.isArray(x)) {
+    return x.concat();
+  } else if (x && typeof x === 'object') {
+    return assign(new x.constructor(), x);
+  } else {
+    return x;
+  }
+}
+
+var COMMAND_PUSH = keyOf({$push: null});
+var COMMAND_UNSHIFT = keyOf({$unshift: null});
+var COMMAND_SPLICE = keyOf({$splice: null});
+var COMMAND_SET = keyOf({$set: null});
+var COMMAND_MERGE = keyOf({$merge: null});
+var COMMAND_APPLY = keyOf({$apply: null});
+
+var ALL_COMMANDS_LIST = [
+  COMMAND_PUSH,
+  COMMAND_UNSHIFT,
+  COMMAND_SPLICE,
+  COMMAND_SET,
+  COMMAND_MERGE,
+  COMMAND_APPLY
+];
+
+var ALL_COMMANDS_SET = {};
+
+ALL_COMMANDS_LIST.forEach(function(command) {
+  ALL_COMMANDS_SET[command] = true;
+});
+
+function invariantArrayCase(value, spec, command) {
+  ("production" !== process.env.NODE_ENV ? invariant(
+    Array.isArray(value),
+    'update(): expected target of %s to be an array; got %s.',
+    command,
+    value
+  ) : invariant(Array.isArray(value)));
+  var specValue = spec[command];
+  ("production" !== process.env.NODE_ENV ? invariant(
+    Array.isArray(specValue),
+    'update(): expected spec of %s to be an array; got %s. ' +
+    'Did you forget to wrap your parameter in an array?',
+    command,
+    specValue
+  ) : invariant(Array.isArray(specValue)));
+}
+
+function update(value, spec) {
+  ("production" !== process.env.NODE_ENV ? invariant(
+    typeof spec === 'object',
+    'update(): You provided a key path to update() that did not contain one ' +
+    'of %s. Did you forget to include {%s: ...}?',
+    ALL_COMMANDS_LIST.join(', '),
+    COMMAND_SET
+  ) : invariant(typeof spec === 'object'));
+
+  if (spec.hasOwnProperty(COMMAND_SET)) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      Object.keys(spec).length === 1,
+      'Cannot have more than one key in an object with %s',
+      COMMAND_SET
+    ) : invariant(Object.keys(spec).length === 1));
+
+    return spec[COMMAND_SET];
+  }
+
+  var nextValue = shallowCopy(value);
+
+  if (spec.hasOwnProperty(COMMAND_MERGE)) {
+    var mergeObj = spec[COMMAND_MERGE];
+    ("production" !== process.env.NODE_ENV ? invariant(
+      mergeObj && typeof mergeObj === 'object',
+      'update(): %s expects a spec of type \'object\'; got %s',
+      COMMAND_MERGE,
+      mergeObj
+    ) : invariant(mergeObj && typeof mergeObj === 'object'));
+    ("production" !== process.env.NODE_ENV ? invariant(
+      nextValue && typeof nextValue === 'object',
+      'update(): %s expects a target of type \'object\'; got %s',
+      COMMAND_MERGE,
+      nextValue
+    ) : invariant(nextValue && typeof nextValue === 'object'));
+    assign(nextValue, spec[COMMAND_MERGE]);
+  }
+
+  if (spec.hasOwnProperty(COMMAND_PUSH)) {
+    invariantArrayCase(value, spec, COMMAND_PUSH);
+    spec[COMMAND_PUSH].forEach(function(item) {
+      nextValue.push(item);
+    });
+  }
+
+  if (spec.hasOwnProperty(COMMAND_UNSHIFT)) {
+    invariantArrayCase(value, spec, COMMAND_UNSHIFT);
+    spec[COMMAND_UNSHIFT].forEach(function(item) {
+      nextValue.unshift(item);
+    });
+  }
+
+  if (spec.hasOwnProperty(COMMAND_SPLICE)) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      Array.isArray(value),
+      'Expected %s target to be an array; got %s',
+      COMMAND_SPLICE,
+      value
+    ) : invariant(Array.isArray(value)));
+    ("production" !== process.env.NODE_ENV ? invariant(
+      Array.isArray(spec[COMMAND_SPLICE]),
+      'update(): expected spec of %s to be an array of arrays; got %s. ' +
+      'Did you forget to wrap your parameters in an array?',
+      COMMAND_SPLICE,
+      spec[COMMAND_SPLICE]
+    ) : invariant(Array.isArray(spec[COMMAND_SPLICE])));
+    spec[COMMAND_SPLICE].forEach(function(args) {
+      ("production" !== process.env.NODE_ENV ? invariant(
+        Array.isArray(args),
+        'update(): expected spec of %s to be an array of arrays; got %s. ' +
+        'Did you forget to wrap your parameters in an array?',
+        COMMAND_SPLICE,
+        spec[COMMAND_SPLICE]
+      ) : invariant(Array.isArray(args)));
+      nextValue.splice.apply(nextValue, args);
+    });
+  }
+
+  if (spec.hasOwnProperty(COMMAND_APPLY)) {
+    ("production" !== process.env.NODE_ENV ? invariant(
+      typeof spec[COMMAND_APPLY] === 'function',
+      'update(): expected spec of %s to be a function; got %s.',
+      COMMAND_APPLY,
+      spec[COMMAND_APPLY]
+    ) : invariant(typeof spec[COMMAND_APPLY] === 'function'));
+    nextValue = spec[COMMAND_APPLY](nextValue);
+  }
+
+  for (var k in spec) {
+    if (!(ALL_COMMANDS_SET.hasOwnProperty(k) && ALL_COMMANDS_SET[k])) {
+      nextValue[k] = update(value[k], spec[k]);
+    }
+  }
+
+  return nextValue;
+}
+
+module.exports = update;
+
+}).call(this,require('_process'))
+},{"./Object.assign":"/home/ribeiro/git/workflow-management/node_modules/react/lib/Object.assign.js","./invariant":"/home/ribeiro/git/workflow-management/node_modules/react/lib/invariant.js","./keyOf":"/home/ribeiro/git/workflow-management/node_modules/react/lib/keyOf.js","_process":"/usr/local/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/home/ribeiro/git/workflow-management/node_modules/react/lib/warning.js":[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -40416,7 +42096,21 @@ RequestActions.load.listen(function (state) {
 
 module.exports = RequestActions;
 
-},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx":[function(require,module,exports){
+},{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+// Each action is like an event channel for one specific event. Actions are called by components.
+// The store is listening to all actions, and the components in turn are listening to the store.
+// Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
+var StateActions = Reflux.createActions(["loadingStart", "loadingEnd"]);
+
+module.exports = StateActions;
+
+},{"reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -40435,8 +42129,13 @@ var UserActions = Reflux.createActions(["loadSuccess", "loadUser", "setUsername"
 
 var loader = new DetailLoader({ model: "account", hash: "me" });
 
-UserActions.loadUser.listen(function (page) {
-    loader.load(UserActions.loadSuccess);
+UserActions.loadUser.listen(function () {
+    var callback = arguments[0] === undefined ? null : arguments[0];
+
+    if (callback != null) loader.load(function (data) {
+        UserActions.loadSuccess(data);
+        callback(data);
+    });else loader.load(UserActions.loadSuccess);
 });
 
 module.exports = UserActions;
@@ -40466,120 +42165,152 @@ module.exports = WorkflowActions;
 },{"./api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx":[function(require,module,exports){
 "use strict";
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var ListLoader = (function () {
-  function ListLoader(options) {
-    _classCallCheck(this, ListLoader);
+var Loader = (function () {
+    function Loader(options) {
+        _classCallCheck(this, Loader);
+    }
 
-    this.__loaded = {};
-    this.model = options.model;
-    this.dontrepeat = options.dontrepeat || false;
-  }
+    _prototypeProperties(Loader, null, {
+        load: {
+            value: function load(url, callback) {
+                var unsuccessful_callback = arguments[2] === undefined ? null : arguments[2];
+                var type = arguments[3] === undefined ? "GET" : arguments[3];
+                var serialized = arguments[4] === undefined ? {} : arguments[4];
 
-  _prototypeProperties(ListLoader, null, {
-    load: {
-      value: function load(callback, state) {
-        if (!this.dontrepeat || this.__loaded[state.currentPage] === undefined) {
-          this.__loaded[state.currentPage] = true;
+                $.ajax({
+                    url: url,
+                    type: type,
+                    data: serialized,
+                    dataType: "json",
+                    success: (function (data) {
+                        callback(data);
+                    }).bind(this),
+                    error: (function (xhr, status, err) {
+                        if (unsuccessful_callback != null) unsuccessful_callback();
 
-          var order = state.externalSortAscending ? "" : "-";
-          $.ajax({
-            url: "api/" + this.model + "/?page=" + (state.currentPage + 1) + "&ordering=" + order + "" + state.externalSortColumn,
-            dataType: "json",
-            success: (function (data) {
-
-              callback(data, state);
-            }).bind(this),
-            error: (function (xhr, status, err) {
-              console.error(status, err.toString());
-            }).bind(this)
-          });
+                        console.error("Unable to load " + url);
+                    }).bind(this)
+                });
+            },
+            writable: true,
+            configurable: true
         }
-      },
-      writable: true,
-      configurable: true
-    }
-  });
+    });
 
-  return ListLoader;
+    return Loader;
 })();
 
-var DetailLoader = (function () {
-  function DetailLoader(options) {
-    _classCallCheck(this, DetailLoader);
+var ListLoader = (function (Loader) {
+    function ListLoader(options) {
+        _classCallCheck(this, ListLoader);
 
-    this.model = options.model;
-    this.hash = options.hash;
-  }
-
-  _prototypeProperties(DetailLoader, null, {
-    load: {
-      value: function load(callback) {
-        console.log("api/" + this.model + "/" + this.hash + "/");
-        $.ajax({
-          url: "api/" + this.model + "/" + this.hash + "/",
-          dataType: "json",
-          success: (function (data) {
-            callback(data);
-          }).bind(this),
-          error: (function (xhr, status, err) {
-            console.error("Unable to load \"api/" + this.model + "/" + this.hash + "/\"");
-          }).bind(this)
-        });
-      },
-      writable: true,
-      configurable: true
+        this.__loaded = {};
+        this.model = options.model;
+        this.dontrepeat = options.dontrepeat || false;
     }
-  });
 
-  return DetailLoader;
-})();
+    _inherits(ListLoader, Loader);
 
-var Login = (function () {
-  function Login(options) {
-    _classCallCheck(this, Login);
+    _prototypeProperties(ListLoader, null, {
+        load: {
+            value: function load(callback, state) {
+                if (!this.dontrepeat || this.__loaded[state.currentPage] === undefined) {
+                    this.__loaded[state.currentPage] = true;
 
-    this.data = {
-      csrfmiddlewaretoken: Django.csrf_token(),
-      username: options.username,
-      password: options.password,
-      remember: options.remember
-    };
-  }
+                    var order = state.externalSortAscending ? "" : "-";
 
-  _prototypeProperties(Login, null, {
-    authenticate: {
+                    _get(Object.getPrototypeOf(ListLoader.prototype), "load", this).call(this, "api/" + this.model + "/?page=" + (state.currentPage + 1) + "&ordering=" + order + "" + state.externalSortColumn, callback);
+                }
+            },
+            writable: true,
+            configurable: true
+        }
+    });
 
-      // Get and csrf token to use on a post form
+    return ListLoader;
+})(Loader);
 
-      value: function authenticate(callback) {
-        var unsuccessful_callback = arguments[1] === undefined ? null : arguments[1];
+var DetailLoader = (function (Loader) {
+    function DetailLoader(options) {
+        _classCallCheck(this, DetailLoader);
 
-        $.ajax({
-          url: "api/account/login/",
-          type: "POST",
-          data: this.data,
-          dataType: "json",
-          success: (function (data) {
-            callback(data);
-          }).bind(this),
-          error: (function (xhr, status, err) {
-            if (unsuccessful_callback != null) unsuccessful_callback();
-
-            console.error("Unable to load 'api/account/login/'");
-          }).bind(this)
-        });
-      },
-      writable: true,
-      configurable: true
+        this.model = options.model;
+        this.hash = options.hash;
     }
-  });
 
-  return Login;
-})();
+    _inherits(DetailLoader, Loader);
+
+    _prototypeProperties(DetailLoader, null, {
+        load: {
+            value: function load(callback) {
+                _get(Object.getPrototypeOf(DetailLoader.prototype), "load", this).call(this, "api/" + this.model + "/" + this.hash + "/", callback);
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return DetailLoader;
+})(Loader);
+
+var Login = (function (Loader) {
+    function Login(options) {
+        _classCallCheck(this, Login);
+
+        this.data = {
+            csrfmiddlewaretoken: Django.csrf_token(),
+            username: options.username,
+            password: options.password,
+            remember: options.remember
+        };
+    }
+
+    _inherits(Login, Loader);
+
+    _prototypeProperties(Login, null, {
+        waitForData: {
+
+            // Check if user is logged in returns a promise
+
+            value: function waitForData() {
+                return $.ajax("api/account/me/");
+            },
+            writable: true,
+            configurable: true
+        },
+        authenticate: {
+
+            // Get and csrf token to use on a post form
+
+            value: function authenticate(callback) {
+                var unsuccessful_callback = arguments[1] === undefined ? null : arguments[1];
+
+                _get(Object.getPrototypeOf(Login.prototype), "load", this).call(this, "api/account/login/", callback, unsuccessful_callback, "POST", this.data);
+            },
+            writable: true,
+            configurable: true
+        },
+        logout: {
+            value: function logout(callback) {
+                var unsuccessful_callback = arguments[1] === undefined ? null : arguments[1];
+
+                _get(Object.getPrototypeOf(Login.prototype), "load", this).call(this, "api/account/logout/", callback, unsuccessful_callback = unsuccessful_callback);
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return Login;
+})(Loader);
 
 module.exports = { ListLoader: ListLoader, DetailLoader: DetailLoader, Login: Login };
 
@@ -40642,6 +42373,8 @@ module.exports = React.createClass({
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var Reflux = _interopRequire(require("reflux"));
+
 var React = _interopRequire(require("react"));
 
 var _reactRouter = require("react-router");
@@ -40656,8 +42389,34 @@ var _reusableNavigationJsx = require("./reusable/navigation.jsx");
 
 var Tab = _reusableNavigationJsx.Tab;
 var UserDropdown = _reusableNavigationJsx.UserDropdown;
+
+var TransitionGroup = _interopRequire(require("react/lib/ReactCSSTransitionGroup"));
+
+var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
+
+var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
+
+var StateActions = _interopRequire(require("../actions/StateActions.jsx"));
+
+var StateStore = _interopRequire(require("../stores/StateStore.jsx"));
+
 module.exports = React.createClass({
   displayName: "Home",
+  mixins: [Reflux.listenTo(UserStore, "update"), Reflux.listenTo(StateStore, "update")],
+  __getState: function __getState() {
+    return {
+      user: UserStore.getUser(),
+      failed: UserStore.getFailed(),
+      loading: StateStore.isLoading() };
+  },
+  getInitialState: function getInitialState() {
+    console.log("initial state");
+    return this.__getState();
+  },
+  update: function update(data) {
+    this.setState(this.__getState());
+  },
+  componentDidMount: function componentDidMount() {},
   render: function render() {
     return React.createElement(
       "div",
@@ -40717,7 +42476,12 @@ module.exports = React.createClass({
         "div",
         { className: "container" },
         React.createElement(Breadcrumbs, { separator: "" }),
-        React.createElement(RouteHandler, null)
+        this.state.loading ? React.createElement("i", { className: "fa fa-4x fa-cog fa-spin" }) : "",
+        React.createElement(
+          TransitionGroup,
+          { component: "div", transitionName: "example" },
+          React.createElement(RouteHandler, { key: name })
+        )
       ),
       React.createElement(
         "footer",
@@ -40732,12 +42496,12 @@ module.exports = React.createClass({
 // /.navbar-collapse -->
 // /.container-fluid -->
 
-},{"./reusable/navigation.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-breadcrumbs":"/home/ribeiro/git/workflow-management/node_modules/react-breadcrumbs/index.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx":[function(require,module,exports){
+},{"../actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/StateStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/StateStore.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","./reusable/navigation.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/navigation.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-breadcrumbs":"/home/ribeiro/git/workflow-management/node_modules/react-breadcrumbs/index.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","react/lib/ReactCSSTransitionGroup":"/home/ribeiro/git/workflow-management/node_modules/react/lib/ReactCSSTransitionGroup.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-var React = _interopRequire(require("react"));
+var React = _interopRequire(require("react/addons"));
 
 var Reflux = _interopRequire(require("reflux"));
 
@@ -40749,98 +42513,13 @@ var ProcessTable = require("./reusable/process.jsx").ProcessTable;
 
 var RequestTable = require("./reusable/request.jsx").RequestTable;
 
-var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
-
-var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
+var Authentication = require("../mixins/component.jsx").Authentication;
 
 module.exports = React.createClass({
   displayName: "",
-  mixins: [Reflux.listenTo(UserStore, "update")],
-  __getState: function __getState() {
-    return {
-      user: UserStore.getUser(),
-      username: UserStore.getUsername(),
-      password: UserStore.getPassword(),
-      remember_me: UserStore.getRememberMe(),
-      failed: UserStore.getFailed()
-    };
-  },
-  getInitialState: function getInitialState() {
-    return this.__getState();
-  },
-  update: function update(data) {
-    this.setState(this.__getState());
-  },
-  __login: function __login() {
+  mixins: [Authentication],
 
-    if (this.refs.usr != "" && this.refs.pwd != "") {
-      UserActions.login({
-        username: this.refs.usr.getDOMNode().value.trim(),
-        password: this.refs.pwd.getDOMNode().value.trim(),
-        remember: this.refs.rmb.getDOMNode().checked
-      });
-    }
-  },
   render: function render() {
-    console.log(this.state.user.authenticated);
-    if (this.state.user.authenticated === false) {
-      return React.createElement(
-        "div",
-        { className: "container" },
-        React.createElement(
-          "div",
-          { className: "row" },
-          React.createElement(
-            "div",
-            { className: "col-sm-6 col-md-4 col-md-offset-4" },
-            React.createElement(
-              "div",
-              { className: "account-wall" },
-              React.createElement(
-                "h1",
-                { className: "text-center login-title" },
-                "Please login"
-              ),
-              React.createElement("img", { className: "profile-img", src: "static/images/user.png",
-                alt: "" }),
-              React.createElement(
-                "form",
-                { className: "form-signin" },
-                React.createElement("input", { name: "username", ref: "usr", type: "text", className: "form-control", placeholder: "Email", required: true, autofocus: true }),
-                React.createElement("input", { name: "password", ref: "pwd", type: "password", className: "form-control", placeholder: "Password", required: true }),
-                this.state.failed ? React.createElement(
-                  "div",
-                  { className: "alert alert-danger", role: "alert" },
-                  "Login failed"
-                ) : "",
-                React.createElement("input", { value: "Sign in", onClick: this.__login,
-                  className: "btn btn-lg btn-primary btn-block",
-                  type: "button" }),
-                React.createElement(
-                  "label",
-                  { className: "checkbox pull-left" },
-                  React.createElement("input", { defaultChecked: "true", ref: "rmb",
-                    name: "remember_me", type: "checkbox", value: "remember-me" }),
-                  "Remember me"
-                ),
-                React.createElement(
-                  "a",
-                  { href: "#", className: "pull-right need-help" },
-                  "Forgot password? "
-                ),
-                React.createElement("span", { className: "clearfix" })
-              )
-            ),
-            React.createElement(
-              "a",
-              { href: "#", className: "text-center new-account" },
-              "Create an account "
-            )
-          )
-        )
-      );
-    }
-    // else
     return React.createElement(LoggedInHome, null);
   }
 });
@@ -40875,11 +42554,107 @@ var LoggedInHome = React.createClass({
     );
   }
 });
+
+},{"../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react/addons":"/home/ribeiro/git/workflow-management/node_modules/react/addons.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/login.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var React = _interopRequire(require("react"));
+
+var UserActions = _interopRequire(require("../actions/UserActions.jsx"));
+
+var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
+
+module.exports = React.createClass({
+    displayName: "Login",
+    mixins: [Reflux.listenTo(UserStore, "update")],
+    __getState: function __getState() {
+        return {
+            failed: UserStore.getFailed()
+        };
+    },
+    getInitialState: function getInitialState() {
+        return this.__getState();
+    },
+    update: function update(data) {
+        this.setState(this.__getState());
+    },
+    __login: function __login() {
+
+        if (this.refs.usr != "" && this.refs.pwd != "") {
+            UserActions.login({
+                username: this.refs.usr.getDOMNode().value.trim(),
+                password: this.refs.pwd.getDOMNode().value.trim(),
+                remember: this.refs.rmb.getDOMNode().checked
+            });
+        }
+    },
+    render: function render() {
+        return React.createElement(
+            "div",
+            { key: "logincomponent", className: "container" },
+            React.createElement(
+                "div",
+                { className: "row" },
+                React.createElement(
+                    "div",
+                    { className: "col-sm-6 col-md-4 col-md-offset-4" },
+                    React.createElement(
+                        "div",
+                        { className: "account-wall" },
+                        React.createElement(
+                            "h1",
+                            { className: "text-center login-title" },
+                            "Please login"
+                        ),
+                        React.createElement("img", { className: "profile-img", src: "static/images/user.png",
+                            alt: "" }),
+                        React.createElement(
+                            "form",
+                            { className: "form-signin" },
+                            React.createElement("input", { name: "username", ref: "usr", type: "text", className: "form-control", placeholder: "Email", required: true, autofocus: true }),
+                            React.createElement("input", { name: "password", ref: "pwd", type: "password", className: "form-control", placeholder: "Password", required: true }),
+                            this.state.failed ? React.createElement(
+                                "div",
+                                { className: "alert alert-danger", role: "alert" },
+                                "Login failed"
+                            ) : "",
+                            React.createElement("input", { value: "Sign in", onClick: this.__login,
+                                className: "btn btn-lg btn-primary btn-block",
+                                type: "button" }),
+                            React.createElement(
+                                "label",
+                                { className: "checkbox pull-left" },
+                                React.createElement("input", { defaultChecked: "true", ref: "rmb",
+                                    name: "remember_me", type: "checkbox", value: "remember-me" }),
+                                "Remember me"
+                            ),
+                            React.createElement(
+                                "a",
+                                { href: "#", className: "pull-right need-help" },
+                                "Forgot password? "
+                            ),
+                            React.createElement("span", { className: "clearfix" })
+                        )
+                    ),
+                    React.createElement(
+                        "a",
+                        { href: "#", className: "text-center new-account" },
+                        "Create an account "
+                    )
+                )
+            )
+        );
+    }
+});
 /*value={this.state.username}*/
 /*onChange={this.setUsername}*/ /*value={this.state.password}*/
 /*onChange={this.setPassword}*/ /*onChange={this.setRememberMe}*/
 
-},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","./reusable/history.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/history.jsx","./reusable/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/process.jsx","./reusable/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/request.jsx","./reusable/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
+},{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -41235,11 +43010,12 @@ var UserDropdown = React.createClass({
   getInitialState: function getInitialState() {
     return this.__getState();
   },
-  componentDidMount: function componentDidMount() {
-    UserActions.loadUser();
-  },
+  componentDidMount: function componentDidMount() {},
   update: function update() {
     this.setState(this.__getState());
+  },
+  logout: function logout() {
+    UserActions.logout();
   },
   render: function render() {
     if (this.state.user.authenticated === false) {
@@ -41290,7 +43066,7 @@ var UserDropdown = React.createClass({
             null,
             React.createElement(
               "a",
-              { href: "#" },
+              { href: "#", onClick: this.logout },
               React.createElement("i", { className: "fa fa-sign-out" }),
               " Logout"
             )
@@ -41877,18 +43653,50 @@ var routes = _interopRequire(require("./routes.jsx"));
 
 var bootstrap = _interopRequire(require("bootstrap"));
 
+var Login = require("./actions/api.jsx").Login;
+
+var UserActions = _interopRequire(require("./actions/UserActions.jsx"));
+
+var UserStore = _interopRequire(require("./stores/UserStore.jsx"));
+
+var StateActions = _interopRequire(require("./actions/StateActions.jsx"));
+
 var content = document.getElementById("playground");
+var lgn = new Login({});
 
 Router.run(routes, Router.HistoryLocation, function (Handler) {
-    return React.render(React.createElement(Handler, null), content);
+    UserActions.loadUser(function (user_data) {
+
+        console.log("render page");
+        React.render(React.createElement(Handler, null), content);
+    });
 });
 
-},{"./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
+},{"./actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","./actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","./actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","./stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 var React = _interopRequire(require("react"));
+
+var UserStore = _interopRequire(require("../stores/UserStore.jsx"));
+
+var Login = require("../actions/api.jsx").Login;
+
+var Authentication = {
+    statics: {
+        willTransitionTo: function willTransitionTo(transition, params, query) {
+            var callback = arguments[3] === undefined ? doRoute : arguments[3];
+
+            console.log("transition");
+
+            var nextPath = transition.path;
+            if (!UserStore.loggedIn()) {
+                transition.redirect("/login", {}, { nextPath: nextPath });
+            }
+        }
+    }
+};
 
 var TableComponentMixin = {
     componentDidMount: function componentDidMount() {
@@ -41963,9 +43771,9 @@ var TableComponentMixin = {
     }
 };
 
-module.exports = { TableComponentMixin: TableComponentMixin };
+module.exports = { Authentication: Authentication, TableComponentMixin: TableComponentMixin };
 
-},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
+},{"../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../stores/UserStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx":[function(require,module,exports){
 "use strict";
 
 var TableStoreMixin = {
@@ -42030,6 +43838,7 @@ var NotFoundRoute = _reactRouter.NotFoundRoute;
 module.exports = React.createElement(
     Route,
     { name: "app", path: "/", handler: require("./components/app.jsx") },
+    React.createElement(Route, { name: "login", path: "login", handler: require("./components/login.jsx") }),
     React.createElement(Route, { name: "home", path: "/", handler: require("./components/home.jsx") }),
     React.createElement(Route, { name: "about", handler: require("./components/about.jsx") }),
     React.createElement(Route, { name: "Workflow", path: "workflow/:object", handler: require("./components/workflow.jsx") }),
@@ -42042,7 +43851,7 @@ module.exports = React.createElement(
     React.createElement(NotFoundRoute, { handler: require("./components/404.jsx") })
 );
 
-},{"./components/404.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx","./components/about.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/about.jsx","./components/app.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/app.jsx","./components/home.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx","./components/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx","./components/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/request.jsx","./components/result/simple.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/result/simple.jsx","./components/task/simple.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx","./components/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/HistoryStore.jsx":[function(require,module,exports){
+},{"./components/404.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/404.jsx","./components/about.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/about.jsx","./components/app.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/app.jsx","./components/home.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/home.jsx","./components/login.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/login.jsx","./components/process.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/process.jsx","./components/request.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/request.jsx","./components/result/simple.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/result/simple.jsx","./components/task/simple.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx","./components/workflow.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/workflow.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/HistoryStore.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -42090,7 +43899,39 @@ module.exports = Reflux.createStore({
     listenables: [RequestActions]
 });
 
-},{"../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
+},{"../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/StateStore.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var StateActions = _interopRequire(require("../actions/StateActions.jsx"));
+
+module.exports = Reflux.createStore({
+    listenables: [StateActions],
+    init: function init() {
+        this.__loading = false;
+    },
+
+    isLoading: function isLoading() {
+        return this.__loading;
+    },
+
+    // Action handlers
+    onLoadingStart: function onLoadingStart() {
+        console.log("loading");
+        this.__loading = true;
+        this.trigger();
+    },
+    onLoadingEnd: function onLoadingEnd() {
+        console.log("finished loading");
+        this.__loading = false;
+        this.trigger();
+    }
+});
+
+},{"../actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/UserStore.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -42107,26 +43948,16 @@ module.exports = Reflux.createStore({
     init: function init() {
         this.__userdata = {};
 
-        // Username for login porpuses
-        this.__username = "";
-        this.__password = "";
-        this.__remember_me = false;
         this.__failed = false;
     },
     getUser: function getUser() {
         return this.__userdata;
     },
-    getUsername: function getUsername() {
-        return this.__username;
-    },
-    getPassword: function getPassword() {
-        return this.__password;
-    },
-    getRememberMe: function getRememberMe() {
-        return this.__remember_me;
-    },
     getFailed: function getFailed() {
         return this.__failed;
+    },
+    loggedIn: function loggedIn() {
+        return this.__userdata.email;
     },
     onLoginFailed: function onLoginFailed() {
         this.__failed = true;
@@ -42135,22 +43966,8 @@ module.exports = Reflux.createStore({
     },
     // Actions handlers (declared on UserActions, and implemented here)
     onLoadSuccess: function onLoadSuccess(data) {
+        console.log(data);
         this.__userdata = data;
-        this.trigger();
-    },
-    onSetUsername: function onSetUsername(username) {
-        console.log(username);
-        this.__username = username;
-
-        this.trigger();
-    },
-    onSetPassword: function onSetPassword(password) {
-        this.__password = password;
-        this.trigger();
-    },
-    onSetRememberMe: function onSetRememberMe(remember) {
-        this.__remember_me = remember;
-
         this.trigger();
     },
     onLogin: function onLogin(data) {
@@ -42159,8 +43976,7 @@ module.exports = Reflux.createStore({
             password: data.password,
             remember: data.remember
         });
-        console.log("ON LOGIN");
-        console.log(log);
+
         log.authenticate(UserActions.loginSuccess, UserActions.loginFailed);
     },
     onLoginSuccess: function onLoginSuccess(data) {
@@ -42170,7 +43986,8 @@ module.exports = Reflux.createStore({
         } else {
             UserActions.loginFailed();
         }
-    }
+    },
+    onLogout: function onLogout(data) {}
 });
 
 },{"../actions/UserActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/UserActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx":[function(require,module,exports){

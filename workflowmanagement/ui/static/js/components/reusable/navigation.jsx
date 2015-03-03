@@ -32,10 +32,12 @@ var UserDropdown = React.createClass({
       return this.__getState();
     },
     componentDidMount: function() {
-      UserActions.loadUser();
     },
     update: function(){
       this.setState(this.__getState());
+    },
+    logout: function(){
+      UserActions.logout();
     },
   render: function () {
     if(this.state.user.authenticated === false){
@@ -53,7 +55,7 @@ var UserDropdown = React.createClass({
                             <strong>Last Login:</strong><br /> {this.state.user.last_login}
                         </li>
                         <li className="divider"></li>
-                        <li><a href="#"><i className="fa fa-sign-out"></i> Logout</a></li>
+                        <li><a href="#" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
                       </ul>
                     </li>
                   </ul>;
