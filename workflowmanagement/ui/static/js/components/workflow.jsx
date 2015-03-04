@@ -10,24 +10,20 @@ import WorkflowActions from '../actions/WorkflowActions.jsx';
 import {WorkflowStore} from '../stores/WorkflowStore.jsx';
 
 export default React.createClass({
-    displayName: route => {
-        return `Workflow ${route.getParams().object}`;
-    },
     mixins: [ Router.Navigation, Router.State, Authentication],
     statics: {
         fetch(params) {
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (workflow) => {
-                    console.log(workflow);
                     return workflow
                 }
-
             );
         }
     },
+    displayName: route => {
+        return `Workflow ${route.props.detail.Workflow.title}`;
+    },
     render() {
-        console.log(this.props.callback);
-
         return (
           <div className="col-md-12">
             <div className="col-md-3">

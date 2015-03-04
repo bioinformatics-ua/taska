@@ -38728,6 +38728,8 @@ module.exports = React.createClass({
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Reflux = _interopRequire(require("reflux"));
 
 var React = _interopRequire(require("react"));
@@ -38769,9 +38771,6 @@ module.exports = React.createClass({
     this.setState(this.__getState());
   },
   render: function render() {
-    var test = function test() {
-      console.log("hello world");
-    };
     return React.createElement(
       "div",
       null,
@@ -38829,9 +38828,9 @@ module.exports = React.createClass({
       React.createElement(
         "div",
         { className: "container" },
-        React.createElement(Breadcrumbs, { separator: "" }),
+        React.createElement(Breadcrumbs, _extends({ separator: "" }, this.props)),
         this.state.loading ? React.createElement("i", { className: "fa fa-4x fa-cog fa-spin" }) : "",
-        React.createElement(RouteHandler, { key: name, callback: test })
+        React.createElement(RouteHandler, _extends({ key: name }, this.props))
       ),
       React.createElement(
         "footer",
@@ -38871,6 +38870,8 @@ module.exports = React.createClass({
   displayName: "",
   mixins: [Router.Navigation, Authentication],
   render: function render() {
+    console.log(this.props.me);
+
     return React.createElement(LoggedInHome, null);
   }
 });
@@ -40038,21 +40039,18 @@ var WorkflowActions = _interopRequire(require("../actions/WorkflowActions.jsx"))
 var WorkflowStore = require("../stores/WorkflowStore.jsx").WorkflowStore;
 
 module.exports = React.createClass({
-    displayName: function (route) {
-        return "Workflow " + route.getParams().object;
-    },
     mixins: [Router.Navigation, Router.State, Authentication],
     statics: {
         fetch: function fetch(params) {
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(function (workflow) {
-                console.log(workflow);
                 return workflow;
             });
         }
     },
+    displayName: function (route) {
+        return "Workflow " + route.props.detail.Workflow.title;
+    },
     render: function render() {
-        console.log(this.props.callback);
-
         return React.createElement(
             "div",
             { className: "col-md-12" },
@@ -40151,9 +40149,7 @@ function fetch(routes, params) {
 
 Router.run(routes, Router.HistoryLocation, function (Handler, state) {
     fetch(state.routes, state.params).then(function (detail) {
-        console.log("DATA HERE:");
-        console.log(detail);
-        React.render(React.createElement(Handler, { detail: detail.Workflow }), content);
+        React.render(React.createElement(Handler, { detail: detail }), content);
     });
 });
 

@@ -14,6 +14,8 @@ export default React.createClass({
   displayName: "",
   mixins: [Router.Navigation, Authentication],
   render: function () {
+    console.log(this.props.me);
+
     return <LoggedInHome />;
   }
 });

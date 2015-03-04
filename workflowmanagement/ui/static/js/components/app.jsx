@@ -31,9 +31,6 @@ export default React.createClass({
         this.setState(this.__getState());
     },
   render: function(){
-    let test = function(){
-      console.log('hello world');
-    }
     return (
       <div>
         <header>
@@ -63,9 +60,9 @@ export default React.createClass({
             </nav>
         </header>
         <div className="container">
-          <Breadcrumbs separator='' />
+          <Breadcrumbs separator='' {...this.props} />
           {this.state.loading ?<i className="fa fa-4x fa-cog fa-spin"></i>:''}
-            <RouteHandler key={name} callback = {test} />
+            <RouteHandler key={name} {...this.props} />
         </div>
         <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
       </div>

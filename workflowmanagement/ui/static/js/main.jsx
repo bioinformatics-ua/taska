@@ -25,9 +25,7 @@ function fetch(routes, params) {
 
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
     fetch(state.routes, state.params).then((detail) => {
-        console.log('DATA HERE:');
-        console.log(detail);
-        React.render(<Handler detail={detail.Workflow} />, content);
+        React.render(<Handler detail={detail} />, content);
     });
 });
 
