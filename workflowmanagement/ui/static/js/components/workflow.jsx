@@ -9,6 +9,8 @@ import WorkflowActions from '../actions/WorkflowActions.jsx';
 
 import {WorkflowStore} from '../stores/WorkflowStore.jsx';
 
+import {StateMachineComponent} from './reusable/statemachine.jsx';
+
 export default React.createClass({
     mixins: [ Router.Navigation, Router.State, Authentication],
     statics: {
@@ -50,8 +52,7 @@ export default React.createClass({
                               </div>
                               <div className="row">
                                 <div className="col-md-12">
-                                    <div id="state_machine_chart">Yello
-                                    </div>
+                                    <StateMachineComponent />
                                 </div>
                               </div>
                               <div className="row">

@@ -322,3 +322,13 @@ footer {
     min-height: 300px;
     background-color: grey;
 }
+.state{
+    margin:5px;
+    z-index: 3000;
+}
+.btn-dotted{
+    border: 4px dotted #C7C7C7;
+    background-color: white;
+    min-width: 200px;
+    height: 100%;
+}

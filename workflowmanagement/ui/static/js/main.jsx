@@ -7,6 +7,10 @@ import Router from 'react-router';
 import routes from './routes.jsx';
 import bootstrap from 'bootstrap';
 
+import jqueryui from 'jquery-ui';
+
+import touchpunch from 'jquery-ui-touch-punch';
+
 import {Login} from './actions/api.jsx';
 
 const content = document.getElementById('playground');
