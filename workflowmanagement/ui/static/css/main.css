@@ -295,3 +295,30 @@ footer {
     display: block;
     margin-top: 10px;
 }
+
+.taskbar{
+    border-right: 1px solid #eee;
+    height: 100%;
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width: 992px) {
+    .taskbar {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+        border-right: 0;
+    }
+}
+
+.task-type .task-type-icon{
+  vertical-align: middle;
+}
+
+.task-type-title {
+    height: 34px;
+}
+
+#state_machine_chart{
+    min-height: 300px;
+    background-color: grey;
+}

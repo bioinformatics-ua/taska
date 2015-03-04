@@ -40051,60 +40051,85 @@ module.exports = React.createClass({
         return "Workflow " + route.props.detail.Workflow.title;
     },
     render: function render() {
+        var initial = this.props.detail.Workflow;
         return React.createElement(
             "div",
-            { className: "col-md-12" },
+            { className: "row" },
             React.createElement(
                 "div",
-                { className: "col-md-3" },
+                { className: "col-md-12" },
                 React.createElement(
                     "div",
-                    { className: "panel panel-default panel-overflow" },
+                    { className: "panel panel-default" },
                     React.createElement(
                         "div",
-                        { className: "panel-heading" },
+                        { className: "panel-body" },
                         React.createElement(
-                            "center",
-                            null,
-                            React.createElement("i", { className: "fa fa-cogs pull-left" }),
+                            "div",
+                            { className: "clearfix taskbar col-md-3" },
                             React.createElement(
                                 "h3",
-                                { className: "panel-title" },
+                                { className: "task-type-title panel-title" },
                                 "Type of Tasks"
-                            )
-                        )
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "panel-body" },
-                        "body"
-                    )
-                )
-            ),
-            React.createElement(
-                "div",
-                { className: "col-md-9" },
-                React.createElement(
-                    "div",
-                    { className: "panel panel-default panel-overflow" },
-                    React.createElement(
-                        "div",
-                        { className: "panel-heading" },
-                        React.createElement(
-                            "center",
-                            null,
-                            React.createElement("i", { className: "fa fa-cogs pull-left" }),
+                            ),
+                            React.createElement("hr", null),
                             React.createElement(
-                                "h3",
-                                { className: "panel-title" },
-                                "NAme of task"
+                                "div",
+                                { className: "task-type col-md-12 col-xs-4 btn btn-default" },
+                                React.createElement("i", { className: "task-type-icon fa fa-2x fa-check" }),
+                                " ",
+                                React.createElement(
+                                    "span",
+                                    null,
+                                    "Simple Task"
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            "div",
+                            { className: "col-md-9" },
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "div",
+                                        { "class": "form-group" },
+                                        React.createElement("input", { type: "title", className: "form-control",
+                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", value: initial.title })
+                                    ),
+                                    React.createElement("hr", null)
+                                )
+                            ),
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "div",
+                                        { id: "state_machine_chart" },
+                                        "Yello"
+                                    )
+                                )
+                            ),
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "button",
+                                        { className: "btn btn-primary pull-right" },
+                                        "Save Workflow"
+                                    )
+                                )
                             )
                         )
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "panel-body" },
-                        "body"
                     )
                 )
             )
