@@ -8,6 +8,8 @@ module.exports = (
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
+        <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
+
         <Route name="home" path="/" handler={require('./components/home.jsx')}/>
 
         <Route name="about" handler={require('./components/about.jsx')} />

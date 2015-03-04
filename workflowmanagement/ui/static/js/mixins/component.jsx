@@ -8,12 +8,14 @@ const Authentication = {
         willTransitionTo: function (transition, params, query, callback) {
             var nextPath = transition.path;
 
-            UserActions.loadIfNecessary((user_data) => {
-                if(user_data.email === undefined)
-                    transition.redirect('/login',{}, {'nextPath' : nextPath });
+            let promise = UserActions.loadDetailIfNecessary.triggerPromise('me').then(
+                (user_data) => {
+                    if(user_data.email === undefined)
+                        transition.redirect('/login',{}, {'nextPath' : nextPath });
 
-                callback();
-            });
+                    callback();
+                }
+            );
         }
     }
 };
@@ -22,12 +24,14 @@ const CheckLog = {
     statics: {
         willTransitionTo: function (transition, params, query, callback) {
             var nextPath = transition.path;
-            UserActions.loadIfNecessary((user_data) => {
-                if(user_data.email != undefined)
-                    transition.redirect('/');
+            UserActions.loadDetailIfNecessary.triggerPromise('me').then(
+                (user_data) => {
+                    if(user_data.email != undefined)
+                        transition.redirect('/');
 
-                callback();
-            });
+                    callback();
+                }
+            );
         }
     }
 };

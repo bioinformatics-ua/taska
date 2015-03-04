@@ -15,7 +15,7 @@ export default React.createClass({
     mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State, CheckLog],
     __getState: function(){
       return {
-        failed: UserStore.getFailed()
+        failed: UserStore.loginFailed()
       }
     },
     getInitialState: function() {

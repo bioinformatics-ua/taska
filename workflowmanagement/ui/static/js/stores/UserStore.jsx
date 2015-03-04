@@ -1,62 +1,36 @@
 'use strict';
 import Reflux from 'reflux';
 import UserActions from '../actions/UserActions.jsx';
-import {ListLoader, DetailLoader} from '../actions/api.jsx'
+import {ListLoader, DetailLoader} from '../actions/api.jsx';
 
-import {Login} from '../actions/api.jsx'
+import {Login} from '../actions/api.jsx';
 
-let loader = new DetailLoader({model: 'account', hash: 'me'});
+import {DetailStoreMixin} from '../mixins/store.jsx';
 
 export default Reflux.createStore({
     listenables: [UserActions],
-
-    init: function () {
-        this.__userdata = {};
-        this.__loaded = false;
-        this.__failed = false;
-
-    },
-    getUser: function(){
-        return this.__userdata;
-    },
-    getFailed: function(){
-        return this.__failed;
+    mixins: [
+        DetailStoreMixin.factory(
+            new DetailLoader({model: 'account', hash: 'me'}),
+            'email',
+            UserActions
+        )
+    ],
+    init(){
+        this.__loginfail = false;
     },
     loggedIn: function(){
-        return this.__userdata.email != undefined;
+        return this.__detaildata.email != undefined;
     },
     onLoginFailed: function(){
-        this.__failed = true;
+        this.__loginfail = true;
 
         this.trigger();
     },
+    loginFailed(){
+        return this.__loginfail;
+    },
     // Actions handlers (declared on UserActions, and implemented here)
-    onLoadUser: function (callback=null) {
-        if(callback != null)
-            loader.load(
-                function(data){
-                    UserActions.loadSuccess(data);
-                    callback(data);
-                }
-            );
-        else
-            loader.load(UserActions.loadSuccess);
-    },
-    onLoadIfNecessary: function (callback=null) {
-        if(this.loaded){
-            if(callback != null)
-                callback(this.__userdata);
-        } else {
-            this.onLoadUser(callback)
-        }
-    },
-    onLoadSuccess: function (data) {
-        this.__userdata = data;
-        if(data.email != undefined){
-            this.loaded = true;
-        }
-        this.trigger();
-    },
     onLogin: function(data){
         let log = new Login({
             'username': data.username,
@@ -74,7 +48,7 @@ export default Reflux.createStore({
     },
     onLoginSuccess: function(data){
         if(data.authenticated){
-            UserActions.loadUser();
+            UserActions.loadDetail();
         } else {
             UserActions.loginFailed();
         }
@@ -84,8 +58,8 @@ export default Reflux.createStore({
         let log = new Login({});
         let self = this;
         log.logout(function(data){
-            self.__loaded = false;
-            self.__userdata = {};
+            self.__loginfail = false;
+            UserActions.unloadDetail();
 
             UserActions.logoutSuccess(data);
             if(callback)

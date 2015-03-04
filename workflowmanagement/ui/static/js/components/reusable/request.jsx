@@ -32,7 +32,7 @@ const RequestStatus = React.createClass({
 const RequestLink = React.createClass({
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.hash}
+    const object = {name: row.title, object: row.hash}
     return <small>
             <Link to="Request" params={object}>{row.title}</Link>
            </small>;
@@ -42,7 +42,6 @@ const RequestLink = React.createClass({
 const RequestUser = React.createClass({
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.hash}
     return <small>{row.processtaskuser.user_repr}</small>;
   }
 });

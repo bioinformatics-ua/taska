@@ -3,21 +3,22 @@ class Loader{
     }
 
     load(url, callback, unsuccessful_callback=null, type="GET", serialized={}){
-      $.ajax({
+      return Promise.resolve($.ajax({
             url: url,
             type: type,
             data: serialized,
             dataType: 'json',
             success: function(data) {
-              callback(data);
+              if(callback)
+                callback(data);
             }.bind(this),
             error: function(xhr, status, err) {
                 if(unsuccessful_callback != null)
                     unsuccessful_callback();
-
+                console.log(xhr);
                 console.error(`Unable to load ${url}`);
             }.bind(this)
-      });
+      }));
     }
 }
 
@@ -35,7 +36,7 @@ class ListLoader extends Loader{
 
                 let order = (state.externalSortAscending)? '':'-';
 
-                super.load(
+                return super.load(
                     `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
                     callback
                     );
@@ -46,10 +47,9 @@ class ListLoader extends Loader{
 class DetailLoader extends Loader{
     constructor(options) {
         this.model = options.model;
-        this.hash = options.hash;
     }
-    load(callback){
-        super.load(`api/${this.model}/${this.hash}/`, callback);
+    load(hash){
+        return super.load(`api/${this.model}/${hash}/`);
     }
 }
 
@@ -65,18 +65,18 @@ class Login extends Loader{
 
   // Check if user is logged in returns a promise
   waitForData(){
-    return $.ajax('api/account/me/');
+    return $.ajax('/api/account/me/');
   }
 
   // Get and csrf token to use on a post form
   authenticate(callback, unsuccessful_callback=null){
 
-    super.load('api/account/login/', callback,
+    return super.load('api/account/login/', callback,
         unsuccessful_callback, "POST", this.data);
   }
 
   logout(callback, unsuccessful_callback=null){
-    super.load('api/account/logout/', callback,
+    return super.load('api/account/logout/', callback,
         unsuccessful_callback=unsuccessful_callback);
   }
 }

@@ -1,9 +1,15 @@
 'use strict';
 
 import React from 'react';
+import Router from 'react-router';
+import {Authentication} from '../mixins/component.jsx';
+
 
 export default React.createClass({
-    displayName: "Request",
+    displayName: route => {
+        return `Request ${route.getParams().object}`;
+    },
+    mixins: [ Router.Navigation, Router.State, Authentication],
       render() {
         return (
           <div>

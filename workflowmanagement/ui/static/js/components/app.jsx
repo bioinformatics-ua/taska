@@ -19,8 +19,8 @@ export default React.createClass({
     Reflux.listenTo(StateStore, 'update')    ],
     __getState: function(){
       return {
-        user: UserStore.getUser(),
-        failed: UserStore.getFailed(),
+        user: UserStore.getDetail(),
+        failed: UserStore.getDetailFailed(),
         loading: StateStore.isLoading(),
       }
     },

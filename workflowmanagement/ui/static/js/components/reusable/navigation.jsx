@@ -25,7 +25,7 @@ var UserDropdown = React.createClass({
       mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State],
     __getState: function(){
       return {
-        user: UserStore.getUser()
+        user: UserStore.getDetail()
       }
     },
     getInitialState: function() {
@@ -56,6 +56,10 @@ var UserDropdown = React.createClass({
                             <strong>Email:</strong><br /> {this.state.user.email}
                             <hr />
                             <strong>Last Login:</strong><br /> {this.state.user.last_login}
+                        </li>
+                        <li className="divider"></li>
+                        <li>
+                          <Link to="profile"><i className="fa fa-pencil-square-o"></i> Edit Profile</Link>
                         </li>
                         <li className="divider"></li>
                         <li><a href="#" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
