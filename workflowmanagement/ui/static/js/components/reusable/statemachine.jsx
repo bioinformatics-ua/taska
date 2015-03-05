@@ -65,6 +65,30 @@ class StateMachine{
         this.__states.push(new_state);
         return true;
     }
+    __renderLine(elem1, elem2){
+        let offset1 = elem1.offset();
+        let offset2 = elem2.offset();
+        let width1 = elem1.width()/2;
+        let width2 = elem2.width()/2;
+        let height1 = elem1.height()/2;
+        let height2 = elem2.height()/2;
+
+        $.line(
+            {x:offset1.left+width1, y:offset1.top+height1},
+            {x:offset2.left+width2, y:offset2.top+height2},
+            {lineWidth: 5});
+    }
+
+    renderLines(){
+        for(let state of this.__states){
+            for(let dependency of state.__dependencies){
+                this.__renderLine($(`#${state.getIdentificator()}`), $(`#${dependency.getIdentificator()}`));
+            }
+            if(state.getLevel() == 1)
+                this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'))
+        }
+    }
+
     getLevels(){
         let getLevel = function(level){
             return level.map(state => {
@@ -76,10 +100,15 @@ class StateMachine{
 
         };
         let list = [];
-
+        list.push(<div className="well well-sm state-level text-center">
+                        <div className="state-start">
+                        <i className="fa fa-3x fa-circle"/>
+                        </div>
+                </div>
+        );
         for(var prop in this.__level){
             list.push(
-                <div className="well text-center">
+                <div className="well well-sm state-level text-center">
                     {getLevel(this.__level[prop])}
                     <div className="btn btn-dotted drop">
                         <i className="fa fa-3x fa-plus"/>
@@ -88,7 +117,7 @@ class StateMachine{
             );
         }
                list.push(
-                <div className="well text-center">
+                <div className="well well-sm state-level text-center">
                     <div className="btn btn-dotted drop">
                         <i className="fa fa-3x fa-plus"/>
                     </div>
@@ -152,19 +181,6 @@ const StateMachineComponent = React.createClass({
             sm: sm
         }
     },
-    __renderLine(elem1, elem2){
-        let offset1 = elem1.offset();
-        let offset2 = elem2.offset();
-        let width1 = elem1.width()/2;
-        let width2 = elem2.width()/2;
-        let height1 = elem1.height()/2;
-        let height2 = elem2.height()/2;
-
-        $.line(
-            {x:offset1.left+width1, y:offset1.top+height1},
-            {x:offset2.left+width2, y:offset2.top+height2},
-            {lineWidth: 5});
-    },
     componentDidMount(){
         $(this.refs.movable.getDOMNode()).find('.state').draggable(
             {
@@ -182,7 +198,8 @@ const StateMachineComponent = React.createClass({
                 .html( "Dropped!" );
           }
         });
-        this.__renderLine($('#1'), $('#2'));
+
+        this.state.sm.renderLines();
     },
     render(){
         console.log(this.state.sm);

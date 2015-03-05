@@ -55181,6 +55181,36 @@ var StateMachine = (function () {
             writable: true,
             configurable: true
         },
+        __renderLine: {
+            value: function __renderLine(elem1, elem2) {
+                var offset1 = elem1.offset();
+                var offset2 = elem2.offset();
+                var width1 = elem1.width() / 2;
+                var width2 = elem2.width() / 2;
+                var height1 = elem1.height() / 2;
+                var height2 = elem2.height() / 2;
+
+                $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, { lineWidth: 5 });
+            },
+            writable: true,
+            configurable: true
+        },
+        renderLines: {
+            value: function renderLines() {
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    for (var _iterator2 = state.__dependencies[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
+                        var dependency = _step2.value;
+
+                        this.__renderLine($("#" + state.getIdentificator()), $("#" + dependency.getIdentificator()));
+                    }
+                    if (state.getLevel() == 1) this.__renderLine($("#" + state.getIdentificator()), $(".state-start"));
+                }
+            },
+            writable: true,
+            configurable: true
+        },
         getLevels: {
             value: function getLevels() {
                 var getLevel = function getLevel(level) {
@@ -55195,11 +55225,19 @@ var StateMachine = (function () {
                     });
                 };
                 var list = [];
-
+                list.push(React.createElement(
+                    "div",
+                    { className: "well well-sm state-level text-center" },
+                    React.createElement(
+                        "div",
+                        { className: "state-start" },
+                        React.createElement("i", { className: "fa fa-3x fa-circle" })
+                    )
+                ));
                 for (var prop in this.__level) {
                     list.push(React.createElement(
                         "div",
-                        { className: "well text-center" },
+                        { className: "well well-sm state-level text-center" },
                         getLevel(this.__level[prop]),
                         React.createElement(
                             "div",
@@ -55210,7 +55248,7 @@ var StateMachine = (function () {
                 }
                 list.push(React.createElement(
                     "div",
-                    { className: "well text-center" },
+                    { className: "well well-sm state-level text-center" },
                     React.createElement(
                         "div",
                         { className: "btn btn-dotted drop" },
@@ -55290,16 +55328,6 @@ var StateMachineComponent = React.createClass({
             sm: sm
         };
     },
-    __renderLine: function __renderLine(elem1, elem2) {
-        var offset1 = elem1.offset();
-        var offset2 = elem2.offset();
-        var width1 = elem1.width() / 2;
-        var width2 = elem2.width() / 2;
-        var height1 = elem1.height() / 2;
-        var height2 = elem2.height() / 2;
-
-        $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, { lineWidth: 5 });
-    },
     componentDidMount: function componentDidMount() {
         $(this.refs.movable.getDOMNode()).find(".state").draggable({
             containment: this.refs.chart.getDOMNode(),
@@ -55312,7 +55340,8 @@ var StateMachineComponent = React.createClass({
                 $(this).addClass("ui-state-highlight").find("p").html("Dropped!");
             }
         });
-        this.__renderLine($("#1"), $("#2"));
+
+        this.state.sm.renderLines();
     },
     render: function render() {
         console.log(this.state.sm);

@@ -320,11 +320,15 @@ footer {
 
 #state_machine_chart{
     min-height: 300px;
-    background-color: grey;
 }
-.state{
+.state, .state-start{
     margin:5px;
     z-index: 3000;
+}
+.state-level{
+    background: none;
+    border: 0;
+    box-shadow: none;
 }
 .btn-dotted{
     border: 4px dotted #C7C7C7;
