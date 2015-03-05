@@ -55552,7 +55552,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "drawDependency", "select"]);
+var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "drawDependency", "select", "setTitle"]);
 
 module.exports = StateMachineActions;
 
@@ -55594,8 +55594,8 @@ var State = (function () {
         equals: {
             value: function equals(other) {
                 if (typeof other === "number") {
-                    return this.__identificator === other;
-                }return this.__identificator === other.__identificator;
+                    return this.__identificator == other;
+                }return this.__identificator == other.__identificator;
             },
             writable: true,
             configurable: true
@@ -55750,6 +55750,8 @@ var StateMachine = (function () {
         },
         deleteState: {
             value: function deleteState(remove_identificator) {
+                console.log(remove_identificator);
+                console.log(typeof remove_identificator);
                 var st_index = __getArrayPos(this.__states, remove_identificator);
                 var removed_state = this.__states.splice(st_index, 1);
 
@@ -55812,7 +55814,8 @@ var StateMachineComponent = React.createClass({
     getState: function getState() {
         return {
             sm: StateMachineStore.getStateMachine(),
-            selected: StateMachineStore.getSelected()
+            selected: StateMachineStore.getSelected(),
+            title: StateMachineStore.getTitle()
         };
     },
     getInitialState: function getInitialState() {
@@ -55866,10 +55869,15 @@ var StateMachineComponent = React.createClass({
             _this.renderLines();
         });
 
-        $(this.refs.statemachine.getDOMNode()).find(".destroy-state").click(function () {
-            var ident = $(this).data("id");
-            StateMachineActions.deleteState(ident);
-        });
+        /*$(this.refs.statemachine.getDOMNode()).find('.destroy-state').click(
+            function(){
+                let ident = $(this).data('id');
+                StateMachineActions.deleteState(ident);
+            }
+        );*/
+    },
+    componentWillMount: function componentWillMount() {
+        StateMachineActions.setTitle(this.props.detail.Workflow.title);
     },
     componentDidMount: function componentDidMount() {
         this.__initUI();
@@ -55887,11 +55895,9 @@ var StateMachineComponent = React.createClass({
         console.log("SAVED WORKFLOW");
     },
     deleteState: function deleteState(event) {
-        console.log("Delete state");
-        console.log(event);
+        StateMachineActions.deleteState();
     },
     select: function select(event) {
-        console.log("SELECT EVENT");
         StateMachineActions.select(event.currentTarget.id);
     },
     getLevels: function getLevels() {
@@ -55899,22 +55905,26 @@ var StateMachineComponent = React.createClass({
 
         var getLevel = function (level) {
             return level.map(function (state) {
-                var state_class = "btn btn-default state";
+                var state_class = "state";
 
                 if (_this.state.selected == state.getIdentificator()) state_class = "" + state_class + " state-selected";
 
                 return React.createElement(
                     "div",
-                    { key: state.getIdentificator(), onClick: _this.select, id: state.getIdentificator(), className: state_class },
-                    state.getIdentificator(),
-                    React.createElement("br", null),
-                    "SimpleTask",
+                    { key: state.getIdentificator(), className: state_class },
+                    React.createElement(
+                        "div",
+                        { onClick: _this.select, id: state.getIdentificator(), className: "btn btn-default" },
+                        state.getIdentificator(),
+                        React.createElement("br", null),
+                        "SimpleTask"
+                    ),
                     React.createElement(
                         "div",
                         { className: "state-options" },
                         React.createElement(
                             "button",
-                            { title: "Click to delete this state", "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
+                            { title: "Click to delete this state", onClick: _this.deleteState, "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
                             React.createElement("i", { className: "fa fa-1x fa-times" })
                         ),
                         React.createElement(
@@ -55994,9 +56004,11 @@ var StateMachineComponent = React.createClass({
             this.getLevels()
         );
     },
+    setTitle: function setTitle(event) {
+        StateMachineActions.setTitle(event.target.value);
+    },
     render: function render() {
         console.log("RENDER");
-        var initial = this.props.detail.Workflow;
         var chart = this.getRepresentation();
         return React.createElement(
             "div",
@@ -56044,7 +56056,7 @@ var StateMachineComponent = React.createClass({
                                         "div",
                                         { "class": "form-group" },
                                         React.createElement("input", { type: "title", className: "form-control",
-                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", value: initial.title })
+                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", onChange: this.setTitle, value: this.state.title })
                                     ),
                                     React.createElement("hr", null)
                                 )
@@ -56106,6 +56118,7 @@ var State = _classesJsx.State;
 var StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init: function init() {
+        this.__title = undefined;
         this.__sm = new StateMachine();
         var state1 = this.__sm.stateFactory(1);
         var state2 = this.__sm.stateFactory(2);
@@ -56121,12 +56134,14 @@ var StateMachineStore = Reflux.createStore({
         this.__sm.addDependency(state3, state1);
         this.__sm.addDependency(state4, state2);
         this.__sm.addDependency(state4, state3);
-        //this.__sm.addDependency(state4, state1);
 
         this.__selected = undefined;
     },
 
-    // getters and setters
+    // getters
+    getTitle: function getTitle() {
+        return this.__title;
+    },
     getStateMachine: function getStateMachine() {
         return this.__sm;
     },
@@ -56149,12 +56164,14 @@ var StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
-    onDeleteState: function onDeleteState(identificator) {
-        console.log("Delete state " + identificator);
+    onDeleteState: function onDeleteState() {
+        //console.log(`Delete state ${this.__selected}`);
 
-        this.__sm.deleteState(identificator);
+        this.__sm.deleteState(this.__selected);
 
         this.__sm.debug();
+
+        this.__selected = undefined;
 
         this.trigger();
     },
@@ -56163,7 +56180,12 @@ var StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onSelect: function onSelect(selected) {
-        this.__selected = selected;
+        this.__selected = Number.parseInt(selected);
+
+        this.trigger();
+    },
+    onSetTitle: function onSetTitle(title) {
+        this.__title = title;
 
         this.trigger();
     }

@@ -20,9 +20,9 @@ class State{
     }
     equals(other){
         if(typeof other === 'number')
-            return this.__identificator === other;
+            return this.__identificator == other;
 
-        return this.__identificator === other.__identificator;
+        return this.__identificator == other.__identificator;
     }
     toString(){
         return `<State: ${this.__identificator}>`;
@@ -109,6 +109,8 @@ class StateMachine{
     }
 
     deleteState(remove_identificator){
+        console.log(remove_identificator);
+        console.log(typeof remove_identificator);
         let st_index = __getArrayPos(this.__states, remove_identificator);
         let removed_state = this.__states.splice(st_index,1);
 

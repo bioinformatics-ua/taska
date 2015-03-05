@@ -6,6 +6,7 @@ import {StateMachine, State} from './classes.jsx';
 const StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init() {
+        this.__title = undefined;
         this.__sm = new StateMachine();
         let state1 = this.__sm.stateFactory(1);
         let state2 = this.__sm.stateFactory(2);
@@ -21,12 +22,14 @@ const StateMachineStore = Reflux.createStore({
         this.__sm.addDependency(state3, state1);
         this.__sm.addDependency(state4, state2);
         this.__sm.addDependency(state4, state3);
-        //this.__sm.addDependency(state4, state1);
 
         this.__selected = undefined;
     },
 
-    // getters and setters
+    // getters
+    getTitle(){
+        return this.__title;
+    },
     getStateMachine(){
         return this.__sm;
     },
@@ -49,12 +52,14 @@ const StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
-    onDeleteState(identificator){
-        console.log(`Delete state ${identificator}`);
+    onDeleteState(){
+        //console.log(`Delete state ${this.__selected}`);
 
-        this.__sm.deleteState(identificator);
+        this.__sm.deleteState(this.__selected);
 
         this.__sm.debug();
+
+        this.__selected = undefined;
 
         this.trigger();
     },
@@ -63,7 +68,12 @@ const StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onSelect(selected){
-        this.__selected = selected;
+        this.__selected = Number.parseInt(selected);
+
+        this.trigger();
+    },
+    onSetTitle(title){
+        this.__title=title;
 
         this.trigger();
     }

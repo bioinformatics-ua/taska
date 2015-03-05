@@ -343,6 +343,7 @@ footer {
 .state{
     margin:5px 15px;
     z-index: 3000;
+    display: inline-block;
 }
 .state-container{
 

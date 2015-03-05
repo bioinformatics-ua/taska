@@ -8,7 +8,8 @@ const StateMachineActions = Reflux.createActions([
     'moveState',
     'deleteState',
     'drawDependency',
-    'select'
+    'select',
+    'setTitle'
 ]);
 
 export default StateMachineActions;

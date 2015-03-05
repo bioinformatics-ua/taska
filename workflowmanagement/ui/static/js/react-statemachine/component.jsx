@@ -12,7 +12,8 @@ const StateMachineComponent = React.createClass({
     getState(){
         return {
             sm: StateMachineStore.getStateMachine(),
-            selected: StateMachineStore.getSelected()
+            selected: StateMachineStore.getSelected(),
+            title: StateMachineStore.getTitle()
         }
     },
     getInitialState(){
@@ -71,12 +72,15 @@ const StateMachineComponent = React.createClass({
             this.renderLines();
         });
 
-        $(this.refs.statemachine.getDOMNode()).find('.destroy-state').click(
+        /*$(this.refs.statemachine.getDOMNode()).find('.destroy-state').click(
             function(){
                 let ident = $(this).data('id');
                 StateMachineActions.deleteState(ident);
             }
-        );
+        );*/
+    },
+    componentWillMount(){
+        StateMachineActions.setTitle(this.props.detail.Workflow.title);
     },
     componentDidMount(){
         this.__initUI();
@@ -94,27 +98,27 @@ const StateMachineComponent = React.createClass({
         console.log('SAVED WORKFLOW');
     },
     deleteState(event){
-        console.log('Delete state');
-        console.log(event);
+        StateMachineActions.deleteState();
     },
     select(event){
-        console.log('SELECT EVENT');
         StateMachineActions.select(event.currentTarget.id);
     },
     getLevels(){
         let getLevel = (level => {
             return level.map(state => {
-                let state_class = "btn btn-default state";
+                let state_class = "state";
 
                 if (this.state.selected == state.getIdentificator())
                     state_class = `${state_class} state-selected`;
 
-              return <div key={state.getIdentificator()} onClick={this.select} id={state.getIdentificator()} className={state_class}>
-                        {state.getIdentificator()}<br />
-                        SimpleTask
+              return <div key={state.getIdentificator()} className={state_class}>
+                        <div onClick={this.select} id={state.getIdentificator()} className="btn btn-default">
+                            {state.getIdentificator()}<br />
+                            SimpleTask
+                        </div>
 
                         <div className="state-options">
-                            <button title="Click to delete this state" data-id={state.getIdentificator()} className="btn btn-xs btn-danger destroy-state">
+                            <button title="Click to delete this state" onClick={this.deleteState} data-id={state.getIdentificator()} className="btn btn-xs btn-danger destroy-state">
                                 <i className="fa fa-1x fa-times"/>
                             </button>
                                 <span title="Drag to create a dependency " className="connect-state"><i className="fa fa-1x fa-circle"/></span>
@@ -184,9 +188,11 @@ const StateMachineComponent = React.createClass({
             </div>
         );
     },
+    setTitle(event){
+        StateMachineActions.setTitle(event.target.value);
+    },
     render(){
         console.log('RENDER');
-        let initial = this.props.detail.Workflow;
         let chart = this.getRepresentation();
         return (
           <div className="row">
@@ -206,7 +212,7 @@ const StateMachineComponent = React.createClass({
 
                                     <div class="form-group">
                                         <input type="title" className="form-control"
-                                        id="exampleInputEmail1" placeholder="Enter the workflow title" value={initial.title} />
+                                        id="exampleInputEmail1" placeholder="Enter the workflow title" onChange={this.setTitle} value={this.state.title} />
                                       </div>
                                     <hr />
                                 </div>
