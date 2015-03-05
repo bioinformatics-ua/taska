@@ -55750,8 +55750,6 @@ var StateMachine = (function () {
         },
         deleteState: {
             value: function deleteState(remove_identificator) {
-                console.log(remove_identificator);
-                console.log(typeof remove_identificator);
                 var st_index = __getArrayPos(this.__states, remove_identificator);
                 var removed_state = this.__states.splice(st_index, 1);
 
@@ -55827,13 +55825,15 @@ var StateMachineComponent = React.createClass({
     __initUI: function __initUI() {
         var _this = this;
 
+        var self = this;
+
         $(".new-state").draggable({
             containment: this.refs.chart.getDOMNode(),
             revert: "invalid",
             opacity: 0.7,
             helper: "clone"
         });
-        var states = $(this.refs.movable.getDOMNode()).find(".state");
+        var states = $(this.refs.movable.getDOMNode()).find(".state-handler");
 
         states.draggable({
             containment: this.refs.statemachine.getDOMNode(),
@@ -55851,7 +55851,22 @@ var StateMachineComponent = React.createClass({
             }
         });
 
+        var state_connectors = $(this.refs.movable.getDOMNode()).find(".connect-state");
+
+        state_connectors.draggable({
+            containment: this.refs.statemachine.getDOMNode(),
+            revert: "invalid",
+            opacity: 0.01,
+            helper: "clone",
+            start: function start(event) {},
+            stop: function stop(event) {},
+            drag: function drag(event, ui) {
+                $(".temp_line").remove();
+                self.__tempLine(ui.offset, $(event.target));
+            } });
+
         $(this.refs.movable.getDOMNode()).find(".drop").droppable({
+            accept: ".state-handler, .new-state",
             activeClass: "ui-state-default",
             hoverClass: "ui-state-hover",
             drop: function drop(event, ui) {
@@ -55863,6 +55878,16 @@ var StateMachineComponent = React.createClass({
                 StateMachineActions.moveState(ui.draggable.attr("id"), level);
             }
         });
+
+        $(this.refs.movable.getDOMNode()).find(".state-handler").droppable({
+            accept: ".connect-state",
+            activeClass: "ui-state-default",
+            hoverClass: "ui-state-hover",
+            drop: function drop(event, ui) {
+                console.log("DROP connector");
+            }
+        });
+
         this.renderLines();
         $(window).resize(function (data) {
             $(".state_line").remove();
@@ -55905,16 +55930,21 @@ var StateMachineComponent = React.createClass({
 
         var getLevel = function (level) {
             return level.map(function (state) {
+                var state_handler_class = "state-handler btn btn-default";
                 var state_class = "state";
 
-                if (_this.state.selected == state.getIdentificator()) state_class = "" + state_class + " state-selected";
+                if (_this.state.selected == state.getIdentificator()) {
+                    state_class = "" + state_class + " state-selected";
+
+                    state_handler_class = "" + state_handler_class + " state-handler-selected";
+                }
 
                 return React.createElement(
                     "div",
                     { key: state.getIdentificator(), className: state_class },
                     React.createElement(
                         "div",
-                        { onClick: _this.select, id: state.getIdentificator(), className: "btn btn-default" },
+                        { onClick: _this.select, id: state.getIdentificator(), className: state_handler_class },
                         state.getIdentificator(),
                         React.createElement("br", null),
                         "SimpleTask"
@@ -55928,8 +55958,8 @@ var StateMachineComponent = React.createClass({
                             React.createElement("i", { className: "fa fa-1x fa-times" })
                         ),
                         React.createElement(
-                            "span",
-                            { title: "Drag to create a dependency ", className: "connect-state" },
+                            "div",
+                            { "data-id": state.getIdentificator(), title: "Drag to create a dependency ", className: "connect-state" },
                             React.createElement("i", { className: "fa fa-1x fa-circle" })
                         )
                     )
@@ -55984,7 +56014,16 @@ var StateMachineComponent = React.createClass({
             className: "" + elem1.attr("id") + "-" + elem2.attr("id") + " state_line"
         });
     },
+    __tempLine: function __tempLine(pos, elem) {
+        var offset = elem.offset();
+        var width = elem.width() / 2;
+        var height = elem.height() / 2;
 
+        $.line({ x: offset.left + width, y: offset.top + height }, { x: pos.left, y: pos.top }, {
+            lineWidth: 5,
+            className: "temp_line"
+        });
+    },
     renderLines: function renderLines() {
         for (var _iterator = this.state.sm.getStates()[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
             var state = _step.value;

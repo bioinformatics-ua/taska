@@ -342,11 +342,13 @@ footer {
 }
 .state{
     margin:5px 15px;
-    z-index: 3000;
     display: inline-block;
 }
 .state-container{
 
+}
+.state-handler{
+    z-index: 3000;
 }
  .state-start{
     color: black;
@@ -386,13 +388,17 @@ footer {
     display: block;
 }
 
-.state-selected{
+.state-handler-selected{
   border-color: rgba(51, 122, 183, 0.61);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
   outline: 0 none;
-  position: relative;
 }
-
+.state {
+    position: relative;
+}
 .new-state{
     z-index:3000;
+}
+
+.connect-state{
 }

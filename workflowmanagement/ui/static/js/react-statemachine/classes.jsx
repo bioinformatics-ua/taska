@@ -109,8 +109,6 @@ class StateMachine{
     }
 
     deleteState(remove_identificator){
-        console.log(remove_identificator);
-        console.log(typeof remove_identificator);
         let st_index = __getArrayPos(this.__states, remove_identificator);
         let removed_state = this.__states.splice(st_index,1);
 

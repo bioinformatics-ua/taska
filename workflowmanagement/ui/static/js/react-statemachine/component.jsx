@@ -23,6 +23,7 @@ const StateMachineComponent = React.createClass({
         this.setState(this.getState());
     },
     __initUI(){
+        let self = this;
 
         $('.new-state').draggable(
             {
@@ -32,7 +33,7 @@ const StateMachineComponent = React.createClass({
               helper: "clone"
             }
         );
-        let states = $(this.refs.movable.getDOMNode()).find('.state');
+        let states = $(this.refs.movable.getDOMNode()).find('.state-handler');
 
         states.draggable(
             {
@@ -53,8 +54,30 @@ const StateMachineComponent = React.createClass({
             }
         );
 
+        let state_connectors = $(this.refs.movable.getDOMNode()).find('.connect-state');
+
+        state_connectors.draggable(
+            {
+              containment: this.refs.statemachine.getDOMNode(),
+              revert: "invalid",
+              opacity: 0.01,
+              helper: "clone",
+              start: function(event) {
+
+              },
+              stop: function(event) {
+
+              },
+              drag: function(event, ui) {
+                $('.temp_line').remove();
+                self.__tempLine(ui.offset, $(event.target));
+              },
+            }
+        );
+
 
         $(this.refs.movable.getDOMNode()).find('.drop').droppable({
+          accept: ".state-handler, .new-state",
           activeClass: "ui-state-default",
           hoverClass: "ui-state-hover",
           drop: function( event, ui ) {
@@ -66,6 +89,16 @@ const StateMachineComponent = React.createClass({
             StateMachineActions.moveState(ui.draggable.attr('id'), level)
           }
         });
+
+        $(this.refs.movable.getDOMNode()).find('.state-handler').droppable({
+          accept: ".connect-state",
+          activeClass: "ui-state-default",
+          hoverClass: "ui-state-hover",
+          drop: function( event, ui ) {
+            console.log('DROP connector');
+          }
+        });
+
         this.renderLines();
         $( window ).resize(data => {
             $('.state_line').remove();
@@ -106,13 +139,17 @@ const StateMachineComponent = React.createClass({
     getLevels(){
         let getLevel = (level => {
             return level.map(state => {
+                let state_handler_class = "state-handler btn btn-default";
                 let state_class = "state";
 
-                if (this.state.selected == state.getIdentificator())
+                if (this.state.selected == state.getIdentificator()){
                     state_class = `${state_class} state-selected`;
 
+                    state_handler_class = `${state_handler_class} state-handler-selected`;
+                }
+
               return <div key={state.getIdentificator()} className={state_class}>
-                        <div onClick={this.select} id={state.getIdentificator()} className="btn btn-default">
+                        <div onClick={this.select} id={state.getIdentificator()} className={state_handler_class}>
                             {state.getIdentificator()}<br />
                             SimpleTask
                         </div>
@@ -121,7 +158,9 @@ const StateMachineComponent = React.createClass({
                             <button title="Click to delete this state" onClick={this.deleteState} data-id={state.getIdentificator()} className="btn btn-xs btn-danger destroy-state">
                                 <i className="fa fa-1x fa-times"/>
                             </button>
-                                <span title="Drag to create a dependency " className="connect-state"><i className="fa fa-1x fa-circle"/></span>
+                                <div data-id={state.getIdentificator()} title="Drag to create a dependency " className="connect-state">
+                                <i className="fa fa-1x fa-circle"/>
+                                </div>
                         </div>
                     </div>;
         });
@@ -171,7 +210,19 @@ const StateMachineComponent = React.createClass({
                 className: `${elem1.attr('id')}-${elem2.attr('id')} state_line`
             });
     },
+    __tempLine(pos, elem){
+        let offset = elem.offset();
+        let width = elem.width()/2;
+        let height = elem.height()/2;
 
+        $.line(
+            {x:offset.left+width, y:offset.top+height},
+            {x:pos.left, y:pos.top},
+            {
+                lineWidth: 5,
+                className: 'temp_line'
+            });
+    },
     renderLines(){
         for(let state of this.state.sm.getStates()){
             for(let dependency of state.__dependencies){
