@@ -35,7 +35,7 @@ export default React.createClass({
                         <div className="clearfix taskbar col-md-3">
                             <h3 className="task-type-title panel-title">Type of Tasks</h3>
                             <hr />
-                            <div className="task-type col-md-12 col-xs-4 btn btn-default">
+                            <div className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             <i className="task-type-icon fa fa-2x fa-check"></i>&nbsp;
                              <span>Simple Task</span></div>
                         </div>

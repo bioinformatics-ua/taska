@@ -55190,7 +55190,10 @@ var StateMachine = (function () {
                 var height1 = elem1.height() / 2;
                 var height2 = elem2.height() / 2;
 
-                $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, { lineWidth: 5 });
+                $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, {
+                    lineWidth: 5,
+                    className: "" + elem1.attr("id") + "-" + elem2.attr("id") + " state_line"
+                });
             },
             writable: true,
             configurable: true
@@ -55230,7 +55233,7 @@ var StateMachine = (function () {
                     { className: "well well-sm state-level text-center" },
                     React.createElement(
                         "div",
-                        { className: "state-start" },
+                        { id: "start", className: "state-start" },
                         React.createElement("i", { className: "fa fa-3x fa-circle" })
                     )
                 ));
@@ -55329,9 +55332,28 @@ var StateMachineComponent = React.createClass({
         };
     },
     componentDidMount: function componentDidMount() {
+        var _this = this;
+
+        $(".new-state").draggable({
+            containment: this.refs.chart.getDOMNode(),
+            revert: "invalid",
+            opacity: 0.7,
+            helper: "clone"
+        });
         $(this.refs.movable.getDOMNode()).find(".state").draggable({
             containment: this.refs.chart.getDOMNode(),
-            revert: "invalid"
+            revert: "invalid",
+            start: function start(event) {
+                var id = event.target.id;
+                $("[class^=\"" + id + "-\"]").hide();
+                $("[class$=\"-" + id + " state_line\"]").toggle();
+            },
+            stop: function stop(event) {
+                var id = event.target.id;
+
+                $("[class^=\"" + id + "-\"]").toggle();
+                $("[class$=\"-" + id + " state_line\"]").toggle();
+            }
         });
         $(this.refs.movable.getDOMNode()).find(".drop").droppable({
             activeClass: "ui-state-default",
@@ -55340,8 +55362,11 @@ var StateMachineComponent = React.createClass({
                 $(this).addClass("ui-state-highlight").find("p").html("Dropped!");
             }
         });
-
         this.state.sm.renderLines();
+        $(window).resize(function (data) {
+            $(".state_line").remove();
+            _this.state.sm.renderLines();
+        });
     },
     render: function render() {
         console.log(this.state.sm);
@@ -55572,7 +55597,7 @@ module.exports = React.createClass({
                             React.createElement("hr", null),
                             React.createElement(
                                 "div",
-                                { className: "task-type col-md-12 col-xs-4 btn btn-default" },
+                                { className: "task-type col-md-12 col-xs-4 btn btn-default new-state" },
                                 React.createElement("i", { className: "task-type-icon fa fa-2x fa-check" }),
                                 " ",
                                 React.createElement(

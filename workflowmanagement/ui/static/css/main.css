@@ -321,10 +321,13 @@ footer {
 #state_machine_chart{
     min-height: 300px;
 }
-.state, .state-start{
+.state{
     margin:5px;
     z-index: 3000;
 }
+ .state-start{
+    color: black;
+ }
 .state-level{
     background: none;
     border: 0;

@@ -76,7 +76,10 @@ class StateMachine{
         $.line(
             {x:offset1.left+width1, y:offset1.top+height1},
             {x:offset2.left+width2, y:offset2.top+height2},
-            {lineWidth: 5});
+            {
+                lineWidth: 5,
+                className: `${elem1.attr('id')}-${elem2.attr('id')} state_line`
+            });
     }
 
     renderLines(){
@@ -101,7 +104,7 @@ class StateMachine{
         };
         let list = [];
         list.push(<div className="well well-sm state-level text-center">
-                        <div className="state-start">
+                        <div id="start" className="state-start">
                         <i className="fa fa-3x fa-circle"/>
                         </div>
                 </div>
@@ -182,10 +185,30 @@ const StateMachineComponent = React.createClass({
         }
     },
     componentDidMount(){
+        $('.new-state').draggable(
+            {
+              containment: this.refs.chart.getDOMNode(),
+              revert: "invalid",
+              opacity: 0.7,
+              helper: "clone"
+            }
+        );
         $(this.refs.movable.getDOMNode()).find('.state').draggable(
             {
               containment: this.refs.chart.getDOMNode(),
-              revert: "invalid"
+              revert: "invalid",
+              start: function(event) {
+                let id = event.target.id;
+                $(`[class^="${id}-"]`).hide();
+                $('[class$="-'+id+' state_line"]').toggle();
+              },
+              stop: function(event) {
+                let id = event.target.id;
+
+                $(`[class^="${id}-"]`).toggle();
+                $('[class$="-'+id+' state_line"]').toggle();
+
+              }
             }
         );
         $(this.refs.movable.getDOMNode()).find('.drop').droppable({
@@ -198,8 +221,11 @@ const StateMachineComponent = React.createClass({
                 .html( "Dropped!" );
           }
         });
-
         this.state.sm.renderLines();
+        $( window ).resize(data => {
+            $('.state_line').remove();
+            this.state.sm.renderLines();
+        });
     },
     render(){
         console.log(this.state.sm);
