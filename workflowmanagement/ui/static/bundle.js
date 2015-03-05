@@ -55053,339 +55053,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/RequestStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/RequestStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/statemachine.jsx":[function(require,module,exports){
-"use strict";
-
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var React = _interopRequire(require("react"));
-
-var cline = _interopRequire(require("../../vendor/jquery.domline"));
-
-var State = (function () {
-    function State(options) {
-        _classCallCheck(this, State);
-
-        this.__identificator = options.identificator;
-        this.__data = options.data;
-        this.__dependencies = [];
-        this.__level = options.level || 1;
-    }
-
-    _prototypeProperties(State, null, {
-        equals: {
-            value: function equals(other) {
-                return this.__identificator === other.__identificator;
-            },
-            writable: true,
-            configurable: true
-        },
-        toString: {
-            value: function toString() {
-                return "<State: " + this.__identificator + ">";
-            },
-            writable: true,
-            configurable: true
-        },
-        addDependency: {
-            value: function addDependency(state) {
-                this.__dependencies.push(state);
-            },
-            writable: true,
-            configurable: true
-        },
-        getLevel: {
-            value: function getLevel() {
-                return this.__level;
-            },
-            writable: true,
-            configurable: true
-        },
-        getIdentificator: {
-            value: function getIdentificator() {
-                return this.__identificator;
-            },
-            writable: true,
-            configurable: true
-        },
-        getData: {
-            value: function getData() {
-                return this.__getData;
-            },
-            writable: true,
-            configurable: true
-        },
-        getDependencies: {
-            value: function getDependencies() {
-                return this.__dependencies;
-            },
-            writable: true,
-            configurable: true
-        }
-    });
-
-    return State;
-})();
-
-var StateMachine = (function () {
-    function StateMachine() {
-        _classCallCheck(this, StateMachine);
-
-        this.__states = [];
-        this.__level = {};
-        this.__nextLevel = 0;
-    }
-
-    _prototypeProperties(StateMachine, null, {
-        addDependency: {
-            value: function addDependency(dependant, dependency) {
-                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-                    var state = _step.value;
-
-                    if (state.equals(dependant)) {
-                        state.addDependency(dependency);
-                    }
-                }
-            },
-            writable: true,
-            configurable: true
-        },
-        addToLevel: {
-            value: function addToLevel(state) {
-                if (this.__level[state.getLevel()] === undefined) this.__level[state.getLevel()] = [state];else this.__level[state.getLevel()].push(state);
-            },
-            writable: true,
-            configurable: true
-        },
-        addState: {
-            value: function addState(new_state) {
-                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-                    var state = _step.value;
-
-                    if (state.equals(new_state)) {
-                        console.warn("You tried to add a state (" + new_state.toString() + ") that already is on the state machine");
-                        return false;
-                    }
-                }
-                if (this.__nextLevel <= new_state.getLevel()) {
-                    this.__nextLevel = new_state.getLevel() + 1;
-                }
-                this.addToLevel(new_state);
-                this.__states.push(new_state);
-                return true;
-            },
-            writable: true,
-            configurable: true
-        },
-        __renderLine: {
-            value: function __renderLine(elem1, elem2) {
-                var offset1 = elem1.offset();
-                var offset2 = elem2.offset();
-                var width1 = elem1.width() / 2;
-                var width2 = elem2.width() / 2;
-                var height1 = elem1.height() / 2;
-                var height2 = elem2.height() / 2;
-
-                $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, {
-                    lineWidth: 5,
-                    className: "" + elem1.attr("id") + "-" + elem2.attr("id") + " state_line"
-                });
-            },
-            writable: true,
-            configurable: true
-        },
-        renderLines: {
-            value: function renderLines() {
-                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-                    var state = _step.value;
-
-                    for (var _iterator2 = state.__dependencies[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
-                        var dependency = _step2.value;
-
-                        this.__renderLine($("#" + state.getIdentificator()), $("#" + dependency.getIdentificator()));
-                    }
-                    if (state.getLevel() == 1) this.__renderLine($("#" + state.getIdentificator()), $(".state-start"));
-                }
-            },
-            writable: true,
-            configurable: true
-        },
-        getLevels: {
-            value: function getLevels() {
-                var getLevel = function getLevel(level) {
-                    return level.map(function (state) {
-                        return React.createElement(
-                            "div",
-                            { id: state.getIdentificator(), className: "btn btn-default state" },
-                            React.createElement("input", { type: "text", placeholder: state.getIdentificator(), value: "" }),
-                            React.createElement("br", null),
-                            "Simple Task"
-                        );
-                    });
-                };
-                var list = [];
-                list.push(React.createElement(
-                    "div",
-                    { className: "well well-sm state-level text-center" },
-                    React.createElement(
-                        "div",
-                        { id: "start", className: "state-start" },
-                        React.createElement("i", { className: "fa fa-3x fa-circle" })
-                    )
-                ));
-                for (var prop in this.__level) {
-                    list.push(React.createElement(
-                        "div",
-                        { className: "well well-sm state-level text-center" },
-                        getLevel(this.__level[prop]),
-                        React.createElement(
-                            "div",
-                            { className: "btn btn-dotted drop" },
-                            React.createElement("i", { className: "fa fa-3x fa-plus" })
-                        )
-                    ));
-                }
-                list.push(React.createElement(
-                    "div",
-                    { className: "well well-sm state-level text-center" },
-                    React.createElement(
-                        "div",
-                        { className: "btn btn-dotted drop" },
-                        React.createElement("i", { className: "fa fa-3x fa-plus" })
-                    )
-                ));
-                return list;
-            },
-            writable: true,
-            configurable: true
-        },
-        getRepresentation: {
-            value: function getRepresentation() {
-                return React.createElement(
-                    "div",
-                    null,
-                    this.getLevels()
-                );
-            },
-            writable: true,
-            configurable: true
-        },
-        debug: {
-            value: function debug() {
-                console.log("STATES");
-                console.log(this.__states);
-                console.log("LEVEL HIERARQUY");
-                console.log(this.__level);
-                console.log("NEXT_LEVEL");
-                console.log(this.__nextLevel);
-            },
-            writable: true,
-            configurable: true
-        }
-    });
-
-    return StateMachine;
-})();
-
-var StateMachineComponent = React.createClass({
-    displayName: "StateMachineComponent",
-
-    getInitialState: function getInitialState() {
-        var sm = new StateMachine();
-        var state1 = new State({
-            identificator: 1,
-            level: 1
-        });
-        var state2 = new State({
-            identificator: 2,
-            level: 2
-        });
-        var state3 = new State({
-            identificator: 3,
-            level: 2
-        });
-        var state4 = new State({
-            identificator: 4,
-            level: 3
-        });
-        sm.addState(state1);
-        sm.addState(state2);
-        sm.addState(state3);
-        sm.addState(state4);
-
-        sm.addDependency(state2, state1);
-        sm.addDependency(state3, state1);
-        sm.addDependency(state4, state2);
-        sm.addDependency(state4, state3);
-
-        //sm.debug();
-        this.setState({
-            state: sm
-        });
-
-        return {
-            sm: sm
-        };
-    },
-    componentDidMount: function componentDidMount() {
-        var _this = this;
-
-        $(".new-state").draggable({
-            containment: this.refs.chart.getDOMNode(),
-            revert: "invalid",
-            opacity: 0.7,
-            helper: "clone"
-        });
-        $(this.refs.movable.getDOMNode()).find(".state").draggable({
-            containment: this.refs.chart.getDOMNode(),
-            revert: "invalid",
-            start: function start(event) {
-                var id = event.target.id;
-                $("[class^=\"" + id + "-\"]").hide();
-                $("[class$=\"-" + id + " state_line\"]").toggle();
-            },
-            stop: function stop(event) {
-                var id = event.target.id;
-
-                $("[class^=\"" + id + "-\"]").toggle();
-                $("[class$=\"-" + id + " state_line\"]").toggle();
-            }
-        });
-        $(this.refs.movable.getDOMNode()).find(".drop").droppable({
-            activeClass: "ui-state-default",
-            hoverClass: "ui-state-hover",
-            drop: function drop(event, ui) {
-                $(this).addClass("ui-state-highlight").find("p").html("Dropped!");
-            }
-        });
-        this.state.sm.renderLines();
-        $(window).resize(function (data) {
-            $(".state_line").remove();
-            _this.state.sm.renderLines();
-        });
-    },
-    render: function render() {
-        console.log(this.state.sm);
-        var chart = this.state.sm.getRepresentation();
-        return React.createElement(
-            "div",
-            { ref: "chart", id: "state_machine_chart" },
-            React.createElement(
-                "div",
-                { ref: "movable" },
-                chart
-            )
-        );
-    }
-});
-
-module.exports = { StateMachineComponent: StateMachineComponent };
-
-},{"../../vendor/jquery.domline":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
+},{"../../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/RequestStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/RequestStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -55558,7 +55226,7 @@ var WorkflowActions = _interopRequire(require("../actions/WorkflowActions.jsx"))
 
 var WorkflowStore = require("../stores/WorkflowStore.jsx").WorkflowStore;
 
-var StateMachineComponent = require("./reusable/statemachine.jsx").StateMachineComponent;
+var StateMachineComponent = require("../react-statemachine/component.jsx").StateMachineComponent;
 
 module.exports = React.createClass({
     mixins: [Router.Navigation, Router.State, Authentication],
@@ -55573,89 +55241,11 @@ module.exports = React.createClass({
         return "Workflow " + route.props.detail.Workflow.title;
     },
     render: function render() {
-        var initial = this.props.detail.Workflow;
-        return React.createElement(
-            "div",
-            { className: "row" },
-            React.createElement(
-                "div",
-                { className: "col-md-12" },
-                React.createElement(
-                    "div",
-                    { className: "panel panel-default" },
-                    React.createElement(
-                        "div",
-                        { className: "panel-body" },
-                        React.createElement(
-                            "div",
-                            { className: "clearfix taskbar col-md-3" },
-                            React.createElement(
-                                "h3",
-                                { className: "task-type-title panel-title" },
-                                "Type of Tasks"
-                            ),
-                            React.createElement("hr", null),
-                            React.createElement(
-                                "div",
-                                { className: "task-type col-md-12 col-xs-4 btn btn-default new-state" },
-                                React.createElement("i", { className: "task-type-icon fa fa-2x fa-check" }),
-                                " ",
-                                React.createElement(
-                                    "span",
-                                    null,
-                                    "Simple Task"
-                                )
-                            )
-                        ),
-                        React.createElement(
-                            "div",
-                            { className: "col-md-9" },
-                            React.createElement(
-                                "div",
-                                { className: "row" },
-                                React.createElement(
-                                    "div",
-                                    { className: "col-md-12" },
-                                    React.createElement(
-                                        "div",
-                                        { "class": "form-group" },
-                                        React.createElement("input", { type: "title", className: "form-control",
-                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", value: initial.title })
-                                    ),
-                                    React.createElement("hr", null)
-                                )
-                            ),
-                            React.createElement(
-                                "div",
-                                { className: "row" },
-                                React.createElement(
-                                    "div",
-                                    { className: "col-md-12" },
-                                    React.createElement(StateMachineComponent, null)
-                                )
-                            ),
-                            React.createElement(
-                                "div",
-                                { className: "row" },
-                                React.createElement(
-                                    "div",
-                                    { className: "col-md-12" },
-                                    React.createElement(
-                                        "button",
-                                        { className: "btn btn-primary pull-right" },
-                                        "Save Workflow"
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
+        return React.createElement(StateMachineComponent, this.props);
     }
 });
 
-},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./reusable/statemachine.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/statemachine.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/main.jsx":[function(require,module,exports){
+},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../react-statemachine/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/component.jsx","../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/main.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -55952,7 +55542,636 @@ var DetailStoreMixin = (function () {
 
 module.exports = { TableStoreMixin: TableStoreMixin, DetailStoreMixin: DetailStoreMixin };
 
-},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx":[function(require,module,exports){
+},{}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/actions.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+// Each action is like an event channel for one specific event. Actions are called by components.
+// The store is listening to all actions, and the components in turn are listening to the store.
+// Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
+var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "drawDependency", "select"]);
+
+module.exports = StateMachineActions;
+
+},{"reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var React = _interopRequire(require("react"));
+
+function __getArrayPos(array, object) {
+    var i = 0;
+    for (var _iterator = array[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+        var entry = _step.value;
+
+        if (entry.equals(object)) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
+var State = (function () {
+    function State(options) {
+        _classCallCheck(this, State);
+
+        this.__identificator = options.identificator;
+        this.__data = options.data;
+        this.__dependencies = [];
+        this.__level = options.level || 1;
+    }
+
+    _prototypeProperties(State, null, {
+        equals: {
+            value: function equals(other) {
+                if (typeof other === "number") {
+                    return this.__identificator === other;
+                }return this.__identificator === other.__identificator;
+            },
+            writable: true,
+            configurable: true
+        },
+        toString: {
+            value: function toString() {
+                return "<State: " + this.__identificator + ">";
+            },
+            writable: true,
+            configurable: true
+        },
+        addDependency: {
+            value: function addDependency(state) {
+                this.__dependencies.push(state);
+            },
+            writable: true,
+            configurable: true
+        },
+        getLevel: {
+            value: function getLevel() {
+                return this.__level;
+            },
+            writable: true,
+            configurable: true
+        },
+        getIdentificator: {
+            value: function getIdentificator() {
+                return this.__identificator;
+            },
+            writable: true,
+            configurable: true
+        },
+        getData: {
+            value: function getData() {
+                return this.__getData;
+            },
+            writable: true,
+            configurable: true
+        },
+        getDependencies: {
+            value: function getDependencies() {
+                return this.__dependencies;
+            },
+            writable: true,
+            configurable: true
+        },
+        deleteState: {
+            value: function deleteState() {
+                console.log("Delete state " + this.__identificator);
+            },
+            writable: true,
+            configurable: true
+        },
+        removeDependency: {
+            value: function removeDependency(identificator) {
+                var index = __getArrayPos(this.__dependencies, identificator);
+                if (index != -1) this.__dependencies.splice(index, 1);
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return State;
+})();
+
+var StateMachine = (function () {
+    function StateMachine() {
+        _classCallCheck(this, StateMachine);
+
+        this.__internal_counter = 0;
+        this.__states = [];
+        this.__level = {};
+        this.__nextLevel = 0;
+    }
+
+    _prototypeProperties(StateMachine, null, {
+        stateFactory: {
+            value: function stateFactory(level) {
+                var data = arguments[1] === undefined ? undefined : arguments[1];
+
+                this.__internal_counter++;
+                return new State({
+                    identificator: this.__internal_counter,
+                    level: level,
+                    data: data
+                });
+            },
+            writable: true,
+            configurable: true
+        },
+        getLevels: {
+            value: function getLevels() {
+                return this.__level;
+            },
+            writable: true,
+            configurable: true
+        },
+        getStates: {
+            value: function getStates() {
+                return this.__states;
+            },
+            writable: true,
+            configurable: true
+        },
+        getNextLevel: {
+            value: function getNextLevel() {
+                return this.__nextLevel;
+            },
+            writable: true,
+            configurable: true
+        },
+        addDependency: {
+            value: function addDependency(dependant, dependency) {
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    if (state.equals(dependant)) {
+                        state.addDependency(dependency);
+                    }
+                }
+            },
+            writable: true,
+            configurable: true
+        },
+        addToLevel: {
+            value: function addToLevel(state) {
+                if (this.__level[state.getLevel()] === undefined) this.__level[state.getLevel()] = [state];else this.__level[state.getLevel()].push(state);
+            },
+            writable: true,
+            configurable: true
+        },
+        addState: {
+            value: function addState(new_state) {
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    if (state.equals(new_state)) {
+                        console.warn("You tried to add a state (" + new_state.toString() + ") that already is on the state machine");
+                        return false;
+                    }
+                }
+                if (this.__nextLevel <= new_state.getLevel()) {
+                    this.__nextLevel = new_state.getLevel() + 1;
+                }
+                this.addToLevel(new_state);
+                this.__states.push(new_state);
+                return true;
+            },
+            writable: true,
+            configurable: true
+        },
+        deleteState: {
+            value: function deleteState(remove_identificator) {
+                var st_index = __getArrayPos(this.__states, remove_identificator);
+                var removed_state = this.__states.splice(st_index, 1);
+
+                for (var level in this.__level) {
+                    var this_level = this.__level[level];
+                    var lv_index = __getArrayPos(this_level, remove_identificator);
+
+                    if (lv_index != -1) this_level.splice(lv_index, 1);
+                }
+
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    state.removeDependency(remove_identificator);
+                }return false;
+            },
+            writable: true,
+            configurable: true
+        },
+        debug: {
+            value: function debug() {
+                console.log("STATES");
+                console.log(this.__states);
+                console.log("LEVEL HIERARQUY");
+                console.log(this.__level);
+                console.log("NEXT_LEVEL");
+                console.log(this.__nextLevel);
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return StateMachine;
+})();
+
+module.exports = { State: State, StateMachine: StateMachine };
+
+},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/component.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var React = _interopRequire(require("react"));
+
+var StateMachine = require("./classes.jsx").StateMachine;
+
+var StateMachineStore = _interopRequire(require("./store.jsx"));
+
+var StateMachineActions = _interopRequire(require("./actions.jsx"));
+
+var cline = _interopRequire(require("../vendor/jquery.domline"));
+
+var StateMachineComponent = React.createClass({
+    displayName: "StateMachineComponent",
+
+    mixins: [Reflux.listenTo(StateMachineStore, "update")],
+    getState: function getState() {
+        return {
+            sm: StateMachineStore.getStateMachine(),
+            selected: StateMachineStore.getSelected()
+        };
+    },
+    getInitialState: function getInitialState() {
+        return this.getState();
+    },
+    update: function update(data) {
+        this.setState(this.getState());
+    },
+    __initUI: function __initUI() {
+        var _this = this;
+
+        $(".new-state").draggable({
+            containment: this.refs.chart.getDOMNode(),
+            revert: "invalid",
+            opacity: 0.7,
+            helper: "clone"
+        });
+        var states = $(this.refs.movable.getDOMNode()).find(".state");
+
+        states.draggable({
+            containment: this.refs.statemachine.getDOMNode(),
+            revert: "invalid",
+            start: function start(event) {
+                var id = event.target.id;
+                $("[class^=\"" + id + "-\"]").hide();
+                $("[class$=\"-" + id + " state_line\"]").toggle();
+            },
+            stop: function stop(event) {
+                var id = event.target.id;
+
+                $("[class^=\"" + id + "-\"]").toggle();
+                $("[class$=\"-" + id + " state_line\"]").toggle();
+            }
+        });
+
+        $(this.refs.movable.getDOMNode()).find(".drop").droppable({
+            activeClass: "ui-state-default",
+            hoverClass: "ui-state-hover",
+            drop: function drop(event, ui) {
+                var level = $(event.target).data("level");
+                console.log(ui.draggable.hasClass("new-state"));
+                if (ui.draggable.hasClass("new-state")) {
+                    StateMachineActions.addState(ui.draggable.data("type"), level);
+                }
+                StateMachineActions.moveState(ui.draggable.attr("id"), level);
+            }
+        });
+        this.renderLines();
+        $(window).resize(function (data) {
+            $(".state_line").remove();
+            _this.renderLines();
+        });
+
+        $(this.refs.statemachine.getDOMNode()).find(".destroy-state").click(function () {
+            var ident = $(this).data("id");
+            StateMachineActions.deleteState(ident);
+        });
+    },
+    componentDidMount: function componentDidMount() {
+        this.__initUI();
+    },
+    componentWillUnmount: function componentWillUnmount() {
+        $(".state_line").remove();
+    },
+    componentWillUpdate: function componentWillUpdate() {
+        $(".state_line").remove();
+    },
+    componentDidUpdate: function componentDidUpdate() {
+        this.__initUI();
+    },
+    saveWorkflow: function saveWorkflow() {
+        console.log("SAVED WORKFLOW");
+    },
+    deleteState: function deleteState(event) {
+        console.log("Delete state");
+        console.log(event);
+    },
+    select: function select(event) {
+        console.log("SELECT EVENT");
+        StateMachineActions.select(event.currentTarget.id);
+    },
+    getLevels: function getLevels() {
+        var _this = this;
+
+        var getLevel = function (level) {
+            return level.map(function (state) {
+                var state_class = "btn btn-default state";
+
+                if (_this.state.selected == state.getIdentificator()) state_class = "" + state_class + " state-selected";
+
+                return React.createElement(
+                    "div",
+                    { key: state.getIdentificator(), onClick: _this.select, id: state.getIdentificator(), className: state_class },
+                    state.getIdentificator(),
+                    React.createElement("br", null),
+                    "SimpleTask",
+                    React.createElement(
+                        "div",
+                        { className: "state-options" },
+                        React.createElement(
+                            "button",
+                            { title: "Click to delete this state", "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
+                            React.createElement("i", { className: "fa fa-1x fa-times" })
+                        ),
+                        React.createElement(
+                            "span",
+                            { title: "Drag to create a dependency ", className: "connect-state" },
+                            React.createElement("i", { className: "fa fa-1x fa-circle" })
+                        )
+                    )
+                );
+            });
+        };
+
+        var list = [];
+        list.push(React.createElement(
+            "div",
+            { key: "level0", className: "well well-sm state-level text-center" },
+            React.createElement(
+                "div",
+                { id: "start", className: "state-start" },
+                React.createElement("i", { className: "fa fa-3x fa-circle" })
+            )
+        ));
+        var levels = this.state.sm.getLevels();
+        for (var prop in levels) {
+            list.push(React.createElement(
+                "div",
+                { key: "level" + prop, className: "well well-sm state-level text-center" },
+                getLevel(levels[prop]),
+                React.createElement(
+                    "div",
+                    { "data-level": "" + prop, className: "btn btn-dotted drop" },
+                    React.createElement("i", { className: "fa fa-3x fa-plus" })
+                )
+            ));
+        }
+        list.push(React.createElement(
+            "div",
+            { key: "levelend", className: "well well-sm state-level text-center" },
+            React.createElement(
+                "div",
+                { "data-level": this.state.sm.getNextLevel(), className: "btn btn-dotted drop" },
+                React.createElement("i", { className: "fa fa-3x fa-plus" })
+            )
+        ));
+        return list;
+    },
+    __renderLine: function __renderLine(elem1, elem2) {
+        var offset1 = elem1.offset();
+        var offset2 = elem2.offset();
+        var width1 = elem1.width() / 2;
+        var width2 = elem2.width() / 2;
+        var height1 = elem1.height() / 2;
+        var height2 = elem2.height() / 2;
+
+        $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, {
+            lineWidth: 5,
+            className: "" + elem1.attr("id") + "-" + elem2.attr("id") + " state_line"
+        });
+    },
+
+    renderLines: function renderLines() {
+        for (var _iterator = this.state.sm.getStates()[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+            var state = _step.value;
+
+            for (var _iterator2 = state.__dependencies[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
+                var dependency = _step2.value;
+
+                this.__renderLine($("#" + state.getIdentificator()), $("#" + dependency.getIdentificator()));
+            }
+            if (state.getLevel() == 1) this.__renderLine($("#" + state.getIdentificator()), $(".state-start"));
+        }
+    },
+    getRepresentation: function getRepresentation() {
+        return React.createElement(
+            "div",
+            null,
+            this.getLevels()
+        );
+    },
+    render: function render() {
+        console.log("RENDER");
+        var initial = this.props.detail.Workflow;
+        var chart = this.getRepresentation();
+        return React.createElement(
+            "div",
+            { className: "row" },
+            React.createElement(
+                "div",
+                { className: "col-md-12" },
+                React.createElement(
+                    "div",
+                    { ref: "statemachine", className: "panel panel-default table-container" },
+                    React.createElement(
+                        "div",
+                        { className: "panel-body table-row" },
+                        React.createElement(
+                            "div",
+                            { ref: "taskbar", className: "clearfix taskbar col-md-3 table-col" },
+                            React.createElement(
+                                "h3",
+                                { className: "task-type-title panel-title" },
+                                "Type of Tasks"
+                            ),
+                            React.createElement("hr", null),
+                            React.createElement(
+                                "div",
+                                { "data-type": "task.SimpleTask", className: "task-type col-md-12 col-xs-4 btn btn-default new-state" },
+                                React.createElement("i", { className: "task-type-icon fa fa-2x fa-check" }),
+                                " ",
+                                React.createElement(
+                                    "span",
+                                    null,
+                                    "Simple Task"
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            "div",
+                            { className: "col-md-9 table-col" },
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "div",
+                                        { "class": "form-group" },
+                                        React.createElement("input", { type: "title", className: "form-control",
+                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", value: initial.title })
+                                    ),
+                                    React.createElement("hr", null)
+                                )
+                            ),
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "div",
+                                        { ref: "chart", id: "state_machine_chart" },
+                                        React.createElement(
+                                            "div",
+                                            { ref: "movable" },
+                                            chart
+                                        )
+                                    )
+                                )
+                            ),
+                            React.createElement(
+                                "div",
+                                { className: "row" },
+                                React.createElement(
+                                    "div",
+                                    { className: "col-md-12" },
+                                    React.createElement(
+                                        "button",
+                                        { onClick: this.saveWorkflow, className: "btn btn-primary pull-right" },
+                                        "Save Workflow"
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
+module.exports = { StateMachineComponent: StateMachineComponent };
+
+},{"../vendor/jquery.domline":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js","./actions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/actions.jsx","./classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","./store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Reflux = _interopRequire(require("reflux"));
+
+var StateMachineActions = _interopRequire(require("./actions.jsx"));
+
+var _classesJsx = require("./classes.jsx");
+
+var StateMachine = _classesJsx.StateMachine;
+var State = _classesJsx.State;
+
+var StateMachineStore = Reflux.createStore({
+    listenables: [StateMachineActions],
+    init: function init() {
+        this.__sm = new StateMachine();
+        var state1 = this.__sm.stateFactory(1);
+        var state2 = this.__sm.stateFactory(2);
+        var state3 = this.__sm.stateFactory(2);
+        var state4 = this.__sm.stateFactory(3);
+
+        this.__sm.addState(state1);
+        this.__sm.addState(state2);
+        this.__sm.addState(state3);
+        this.__sm.addState(state4);
+
+        this.__sm.addDependency(state2, state1);
+        this.__sm.addDependency(state3, state1);
+        this.__sm.addDependency(state4, state2);
+        this.__sm.addDependency(state4, state3);
+        //this.__sm.addDependency(state4, state1);
+
+        this.__selected = undefined;
+    },
+
+    // getters and setters
+    getStateMachine: function getStateMachine() {
+        return this.__sm;
+    },
+
+    getSelected: function getSelected() {
+        return this.__selected;
+    },
+    // Action handlers
+    onAddState: function onAddState(type, level) {
+        console.log("Add new state of type " + type + " into level " + level);
+
+        var new_state = this.__sm.stateFactory(level);
+
+        this.__sm.addState(new_state);
+
+        this.trigger();
+    },
+    onMoveState: function onMoveState(identificator, level) {
+        console.log("Drop " + identificator + " into level " + level);
+
+        this.trigger();
+    },
+    onDeleteState: function onDeleteState(identificator) {
+        console.log("Delete state " + identificator);
+
+        this.__sm.deleteState(identificator);
+
+        this.__sm.debug();
+
+        this.trigger();
+    },
+    onDrawDependency: function onDrawDependency() {
+
+        this.trigger();
+    },
+    onSelect: function onSelect(selected) {
+        this.__selected = selected;
+
+        this.trigger();
+    }
+});
+
+module.exports = StateMachineStore;
+
+},{"./actions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/actions.jsx","./classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };

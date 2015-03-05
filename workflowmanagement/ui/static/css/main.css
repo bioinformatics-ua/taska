@@ -300,6 +300,7 @@ footer {
     border-right: 1px solid #eee;
     height: 100%;
     margin-bottom: 20px;
+
 }
 
 @media screen and (max-width: 992px) {
@@ -307,6 +308,24 @@ footer {
         border-bottom: 1px solid #eee;
         padding-bottom: 20px;
         border-right: 0;
+    }
+}
+
+@media screen and (min-width: 992px){
+    .table-container {
+      display: table;
+    }
+
+    .table-container .table-row {
+      height: 100%;
+      display: table-row;
+    }
+
+    .table-container .table-row .table-col {
+      display: table-cell;
+      float: none;
+      vertical-align: top;
+      padding: 20px;
     }
 }
 
@@ -322,8 +341,11 @@ footer {
     min-height: 300px;
 }
 .state{
-    margin:5px;
+    margin:5px 15px;
     z-index: 3000;
+}
+.state-container{
+
 }
  .state-start{
     color: black;
@@ -336,6 +358,40 @@ footer {
 .btn-dotted{
     border: 4px dotted #C7C7C7;
     background-color: white;
-    min-width: 200px;
+    min-width: 150px;
     height: 100%;
+}
+.state-options{
+    display: none;
+
+}
+
+.state-options > .destroy-state{
+    position:absolute;
+
+    margin-right:-25px;
+    top:0;
+    right:0;
+}
+
+.state-options > .connect-state{
+    position:absolute;
+    bottom:0;
+    right: 0;
+    margin-right: -20px;
+}
+
+.state-selected > .state-options{
+    display: block;
+}
+
+.state-selected{
+  border-color: rgba(51, 122, 183, 0.61);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
+  outline: 0 none;
+  position: relative;
+}
+
+.new-state{
+    z-index:3000;
 }

@@ -46,7 +46,8 @@ class TaskAdmin(admin.ModelAdmin):
     change_form_template='admin/change_form_task.html'
     form = TaskForm
     list_display = ('title', 'workflow', 'sortid', 'description', 'id', 'task_type')
-    readonly_fields = ('id',)
+    readonly_fields = ('id', 'hash', 'ttype')
+
     ordering = ('workflow','sortid', 'title')
 
     help_text = "This is meant to be used as a generic overview of all tasks, not as a place to add/edit/delete tasks. Tasks can be of different kinds, and should be added through they're respective models (such as SimpleTask, or other implementations)"
@@ -66,5 +67,5 @@ class SimpleTaskAdmin(admin.ModelAdmin):
     change_form_template='admin/change_form_task.html'
     form = TaskForm
     list_display = ('title', 'workflow', 'sortid', 'description', 'id')
-    readonly_fields = ('id',)
+    readonly_fields = ('id', 'hash', 'ttype')
     ordering = ('workflow','sortid', 'title')
