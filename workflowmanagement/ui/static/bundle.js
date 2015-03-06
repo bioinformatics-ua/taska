@@ -55552,7 +55552,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "drawDependency", "select", "setTitle"]);
+var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "select", "setTitle"]);
 
 module.exports = StateMachineActions;
 
@@ -55587,7 +55587,7 @@ var State = (function () {
         this.__identificator = options.identificator;
         this.__data = options.data;
         this.__dependencies = [];
-        this.__level = options.level || 1;
+        this.__level = options.level;
     }
 
     _prototypeProperties(State, null, {
@@ -55609,7 +55609,9 @@ var State = (function () {
         },
         addDependency: {
             value: function addDependency(state) {
-                this.__dependencies.push(state);
+                var i = __getArrayPos(this.__dependencies, state);
+
+                if (i == -1) this.__dependencies.push(state);
             },
             writable: true,
             configurable: true
@@ -55617,6 +55619,20 @@ var State = (function () {
         getLevel: {
             value: function getLevel() {
                 return this.__level;
+            },
+            writable: true,
+            configurable: true
+        },
+        setLevel: {
+            value: function setLevel(level) {
+                this.__level = level;
+            },
+            writable: true,
+            configurable: true
+        },
+        levelUp: {
+            value: function levelUp() {
+                this.__level++;
             },
             writable: true,
             configurable: true
@@ -55638,6 +55654,13 @@ var State = (function () {
         getDependencies: {
             value: function getDependencies() {
                 return this.__dependencies;
+            },
+            writable: true,
+            configurable: true
+        },
+        setDependencies: {
+            value: function setDependencies(deps) {
+                this.__dependencies = deps;
             },
             writable: true,
             configurable: true
@@ -55721,6 +55744,17 @@ var StateMachine = (function () {
             writable: true,
             configurable: true
         },
+        getState: {
+            value: function getState(identificator) {
+                var i = __getArrayPos(this.__states, identificator);
+
+                if (i != -1) {
+                    return this.__states[i];
+                }return undefined;
+            },
+            writable: true,
+            configurable: true
+        },
         addToLevel: {
             value: function addToLevel(state) {
                 if (this.__level[state.getLevel()] === undefined) this.__level[state.getLevel()] = [state];else this.__level[state.getLevel()].push(state);
@@ -55730,20 +55764,60 @@ var StateMachine = (function () {
         },
         addState: {
             value: function addState(new_state) {
-                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-                    var state = _step.value;
-
-                    if (state.equals(new_state)) {
-                        console.warn("You tried to add a state (" + new_state.toString() + ") that already is on the state machine");
-                        return false;
-                    }
+                var i = __getArrayPos(this.__states, new_state);
+                if (i != -1) {
+                    console.warn("You tried to add a state (" + new_state.toString() + ") that already is on the state machine");
+                    return false;
                 }
-                if (this.__nextLevel <= new_state.getLevel()) {
+
+                if (new_state.getLevel() == 0) {
+                    this.levelUp();
+                    new_state.levelUp();
+                } else if (this.__nextLevel <= new_state.getLevel()) {
                     this.__nextLevel = new_state.getLevel() + 1;
                 }
                 this.addToLevel(new_state);
                 this.__states.push(new_state);
                 return true;
+            },
+            writable: true,
+            configurable: true
+        },
+        moveState: {
+            /* When we move a state from a level to another, besides changing the state level,
+               we also have to change the dependencies, since a state can only depend upon
+               states higher in the hierarchy then himself (this way we ensure its loop free)
+            */
+
+            value: function moveState(moved_state, level) {
+                this.__level = {};
+
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    if (state.equals(moved_state)) {
+                        state.setLevel(level);
+
+                        var deps = state.getDependencies();
+                        var valid_deps = [];
+                        for (var i = 0; i < deps.length; i++) {
+                            if (deps[i].getLevel() < level) valid_deps.push(deps[i]);
+                        }
+                        state.setDependencies(valid_deps);
+                    } else if (state.getLevel() < level) {
+                        var deps = state.getDependencies();
+                        var valid_deps = [];
+
+                        for (var i = 0; i < deps.length; i++) {
+                            if (!deps[i].equals(moved_state)) {
+                                valid_deps.push(deps[i]);
+                            }
+                        }
+                        state.setDependencies(valid_deps);
+                    }
+
+                    this.addToLevel(state);
+                }
             },
             writable: true,
             configurable: true
@@ -55769,11 +55843,28 @@ var StateMachine = (function () {
             writable: true,
             configurable: true
         },
+        levelUp: {
+
+            // This increases every single state one level on the hierarqy (useful if we want to prepend states to the state-machine)
+
+            value: function levelUp() {
+                this.__level = {};
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    state.levelUp();
+                    this.addToLevel(state);
+                }
+                this.__nextLevel++;
+            },
+            writable: true,
+            configurable: true
+        },
         debug: {
             value: function debug() {
                 console.log("STATES");
                 console.log(this.__states);
-                console.log("LEVEL HIERARQUY");
+                console.log("LEVEL HIERARQY");
                 console.log(this.__level);
                 console.log("NEXT_LEVEL");
                 console.log(this.__nextLevel);
@@ -55859,7 +55950,9 @@ var StateMachineComponent = React.createClass({
             opacity: 0.01,
             helper: "clone",
             start: function start(event) {},
-            stop: function stop(event) {},
+            stop: function stop(event) {
+                $(".temp_line").remove();
+            },
             drag: function drag(event, ui) {
                 $(".temp_line").remove();
                 self.__tempLine(ui.offset, $(event.target));
@@ -55884,7 +55977,10 @@ var StateMachineComponent = React.createClass({
             activeClass: "ui-state-default",
             hoverClass: "ui-state-hover",
             drop: function drop(event, ui) {
-                console.log("DROP connector");
+                var elem1 = Number.parseInt(event.target.id);
+                var elem2 = Number.parseInt($(ui.draggable).data("id"));
+
+                self.addDependency(elem1, elem2);
             }
         });
 
@@ -55921,6 +56017,9 @@ var StateMachineComponent = React.createClass({
     },
     deleteState: function deleteState(event) {
         StateMachineActions.deleteState();
+    },
+    addDependency: function addDependency(elem1, elem2) {
+        StateMachineActions.addDependency(elem1, elem2);
     },
     select: function select(event) {
         StateMachineActions.select(event.currentTarget.id);
@@ -55973,11 +56072,17 @@ var StateMachineComponent = React.createClass({
             { key: "level0", className: "well well-sm state-level text-center" },
             React.createElement(
                 "div",
-                { id: "start", className: "state-start" },
+                { className: "state-start" },
                 React.createElement("i", { className: "fa fa-3x fa-circle" })
+            ),
+            React.createElement(
+                "div",
+                { "data-level": "0", className: "btn btn-dotted drop" },
+                React.createElement("i", { className: "fa fa-3x fa-plus" })
             )
         ));
         var levels = this.state.sm.getLevels();
+        console.log(levels);
         for (var prop in levels) {
             list.push(React.createElement(
                 "div",
@@ -55990,9 +56095,10 @@ var StateMachineComponent = React.createClass({
                 )
             ));
         }
+        console.log(this.state.sm.getNextLevel());
         list.push(React.createElement(
             "div",
-            { key: "levelend", className: "well well-sm state-level text-center" },
+            { key: "level" + this.state.sm.getNextLevel(), className: "well well-sm state-level text-center" },
             React.createElement(
                 "div",
                 { "data-level": this.state.sm.getNextLevel(), className: "btn btn-dotted drop" },
@@ -56063,7 +56169,7 @@ var StateMachineComponent = React.createClass({
                         { className: "panel-body table-row" },
                         React.createElement(
                             "div",
-                            { ref: "taskbar", className: "clearfix taskbar col-md-3 table-col" },
+                            { ref: "taskbar", className: "clearfix taskbar col-md-2 table-col" },
                             React.createElement(
                                 "h3",
                                 { className: "task-type-title panel-title" },
@@ -56084,7 +56190,7 @@ var StateMachineComponent = React.createClass({
                         ),
                         React.createElement(
                             "div",
-                            { className: "col-md-9 table-col" },
+                            { className: "col-md-10 table-col" },
                             React.createElement(
                                 "div",
                                 { className: "row" },
@@ -56201,6 +56307,13 @@ var StateMachineStore = Reflux.createStore({
     onMoveState: function onMoveState(identificator, level) {
         console.log("Drop " + identificator + " into level " + level);
 
+        var e = this.__sm.getState(Number.parseInt(identificator));
+
+        // There must be a state with the correct identifier, and its meaningless to move it to the same level as it already is
+        if (e != undefined && e.getLevel() != level) {
+            this.__sm.moveState(e, level);
+        }
+
         this.trigger();
     },
     onDeleteState: function onDeleteState() {
@@ -56214,8 +56327,16 @@ var StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
-    onDrawDependency: function onDrawDependency() {
+    onAddDependency: function onAddDependency(elem1, elem2) {
 
+        var e1 = this.__sm.getState(elem1);
+        var e2 = this.__sm.getState(elem2);
+
+        if (e1 != undefined && e2 != undefined) {
+            if (e1.getLevel() > e2.getLevel()) this.__sm.addDependency(e1, e2);else if (e2.getLevel() > e1.getLevel()) this.__sm.addDependency(e2, e1);
+        }
+
+        this.__sm.debug();
         this.trigger();
     },
     onSelect: function onSelect(selected) {

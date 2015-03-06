@@ -50,6 +50,13 @@ const StateMachineStore = Reflux.createStore({
     onMoveState(identificator, level){
         console.log(`Drop ${identificator} into level ${level}`);
 
+        let e = this.__sm.getState(Number.parseInt(identificator));
+
+        // There must be a state with the correct identifier, and its meaningless to move it to the same level as it already is
+        if(e != undefined && e.getLevel()!=level){
+            this.__sm.moveState(e, level);
+        }
+
         this.trigger();
     },
     onDeleteState(){
@@ -63,8 +70,19 @@ const StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
-    onDrawDependency(){
+    onAddDependency(elem1, elem2){
 
+        let e1 = this.__sm.getState(elem1);
+        let e2 = this.__sm.getState(elem2);
+
+        if(e1 != undefined && e2 != undefined){
+            if(e1.getLevel() > e2.getLevel())
+                this.__sm.addDependency(e1, e2);
+            else if(e2.getLevel() > e1.getLevel())
+                this.__sm.addDependency(e2, e1);
+        }
+
+        this.__sm.debug();
         this.trigger();
     },
     onSelect(selected){

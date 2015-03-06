@@ -66,7 +66,7 @@ const StateMachineComponent = React.createClass({
 
               },
               stop: function(event) {
-
+                $('.temp_line').remove();
               },
               drag: function(event, ui) {
                 $('.temp_line').remove();
@@ -95,7 +95,10 @@ const StateMachineComponent = React.createClass({
           activeClass: "ui-state-default",
           hoverClass: "ui-state-hover",
           drop: function( event, ui ) {
-            console.log('DROP connector');
+            let elem1 = Number.parseInt(event.target.id);
+            let elem2 = Number.parseInt($(ui.draggable).data('id'));
+
+            self.addDependency(elem1, elem2);
           }
         });
 
@@ -133,6 +136,9 @@ const StateMachineComponent = React.createClass({
     deleteState(event){
         StateMachineActions.deleteState();
     },
+    addDependency(elem1, elem2){
+        StateMachineActions.addDependency(elem1, elem2);
+    },
     select(event){
         StateMachineActions.select(event.currentTarget.id);
     },
@@ -169,12 +175,16 @@ const StateMachineComponent = React.createClass({
 
         let list = [];
         list.push(<div key="level0" className="well well-sm state-level text-center">
-                        <div id="start" className="state-start">
+                        <div className="state-start">
                         <i className="fa fa-3x fa-circle"/>
+                        </div>
+                        <div data-level="0" className="btn btn-dotted drop">
+                            <i className="fa fa-3x fa-plus"/>
                         </div>
                 </div>
         );
         let levels = this.state.sm.getLevels();
+        console.log(levels);
         for(var prop in levels){
             list.push(
                 <div key={`level${prop}`} className="well well-sm state-level text-center">
@@ -185,8 +195,9 @@ const StateMachineComponent = React.createClass({
                 </div>
             );
         }
+               console.log(this.state.sm.getNextLevel());
                list.push(
-                <div key="levelend" className="well well-sm state-level text-center">
+                <div key={`level${this.state.sm.getNextLevel()}`} className="well well-sm state-level text-center">
                     <div data-level={this.state.sm.getNextLevel()} className="btn btn-dotted drop">
                         <i className="fa fa-3x fa-plus"/>
                     </div>
@@ -250,14 +261,14 @@ const StateMachineComponent = React.createClass({
           <div className="col-md-12">
                 <div ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
-                        <div ref="taskbar" className="clearfix taskbar col-md-3 table-col">
+                        <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
                             <h3 className="task-type-title panel-title">Type of Tasks</h3>
                             <hr />
                             <div data-type="task.SimpleTask" className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             <i className="task-type-icon fa fa-2x fa-check"></i>&nbsp;
                              <span>Simple Task</span></div>
                         </div>
-                        <div className="col-md-9 table-col">
+                        <div className="col-md-10 table-col">
                                 <div className="row">
                               <div className="col-md-12">
 

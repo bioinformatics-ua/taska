@@ -16,7 +16,7 @@ class State{
         this.__identificator = options.identificator;
         this.__data = options.data;
         this.__dependencies = [];
-        this.__level = options.level || 1;
+        this.__level = options.level;
     }
     equals(other){
         if(typeof other === 'number')
@@ -28,10 +28,19 @@ class State{
         return `<State: ${this.__identificator}>`;
     }
     addDependency(state){
-        this.__dependencies.push(state);
+        let i = __getArrayPos(this.__dependencies, state);
+
+        if(i == -1)
+            this.__dependencies.push(state);
     }
     getLevel(){
         return this.__level;
+    }
+    setLevel(level){
+        this.__level = level;
+    }
+    levelUp(){
+        this.__level++;
     }
     getIdentificator(){
         return this.__identificator;
@@ -41,6 +50,9 @@ class State{
     }
     getDependencies(){
         return this.__dependencies;
+    }
+    setDependencies(deps){
+        this.__dependencies = deps;
     }
     deleteState(){
         console.log(`Delete state ${this.__identificator}`)
@@ -86,6 +98,15 @@ class StateMachine{
             }
         }
     }
+    getState(identificator){
+        let i = __getArrayPos(this.__states, identificator);
+
+        if(i != -1)
+            return this.__states[i];
+
+        return undefined;
+
+    }
     addToLevel(state){
         if(this.__level[state.getLevel()] === undefined)
             this.__level[state.getLevel()] = [state];
@@ -94,18 +115,58 @@ class StateMachine{
     }
 
     addState(new_state){
-        for(let state of this.__states){
-            if(state.equals(new_state)){
-                console.warn(`You tried to add a state (${new_state.toString()}) that already is on the state machine`);
-                return false;
-            }
+        let i = __getArrayPos(this.__states, new_state);
+        if(i != -1){
+            console.warn(`You tried to add a state (${new_state.toString()}) that already is on the state machine`);
+            return false;
         }
-        if(this.__nextLevel <= new_state.getLevel()){
+
+        if(new_state.getLevel() == 0){
+            this.levelUp();
+            new_state.levelUp();
+        }
+        else if(this.__nextLevel <= new_state.getLevel()){
             this.__nextLevel = new_state.getLevel()+1;
         }
         this.addToLevel(new_state);
         this.__states.push(new_state);
         return true;
+    }
+    /* When we move a state from a level to another, besides changing the state level,
+       we also have to change the dependencies, since a state can only depend upon
+       states higher in the hierarchy then himself (this way we ensure its loop free)
+    */
+    moveState(moved_state, level){
+        this.__level = {}
+
+        for(let state of this.__states){
+            if(state.equals(moved_state)){
+                state.setLevel(level);
+
+                let deps = state.getDependencies();
+                let valid_deps = [];
+                for(let i=0;i<deps.length;i++){
+                    if(deps[i].getLevel()<level)
+                        valid_deps.push(deps[i]);
+                }
+                state.setDependencies(valid_deps);
+            }
+            else if(state.getLevel()<level){
+                let deps = state.getDependencies();
+                let valid_deps = [];
+
+                for(let i=0;i<deps.length;i++){
+                    if(!deps[i].equals(moved_state)){
+                        valid_deps.push(deps[i]);
+                    }
+                }
+                state.setDependencies(valid_deps);
+            }
+
+            this.addToLevel(state);
+        }
+
+
     }
 
     deleteState(remove_identificator){
@@ -125,10 +186,21 @@ class StateMachine{
 
         return false;
     }
+
+    // This increases every single state one level on the hierarqy (useful if we want to prepend states to the state-machine)
+    levelUp(){
+        this.__level =  {};
+        for(let state of this.__states){
+            state.levelUp();
+            this.addToLevel(state);
+        }
+        this.__nextLevel++;
+    }
+
     debug(){
         console.log('STATES');
         console.log(this.__states);
-        console.log('LEVEL HIERARQUY');
+        console.log('LEVEL HIERARQY');
         console.log(this.__level);
         console.log('NEXT_LEVEL');
         console.log(this.__nextLevel);
