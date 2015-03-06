@@ -217,7 +217,7 @@ class StateMachine{
     levelUp(start_level=0){
         this.__level =  {};
         for(let state of this.__states){
-            if(state.getLevel() > start_level)
+            if(state.getLevel() >= start_level)
                 state.levelUp();
             this.addToLevel(state);
         }

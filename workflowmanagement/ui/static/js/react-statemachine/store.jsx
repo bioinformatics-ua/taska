@@ -107,6 +107,7 @@ const StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onInsertAbove(level){
+        console.log(`Insert above ${level}`);
 
         this.__sm.insertAbove(level);
 

@@ -55889,7 +55889,7 @@ var StateMachine = (function () {
                 for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
                     var state = _step.value;
 
-                    if (state.getLevel() > start_level) state.levelUp();
+                    if (state.getLevel() >= start_level) state.levelUp();
                     this.addToLevel(state);
                 }
                 this.__nextLevel++;
@@ -56138,8 +56138,8 @@ var StateMachineComponent = React.createClass({
         StateMachineActions.clearSelect();
     },
     insertAbove: function insertAbove(event) {
-        var level = $(event.target).data("level");
-
+        event.stopPropagation();
+        var level = $(event.target).parent().data("level");
         StateMachineActions.insertAbove(Number.parseInt(level));
     },
     getLevels: function getLevels() {
@@ -56533,6 +56533,7 @@ var StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onInsertAbove: function onInsertAbove(level) {
+        console.log("Insert above " + level);
 
         this.__sm.insertAbove(level);
 

@@ -160,8 +160,8 @@ const StateMachineComponent = React.createClass({
         StateMachineActions.clearSelect();
     },
     insertAbove(event){
-        let level = $(event.target).data('level');
-
+        event.stopPropagation();
+        let level = $(event.target).parent().data('level');
         StateMachineActions.insertAbove(Number.parseInt(level));
     },
     getLevels(){
