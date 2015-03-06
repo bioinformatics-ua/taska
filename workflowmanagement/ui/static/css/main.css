@@ -297,7 +297,8 @@ footer {
 }
 
 .taskbar{
-    border-right: 1px solid #eee;
+    background-color: whitesmoke;
+    border-right: 1px solid rgb(205, 205, 205);
     height: 100%;
     margin-bottom: 20px;
 
@@ -365,7 +366,7 @@ footer {
     background-color: white;
     min-width: 100px;
 }
-.state-options{
+.state-options, .line-options{
     display: none;
 
 }
@@ -380,19 +381,32 @@ footer {
 
 .state-options > .connect-state{
     position:absolute;
-    bottom:0;
+    bottom:-20px;
     right: 0;
-    margin-right: -20px;
+    width: 16px;
+    margin-left: -8px;
+    left: 50%;
 }
 
-.state-selected > .state-options{
+.state-selected > .state-options, .state_line_selected > .line-options{
     display: block;
 }
 
-.state-handler-selected{
+.state-handler-selected, .state_line_selected{
   border-color: rgba(51, 122, 183, 0.61);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
   outline: 0 none;
+}
+
+.line-options{
+    position: absolute;
+    z-index:3001;
+    margin-left: 20px;
+    margin-top: -8px;
+}
+
+.initial_state {
+    display: block;
 }
 .state {
     position: relative;
@@ -402,4 +416,44 @@ footer {
 }
 
 .connect-state{
+}
+
+.state_line::after{
+    content: '←';
+    font-size: 40px;
+    margin-left: -4px;
+    line-height: 0;
+}
+
+.state_line:hover{
+  border-color: rgba(51, 122, 183, 0.61);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 122, 0, 1);
+
+  outline: 0 none;
+  z-index:2999;
+}
+
+.level-separator{
+    height: 5px;
+    position: absolute;
+    width: 100%;
+    margin-top: -20px;
+    background-color: rgb(199, 199, 199);
+}
+.level-separator:hover{
+    background-color: rgb(199, 199, 199);
+}
+.level-label{
+    position: absolute;
+    right:0;
+    margin-top: -15px;
+    color: rgb(199, 199, 199);
+}
+.level-separator-container{
+    opacity: 0.2;
+    position:relative;
+}
+
+.level-separator-container:hover{
+    opacity: 1;
 }

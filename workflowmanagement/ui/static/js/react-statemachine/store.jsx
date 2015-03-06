@@ -62,11 +62,18 @@ const StateMachineStore = Reflux.createStore({
     onDeleteState(){
         //console.log(`Delete state ${this.__selected}`);
 
-        this.__sm.deleteState(this.__selected);
+        this.__sm.deleteState(Number.parseInt(this.__selected));
 
         this.__sm.debug();
 
         this.__selected = undefined;
+
+        this.trigger();
+    },
+    onDeleteDependency(dependant, dependency){
+        console.log(`Delete ${dependency} from ${dependant}`);
+
+        this.__sm.deleteDependency(dependant, dependency);
 
         this.trigger();
     },
@@ -86,12 +93,22 @@ const StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onSelect(selected){
-        this.__selected = Number.parseInt(selected);
+        this.__selected = selected;
 
+        this.trigger();
+    },
+    onClearSelect(selected){
+        this.__selected = undefined;
         this.trigger();
     },
     onSetTitle(title){
         this.__title=title;
+
+        this.trigger();
+    },
+    onInsertAbove(level){
+
+        this.__sm.insertAbove(level);
 
         this.trigger();
     }

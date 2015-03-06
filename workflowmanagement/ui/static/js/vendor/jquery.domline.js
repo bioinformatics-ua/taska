@@ -59,6 +59,7 @@
             theta = (180 + Math.atan2(from.y - to.y, from.x - to.x) * 180 / Math.PI + 360) % 360;
         }
         pos.transform = 'rotate(' + theta + 'deg)';
+        pos.reversetransform = 'rotate(-' + theta + 'deg)';
         // These have to come after the transform property to override the left/top
         //  values set by the transform matrix in IE
         pos.left = left;
@@ -90,8 +91,10 @@
         // Create div element
         var opts = $.extend({}, $.line.defaults, options || {}),
             $elem = opts.elem ? $(opts.elem) : $('<div/>', {
-                'class': opts.className
-            }),
+                'class': opts.className,
+                'title': opts.title || '',
+                'id': options.id
+            }).append(options.extraHtml),
             css = {
                 position: 'absolute',
                 backgroundColor: opts.lineColor,
@@ -126,7 +129,12 @@
         pos = calcPosition(from, to, calcDims);
         extra = pos.extra;
         delete pos.extra;
+
+        var     reverse = pos.reversetransform;
+        delete pos.reversetransform;
+
         $elem.css(pos);
+        //$elem.children(":first").css({'transform': reverse});
 
         // Build object if returnValues option is true
         if (opts.returnValues) {

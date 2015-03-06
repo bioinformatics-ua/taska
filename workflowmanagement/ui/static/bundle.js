@@ -55552,7 +55552,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "select", "setTitle"]);
+var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove"]);
 
 module.exports = StateMachineActions;
 
@@ -55616,6 +55616,15 @@ var State = (function () {
             writable: true,
             configurable: true
         },
+        deleteDependency: {
+            value: function deleteDependency(dependency) {
+                var i = __getArrayPos(this.__dependencies, dependency);
+
+                if (i != -1) this.__dependencies.splice(i, 1);
+            },
+            writable: true,
+            configurable: true
+        },
         getLevel: {
             value: function getLevel() {
                 return this.__level;
@@ -55633,6 +55642,13 @@ var State = (function () {
         levelUp: {
             value: function levelUp() {
                 this.__level++;
+            },
+            writable: true,
+            configurable: true
+        },
+        levelDown: {
+            value: function levelDown() {
+                this.__level--;
             },
             writable: true,
             configurable: true
@@ -55744,6 +55760,15 @@ var StateMachine = (function () {
             writable: true,
             configurable: true
         },
+        deleteDependency: {
+            value: function deleteDependency(dependant, dependency) {
+                var i = __getArrayPos(this.__states, dependant);
+
+                if (i != -1) this.__states[i].deleteDependency(dependency);
+            },
+            writable: true,
+            configurable: true
+        },
         getState: {
             value: function getState(identificator) {
                 var i = __getArrayPos(this.__states, identificator);
@@ -55790,8 +55815,12 @@ var StateMachine = (function () {
             */
 
             value: function moveState(moved_state, level) {
-                this.__level = {};
+                if (level == 0) {
+                    this.levelUp();
+                    level++;
+                }
 
+                this.__level = {};
                 for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
                     var state = _step.value;
 
@@ -55806,10 +55835,8 @@ var StateMachine = (function () {
                         }
                         state.setDependencies(valid_deps);
                     } else if (state.getLevel() <= level) {
-                        console.log("PROCESS " + state.getIdentificator());
-
                         var deps = state.getDependencies();
-                        console.log(deps);
+
                         for (var i = 0; i < deps.length; i++) {
                             if (deps[i].equals(moved_state)) {
                                 deps.splice(i, 1);
@@ -55822,6 +55849,8 @@ var StateMachine = (function () {
                 }
 
                 if (level == this.getNextLevel()) this.__nextLevel++;
+
+                this.removeDiscontinuities();
             },
             writable: true,
             configurable: true
@@ -55842,7 +55871,9 @@ var StateMachine = (function () {
                     var state = _step.value;
 
                     state.removeDependency(remove_identificator);
-                }return false;
+                }this.removeDiscontinuities();
+
+                return false;
             },
             writable: true,
             configurable: true
@@ -55852,14 +55883,74 @@ var StateMachine = (function () {
             // This increases every single state one level on the hierarqy (useful if we want to prepend states to the state-machine)
 
             value: function levelUp() {
+                var start_level = arguments[0] === undefined ? 0 : arguments[0];
+
                 this.__level = {};
                 for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
                     var state = _step.value;
 
-                    state.levelUp();
+                    if (state.getLevel() > start_level) state.levelUp();
                     this.addToLevel(state);
                 }
                 this.__nextLevel++;
+            },
+            writable: true,
+            configurable: true
+        },
+        levelDown: {
+
+            // This decreases every single state one level on the hierarchy, starting at the level defined on start_level
+
+            value: function levelDown() {
+                var start_level = arguments[0] === undefined ? 0 : arguments[0];
+
+                this.__level = {};
+                for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var state = _step.value;
+
+                    if (state.getLevel() > start_level) state.levelDown();
+
+                    this.addToLevel(state);
+                }
+                this.__nextLevel--;
+            },
+            writable: true,
+            configurable: true
+        },
+        insertAbove: {
+            value: function insertAbove(level) {
+                this.levelUp(level);
+
+                this.__level[level] = [];
+            },
+            writable: true,
+            configurable: true
+        },
+        removeDiscontinuities: {
+
+            // when moving or deleting states, we could be creating a discontinuity in the level structure, when that happens we need to remove
+            // this blank levels(because they have no semantic meaning)
+
+            value: function removeDiscontinuities() {
+                console.log("REMOVE discontinuity cicle");
+                var i = 1;
+                var failed = false;
+
+                // continuosly do passes while we catch discontinuities.
+                // Teorically, we should never get more than one discontinuity, but tecnically they are possible
+                for (var level in this.__level) {
+                    if (level != i) {
+                        this.levelDown(i);
+                        return this.removeDiscontinuities();
+                    }
+                    var this_level = this.__level[level];
+
+                    if (this_level.length == 0) {
+                        this.levelDown(i);
+                        return this.removeDiscontinuities();
+                    }
+                    i++;
+                }
             },
             writable: true,
             configurable: true
@@ -55963,7 +56054,16 @@ var StateMachineComponent = React.createClass({
             } });
 
         $(this.refs.movable.getDOMNode()).find(".drop").droppable({
-            accept: ".state-handler, .new-state",
+            accept: function accept(elem) {
+                var _elem = $(elem);
+
+                if (_elem.hasClass("state-handler") || _elem.hasClass("new-state")) {
+                    if (_elem.data("level") != $(this).data("level")) {
+                        return true;
+                    }
+                }
+                return false;
+            },
             activeClass: "ui-state-default",
             hoverClass: "ui-state-hover",
             drop: function drop(event, ui) {
@@ -56022,11 +56122,25 @@ var StateMachineComponent = React.createClass({
     deleteState: function deleteState(event) {
         StateMachineActions.deleteState();
     },
+    deleteConnection: function deleteConnection(dependant, dependency) {
+        StateMachineActions.deleteDependency(dependant, dependency);
+    },
     addDependency: function addDependency(elem1, elem2) {
         StateMachineActions.addDependency(elem1, elem2);
     },
     select: function select(event) {
+        event.stopPropagation();
         StateMachineActions.select(event.currentTarget.id);
+    },
+    clearSelect: function clearSelect(event) {
+        event.stopPropagation();
+        console.log("CLEAR SELECT");
+        StateMachineActions.clearSelect();
+    },
+    insertAbove: function insertAbove(event) {
+        var level = $(event.target).data("level");
+
+        StateMachineActions.insertAbove(Number.parseInt(level));
     },
     getLevels: function getLevels() {
         var _this = this;
@@ -56047,7 +56161,7 @@ var StateMachineComponent = React.createClass({
                     { key: state.getIdentificator(), className: state_class },
                     React.createElement(
                         "div",
-                        { onClick: _this.select, id: state.getIdentificator(), className: state_handler_class },
+                        { onClick: _this.select, "data-level": state.getLevel(), id: state.getIdentificator(), className: state_handler_class },
                         state.getIdentificator(),
                         React.createElement("br", null),
                         "SimpleTask"
@@ -56071,47 +56185,58 @@ var StateMachineComponent = React.createClass({
         };
 
         var list = [];
+        var initial_state = this.state.sm.getNextLevel() == 1 ? "initial_state" : "";
+
         list.push(React.createElement(
             "div",
-            { key: "level0", className: "well well-sm state-level text-center" },
+            { key: "level0", onClick: this.clearSelect, className: "well well-sm state-level text-center" },
             React.createElement(
                 "div",
-                { className: "state-start" },
+                { title: "Origin of study Workflow diagram", className: "state-start" },
                 React.createElement("i", { className: "fa fa-3x fa-circle" })
             ),
             React.createElement(
                 "div",
-                { "data-level": "0", className: "btn btn-dotted drop" },
+                { title: "Drop tasks to add/move them here.", "data-level": "0", className: "btn btn-dotted drop " + initial_state },
                 React.createElement("i", { className: "fa fa-3x fa-plus" })
             )
         ));
         var levels = this.state.sm.getLevels();
-        console.log(levels);
         for (var prop in levels) {
             list.push(React.createElement(
                 "div",
-                { key: "level" + prop, className: "well well-sm state-level text-center" },
+                { key: "level" + prop, onClick: this.clearSelect, className: "well well-sm state-level text-center" },
+                React.createElement(
+                    "div",
+                    { onClick: this.insertAbove, "data-level": prop, className: "level-separator-container" },
+                    React.createElement("div", { className: "level-separator" }),
+                    React.createElement(
+                        "small",
+                        { className: "level-label" },
+                        "Click line to add row here."
+                    )
+                ),
                 getLevel(levels[prop]),
                 React.createElement(
                     "div",
-                    { "data-level": "" + prop, className: "btn btn-dotted drop" },
+                    { title: "Drop tasks to add/move them here.", "data-level": "" + prop, className: "btn btn-dotted drop" },
                     React.createElement("i", { className: "fa fa-3x fa-plus" })
                 )
             ));
         }
-        console.log(this.state.sm.getNextLevel());
-        list.push(React.createElement(
+        if (this.state.sm.getNextLevel() > 1) list.push(React.createElement(
             "div",
-            { key: "level" + this.state.sm.getNextLevel(), className: "well well-sm state-level text-center" },
+            { key: "level" + this.state.sm.getNextLevel(), onClick: this.clearSelect, className: "well well-sm state-level text-center" },
             React.createElement(
                 "div",
-                { "data-level": this.state.sm.getNextLevel(), className: "btn btn-dotted drop" },
+                { title: "Drop tasks to add/move them here.", "data-level": this.state.sm.getNextLevel(), className: "btn btn-dotted drop" },
                 React.createElement("i", { className: "fa fa-3x fa-plus" })
             )
         ));
         return list;
     },
     __renderLine: function __renderLine(elem1, elem2) {
+
         var offset1 = elem1.offset();
         var offset2 = elem2.offset();
         var width1 = elem1.width() / 2;
@@ -56119,9 +56244,28 @@ var StateMachineComponent = React.createClass({
         var height1 = elem1.height() / 2;
         var height2 = elem2.height() / 2;
 
-        $.line({ x: offset1.left + width1, y: offset1.top + height1 }, { x: offset2.left + width2, y: offset2.top + height2 }, {
+        var maximum_referential = $("#state_machine_chart").width() / 2 - width1;
+        //console.log(`Maximum Referential ${maximum_referential}`);
+        var referential_zero = offset1.left + width1;
+        //console.log(`Referential zero ${referential_zero}`);
+        var relative_ref = offset2.left - referential_zero;
+        //console.log(`Relative referencial ${relative_ref}`);
+        var horizontal_variation = width1 + relative_ref * width1 / maximum_referential;
+        //console.log(`Horizontal_variation ${horizontal_variation}`);
+
+        var conn = "" + elem1.attr("id") + "-" + elem2.attr("id");
+
+        var selected = this.state.selected == conn ? "state_line_selected" : "";
+
+        // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
+        var exists = elem2.attr("id") != undefined;
+
+        $.line({ x: offset1.left + horizontal_variation, y: offset1.top - 4 }, { x: offset2.left + width2, y: offset2.top + height2 }, {
             lineWidth: 5,
-            className: "" + elem1.attr("id") + "-" + elem2.attr("id") + " state_line"
+            className: "" + conn + " state_line " + selected,
+            title: exists ? "" + elem1.attr("id") + " depends upon " + elem2.attr("id") + " " : undefined,
+            id: exists ? "" + conn : undefined,
+            extraHtml: exists ? "\n                    <div class=\"line-options\">\n                        <button title=\"Click to delete this line\" data-id=\"" + conn + "\" class=\"btn btn-xs btn-danger destroy-connection\">\n                                <i class=\"fa fa-1x fa-times\"></i>\n                        </button>\n                    </div>\n                " : undefined
         });
     },
     __tempLine: function __tempLine(pos, elem) {
@@ -56135,6 +56279,10 @@ var StateMachineComponent = React.createClass({
         });
     },
     renderLines: function renderLines() {
+        var _this = this;
+
+        var self = this;
+
         for (var _iterator = this.state.sm.getStates()[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
             var state = _step.value;
 
@@ -56145,6 +56293,17 @@ var StateMachineComponent = React.createClass({
             }
             if (state.getLevel() == 1) this.__renderLine($("#" + state.getIdentificator()), $(".state-start"));
         }
+
+        $(".state_line").click(function (event) {
+            _this.select(event);
+        });
+
+        $(".state_line .destroy-connection").click(function (event) {
+            event.stopPropagation();
+
+            var conn = $(this).data("id").split("-");
+            if (conn.length == 2) self.deleteConnection(Number.parseInt(conn[0]), Number.parseInt(conn[1]));else console.error("Invalid connection state");
+        });
     },
     getRepresentation: function getRepresentation() {
         return React.createElement(
@@ -56203,9 +56362,18 @@ var StateMachineComponent = React.createClass({
                                     { className: "col-md-12" },
                                     React.createElement(
                                         "div",
-                                        { "class": "form-group" },
+                                        { className: "input-group" },
+                                        React.createElement(
+                                            "span",
+                                            { className: "input-group-addon", id: "study-title" },
+                                            React.createElement(
+                                                "strong",
+                                                null,
+                                                "Study Title"
+                                            )
+                                        ),
                                         React.createElement("input", { type: "title", className: "form-control",
-                                            id: "exampleInputEmail1", placeholder: "Enter the workflow title", onChange: this.setTitle, value: this.state.title })
+                                            id: "exampleInputEmail1", "aria-describedby": "study-title", placeholder: "Enter the workflow title", onChange: this.setTitle, value: this.state.title })
                                     ),
                                     React.createElement("hr", null)
                                 )
@@ -56236,7 +56404,7 @@ var StateMachineComponent = React.createClass({
                                     React.createElement(
                                         "button",
                                         { onClick: this.saveWorkflow, className: "btn btn-primary pull-right" },
-                                        "Save Workflow"
+                                        "Save Study"
                                     )
                                 )
                             )
@@ -56323,11 +56491,18 @@ var StateMachineStore = Reflux.createStore({
     onDeleteState: function onDeleteState() {
         //console.log(`Delete state ${this.__selected}`);
 
-        this.__sm.deleteState(this.__selected);
+        this.__sm.deleteState(Number.parseInt(this.__selected));
 
         this.__sm.debug();
 
         this.__selected = undefined;
+
+        this.trigger();
+    },
+    onDeleteDependency: function onDeleteDependency(dependant, dependency) {
+        console.log("Delete " + dependency + " from " + dependant);
+
+        this.__sm.deleteDependency(dependant, dependency);
 
         this.trigger();
     },
@@ -56344,12 +56519,22 @@ var StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onSelect: function onSelect(selected) {
-        this.__selected = Number.parseInt(selected);
+        this.__selected = selected;
 
+        this.trigger();
+    },
+    onClearSelect: function onClearSelect(selected) {
+        this.__selected = undefined;
         this.trigger();
     },
     onSetTitle: function onSetTitle(title) {
         this.__title = title;
+
+        this.trigger();
+    },
+    onInsertAbove: function onInsertAbove(level) {
+
+        this.__sm.insertAbove(level);
 
         this.trigger();
     }
@@ -56669,6 +56854,7 @@ module.exports = Reflux.createStore({
             theta = (180 + Math.atan2(from.y - to.y, from.x - to.x) * 180 / Math.PI + 360) % 360;
         }
         pos.transform = "rotate(" + theta + "deg)";
+        pos.reversetransform = "rotate(-" + theta + "deg)";
         // These have to come after the transform property to override the left/top
         //  values set by the transform matrix in IE
         pos.left = left;
@@ -56700,8 +56886,10 @@ module.exports = Reflux.createStore({
         // Create div element
         var opts = $.extend({}, $.line.defaults, options || {}),
             $elem = opts.elem ? $(opts.elem) : $("<div/>", {
-            "class": opts.className
-        }),
+            "class": opts.className,
+            title: opts.title || "",
+            id: options.id
+        }).append(options.extraHtml),
             css = {
             position: "absolute",
             backgroundColor: opts.lineColor,
@@ -56734,7 +56922,12 @@ module.exports = Reflux.createStore({
         pos = calcPosition(from, to, calcDims);
         extra = pos.extra;
         delete pos.extra;
+
+        var reverse = pos.reversetransform;
+        delete pos.reversetransform;
+
         $elem.css(pos);
+        //$elem.children(":first").css({'transform': reverse});
 
         // Build object if returnValues option is true
         if (opts.returnValues) {

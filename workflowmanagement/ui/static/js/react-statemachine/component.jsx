@@ -77,7 +77,15 @@ const StateMachineComponent = React.createClass({
 
 
         $(this.refs.movable.getDOMNode()).find('.drop').droppable({
-          accept: ".state-handler, .new-state",
+          accept: function(elem){
+            let _elem = $(elem);
+
+            if(_elem.hasClass('state-handler') || _elem.hasClass('new-state')){
+                if(_elem.data('level') != $(this).data('level'))
+                    return true;
+            }
+            return false;
+          },
           activeClass: "ui-state-default",
           hoverClass: "ui-state-hover",
           drop: function( event, ui ) {
@@ -136,11 +144,25 @@ const StateMachineComponent = React.createClass({
     deleteState(event){
         StateMachineActions.deleteState();
     },
+    deleteConnection(dependant, dependency){
+        StateMachineActions.deleteDependency(dependant, dependency);
+    },
     addDependency(elem1, elem2){
         StateMachineActions.addDependency(elem1, elem2);
     },
     select(event){
+        event.stopPropagation();
         StateMachineActions.select(event.currentTarget.id);
+    },
+    clearSelect(event){
+        event.stopPropagation();
+        console.log('CLEAR SELECT');
+        StateMachineActions.clearSelect();
+    },
+    insertAbove(event){
+        let level = $(event.target).data('level');
+
+        StateMachineActions.insertAbove(Number.parseInt(level));
     },
     getLevels(){
         let getLevel = (level => {
@@ -155,7 +177,7 @@ const StateMachineComponent = React.createClass({
                 }
 
               return <div key={state.getIdentificator()} className={state_class}>
-                        <div onClick={this.select} id={state.getIdentificator()} className={state_handler_class}>
+                        <div onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
                             {state.getIdentificator()}<br />
                             SimpleTask
                         </div>
@@ -174,31 +196,36 @@ const StateMachineComponent = React.createClass({
         });
 
         let list = [];
-        list.push(<div key="level0" className="well well-sm state-level text-center">
-                        <div className="state-start">
+        let initial_state = (this.state.sm.getNextLevel() == 1)? 'initial_state': '';
+
+        list.push(<div key="level0" onClick={this.clearSelect} className="well well-sm state-level text-center">
+                        <div title="Origin of study Workflow diagram" className="state-start">
                         <i className="fa fa-3x fa-circle"/>
                         </div>
-                        <div data-level="0" className="btn btn-dotted drop">
+                        <div title="Drop tasks to add/move them here." data-level="0" className={`btn btn-dotted drop ${initial_state}`}>
                             <i className="fa fa-3x fa-plus"/>
                         </div>
-                </div>
+            </div>
         );
         let levels = this.state.sm.getLevels();
-        console.log(levels);
         for(var prop in levels){
             list.push(
-                <div key={`level${prop}`} className="well well-sm state-level text-center">
+                <div key={`level${prop}`} onClick={this.clearSelect} className="well well-sm state-level text-center">
+                    <div onClick={this.insertAbove} data-level={prop} className="level-separator-container">
+                        <div className="level-separator"></div>
+                        <small className="level-label">Click line to add row here.</small>
+                    </div>
                     {getLevel(levels[prop])}
-                    <div data-level={`${prop}`} className="btn btn-dotted drop">
+                    <div title="Drop tasks to add/move them here." data-level={`${prop}`} className="btn btn-dotted drop">
                         <i className="fa fa-3x fa-plus"/>
                     </div>
                 </div>
             );
         }
-               console.log(this.state.sm.getNextLevel());
-               list.push(
-                <div key={`level${this.state.sm.getNextLevel()}`} className="well well-sm state-level text-center">
-                    <div data-level={this.state.sm.getNextLevel()} className="btn btn-dotted drop">
+        if(this.state.sm.getNextLevel() > 1)
+            list.push(
+                <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level text-center">
+                    <div title="Drop tasks to add/move them here." data-level={this.state.sm.getNextLevel()} className="btn btn-dotted drop">
                         <i className="fa fa-3x fa-plus"/>
                     </div>
                 </div>
@@ -206,6 +233,7 @@ const StateMachineComponent = React.createClass({
         return list;
     },
     __renderLine(elem1, elem2){
+
         let offset1 = elem1.offset();
         let offset2 = elem2.offset();
         let width1 = elem1.width()/2;
@@ -213,12 +241,37 @@ const StateMachineComponent = React.createClass({
         let height1 = elem1.height()/2;
         let height2 = elem2.height()/2;
 
+        let maximum_referential = ($('#state_machine_chart').width()/2) - width1;
+        //console.log(`Maximum Referential ${maximum_referential}`);
+        let referential_zero = offset1.left+width1;
+        //console.log(`Referential zero ${referential_zero}`);
+        let relative_ref = offset2.left-referential_zero;
+        //console.log(`Relative referencial ${relative_ref}`);
+        let horizontal_variation = width1 + ((relative_ref * width1) / maximum_referential);
+        //console.log(`Horizontal_variation ${horizontal_variation}`);
+
+        let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
+
+        let selected = (this.state.selected == conn)? 'state_line_selected': '';
+
+        // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
+        let exists = elem2.attr('id') != undefined;
+
         $.line(
-            {x:offset1.left+width1, y:offset1.top+height1},
+            {x:offset1.left+horizontal_variation, y:offset1.top-4},
             {x:offset2.left+width2, y:offset2.top+height2},
             {
                 lineWidth: 5,
-                className: `${elem1.attr('id')}-${elem2.attr('id')} state_line`
+                className: `${conn} state_line ${selected}`,
+                title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
+                id: (exists)? `${conn}`: undefined,
+                extraHtml: (exists)? `
+                    <div class="line-options">
+                        <button title="Click to delete this line" data-id="${conn}" class="btn btn-xs btn-danger destroy-connection">
+                                <i class="fa fa-1x fa-times"></i>
+                        </button>
+                    </div>
+                `: undefined
             });
     },
     __tempLine(pos, elem){
@@ -235,6 +288,8 @@ const StateMachineComponent = React.createClass({
             });
     },
     renderLines(){
+        let self = this;
+
         for(let state of this.state.sm.getStates()){
             for(let dependency of state.__dependencies){
                 this.__renderLine($(`#${state.getIdentificator()}`), $(`#${dependency.getIdentificator()}`));
@@ -242,6 +297,21 @@ const StateMachineComponent = React.createClass({
             if(state.getLevel() == 1)
                 this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'))
         }
+
+        $('.state_line').click(event =>{
+            this.select(event);
+        });
+
+        $('.state_line .destroy-connection').click(function(event){
+            event.stopPropagation();
+
+            let conn = $(this).data('id').split('-');
+            if(conn.length == 2)
+                self.deleteConnection(Number.parseInt(conn[0]), Number.parseInt(conn[1]));
+            else
+                console.error('Invalid connection state');
+
+        });
     },
     getRepresentation(){
         return (
@@ -271,11 +341,11 @@ const StateMachineComponent = React.createClass({
                         <div className="col-md-10 table-col">
                                 <div className="row">
                               <div className="col-md-12">
-
-                                    <div class="form-group">
-                                        <input type="title" className="form-control"
-                                        id="exampleInputEmail1" placeholder="Enter the workflow title" onChange={this.setTitle} value={this.state.title} />
-                                      </div>
+                                    <div className="input-group">
+                                      <span className="input-group-addon" id="study-title"><strong>Study Title</strong></span>
+                                      <input type="title" className="form-control"
+                                        id="exampleInputEmail1" aria-describedby="study-title" placeholder="Enter the workflow title" onChange={this.setTitle} value={this.state.title} />
+                                    </div>
                                     <hr />
                                 </div>
                               </div>
@@ -290,7 +360,7 @@ const StateMachineComponent = React.createClass({
                               </div>
                               <div className="row">
                               <div className="col-md-12">
-                              <button onClick={this.saveWorkflow} className="btn btn-primary pull-right">Save Workflow</button>
+                              <button onClick={this.saveWorkflow} className="btn btn-primary pull-right">Save Study</button>
                               </div>
                               </div>
 
