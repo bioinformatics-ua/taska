@@ -146,27 +146,31 @@ class StateMachine{
                 let deps = state.getDependencies();
                 let valid_deps = [];
                 for(let i=0;i<deps.length;i++){
+                    console.log(`IS ${deps[i].getLevel()} < ${level} ? ${deps[i].getLevel()<level }`);
                     if(deps[i].getLevel()<level)
                         valid_deps.push(deps[i]);
                 }
                 state.setDependencies(valid_deps);
             }
-            else if(state.getLevel()<level){
-                let deps = state.getDependencies();
-                let valid_deps = [];
+            else if(state.getLevel()<=level){
+                console.log(`PROCESS ${state.getIdentificator()}`);
 
+                let deps = state.getDependencies();
+                console.log(deps);
                 for(let i=0;i<deps.length;i++){
-                    if(!deps[i].equals(moved_state)){
-                        valid_deps.push(deps[i]);
+                    if(deps[i].equals(moved_state)){
+                        deps.splice(i,1);
+                        continue;
                     }
                 }
-                state.setDependencies(valid_deps);
+
             }
 
             this.addToLevel(state);
         }
 
-
+        if(level == this.getNextLevel())
+            this.__nextLevel++;
     }
 
     deleteState(remove_identificator){
