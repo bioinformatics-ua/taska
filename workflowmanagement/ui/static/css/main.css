@@ -350,6 +350,7 @@ footer {
 }
 .state-handler{
     z-index: 3000;
+    position: relative;
 }
  .state-start{
     color: black;

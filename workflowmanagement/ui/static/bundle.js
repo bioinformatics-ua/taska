@@ -55216,6 +55216,8 @@ module.exports = React.createClass({
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = _interopRequire(require("react"));
 
 var Router = _interopRequire(require("react-router"));
@@ -55241,7 +55243,7 @@ module.exports = React.createClass({
         return "Workflow " + route.props.detail.Workflow.title;
     },
     render: function render() {
-        return React.createElement(StateMachineComponent, this.props);
+        return React.createElement(StateMachineComponent, _extends({ editable: true }, this.props));
     }
 });
 
@@ -55552,7 +55554,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove"]);
+var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow"]);
 
 module.exports = StateMachineActions;
 
@@ -55588,6 +55590,7 @@ var State = (function () {
         this.__data = options.data;
         this.__dependencies = [];
         this.__level = options.level;
+        this.__version = 0;
     }
 
     _prototypeProperties(State, null, {
@@ -55641,6 +55644,8 @@ var State = (function () {
         },
         levelUp: {
             value: function levelUp() {
+                this.__version++;
+
                 this.__level++;
             },
             writable: true,
@@ -55648,7 +55653,16 @@ var State = (function () {
         },
         levelDown: {
             value: function levelDown() {
+                this.__version++;
+
                 this.__level--;
+            },
+            writable: true,
+            configurable: true
+        },
+        getVersion: {
+            value: function getVersion() {
+                return this.__version;
             },
             writable: true,
             configurable: true
@@ -56005,6 +56019,11 @@ var StateMachineComponent = React.createClass({
     getInitialState: function getInitialState() {
         return this.getState();
     },
+    getDefaultProps: function getDefaultProps() {
+        return {
+            editable: true
+        };
+    },
     update: function update(data) {
         this.setState(this.getState());
     },
@@ -56013,81 +56032,79 @@ var StateMachineComponent = React.createClass({
 
         var self = this;
 
-        $(".new-state").draggable({
-            containment: this.refs.chart.getDOMNode(),
-            revert: "invalid",
-            opacity: 0.7,
-            helper: "clone"
-        });
-        var states = $(this.refs.movable.getDOMNode()).find(".state-handler");
+        if (this.props.editable) {
+            $(".new-state").draggable({
+                containment: this.refs.chart.getDOMNode(),
+                revert: "invalid",
+                opacity: 0.7,
+                helper: "clone"
+            });
+            var states = $(this.refs.movable.getDOMNode()).find(".state-handler");
 
-        states.draggable({
-            containment: this.refs.statemachine.getDOMNode(),
-            revert: "invalid",
-            start: function start(event) {
-                var id = event.target.id;
-                $("[class^=\"" + id + "-\"]").hide();
-                $("[class$=\"-" + id + " state_line\"]").toggle();
-            },
-            stop: function stop(event) {
-                var id = event.target.id;
+            states.draggable({
+                containment: this.refs.statemachine.getDOMNode(),
+                revert: "invalid",
+                start: function start(event) {
+                    var id = event.target.id;
+                    $("[class^=\"" + id + "-\"]").hide();
+                    $("[class$=\"-" + id + " state_line\"]").toggle();
+                },
+                stop: function stop(event) {
+                    var id = event.target.id;
 
-                $("[class^=\"" + id + "-\"]").toggle();
-                $("[class$=\"-" + id + " state_line\"]").toggle();
-            }
-        });
+                    $("[class^=\"" + id + "-\"]").toggle();
+                    $("[class$=\"-" + id + " state_line\"]").toggle();
+                }
+            });
 
-        var state_connectors = $(this.refs.movable.getDOMNode()).find(".connect-state");
+            var state_connectors = $(this.refs.movable.getDOMNode()).find(".connect-state");
 
-        state_connectors.draggable({
-            containment: this.refs.statemachine.getDOMNode(),
-            revert: "invalid",
-            opacity: 0.01,
-            helper: "clone",
-            start: function start(event) {},
-            stop: function stop(event) {
-                $(".temp_line").remove();
-            },
-            drag: function drag(event, ui) {
-                $(".temp_line").remove();
-                self.__tempLine(ui.offset, $(event.target));
-            } });
+            state_connectors.draggable({
+                containment: this.refs.statemachine.getDOMNode(),
+                revert: "invalid",
+                opacity: 0.01,
+                helper: "clone",
+                start: function start(event) {},
+                stop: function stop(event) {
+                    $(".temp_line").remove();
+                },
+                drag: function drag(event, ui) {
+                    $(".temp_line").remove();
+                    self.__tempLine(ui.offset, $(event.target));
+                } });
 
-        $(this.refs.movable.getDOMNode()).find(".drop").droppable({
-            accept: function accept(elem) {
-                var _elem = $(elem);
+            $(this.refs.movable.getDOMNode()).find(".drop").droppable({
+                accept: function accept(elem) {
+                    var _elem = $(elem);
 
-                if (_elem.hasClass("state-handler") || _elem.hasClass("new-state")) {
-                    if (_elem.data("level") != $(this).data("level")) {
-                        return true;
+                    if (_elem.hasClass("state-handler") || _elem.hasClass("new-state")) {
+                        if (_elem.data("level") != $(this).data("level")) {
+                            return true;
+                        }
                     }
+                    return false;
+                },
+                activeClass: "ui-state-default",
+                hoverClass: "ui-state-hover",
+                drop: function drop(event, ui) {
+                    var level = $(event.target).data("level");
+                    console.log(ui.draggable.hasClass("new-state"));
+                    if (ui.draggable.hasClass("new-state")) StateMachineActions.addState(ui.draggable.data("type"), level);else StateMachineActions.moveState(ui.draggable.attr("id"), level);
                 }
-                return false;
-            },
-            activeClass: "ui-state-default",
-            hoverClass: "ui-state-hover",
-            drop: function drop(event, ui) {
-                var level = $(event.target).data("level");
-                console.log(ui.draggable.hasClass("new-state"));
-                if (ui.draggable.hasClass("new-state")) {
-                    StateMachineActions.addState(ui.draggable.data("type"), level);
+            });
+
+            $(this.refs.movable.getDOMNode()).find(".state-handler").droppable({
+                accept: ".connect-state",
+                activeClass: "ui-state-default",
+                hoverClass: "ui-state-hover",
+                drop: function drop(event, ui) {
+                    var elem1 = Number.parseInt(event.target.id);
+                    var elem2 = Number.parseInt($(ui.draggable).data("id"));
+
+                    self.addDependency(elem1, elem2);
                 }
-                StateMachineActions.moveState(ui.draggable.attr("id"), level);
-            }
-        });
-
-        $(this.refs.movable.getDOMNode()).find(".state-handler").droppable({
-            accept: ".connect-state",
-            activeClass: "ui-state-default",
-            hoverClass: "ui-state-hover",
-            drop: function drop(event, ui) {
-                var elem1 = Number.parseInt(event.target.id);
-                var elem2 = Number.parseInt($(ui.draggable).data("id"));
-
-                self.addDependency(elem1, elem2);
-            }
-        });
-
+            });
+        }
         this.renderLines();
         $(window).resize(function (data) {
             $(".state_line").remove();
@@ -56101,6 +56118,11 @@ var StateMachineComponent = React.createClass({
             }
         );*/
     },
+    killUI: function killUI() {
+        $(".ui-draggable").draggable("destroy");
+        $(".ui-droppable").droppable("destroy");
+        $(".state_line").remove();
+    },
     componentWillMount: function componentWillMount() {
         StateMachineActions.setTitle(this.props.detail.Workflow.title);
     },
@@ -56108,10 +56130,10 @@ var StateMachineComponent = React.createClass({
         this.__initUI();
     },
     componentWillUnmount: function componentWillUnmount() {
-        $(".state_line").remove();
+        this.killUI();
     },
     componentWillUpdate: function componentWillUpdate() {
-        $(".state_line").remove();
+        this.killUI();
     },
     componentDidUpdate: function componentDidUpdate() {
         this.__initUI();
@@ -56142,6 +56164,11 @@ var StateMachineComponent = React.createClass({
         var level = $(event.target).parent().data("level");
         StateMachineActions.insertAbove(Number.parseInt(level));
     },
+    removeRow: function removeRow(event) {
+        event.stopPropagation();
+
+        StateMachineActions.removeRow();
+    },
     getLevels: function getLevels() {
         var _this = this;
 
@@ -56156,9 +56183,23 @@ var StateMachineComponent = React.createClass({
                     state_handler_class = "" + state_handler_class + " state-handler-selected";
                 }
 
+                var stateOptions = _this.props.editable ? React.createElement(
+                    "div",
+                    { className: "state-options" },
+                    React.createElement(
+                        "button",
+                        { title: "Click to delete this state", onClick: _this.deleteState, "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
+                        React.createElement("i", { className: "fa fa-1x fa-times" })
+                    ),
+                    React.createElement(
+                        "div",
+                        { "data-id": state.getIdentificator(), title: "Drag to create a dependency ", className: "connect-state" },
+                        React.createElement("i", { className: "fa fa-1x fa-circle" })
+                    )
+                ) : "";
                 return React.createElement(
                     "div",
-                    { key: state.getIdentificator(), className: state_class },
+                    { key: "i" + state.getIdentificator() + "_v" + state.getVersion(), className: state_class },
                     React.createElement(
                         "div",
                         { onClick: _this.select, "data-level": state.getLevel(), id: state.getIdentificator(), className: state_handler_class },
@@ -56166,20 +56207,7 @@ var StateMachineComponent = React.createClass({
                         React.createElement("br", null),
                         "SimpleTask"
                     ),
-                    React.createElement(
-                        "div",
-                        { className: "state-options" },
-                        React.createElement(
-                            "button",
-                            { title: "Click to delete this state", onClick: _this.deleteState, "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
-                            React.createElement("i", { className: "fa fa-1x fa-times" })
-                        ),
-                        React.createElement(
-                            "div",
-                            { "data-id": state.getIdentificator(), title: "Drag to create a dependency ", className: "connect-state" },
-                            React.createElement("i", { className: "fa fa-1x fa-circle" })
-                        )
-                    )
+                    stateOptions
                 );
             });
         };
@@ -56187,6 +56215,15 @@ var StateMachineComponent = React.createClass({
         var list = [];
         var initial_state = this.state.sm.getNextLevel() == 1 ? "initial_state" : "";
 
+        var drop = function (prop) {
+            var initial_state = arguments[1] === undefined ? "" : arguments[1];
+
+            return _this.props.editable ? React.createElement(
+                "div",
+                { title: "Drop tasks to add/move them here.", "data-level": "" + prop, className: "btn btn-dotted drop " + initial_state },
+                React.createElement("i", { className: "fa fa-3x fa-plus" })
+            ) : "";
+        };
         list.push(React.createElement(
             "div",
             { key: "level0", onClick: this.clearSelect, className: "well well-sm state-level text-center" },
@@ -56195,43 +56232,46 @@ var StateMachineComponent = React.createClass({
                 { title: "Origin of study Workflow diagram", className: "state-start" },
                 React.createElement("i", { className: "fa fa-3x fa-circle" })
             ),
-            React.createElement(
-                "div",
-                { title: "Drop tasks to add/move them here.", "data-level": "0", className: "btn btn-dotted drop " + initial_state },
-                React.createElement("i", { className: "fa fa-3x fa-plus" })
-            )
+            drop(0, initial_state)
         ));
         var levels = this.state.sm.getLevels();
+
+        var delete_row = function (level) {
+
+            return level.length == 0 ? React.createElement(
+                "button",
+                { onClick: _this.removeRow, className: "pull-right btn btn-xs btn-link" },
+                "Delete row"
+            ) : "";
+        };
+
+        var insertAbove = function (prop) {
+            return _this.props.editable ? React.createElement(
+                "div",
+                { onClick: _this.insertAbove, "data-level": prop, className: "level-separator-container" },
+                React.createElement("div", { className: "level-separator" }),
+                React.createElement(
+                    "small",
+                    { className: "level-label" },
+                    "Click line to add row here."
+                )
+            ) : "";
+        };
+
         for (var prop in levels) {
             list.push(React.createElement(
                 "div",
                 { key: "level" + prop, onClick: this.clearSelect, className: "well well-sm state-level text-center" },
-                React.createElement(
-                    "div",
-                    { onClick: this.insertAbove, "data-level": prop, className: "level-separator-container" },
-                    React.createElement("div", { className: "level-separator" }),
-                    React.createElement(
-                        "small",
-                        { className: "level-label" },
-                        "Click line to add row here."
-                    )
-                ),
+                insertAbove(prop),
                 getLevel(levels[prop]),
-                React.createElement(
-                    "div",
-                    { title: "Drop tasks to add/move them here.", "data-level": "" + prop, className: "btn btn-dotted drop" },
-                    React.createElement("i", { className: "fa fa-3x fa-plus" })
-                )
+                drop(prop),
+                delete_row(levels[prop])
             ));
         }
         if (this.state.sm.getNextLevel() > 1) list.push(React.createElement(
             "div",
             { key: "level" + this.state.sm.getNextLevel(), onClick: this.clearSelect, className: "well well-sm state-level text-center" },
-            React.createElement(
-                "div",
-                { title: "Drop tasks to add/move them here.", "data-level": this.state.sm.getNextLevel(), className: "btn btn-dotted drop" },
-                React.createElement("i", { className: "fa fa-3x fa-plus" })
-            )
+            drop(this.state.sm.getNextLevel())
         ));
         return list;
     },
@@ -56265,7 +56305,7 @@ var StateMachineComponent = React.createClass({
             className: "" + conn + " state_line " + selected,
             title: exists ? "" + elem1.attr("id") + " depends upon " + elem2.attr("id") + " " : undefined,
             id: exists ? "" + conn : undefined,
-            extraHtml: exists ? "\n                    <div class=\"line-options\">\n                        <button title=\"Click to delete this line\" data-id=\"" + conn + "\" class=\"btn btn-xs btn-danger destroy-connection\">\n                                <i class=\"fa fa-1x fa-times\"></i>\n                        </button>\n                    </div>\n                " : undefined
+            extraHtml: exists && this.props.editable ? "\n                    <div class=\"line-options\">\n                        <button title=\"Click to delete this line\" data-id=\"" + conn + "\" class=\"btn btn-xs btn-danger destroy-connection\">\n                                <i class=\"fa fa-1x fa-times\"></i>\n                        </button>\n                    </div>\n                " : undefined
         });
     },
     __tempLine: function __tempLine(pos, elem) {
@@ -56536,6 +56576,11 @@ var StateMachineStore = Reflux.createStore({
         console.log("Insert above " + level);
 
         this.__sm.insertAbove(level);
+
+        this.trigger();
+    },
+    onRemoveRow: function onRemoveRow() {
+        this.__sm.removeDiscontinuities();
 
         this.trigger();
     }

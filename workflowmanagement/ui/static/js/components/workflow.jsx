@@ -27,7 +27,7 @@ export default React.createClass({
     },
     render() {
         return (
-          <StateMachineComponent {...this.props}/>
+          <StateMachineComponent editable={true} {...this.props}/>
         );
     }
 });

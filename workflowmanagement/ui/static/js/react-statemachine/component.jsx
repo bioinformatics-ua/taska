@@ -19,12 +19,18 @@ const StateMachineComponent = React.createClass({
     getInitialState(){
         return this.getState();
     },
+    getDefaultProps() {
+        return {
+            editable: true
+        };
+    },
     update(data){
         this.setState(this.getState());
     },
     __initUI(){
         let self = this;
 
+        if(this.props.editable){
         $('.new-state').draggable(
             {
               containment: this.refs.chart.getDOMNode(),
@@ -91,10 +97,11 @@ const StateMachineComponent = React.createClass({
           drop: function( event, ui ) {
             let level = $(event.target).data('level');
             console.log(ui.draggable.hasClass('new-state'));
-            if(ui.draggable.hasClass('new-state')){
+            if(ui.draggable.hasClass('new-state'))
                 StateMachineActions.addState(ui.draggable.data('type'), level);
-            }
-            StateMachineActions.moveState(ui.draggable.attr('id'), level)
+            else
+                StateMachineActions.moveState(ui.draggable.attr('id'), level);
+
           }
         });
 
@@ -109,7 +116,7 @@ const StateMachineComponent = React.createClass({
             self.addDependency(elem1, elem2);
           }
         });
-
+    }
         this.renderLines();
         $( window ).resize(data => {
             $('.state_line').remove();
@@ -123,6 +130,11 @@ const StateMachineComponent = React.createClass({
             }
         );*/
     },
+    killUI(){
+        $('.ui-draggable').draggable( "destroy" );
+        $('.ui-droppable').droppable( "destroy" );
+        $('.state_line').remove();
+    },
     componentWillMount(){
         StateMachineActions.setTitle(this.props.detail.Workflow.title);
     },
@@ -130,10 +142,10 @@ const StateMachineComponent = React.createClass({
         this.__initUI();
     },
     componentWillUnmount(){
-        $('.state_line').remove();
+        this.killUI();
     },
     componentWillUpdate(){
-        $('.state_line').remove();
+        this.killUI();
     },
     componentDidUpdate(){
         this.__initUI();
@@ -164,6 +176,11 @@ const StateMachineComponent = React.createClass({
         let level = $(event.target).parent().data('level');
         StateMachineActions.insertAbove(Number.parseInt(level));
     },
+    removeRow(event){
+        event.stopPropagation();
+
+        StateMachineActions.removeRow();
+    },
     getLevels(){
         let getLevel = (level => {
             return level.map(state => {
@@ -176,12 +193,7 @@ const StateMachineComponent = React.createClass({
                     state_handler_class = `${state_handler_class} state-handler-selected`;
                 }
 
-              return <div key={state.getIdentificator()} className={state_class}>
-                        <div onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
-                            {state.getIdentificator()}<br />
-                            SimpleTask
-                        </div>
-
+                let stateOptions = this.props.editable? (
                         <div className="state-options">
                             <button title="Click to delete this state" onClick={this.deleteState} data-id={state.getIdentificator()} className="btn btn-xs btn-danger destroy-state">
                                 <i className="fa fa-1x fa-times"/>
@@ -190,6 +202,13 @@ const StateMachineComponent = React.createClass({
                                 <i className="fa fa-1x fa-circle"/>
                                 </div>
                         </div>
+                ):'';
+              return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
+                        <div onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
+                            {state.getIdentificator()}<br />
+                            SimpleTask
+                        </div>
+                        {stateOptions}
                     </div>;
         });
 
@@ -198,36 +217,56 @@ const StateMachineComponent = React.createClass({
         let list = [];
         let initial_state = (this.state.sm.getNextLevel() == 1)? 'initial_state': '';
 
+        let drop = (prop, initial_state='') => {
+            return this.props.editable? (
+                <div title="Drop tasks to add/move them here." data-level={`${prop}`} className={`btn btn-dotted drop ${initial_state}`}>
+                    <i className="fa fa-3x fa-plus"/>
+                </div>
+            ):''
+        };
         list.push(<div key="level0" onClick={this.clearSelect} className="well well-sm state-level text-center">
                         <div title="Origin of study Workflow diagram" className="state-start">
                         <i className="fa fa-3x fa-circle"/>
                         </div>
-                        <div title="Drop tasks to add/move them here." data-level="0" className={`btn btn-dotted drop ${initial_state}`}>
-                            <i className="fa fa-3x fa-plus"/>
-                        </div>
+                        {drop(0,initial_state)}
             </div>
         );
         let levels = this.state.sm.getLevels();
+
+        let delete_row = (level => {
+
+            return level.length == 0 ?<button onClick={this.removeRow} className="pull-right btn btn-xs btn-link">Delete row</button>:'';
+        });
+
+        let insertAbove = prop => {
+            return this.props.editable ? (
+                <div onClick={this.insertAbove} data-level={prop} className="level-separator-container">
+                    <div className="level-separator"></div>
+                    <small className="level-label">Click line to add row here.</small>
+                </div>
+            ):'';
+        };
+
         for(var prop in levels){
             list.push(
                 <div key={`level${prop}`} onClick={this.clearSelect} className="well well-sm state-level text-center">
-                    <div onClick={this.insertAbove} data-level={prop} className="level-separator-container">
-                        <div className="level-separator"></div>
-                        <small className="level-label">Click line to add row here.</small>
-                    </div>
+
+                    {insertAbove(prop)}
+
                     {getLevel(levels[prop])}
-                    <div title="Drop tasks to add/move them here." data-level={`${prop}`} className="btn btn-dotted drop">
-                        <i className="fa fa-3x fa-plus"/>
-                    </div>
+
+                    {drop(prop)}
+
+                    {delete_row(levels[prop])}
+
                 </div>
             );
         }
         if(this.state.sm.getNextLevel() > 1)
             list.push(
                 <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level text-center">
-                    <div title="Drop tasks to add/move them here." data-level={this.state.sm.getNextLevel()} className="btn btn-dotted drop">
-                        <i className="fa fa-3x fa-plus"/>
-                    </div>
+
+                    {drop(this.state.sm.getNextLevel())}
                 </div>
             );
         return list;
@@ -265,7 +304,7 @@ const StateMachineComponent = React.createClass({
                 className: `${conn} state_line ${selected}`,
                 title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
                 id: (exists)? `${conn}`: undefined,
-                extraHtml: (exists)? `
+                extraHtml: (exists && this.props.editable)? `
                     <div class="line-options">
                         <button title="Click to delete this line" data-id="${conn}" class="btn btn-xs btn-danger destroy-connection">
                                 <i class="fa fa-1x fa-times"></i>

@@ -12,7 +12,8 @@ const StateMachineActions = Reflux.createActions([
     'select',
     'clearSelect',
     'setTitle',
-    'insertAbove'
+    'insertAbove',
+    'removeRow'
 ]);
 
 export default StateMachineActions;

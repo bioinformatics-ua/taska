@@ -17,6 +17,7 @@ class State{
         this.__data = options.data;
         this.__dependencies = [];
         this.__level = options.level;
+        this.__version = 0;
     }
     equals(other){
         if(typeof other === 'number')
@@ -46,10 +47,17 @@ class State{
         this.__level = level;
     }
     levelUp(){
+        this.__version++;
+
         this.__level++;
     }
     levelDown(){
+        this.__version++;
+
         this.__level--;
+    }
+    getVersion(){
+        return this.__version;
     }
     getIdentificator(){
         return this.__identificator;

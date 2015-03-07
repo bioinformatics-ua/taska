@@ -112,6 +112,11 @@ const StateMachineStore = Reflux.createStore({
         this.__sm.insertAbove(level);
 
         this.trigger();
+    },
+    onRemoveRow(){
+        this.__sm.removeDiscontinuities();
+
+        this.trigger();
     }
 });
 
