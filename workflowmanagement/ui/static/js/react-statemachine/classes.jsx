@@ -82,6 +82,9 @@ class State{
     }
 }
 
+class SimpleState extends State {
+}
+
 class StateMachine{
     constructor(){
         this.__internal_counter = 0;
@@ -90,9 +93,12 @@ class StateMachine{
         this.__nextLevel = 0;
     }
 
-    stateFactory(level, data=undefined){
+    stateFactory(level, state, data=undefined){
         this.__internal_counter++;
-        return new State({
+
+        console.log(state);
+
+        return new state({
             identificator: this.__internal_counter,
             level: level,
             data: data
@@ -285,4 +291,4 @@ class StateMachine{
     }
 }
 
-export default {State, StateMachine}
+export default {State, SimpleState, StateMachine}

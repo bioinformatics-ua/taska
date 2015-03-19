@@ -354,7 +354,7 @@ footer {
 
 }
 .state-handler{
-    z-index: 3000;
+    z-index: 1000;
     position: relative;
 }
  .state-start{
@@ -414,7 +414,7 @@ footer {
 
 .line-options{
     position: absolute;
-    z-index:3001;
+    z-index:1001;
     margin-left: 20px;
     margin-top: -8px;
 }
@@ -426,7 +426,7 @@ footer {
     position: relative;
 }
 .new-state{
-    z-index:3000;
+    z-index:1000;
 }
 
 .connect-state{
@@ -450,7 +450,7 @@ footer {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 122, 0, 1);
 
   outline: 0 none;
-  z-index:2999;
+  z-index:999;
 }
 
 .level-separator{
@@ -477,4 +477,7 @@ footer {
 
 .level-separator-container:hover{
     opacity: 1;
+}
+.taskaddgroup ul{
+    z-index: 3000;
 }

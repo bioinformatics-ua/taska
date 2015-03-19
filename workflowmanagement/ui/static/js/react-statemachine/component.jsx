@@ -264,8 +264,20 @@ const StateMachineComponent = React.createClass({
 
         let drop = (prop, initial_state='') => {
             return this.props.editable? (
-                <div title="Drop tasks to add/move them here." data-level={`${prop}`} className={`btn btn-dotted drop ${initial_state}`}>
-                    <i className="fa fa-3x fa-plus"/>
+
+                <div className="btn-group taskaddgroup">
+                    <div title="Drop tasks to add/move them here." data-level={`${prop}`}
+                    className={`btn btn-dotted drop dropdown-toggle ${initial_state}`} data-toggle="dropdown" aria-expanded="false">
+                        <i className="fa fa-3x fa-plus"/>
+                    </div>
+                    <ul className="dropdown-menu" role="menu">
+                        <li><small>Choose an task type to add it to this level.</small></li>
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li className="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
                 </div>
             ):''
         };

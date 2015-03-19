@@ -55640,6 +55640,8 @@ module.exports = StateMachineActions;
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -55792,6 +55794,20 @@ var State = (function () {
     return State;
 })();
 
+var SimpleState = (function (State) {
+    function SimpleState() {
+        _classCallCheck(this, SimpleState);
+
+        if (State != null) {
+            State.apply(this, arguments);
+        }
+    }
+
+    _inherits(SimpleState, State);
+
+    return SimpleState;
+})(State);
+
 var StateMachine = (function () {
     function StateMachine() {
         _classCallCheck(this, StateMachine);
@@ -55804,11 +55820,14 @@ var StateMachine = (function () {
 
     _prototypeProperties(StateMachine, null, {
         stateFactory: {
-            value: function stateFactory(level) {
-                var data = arguments[1] === undefined ? undefined : arguments[1];
+            value: function stateFactory(level, state) {
+                var data = arguments[2] === undefined ? undefined : arguments[2];
 
                 this.__internal_counter++;
-                return new State({
+
+                console.log(state);
+
+                return new state({
                     identificator: this.__internal_counter,
                     level: level,
                     data: data
@@ -56063,7 +56082,7 @@ var StateMachine = (function () {
     return StateMachine;
 })();
 
-module.exports = { State: State, StateMachine: StateMachine };
+module.exports = { State: State, SimpleState: SimpleState, StateMachine: StateMachine };
 
 },{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/component.jsx":[function(require,module,exports){
 "use strict";
@@ -56330,8 +56349,63 @@ var StateMachineComponent = React.createClass({
 
             return _this.props.editable ? React.createElement(
                 "div",
-                { title: "Drop tasks to add/move them here.", "data-level": "" + prop, className: "btn btn-dotted drop " + initial_state },
-                React.createElement("i", { className: "fa fa-3x fa-plus" })
+                { className: "btn-group taskaddgroup" },
+                React.createElement(
+                    "div",
+                    { title: "Drop tasks to add/move them here.", "data-level": "" + prop,
+                        className: "btn btn-dotted drop dropdown-toggle " + initial_state, "data-toggle": "dropdown", "aria-expanded": "false" },
+                    React.createElement("i", { className: "fa fa-3x fa-plus" })
+                ),
+                React.createElement(
+                    "ul",
+                    { className: "dropdown-menu", role: "menu" },
+                    React.createElement(
+                        "li",
+                        null,
+                        React.createElement(
+                            "small",
+                            null,
+                            "Choose an task type to add it to this level."
+                        )
+                    ),
+                    React.createElement(
+                        "li",
+                        null,
+                        React.createElement(
+                            "a",
+                            { href: "#" },
+                            "Action"
+                        )
+                    ),
+                    React.createElement(
+                        "li",
+                        null,
+                        React.createElement(
+                            "a",
+                            { href: "#" },
+                            "Another action"
+                        )
+                    ),
+                    React.createElement(
+                        "li",
+                        null,
+                        React.createElement(
+                            "a",
+                            { href: "#" },
+                            "Something else here"
+                        )
+                    ),
+                    React.createElement("li", { className: "divider" }),
+                    React.createElement(
+                        "li",
+                        null,
+                        React.createElement(
+                            "a",
+                            { href: "#" },
+                            "Separated link"
+                        )
+                    )
+                )
             ) : "";
         };
         list.push(React.createElement(
@@ -56580,17 +56654,19 @@ var StateMachineActions = _interopRequire(require("./actions.jsx"));
 var _classesJsx = require("./classes.jsx");
 
 var StateMachine = _classesJsx.StateMachine;
-var State = _classesJsx.State;
+var SimpleState = _classesJsx.SimpleState;
 
 var StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init: function init() {
         this.__title = undefined;
         this.__sm = new StateMachine();
-        var state1 = this.__sm.stateFactory(1);
-        var state2 = this.__sm.stateFactory(2);
-        var state3 = this.__sm.stateFactory(2);
-        var state4 = this.__sm.stateFactory(3);
+        console.log("here");
+
+        var state1 = this.__sm.stateFactory(1, SimpleState);
+        var state2 = this.__sm.stateFactory(2, SimpleState);
+        var state3 = this.__sm.stateFactory(2, SimpleState);
+        var state4 = this.__sm.stateFactory(3, SimpleState);
 
         this.__sm.addState(state1);
         this.__sm.addState(state2);
@@ -56620,7 +56696,7 @@ var StateMachineStore = Reflux.createStore({
     onAddState: function onAddState(type, level) {
         console.log("Add new state of type " + type + " into level " + level);
 
-        var new_state = this.__sm.stateFactory(level);
+        var new_state = this.__sm.stateFactory(level, SimpleState);
 
         this.__sm.addState(new_state);
 

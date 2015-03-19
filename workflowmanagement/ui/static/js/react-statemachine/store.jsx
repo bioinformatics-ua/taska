@@ -1,17 +1,19 @@
 import Reflux from 'reflux';
 
 import StateMachineActions from './actions.jsx';
-import {StateMachine, State} from './classes.jsx';
+import {StateMachine, SimpleState} from './classes.jsx';
 
 const StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init() {
         this.__title = undefined;
         this.__sm = new StateMachine();
-        let state1 = this.__sm.stateFactory(1);
-        let state2 = this.__sm.stateFactory(2);
-        let state3 = this.__sm.stateFactory(2);
-        let state4 = this.__sm.stateFactory(3);
+        console.log('here');
+
+        let state1 = this.__sm.stateFactory(1, SimpleState);
+        let state2 = this.__sm.stateFactory(2, SimpleState);
+        let state3 = this.__sm.stateFactory(2, SimpleState);
+        let state4 = this.__sm.stateFactory(3, SimpleState);
 
         this.__sm.addState(state1);
         this.__sm.addState(state2);
@@ -41,7 +43,7 @@ const StateMachineStore = Reflux.createStore({
     onAddState(type, level){
         console.log(`Add new state of type ${type} into level ${level}`);
 
-        let new_state = this.__sm.stateFactory(level);
+        let new_state = this.__sm.stateFactory(level, SimpleState);
 
         this.__sm.addState(new_state);
 
