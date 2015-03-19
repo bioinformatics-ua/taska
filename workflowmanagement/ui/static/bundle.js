@@ -28143,7 +28143,84 @@ var Breadcrumbs = React.createClass({
 if ("undefined" !== typeof module)
     module.exports = Breadcrumbs;
 
-},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/Cancellation.js":[function(require,module,exports){
+},{"react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/node_modules/react-hotkey/index.js":[function(require,module,exports){
+var EventListener = require('react/lib/EventListener');
+var SyntheticKeyboardEvent = require('react/lib/SyntheticKeyboardEvent');
+
+var documentListener;
+/**
+ * Enable the global event listener. Is idempotent.
+ */
+exports.activate = function(event) {
+    if (!event) {
+        event = 'keyup';
+    }
+    if (!documentListener) {
+        documentListener = EventListener.listen(document, event, handle);
+    }
+    return exports;
+};
+/**
+ * Disable the global event listener. Is idempotent.
+ */
+exports.disable = function() {
+    if (documentListener) {
+        documentListener.remove();
+        documentListener = null;
+    }
+};
+
+// Container for all the handlers
+var handlers = [];
+
+/**
+ * Mixin that calls `handlerName` on your component if it is mounted and a
+ * key event has bubbled up to the document
+ */
+exports.Mixin = function HotkeyMixin(handlerName) {
+    return {
+        componentDidMount: function() {
+            var handler = this[handlerName];
+            handlers.push(handler);
+        },
+        componentWillUnmount: function() {
+            var handler = this[handlerName];
+            var index = handlers.indexOf(handler);
+            handlers.splice(index, 1);
+        }
+    };
+};
+
+
+// Create and dispatch an event object using React's object pool
+// Cribbed from SimpleEventPlugin and EventPluginHub
+function handle(nativeEvent) {
+    var event = SyntheticKeyboardEvent.getPooled({}, 'hotkey', nativeEvent);
+    try {
+        dispatchEvent(event, handlers);
+    } finally {
+        if (!event.isPersistent()) {
+            event.constructor.release(event);
+        }
+    }
+}
+// Dispatch the event, in order, to all interested listeners
+// The most recently mounted component is the first to receive the event
+// Cribbed from a combination of SimpleEventPlugin and EventPluginUtils
+function dispatchEvent(event, handlers) {
+    for (var i = (handlers.length - 1); i >= 0; i--) {
+        if (event.isPropagationStopped()) {
+            break;
+        }
+        var returnValue = handlers[i](event);
+        if (returnValue === false) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    }
+}
+
+},{"react/lib/EventListener":"/home/ribeiro/git/workflow-management/node_modules/react/lib/EventListener.js","react/lib/SyntheticKeyboardEvent":"/home/ribeiro/git/workflow-management/node_modules/react/lib/SyntheticKeyboardEvent.js"}],"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/Cancellation.js":[function(require,module,exports){
 "use strict";
 
 /**
@@ -56003,12 +56080,32 @@ var StateMachineStore = _interopRequire(require("./store.jsx"));
 
 var StateMachineActions = _interopRequire(require("./actions.jsx"));
 
+var hotkey = _interopRequire(require("react-hotkey"));
+
+hotkey.activate();
+
 var cline = _interopRequire(require("../vendor/jquery.domline"));
+
+// preventing backspace to trigger going back in the browser
+// got the idea from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
+$(document).keydown(function (e) {
+    var doPrevent;
+    if (e.keyCode == 8) {
+        var d = e.srcElement || e.target;
+        if (d.tagName.toUpperCase() == "INPUT" || d.tagName.toUpperCase() == "TEXTAREA") {
+            doPrevent = d.readOnly || d.disabled;
+        } else doPrevent = true;
+    } else if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+        e.preventDefault();
+    } else doPrevent = false;
+
+    if (doPrevent) e.preventDefault();
+});
 
 var StateMachineComponent = React.createClass({
     displayName: "StateMachineComponent",
 
-    mixins: [Reflux.listenTo(StateMachineStore, "update")],
+    mixins: [Reflux.listenTo(StateMachineStore, "update"), hotkey.Mixin("handleHotkey")],
     getState: function getState() {
         return {
             sm: StateMachineStore.getStateMachine(),
@@ -56026,6 +56123,19 @@ var StateMachineComponent = React.createClass({
     },
     update: function update(data) {
         this.setState(this.getState());
+    },
+    handleHotkey: function handleHotkey(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        // receives a React Keyboard Event
+        // http://facebook.github.io/react/docs/events.html#keyboard-events
+        if (e.keyCode === 8 && e.target === document.body && this.state.selected) {
+            var selection = this.state.selected.split("-");
+            if (selection.length == 2) this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]));else if (selection.length == 1) this.deleteState(selection[0]);
+            // else theres something wrong...
+        } else if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+            console.log("SAVE ME PLEASE I BEG YOU!!!");
+        }
     },
     __initUI: function __initUI() {
         var _this = this;
@@ -56155,7 +56265,6 @@ var StateMachineComponent = React.createClass({
         StateMachineActions.select(event.currentTarget.id);
     },
     clearSelect: function clearSelect(event) {
-        console.log(event);
         event.stopPropagation();
         console.log("CLEAR SELECT");
         StateMachineActions.clearSelect();
@@ -56459,7 +56568,7 @@ var StateMachineComponent = React.createClass({
 
 module.exports = { StateMachineComponent: StateMachineComponent };
 
-},{"../vendor/jquery.domline":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js","./actions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/actions.jsx","./classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","./store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx":[function(require,module,exports){
+},{"../vendor/jquery.domline":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js","./actions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/actions.jsx","./classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","./store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-hotkey":"/home/ribeiro/git/workflow-management/node_modules/react-hotkey/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/store.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };

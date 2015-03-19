@@ -17,7 +17,8 @@
     "griddle-react": "~0.2.4",
     "events": "~1.0.2",
     "jquery-ui": "~1.10.5",
-    "jquery-ui-touch-punch": "~0.2.3"
+    "jquery-ui-touch-punch": "~0.2.3",
+    "react-hotkey": "~0.3.0"
   },
   "style": "./workflowmanagement/ui/css/main.css",
   "devDependencies": {

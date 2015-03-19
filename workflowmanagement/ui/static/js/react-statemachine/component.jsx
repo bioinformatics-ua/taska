@@ -5,10 +5,34 @@ import {StateMachine} from './classes.jsx';
 import StateMachineStore from './store.jsx';
 import StateMachineActions from './actions.jsx';
 
+import hotkey from 'react-hotkey';
+hotkey.activate();
+
 import cline from '../vendor/jquery.domline';
 
+    // preventing backspace to trigger going back in the browser
+    // got the idea from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
+    $(document).keydown(function(e) {
+        var doPrevent;
+        if (e.keyCode == 8) {
+            var d = e.srcElement || e.target;
+            if (d.tagName.toUpperCase() == 'INPUT' || d.tagName.toUpperCase() == 'TEXTAREA') {
+                doPrevent = d.readOnly || d.disabled;
+            }
+            else
+                doPrevent = true;
+        } else if(e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)){
+            e.preventDefault();
+        }
+        else
+            doPrevent = false;
+
+        if (doPrevent)
+            e.preventDefault();
+    });
+
 const StateMachineComponent = React.createClass({
-    mixins: [Reflux.listenTo(StateMachineStore, 'update')],
+    mixins: [Reflux.listenTo(StateMachineStore, 'update'), hotkey.Mixin('handleHotkey')],
     getState(){
         return {
             sm: StateMachineStore.getStateMachine(),
@@ -26,6 +50,28 @@ const StateMachineComponent = React.createClass({
     },
     update(data){
         this.setState(this.getState());
+    },
+    handleHotkey(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        // receives a React Keyboard Event
+        // http://facebook.github.io/react/docs/events.html#keyboard-events
+        if(    e.keyCode === 8
+            && e.target === document.body
+            && this.state.selected
+        ){
+            let selection = this.state.selected.split('-');
+            if(selection.length == 2)
+                this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]))
+            else if(selection.length == 1)
+                this.deleteState(selection[0]);
+            // else theres something wrong...
+        } else if(
+            e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+        ){
+            console.log('SAVE ME PLEASE I BEG YOU!!!');
+        }
+
     },
     __initUI(){
         let self = this;
@@ -166,7 +212,6 @@ const StateMachineComponent = React.createClass({
         StateMachineActions.select(event.currentTarget.id);
     },
     clearSelect(event){
-        console.log(event);
         event.stopPropagation();
         console.log('CLEAR SELECT');
         StateMachineActions.clearSelect();
