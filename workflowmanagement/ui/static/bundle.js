@@ -54058,8 +54058,6 @@ module.exports = React.createClass({
   displayName: "",
   mixins: [Router.Navigation, Authentication],
   render: function render() {
-    console.log(this.props.me);
-
     return React.createElement(LoggedInHome, null);
   }
 });
@@ -55283,6 +55281,8 @@ function fetch(routes, params) {
         });
     })).then(function () {
         return data;
+    })["catch"](function () {
+        console.log("ERROR");
     });
 }
 
@@ -56033,8 +56033,8 @@ var StateMachineComponent = React.createClass({
         var self = this;
 
         if (this.props.editable) {
+
             $(".new-state").draggable({
-                containment: this.refs.chart.getDOMNode(),
                 revert: "invalid",
                 opacity: 0.7,
                 helper: "clone"
@@ -56057,22 +56057,6 @@ var StateMachineComponent = React.createClass({
                 }
             });
 
-            var state_connectors = $(this.refs.movable.getDOMNode()).find(".connect-state");
-
-            state_connectors.draggable({
-                containment: this.refs.statemachine.getDOMNode(),
-                revert: "invalid",
-                opacity: 0.01,
-                helper: "clone",
-                start: function start(event) {},
-                stop: function stop(event) {
-                    $(".temp_line").remove();
-                },
-                drag: function drag(event, ui) {
-                    $(".temp_line").remove();
-                    self.__tempLine(ui.offset, $(event.target));
-                } });
-
             $(this.refs.movable.getDOMNode()).find(".drop").droppable({
                 accept: function accept(elem) {
                     var _elem = $(elem);
@@ -56088,10 +56072,26 @@ var StateMachineComponent = React.createClass({
                 hoverClass: "ui-state-hover",
                 drop: function drop(event, ui) {
                     var level = $(event.target).data("level");
-                    console.log(ui.draggable.hasClass("new-state"));
+
                     if (ui.draggable.hasClass("new-state")) StateMachineActions.addState(ui.draggable.data("type"), level);else StateMachineActions.moveState(ui.draggable.attr("id"), level);
                 }
             });
+
+            var state_connectors = $(this.refs.movable.getDOMNode()).find(".connect-state");
+
+            state_connectors.draggable({
+                containment: this.refs.statemachine.getDOMNode(),
+                revert: "invalid",
+                opacity: 0.01,
+                helper: "clone",
+                start: function start(event) {},
+                stop: function stop(event) {
+                    $(".temp_line").remove();
+                },
+                drag: function drag(event, ui) {
+                    $(".temp_line").remove();
+                    self.__tempLine(ui.offset, $(event.target));
+                } });
 
             $(this.refs.movable.getDOMNode()).find(".state-handler").droppable({
                 accept: ".connect-state",
@@ -56155,6 +56155,7 @@ var StateMachineComponent = React.createClass({
         StateMachineActions.select(event.currentTarget.id);
     },
     clearSelect: function clearSelect(event) {
+        console.log(event);
         event.stopPropagation();
         console.log("CLEAR SELECT");
         StateMachineActions.clearSelect();
@@ -56226,7 +56227,7 @@ var StateMachineComponent = React.createClass({
         };
         list.push(React.createElement(
             "div",
-            { key: "level0", onClick: this.clearSelect, className: "well well-sm state-level text-center" },
+            { key: "level0", onDoubleClick: this.clearSelect, className: "well well-sm state-level no-select text-center" },
             React.createElement(
                 "div",
                 { title: "Origin of study Workflow diagram", className: "state-start" },
@@ -56261,7 +56262,7 @@ var StateMachineComponent = React.createClass({
         for (var prop in levels) {
             list.push(React.createElement(
                 "div",
-                { key: "level" + prop, onClick: this.clearSelect, className: "well well-sm state-level text-center" },
+                { key: "level" + prop, onDoubleClick: this.clearSelect, className: "well well-sm state-level no-select text-center" },
                 insertAbove(prop),
                 getLevel(levels[prop]),
                 drop(prop),
@@ -56270,7 +56271,7 @@ var StateMachineComponent = React.createClass({
         }
         if (this.state.sm.getNextLevel() > 1) list.push(React.createElement(
             "div",
-            { key: "level" + this.state.sm.getNextLevel(), onClick: this.clearSelect, className: "well well-sm state-level text-center" },
+            { key: "level" + this.state.sm.getNextLevel(), onClick: this.clearSelect, className: "well well-sm state-level no-select text-center" },
             drop(this.state.sm.getNextLevel())
         ));
         return list;
@@ -56363,7 +56364,7 @@ var StateMachineComponent = React.createClass({
             { className: "row" },
             React.createElement(
                 "div",
-                { className: "col-md-12" },
+                { className: "col-md-12 no-select" },
                 React.createElement(
                     "div",
                     { ref: "statemachine", className: "panel panel-default table-container" },
@@ -56393,7 +56394,7 @@ var StateMachineComponent = React.createClass({
                         ),
                         React.createElement(
                             "div",
-                            { className: "col-md-10 table-col" },
+                            { className: "col-md-10 table-col no-select" },
                             React.createElement(
                                 "div",
                                 { className: "row" },
@@ -56751,7 +56752,7 @@ var DetailStoreMixin = require("../mixins/store.jsx").DetailStoreMixin;
 
 module.exports = Reflux.createStore({
     listenables: [UserActions],
-    mixins: [DetailStoreMixin.factory(new DetailLoader({ model: "account", hash: "me" }), "email", UserActions)],
+    mixins: [DetailStoreMixin.factory(new DetailLoader({ model: "account" }), "email", UserActions)],
     init: function init() {
         this.__loginfail = false;
     },
@@ -56783,7 +56784,7 @@ module.exports = Reflux.createStore({
     },
     onLoginSuccess: function onLoginSuccess(data) {
         if (data.authenticated) {
-            UserActions.loadDetail();
+            UserActions.loadDetail("me");
         } else {
             UserActions.loginFailed();
         }
@@ -56800,7 +56801,7 @@ module.exports = Reflux.createStore({
         });
     },
     onLogoutSuccess: function onLogoutSuccess(data) {
-        if (data.authenticated === false) UserActions.loadUser();
+        if (data.authenticated === false) UserActions.loadDetail("me");
     }
 });
 

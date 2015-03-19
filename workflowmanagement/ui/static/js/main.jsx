@@ -24,7 +24,12 @@ function fetch(routes, params) {
         .map(route => {
             return route.handler.fetch(params).then(d => {data[route.name] = d;});
         })
-    ).then(() => data);
+    ).then(() => data)
+    .catch(
+        () => {
+            console.log('ERROR');
+        }
+    );
 }
 
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {

@@ -11,7 +11,7 @@ export default Reflux.createStore({
     listenables: [UserActions],
     mixins: [
         DetailStoreMixin.factory(
-            new DetailLoader({model: 'account', hash: 'me'}),
+            new DetailLoader({model: 'account'}),
             'email',
             UserActions
         )
@@ -48,7 +48,7 @@ export default Reflux.createStore({
     },
     onLoginSuccess: function(data){
         if(data.authenticated){
-            UserActions.loadDetail();
+            UserActions.loadDetail('me');
         } else {
             UserActions.loginFailed();
         }
@@ -68,7 +68,7 @@ export default Reflux.createStore({
     },
     onLogoutSuccess: function(data){
         if(data.authenticated === false)
-            UserActions.loadUser()
+            UserActions.loadDetail('me')
 
     }
 });

@@ -31,9 +31,9 @@ const StateMachineComponent = React.createClass({
         let self = this;
 
         if(this.props.editable){
+
         $('.new-state').draggable(
             {
-              containment: this.refs.chart.getDOMNode(),
               revert: "invalid",
               opacity: 0.7,
               helper: "clone"
@@ -60,6 +60,29 @@ const StateMachineComponent = React.createClass({
             }
         );
 
+        $(this.refs.movable.getDOMNode()).find('.drop').droppable({
+          accept: function(elem){
+            let _elem = $(elem);
+
+            if(_elem.hasClass('state-handler') || _elem.hasClass('new-state')){
+                if(_elem.data('level') != $(this).data('level'))
+                    return true;
+            }
+            return false;
+          },
+          activeClass: "ui-state-default",
+          hoverClass: "ui-state-hover",
+          drop: function( event, ui ) {
+            let level = $(event.target).data('level');
+
+            if(ui.draggable.hasClass('new-state'))
+                StateMachineActions.addState(ui.draggable.data('type'), level);
+            else
+                StateMachineActions.moveState(ui.draggable.attr('id'), level);
+
+          }
+        });
+
         let state_connectors = $(this.refs.movable.getDOMNode()).find('.connect-state');
 
         state_connectors.draggable(
@@ -80,30 +103,6 @@ const StateMachineComponent = React.createClass({
               },
             }
         );
-
-
-        $(this.refs.movable.getDOMNode()).find('.drop').droppable({
-          accept: function(elem){
-            let _elem = $(elem);
-
-            if(_elem.hasClass('state-handler') || _elem.hasClass('new-state')){
-                if(_elem.data('level') != $(this).data('level'))
-                    return true;
-            }
-            return false;
-          },
-          activeClass: "ui-state-default",
-          hoverClass: "ui-state-hover",
-          drop: function( event, ui ) {
-            let level = $(event.target).data('level');
-            console.log(ui.draggable.hasClass('new-state'));
-            if(ui.draggable.hasClass('new-state'))
-                StateMachineActions.addState(ui.draggable.data('type'), level);
-            else
-                StateMachineActions.moveState(ui.draggable.attr('id'), level);
-
-          }
-        });
 
         $(this.refs.movable.getDOMNode()).find('.state-handler').droppable({
           accept: ".connect-state",
@@ -167,6 +166,7 @@ const StateMachineComponent = React.createClass({
         StateMachineActions.select(event.currentTarget.id);
     },
     clearSelect(event){
+        console.log(event);
         event.stopPropagation();
         console.log('CLEAR SELECT');
         StateMachineActions.clearSelect();
@@ -224,7 +224,7 @@ const StateMachineComponent = React.createClass({
                 </div>
             ):''
         };
-        list.push(<div key="level0" onClick={this.clearSelect} className="well well-sm state-level text-center">
+        list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
                         <div title="Origin of study Workflow diagram" className="state-start">
                         <i className="fa fa-3x fa-circle"/>
                         </div>
@@ -249,7 +249,7 @@ const StateMachineComponent = React.createClass({
 
         for(var prop in levels){
             list.push(
-                <div key={`level${prop}`} onClick={this.clearSelect} className="well well-sm state-level text-center">
+                <div key={`level${prop}`} onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
 
                     {insertAbove(prop)}
 
@@ -264,7 +264,7 @@ const StateMachineComponent = React.createClass({
         }
         if(this.state.sm.getNextLevel() > 1)
             list.push(
-                <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level text-center">
+                <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level no-select text-center">
 
                     {drop(this.state.sm.getNextLevel())}
                 </div>
@@ -367,7 +367,7 @@ const StateMachineComponent = React.createClass({
         let chart = this.getRepresentation();
         return (
           <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-12 no-select">
                 <div ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
                         <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
@@ -377,7 +377,7 @@ const StateMachineComponent = React.createClass({
                             <i className="task-type-icon fa fa-2x fa-check"></i>&nbsp;
                              <span>Simple Task</span></div>
                         </div>
-                        <div className="col-md-10 table-col">
+                        <div className="col-md-10 table-col no-select">
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="input-group">
