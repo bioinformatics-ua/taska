@@ -55128,7 +55128,106 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-},{"../../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/RequestStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/RequestStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
+},{"../../actions/RequestActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/RequestActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/RequestStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/RequestStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/states/SimpleTask.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var React = _interopRequire(require("react"));
+
+var SimpleState = require("../../../react-statemachine/classes.jsx").SimpleState;
+
+var SimpleTask = (function (SimpleState) {
+    function SimpleTask(options) {
+        _classCallCheck(this, SimpleTask);
+
+        _get(Object.getPrototypeOf(SimpleTask.prototype), "constructor", this).call(this, options);
+    }
+
+    _inherits(SimpleTask, SimpleState);
+
+    _prototypeProperties(SimpleTask, {
+        typeIcon: {
+            value: function typeIcon() {
+                return React.createElement("i", { className: "fa fa-check" });
+            },
+            writable: true,
+            configurable: true
+        },
+        repr: {
+            value: function repr() {
+                return "Simple Task";
+            },
+            writable: true,
+            configurable: true
+        }
+    }, {
+        detailRender: {
+            value: function detailRender() {
+                var self = this;
+                var SimpleFields = React.createClass({
+                    displayName: "SimpleFields",
+
+                    getInitialState: function getInitialState() {
+                        return self.__data;
+                    },
+                    setDescription: function setDescription(e) {
+                        this.setState({ name: e.target.value });
+                    },
+                    render: function render() {
+                        return React.createElement(
+                            "span",
+                            null,
+                            React.createElement(
+                                "div",
+                                { className: "form-group" },
+                                React.createElement(
+                                    "div",
+                                    { className: "input-group clearfix" },
+                                    React.createElement(
+                                        "span",
+                                        { className: "input-group-addon", id: "state-description" },
+                                        React.createElement(
+                                            "strong",
+                                            null,
+                                            "Task Description"
+                                        )
+                                    ),
+                                    React.createElement(
+                                        "textarea",
+                                        { rows: "6", type: "description", className: "form-control",
+                                            "aria-describedby": "state-description",
+                                            placeholder: "Enter the state description here",
+                                            onChange: this.setDescription },
+                                        this.state.description
+                                    )
+                                )
+                            )
+                        );
+                    }
+                });
+
+                return _get(Object.getPrototypeOf(SimpleTask.prototype), "detailRender", this).call(this, SimpleFields);
+            },
+            writable: true,
+            configurable: true
+        }
+    });
+
+    return SimpleTask;
+})(SimpleState);
+
+module.exports = SimpleTask;
+
+},{"../../../react-statemachine/classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/workflow.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -55305,6 +55404,13 @@ var WorkflowStore = require("../stores/WorkflowStore.jsx").WorkflowStore;
 
 var StateMachineComponent = require("../react-statemachine/component.jsx").StateMachineComponent;
 
+var _reactStatemachineClassesJsx = require("../react-statemachine/classes.jsx");
+
+var StateMachine = _reactStatemachineClassesJsx.StateMachine;
+var SimpleState = _reactStatemachineClassesJsx.SimpleState;
+
+var SimpleTask = _interopRequire(require("./reusable/states/SimpleTask.jsx"));
+
 module.exports = React.createClass({
     mixins: [Router.Navigation, Router.State, Authentication],
     statics: {
@@ -55317,12 +55423,46 @@ module.exports = React.createClass({
     displayName: function (route) {
         return "Workflow " + route.props.detail.Workflow.title;
     },
+    serializeStateMachine: function serializeStateMachine() {
+        var sm = new StateMachine();
+
+        sm.addStateClass({
+            id: "task.SimpleState",
+            Class: SimpleState
+        });
+        sm.addStateClass({
+            id: "task.SimpleTask",
+            Class: SimpleTask
+        });
+
+        var state1 = sm.stateFactory(1, SimpleState, { name: "Fazer a cama" });
+        var state2 = sm.stateFactory(2, SimpleTask, { name: "Ir à padaria lanchar" });
+        var state3 = sm.stateFactory(2, SimpleTask, { name: "Ir comprar pão" });
+        var state4 = sm.stateFactory(3, SimpleTask, { name: "Ir para o trabalho" });
+
+        sm.addState(state1);
+        sm.addState(state2);
+        sm.addState(state3);
+        sm.addState(state4);
+
+        sm.addDependency(state2, state1);
+        sm.addDependency(state3, state1);
+        sm.addDependency(state4, state2);
+        sm.addDependency(state4, state3);
+
+        return sm;
+    },
     render: function render() {
-        return React.createElement(StateMachineComponent, _extends({ editable: true }, this.props));
+        return React.createElement(
+            "span",
+            null,
+            React.createElement(StateMachineComponent, _extends({ initialSm: this.serializeStateMachine(),
+                editable: true }, this.props))
+        );
     }
 });
 
-},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../react-statemachine/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/component.jsx","../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/main.jsx":[function(require,module,exports){
+},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../react-statemachine/classes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/classes.jsx","../react-statemachine/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/react-statemachine/component.jsx","../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./reusable/states/SimpleTask.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/states/SimpleTask.jsx","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/main.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -55631,7 +55771,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow"]);
+var StateMachineActions = Reflux.createActions(["calibrate", "addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow", "setStateTitle"]);
 
 module.exports = StateMachineActions;
 
@@ -55640,6 +55780,8 @@ module.exports = StateMachineActions;
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
@@ -55647,6 +55789,12 @@ var _prototypeProperties = function (child, staticProps, instanceProps) { if (st
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var React = _interopRequire(require("react"));
+
+var dummy = React.createClass({
+    displayName: "dummy",
+    render: function render() {
+        return React.createElement("span", null);
+    } });
 
 function __getArrayPos(array, object) {
     var i = 0;
@@ -55666,13 +55814,59 @@ var State = (function () {
         _classCallCheck(this, State);
 
         this.__identificator = options.identificator;
-        this.__data = options.data;
+        this.__data = options.data || {};
         this.__dependencies = [];
         this.__level = options.level;
         this.__version = 0;
+        this.__container = options.container;
     }
 
-    _prototypeProperties(State, null, {
+    _prototypeProperties(State, {
+        typeIcon: {
+            value: function typeIcon() {
+                return React.createElement("i", null);
+            },
+            writable: true,
+            configurable: true
+        },
+        repr: {
+            value: function repr() {
+                return "Task";
+            },
+            writable: true,
+            configurable: true
+        }
+    }, {
+        label: {
+            value: function label() {
+                var new_label = arguments[0] === undefined ? undefined : arguments[0];
+
+                if (new_label) {
+                    this.__data.name = new_label;
+                    //this.__version++;
+                    return true;
+                }
+                // else is a reading
+                var name = this.__data.name || "Unnamed";
+
+                return name;
+            },
+            writable: true,
+            configurable: true
+        },
+        type: {
+            value: function type() {
+                return React.createElement(
+                    "span",
+                    null,
+                    this.__proto__.constructor.typeIcon(),
+                    " ",
+                    this.__proto__.constructor.repr()
+                );
+            },
+            writable: true,
+            configurable: true
+        },
         equals: {
             value: function equals(other) {
                 if (typeof other === "number") {
@@ -55788,6 +55982,154 @@ var State = (function () {
             },
             writable: true,
             configurable: true
+        },
+        getName: {
+            value: function getName() {
+                return this.__data.name || "Unnamed";
+            },
+            writable: true,
+            configurable: true
+        },
+        detailRender: {
+            value: function detailRender() {
+                var ChildComponent = arguments[0] === undefined ? dummy : arguments[0];
+
+                var self = this;
+
+                var DetailState = React.createClass({
+                    displayName: "DetailState",
+
+                    getInitialState: function getInitialState() {
+                        return self.__data;
+                    },
+                    setTitle: function setTitle(e) {
+                        this.setState({ name: e.target.value });
+                    },
+                    render: function render() {
+                        var dependencies = self.getDependencies().map(function (dependency) {
+                            return React.createElement(
+                                "span",
+                                { key: dependency.getIdentificator(),
+                                    className: "state-dep-label label label-default" },
+                                dependency.label(),
+                                "  ",
+                                React.createElement("i", { className: "fa fa-times" })
+                            );
+                        });
+
+                        var possible_newdeps = [],
+                            abovestates = self.__container.getStates(self.getLevel());
+
+                        for (var _iterator = abovestates[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                            var state = _step.value;
+
+                            if (__getArrayPos(self.getDependencies(), state) === -1) possible_newdeps.push(state);
+                        }
+
+                        var possibledropdown = possible_newdeps.map(function (state) {
+                            React.createElement(
+                                "li",
+                                null,
+                                React.createElement(
+                                    "a",
+                                    { key: state.getIdentificator() },
+                                    state.label()
+                                )
+                            );
+                        });
+
+                        dependencies.push(React.createElement(
+                            "div",
+                            { className: "btn-group dropup" },
+                            React.createElement(
+                                "span",
+                                { type: "button", className: "label label-success dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false" },
+                                "Add dependency ",
+                                React.createElement("span", { className: "caret" }),
+                                React.createElement(
+                                    "span",
+                                    { className: "sr-only" },
+                                    "Toggle Dropdown"
+                                )
+                            ),
+                            React.createElement(
+                                "ul",
+                                { className: "dropdown-menu dropdown-menu-right", role: "menu" },
+                                possibledropdown
+                            )
+                        ));
+
+                        return React.createElement(
+                            "span",
+                            null,
+                            React.createElement(
+                                "div",
+                                { className: "form-group" },
+                                React.createElement(
+                                    "div",
+                                    { className: "input-group clearfix" },
+                                    React.createElement(
+                                        "span",
+                                        { className: "input-group-addon", id: "state-title" },
+                                        React.createElement(
+                                            "strong",
+                                            null,
+                                            "State Name"
+                                        )
+                                    ),
+                                    React.createElement("input", { type: "title", className: "form-control",
+                                        "aria-describedby": "state-title",
+                                        placeholder: "Enter the state name",
+                                        onChange: this.setTitle, value: this.state.name })
+                                )
+                            ),
+                            React.createElement(ChildComponent, null),
+                            React.createElement(
+                                "div",
+                                { className: "form-group" },
+                                React.createElement(
+                                    "div",
+                                    { className: "input-group" },
+                                    React.createElement(
+                                        "span",
+                                        { className: "input-group-addon", id: "state-dependencies" },
+                                        React.createElement(
+                                            "strong",
+                                            null,
+                                            "Dependencies"
+                                        )
+                                    ),
+                                    React.createElement(
+                                        "div",
+                                        { className: "form-control", "aria-describedby": "study-title" },
+                                        dependencies
+                                    )
+                                )
+                            ),
+                            React.createElement(
+                                "div",
+                                { className: "clearfix" },
+                                React.createElement(
+                                    "button",
+                                    { onClick: this.save, className: "pull-right btn btn-primary" },
+                                    "Save Details"
+                                )
+                            )
+                        );
+                    }
+                });
+
+                return DetailState;
+            },
+            writable: true,
+            configurable: true
+        },
+        detailProcess: {
+            value: function detailProcess(data) {
+                return false;
+            },
+            writable: true,
+            configurable: true
         }
     });
 
@@ -55795,15 +56137,30 @@ var State = (function () {
 })();
 
 var SimpleState = (function (State) {
-    function SimpleState() {
+    function SimpleState(options) {
         _classCallCheck(this, SimpleState);
 
-        if (State != null) {
-            State.apply(this, arguments);
-        }
+        _get(Object.getPrototypeOf(SimpleState.prototype), "constructor", this).call(this, options);
     }
 
     _inherits(SimpleState, State);
+
+    _prototypeProperties(SimpleState, {
+        typeIcon: {
+            value: function typeIcon() {
+                return React.createElement("i", { className: "fa fa-plus" });
+            },
+            writable: true,
+            configurable: true
+        },
+        repr: {
+            value: function repr() {
+                return "Simple State";
+            },
+            writable: true,
+            configurable: true
+        }
+    });
 
     return SimpleState;
 })(State);
@@ -55816,21 +56173,52 @@ var StateMachine = (function () {
         this.__states = [];
         this.__level = {};
         this.__nextLevel = 0;
+        this.__stateclasses = [];
     }
 
     _prototypeProperties(StateMachine, null, {
+        addStateClass: {
+            value: function addStateClass() {
+                var options = arguments[0] === undefined ? {} : arguments[0];
+
+                this.__stateclasses.push(options);
+            },
+            writable: true,
+            configurable: true
+        },
+        getStateClass: {
+            value: function getStateClass(id) {
+                for (var _iterator = this.__stateclasses[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var stclass = _step.value;
+
+                    if (stclass.id === id) {
+                        return stclass;
+                    }
+                }return undefined;
+            },
+            writable: true,
+            configurable: true
+        },
+        getStateClasses: {
+            value: function getStateClasses() {
+                return this.__stateclasses;
+            },
+            writable: true,
+            configurable: true
+        },
         stateFactory: {
-            value: function stateFactory(level, state) {
+            value: function stateFactory(level, Class) {
                 var data = arguments[2] === undefined ? undefined : arguments[2];
+
+                var self = this;
 
                 this.__internal_counter++;
 
-                console.log(state);
-
-                return new state({
+                return new Class({
                     identificator: this.__internal_counter,
                     level: level,
-                    data: data
+                    data: data,
+                    container: this
                 });
             },
             writable: true,
@@ -55845,6 +56233,19 @@ var StateMachine = (function () {
         },
         getStates: {
             value: function getStates() {
+                var threshold = arguments[0] === undefined ? undefined : arguments[0];
+
+                if (threshold) {
+                    var okay = [];
+                    for (var _iterator = this.__states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                        var state = _step.value;
+
+                        if (state.getLevel() < threshold) okay.push(state);
+                    }
+
+                    return okay;
+                }
+
                 return this.__states;
             },
             writable: true,
@@ -55886,6 +56287,28 @@ var StateMachine = (function () {
                 if (i != -1) {
                     return this.__states[i];
                 }return undefined;
+            },
+            writable: true,
+            configurable: true
+        },
+        detailRender: {
+            value: function detailRender(identificator) {
+                var i = __getArrayPos(this.__states, identificator);
+
+                if (i != -1) {
+                    return this.__states[i].detailRender();
+                }return undefined;
+            },
+            writable: true,
+            configurable: true
+        },
+        detailProcess: {
+            value: function detailProcess(identificator, data) {
+                var i = __getArrayPos(this.__states, identificator);
+
+                if (i != -1) {
+                    return this.__states[i].detailProcess(data);
+                }return false;
             },
             writable: true,
             configurable: true
@@ -56133,6 +56556,8 @@ var StateMachineComponent = React.createClass({
         };
     },
     getInitialState: function getInitialState() {
+        StateMachineActions.calibrate(this.props.initialSm);
+
         return this.getState();
     },
     getDefaultProps: function getDefaultProps() {
@@ -56240,17 +56665,30 @@ var StateMachineComponent = React.createClass({
             _this.renderLines();
         });
 
-        /*$(this.refs.statemachine.getDOMNode()).find('.destroy-state').click(
-            function(){
-                let ident = $(this).data('id');
-                StateMachineActions.deleteState(ident);
+        $(".clickedit").css("visibility", "hidden").focusout(self.setStateTitle).keyup(function (e) {
+            if (e.which && e.which == 13 || e.keyCode && e.keyCode == 13) {
+                self.setStateTitle(e);
+                return false;
+            } else {
+                return true;
             }
-        );*/
+        }).prev().dblclick(function (event) {
+            event.stopPropagation();
+
+            $(this).css("visibility", "hidden");
+            var the_input = $(this).next();
+            var text = the_input.val();
+            the_input.val("");
+            the_input.css("visibility", "visible").focus();
+            the_input.val(text);
+        });
     },
     killUI: function killUI() {
         $(".ui-draggable").draggable("destroy");
         $(".ui-droppable").droppable("destroy");
         $(".state_line").remove();
+
+        $(".clickedit").off();
     },
     componentWillMount: function componentWillMount() {
         StateMachineActions.setTitle(this.props.detail.Workflow.title);
@@ -56283,6 +56721,13 @@ var StateMachineComponent = React.createClass({
         event.stopPropagation();
         StateMachineActions.select(event.currentTarget.id);
     },
+    editLabel: function editLabel(event) {
+        event.stopPropagation();
+        console.log("Edit label for " + event.currentTarget.parentNode.id);
+    },
+    cancel: function cancel(event) {
+        event.stopPropagation();
+    },
     clearSelect: function clearSelect(event) {
         event.stopPropagation();
         console.log("CLEAR SELECT");
@@ -56298,12 +56743,27 @@ var StateMachineComponent = React.createClass({
 
         StateMachineActions.removeRow();
     },
+    setStateTitle: function setStateTitle(e) {
+        var input = $(e.target),
+            label = input && input.prev();
+
+        var new_title = input.val() === "" ? defaultText : input.val();
+
+        label.text(new_title);
+
+        input.css("visibility", "hidden");
+        label.css("visibility", "visible");
+        StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
+    },
+    saveDetail: function saveDetail(event) {
+        console.log(event);
+    },
     getLevels: function getLevels() {
         var _this = this;
 
         var getLevel = function (level) {
             return level.map(function (state) {
-                var state_handler_class = "state-handler btn btn-default";
+                var state_handler_class = "state-handler btn btn-default form-group";
                 var state_class = "state";
 
                 if (_this.state.selected == state.getIdentificator()) {
@@ -56317,7 +56777,9 @@ var StateMachineComponent = React.createClass({
                     { className: "state-options" },
                     React.createElement(
                         "button",
-                        { title: "Click to delete this state", onClick: _this.deleteState, "data-id": state.getIdentificator(), className: "btn btn-xs btn-danger destroy-state" },
+                        { title: "Click to delete this state",
+                            onClick: _this.deleteState, "data-id": state.getIdentificator(),
+                            className: "btn btn-xs btn-danger destroy-state" },
                         React.createElement("i", { className: "fa fa-1x fa-times" })
                     ),
                     React.createElement(
@@ -56332,9 +56794,26 @@ var StateMachineComponent = React.createClass({
                     React.createElement(
                         "div",
                         { onClick: _this.select, "data-level": state.getLevel(), id: state.getIdentificator(), className: state_handler_class },
-                        state.getIdentificator(),
-                        React.createElement("br", null),
-                        "SimpleTask"
+                        React.createElement(
+                            "label",
+                            { onClick: _this.cancel },
+                            state.label()
+                        ),
+                        React.createElement("input", { type: "text", className: "clickedit form-control", defaultValue: state.label() }),
+                        React.createElement(
+                            "div",
+                            null,
+                            " ",
+                            React.createElement(
+                                "div",
+                                { className: "pull-right" },
+                                React.createElement(
+                                    "small",
+                                    null,
+                                    state.type()
+                                )
+                            )
+                        )
                     ),
                     stateOptions
                 );
@@ -56346,6 +56825,22 @@ var StateMachineComponent = React.createClass({
 
         var drop = function (prop) {
             var initial_state = arguments[1] === undefined ? "" : arguments[1];
+
+            var state_list = _this.state.sm.getStateClasses().map(function (stclass) {
+                return React.createElement(
+                    "li",
+                    { key: stclass.id },
+                    React.createElement(
+                        "a",
+                        { onClick: function (event) {
+                                return StateMachineActions.addState(stclass.id, prop);
+                            } },
+                        stclass.Class.typeIcon(),
+                        " ",
+                        stclass.Class.repr()
+                    )
+                );
+            });
 
             return _this.props.editable ? React.createElement(
                 "div",
@@ -56359,52 +56854,7 @@ var StateMachineComponent = React.createClass({
                 React.createElement(
                     "ul",
                     { className: "dropdown-menu", role: "menu" },
-                    React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                            "small",
-                            null,
-                            "Choose an task type to add it to this level."
-                        )
-                    ),
-                    React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                            "a",
-                            { href: "#" },
-                            "Action"
-                        )
-                    ),
-                    React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                            "a",
-                            { href: "#" },
-                            "Another action"
-                        )
-                    ),
-                    React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                            "a",
-                            { href: "#" },
-                            "Something else here"
-                        )
-                    ),
-                    React.createElement("li", { className: "divider" }),
-                    React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                            "a",
-                            { href: "#" },
-                            "Separated link"
-                        )
-                    )
+                    state_list
                 )
             ) : "";
         };
@@ -56540,8 +56990,41 @@ var StateMachineComponent = React.createClass({
         StateMachineActions.setTitle(event.target.value);
     },
     render: function render() {
+        var _this = this;
+
         console.log("RENDER");
         var chart = this.getRepresentation();
+
+        var state_list = this.state.sm.getStateClasses().map(function (stclass) {
+            return React.createElement(
+                "div",
+                { key: stclass.id, "data-type": stclass.id,
+                    className: "task-type col-md-12 col-xs-4 btn btn-default btn-block new-state" },
+                stclass.Class.typeIcon(),
+                " ",
+                stclass.Class.repr()
+            );
+        });
+
+        var state_detail = function () {
+
+            if (_this.state.selected) {
+                var DRender = _this.state.sm.detailRender(Number.parseInt(_this.state.selected));
+
+                return React.createElement(
+                    "span",
+                    null,
+                    React.createElement(DRender, { saveDetail: _this.saveDetail })
+                );
+            }
+
+            return React.createElement(
+                "center",
+                null,
+                "Please select a state to see his data options."
+            );
+        };
+
         return React.createElement(
             "div",
             { className: "row" },
@@ -56563,17 +57046,7 @@ var StateMachineComponent = React.createClass({
                                 "Type of Tasks"
                             ),
                             React.createElement("hr", null),
-                            React.createElement(
-                                "div",
-                                { "data-type": "task.SimpleTask", className: "task-type col-md-12 col-xs-4 btn btn-default new-state" },
-                                React.createElement("i", { className: "task-type-icon fa fa-2x fa-check" }),
-                                " ",
-                                React.createElement(
-                                    "span",
-                                    null,
-                                    "Simple Task"
-                                )
-                            )
+                            state_list
                         ),
                         React.createElement(
                             "div",
@@ -56597,10 +57070,18 @@ var StateMachineComponent = React.createClass({
                                             )
                                         ),
                                         React.createElement("input", { type: "title", className: "form-control",
-                                            id: "exampleInputEmail1", "aria-describedby": "study-title", placeholder: "Enter the workflow title", onChange: this.setTitle, value: this.state.title })
+                                            id: "exampleInputEmail1", "aria-describedby": "study-title",
+                                            placeholder: "Enter the workflow title",
+                                            onChange: this.setTitle, value: this.state.title })
                                     ),
                                     React.createElement("hr", null)
                                 )
+                            ),
+                            React.createElement(
+                                "button",
+                                { onClick: this.saveWorkflow, className: "btn btn-primary savestate" },
+                                React.createElement("i", { className: "fa fa-floppy-o" }),
+                                "  Save Study"
                             ),
                             React.createElement(
                                 "div",
@@ -56626,9 +57107,13 @@ var StateMachineComponent = React.createClass({
                                     "div",
                                     { className: "col-md-12" },
                                     React.createElement(
-                                        "button",
-                                        { onClick: this.saveWorkflow, className: "btn btn-primary pull-right" },
-                                        "Save Study"
+                                        "div",
+                                        { className: "panel panel-default" },
+                                        React.createElement(
+                                            "div",
+                                            { className: "panel-body" },
+                                            state_detail()
+                                        )
                                     )
                                 )
                             )
@@ -56651,36 +57136,28 @@ var Reflux = _interopRequire(require("reflux"));
 
 var StateMachineActions = _interopRequire(require("./actions.jsx"));
 
-var _classesJsx = require("./classes.jsx");
-
-var StateMachine = _classesJsx.StateMachine;
-var SimpleState = _classesJsx.SimpleState;
+var StateMachine = require("./classes.jsx").StateMachine;
 
 var StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init: function init() {
-        this.__title = undefined;
         this.__sm = new StateMachine();
-        console.log("here");
-
-        var state1 = this.__sm.stateFactory(1, SimpleState);
-        var state2 = this.__sm.stateFactory(2, SimpleState);
-        var state3 = this.__sm.stateFactory(2, SimpleState);
-        var state4 = this.__sm.stateFactory(3, SimpleState);
-
-        this.__sm.addState(state1);
-        this.__sm.addState(state2);
-        this.__sm.addState(state3);
-        this.__sm.addState(state4);
-
-        this.__sm.addDependency(state2, state1);
-        this.__sm.addDependency(state3, state1);
-        this.__sm.addDependency(state4, state2);
-        this.__sm.addDependency(state4, state3);
-
+        this.__title = undefined;
         this.__selected = undefined;
     },
+    onCalibrate: function onCalibrate(sm) {
+        var title = arguments[1] === undefined ? "" : arguments[1];
 
+        var refresh = false;
+        if (this.__sm) refresh = true;
+        this.__sm = sm;
+        this.__title = title;
+        this.__selected = undefined;
+
+        if (refresh) {
+            this.trigger();
+        }
+    },
     // getters
     getTitle: function getTitle() {
         return this.__title;
@@ -56695,8 +57172,9 @@ var StateMachineStore = Reflux.createStore({
     // Action handlers
     onAddState: function onAddState(type, level) {
         console.log("Add new state of type " + type + " into level " + level);
+        var type = this.__sm.getStateClass(type).Class;
 
-        var new_state = this.__sm.stateFactory(level, SimpleState);
+        var new_state = this.__sm.stateFactory(level, type);
 
         this.__sm.addState(new_state);
 
@@ -56722,6 +57200,14 @@ var StateMachineStore = Reflux.createStore({
         this.__sm.debug();
 
         this.__selected = undefined;
+
+        this.trigger();
+    },
+    onSetStateTitle: function onSetStateTitle(elem, new_title) {
+        var elem_obj = this.__sm.getState(elem);
+        elem_obj.label(new_title);
+
+        this.__selected = elem;
 
         this.trigger();
     },

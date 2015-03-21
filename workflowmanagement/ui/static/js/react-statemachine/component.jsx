@@ -41,6 +41,8 @@ const StateMachineComponent = React.createClass({
         }
     },
     getInitialState(){
+        StateMachineActions.calibrate(this.props.initialSm);
+
         return this.getState();
     },
     getDefaultProps() {
@@ -168,17 +170,33 @@ const StateMachineComponent = React.createClass({
             this.renderLines();
         });
 
-        /*$(this.refs.statemachine.getDOMNode()).find('.destroy-state').click(
-            function(){
-                let ident = $(this).data('id');
-                StateMachineActions.deleteState(ident);
+        $('.clickedit').css('visibility', 'hidden')
+        .focusout(self.setStateTitle)
+        .keyup(function (e) {
+            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                self.setStateTitle(e);
+                return false;
+            } else {
+                return true;
             }
-        );*/
+        })
+        .prev().dblclick(function (event) {
+            event.stopPropagation();
+
+            $(this).css('visibility', 'hidden');
+            let the_input = $(this).next();
+            let text = the_input.val();
+            the_input.val('');
+            the_input.css('visibility', 'visible').focus();
+            the_input.val(text);
+        });
     },
     killUI(){
         $('.ui-draggable').draggable( "destroy" );
         $('.ui-droppable').droppable( "destroy" );
         $('.state_line').remove();
+
+        $('.clickedit').off();
     },
     componentWillMount(){
         StateMachineActions.setTitle(this.props.detail.Workflow.title);
@@ -211,6 +229,13 @@ const StateMachineComponent = React.createClass({
         event.stopPropagation();
         StateMachineActions.select(event.currentTarget.id);
     },
+    editLabel(event){
+        event.stopPropagation();
+        console.log(`Edit label for ${event.currentTarget.parentNode.id}`);
+    },
+    cancel(event){
+        event.stopPropagation();
+    },
     clearSelect(event){
         event.stopPropagation();
         console.log('CLEAR SELECT');
@@ -226,10 +251,25 @@ const StateMachineComponent = React.createClass({
 
         StateMachineActions.removeRow();
     },
+    setStateTitle(e){
+        let input = $(e.target),
+            label = input && input.prev();
+
+        let new_title = input.val() === '' ? defaultText : input.val();
+
+        label.text(new_title);
+
+        input.css('visibility', 'hidden');
+        label.css('visibility', 'visible');
+        StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
+    },
+    saveDetail(event){
+        console.log(event);
+    },
     getLevels(){
         let getLevel = (level => {
             return level.map(state => {
-                let state_handler_class = "state-handler btn btn-default";
+                let state_handler_class = "state-handler btn btn-default form-group";
                 let state_class = "state";
 
                 if (this.state.selected == state.getIdentificator()){
@@ -240,7 +280,9 @@ const StateMachineComponent = React.createClass({
 
                 let stateOptions = this.props.editable? (
                         <div className="state-options">
-                            <button title="Click to delete this state" onClick={this.deleteState} data-id={state.getIdentificator()} className="btn btn-xs btn-danger destroy-state">
+                            <button title="Click to delete this state"
+                            onClick={this.deleteState} data-id={state.getIdentificator()}
+                            className="btn btn-xs btn-danger destroy-state">
                                 <i className="fa fa-1x fa-times"/>
                             </button>
                                 <div data-id={state.getIdentificator()} title="Drag to create a dependency " className="connect-state">
@@ -250,8 +292,13 @@ const StateMachineComponent = React.createClass({
                 ):'';
               return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
                         <div onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
-                            {state.getIdentificator()}<br />
-                            SimpleTask
+                            <label onClick={this.cancel}>{state.label()}</label>
+                            <input type="text" className="clickedit form-control" defaultValue={state.label()} ></input>
+                            <div>&nbsp;
+                                <div className="pull-right">
+                                    <small>{state.type()}</small>
+                                </div>
+                            </div>
                         </div>
                         {stateOptions}
                     </div>;
@@ -263,6 +310,17 @@ const StateMachineComponent = React.createClass({
         let initial_state = (this.state.sm.getNextLevel() == 1)? 'initial_state': '';
 
         let drop = (prop, initial_state='') => {
+
+            let state_list = this.state.sm.getStateClasses().map(
+                (stclass) => {
+                    return  <li key={stclass.id}>
+                                <a onClick={(event) => StateMachineActions.addState(stclass.id, prop)}>
+                                    {stclass.Class.typeIcon()} {stclass.Class.repr()}
+                                </a>
+                            </li>;
+                }
+            );
+
             return this.props.editable? (
 
                 <div className="btn-group taskaddgroup">
@@ -271,15 +329,10 @@ const StateMachineComponent = React.createClass({
                         <i className="fa fa-3x fa-plus"/>
                     </div>
                     <ul className="dropdown-menu" role="menu">
-                        <li><small>Choose an task type to add it to this level.</small></li>
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li className="divider"></li>
-                        <li><a href="#">Separated link</a></li>
+                        {state_list}
                     </ul>
                 </div>
-            ):''
+            ):'';
         };
         list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
                         <div title="Origin of study Workflow diagram" className="state-start">
@@ -422,6 +475,27 @@ const StateMachineComponent = React.createClass({
     render(){
         console.log('RENDER');
         let chart = this.getRepresentation();
+
+        let state_list = this.state.sm.getStateClasses().map(
+            (stclass) => {
+                return  <div key={stclass.id} data-type={stclass.id}
+                className="task-type col-md-12 col-xs-4 btn btn-default btn-block new-state">
+                            {stclass.Class.typeIcon()} {stclass.Class.repr()}
+                        </div>;
+            }
+        );
+
+        const state_detail = () => {
+
+            if(this.state.selected){
+                const DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected));
+
+                return <span><DRender saveDetail={this.saveDetail} /></span>;
+            }
+
+            return <center>Please select a state to see his data options.</center>;
+        };
+
         return (
           <div className="row">
           <div className="col-md-12 no-select">
@@ -430,9 +504,8 @@ const StateMachineComponent = React.createClass({
                         <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
                             <h3 className="task-type-title panel-title">Type of Tasks</h3>
                             <hr />
-                            <div data-type="task.SimpleTask" className="task-type col-md-12 col-xs-4 btn btn-default new-state">
-                            <i className="task-type-icon fa fa-2x fa-check"></i>&nbsp;
-                             <span>Simple Task</span></div>
+                            {state_list}
+
                         </div>
                         <div className="col-md-10 table-col no-select">
                                 <div className="row">
@@ -440,11 +513,18 @@ const StateMachineComponent = React.createClass({
                                     <div className="input-group">
                                       <span className="input-group-addon" id="study-title"><strong>Study Title</strong></span>
                                       <input type="title" className="form-control"
-                                        id="exampleInputEmail1" aria-describedby="study-title" placeholder="Enter the workflow title" onChange={this.setTitle} value={this.state.title} />
+                                        id="exampleInputEmail1" aria-describedby="study-title"
+                                        placeholder="Enter the workflow title"
+                                        onChange={this.setTitle} value={this.state.title} />
                                     </div>
                                     <hr />
                                 </div>
                               </div>
+
+                                  <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                  <i className="fa fa-floppy-o"></i> &nbsp;Save Study
+                                  </button>
+
                               <div className="row">
                                 <div className="col-md-12">
                                     <div ref="chart" id="state_machine_chart">
@@ -455,9 +535,13 @@ const StateMachineComponent = React.createClass({
                                 </div>
                               </div>
                               <div className="row">
-                              <div className="col-md-12">
-                              <button onClick={this.saveWorkflow} className="btn btn-primary pull-right">Save Study</button>
-                              </div>
+                                <div className="col-md-12">
+                                    <div className="panel panel-default">
+                                      <div className="panel-body">
+                                        {state_detail()}
+                                      </div>
+                                    </div>
+                                </div>
                               </div>
 
                         </div>

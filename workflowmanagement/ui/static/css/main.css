@@ -387,7 +387,7 @@ footer {
 
 .state-options > .destroy-state{
     position:absolute;
-
+    z-index: 3000;
     margin-right:-25px;
     top:0;
     right:0;
@@ -480,4 +480,28 @@ footer {
 }
 .taskaddgroup ul{
     z-index: 3000;
+}
+
+.clickedit{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 1001;
+}
+
+.savestate{
+    position: absolute;
+    right: 20px;
+    z-index: 2000;
+}
+
+.input-group-addon {
+    min-width:150px;
+    text-align:left;
+}
+
+.state-dep-label {
+    margin-right: 10px;
 }

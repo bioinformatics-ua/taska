@@ -1,33 +1,27 @@
 import Reflux from 'reflux';
 
 import StateMachineActions from './actions.jsx';
-import {StateMachine, SimpleState} from './classes.jsx';
+import {StateMachine} from './classes.jsx';
 
 const StateMachineStore = Reflux.createStore({
     listenables: [StateMachineActions],
     init() {
-        this.__title = undefined;
         this.__sm = new StateMachine();
-        console.log('here');
-
-        let state1 = this.__sm.stateFactory(1, SimpleState);
-        let state2 = this.__sm.stateFactory(2, SimpleState);
-        let state3 = this.__sm.stateFactory(2, SimpleState);
-        let state4 = this.__sm.stateFactory(3, SimpleState);
-
-        this.__sm.addState(state1);
-        this.__sm.addState(state2);
-        this.__sm.addState(state3);
-        this.__sm.addState(state4);
-
-        this.__sm.addDependency(state2, state1);
-        this.__sm.addDependency(state3, state1);
-        this.__sm.addDependency(state4, state2);
-        this.__sm.addDependency(state4, state3);
-
+        this.__title = undefined;
         this.__selected = undefined;
     },
+    onCalibrate(sm, title=""){
+        let refresh = false;
+            if(this.__sm)
+                refresh=true;
+        this.__sm = sm;
+        this.__title = title;
+        this.__selected = undefined;
 
+        if(refresh){
+            this.trigger();
+        }
+    },
     // getters
     getTitle(){
         return this.__title;
@@ -42,8 +36,9 @@ const StateMachineStore = Reflux.createStore({
     // Action handlers
     onAddState(type, level){
         console.log(`Add new state of type ${type} into level ${level}`);
+        let type = this.__sm.getStateClass(type).Class;
 
-        let new_state = this.__sm.stateFactory(level, SimpleState);
+        let new_state = this.__sm.stateFactory(level, type);
 
         this.__sm.addState(new_state);
 
@@ -69,6 +64,14 @@ const StateMachineStore = Reflux.createStore({
         this.__sm.debug();
 
         this.__selected = undefined;
+
+        this.trigger();
+    },
+    onSetStateTitle(elem, new_title){
+        let elem_obj = this.__sm.getState(elem);
+        elem_obj.label(new_title);
+
+        this.__selected = elem;
 
         this.trigger();
     },

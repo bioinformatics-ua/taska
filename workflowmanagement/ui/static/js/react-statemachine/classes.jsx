@@ -1,5 +1,7 @@
 import React from 'react';
 
+const dummy = React.createClass({render(){return <span></span>; }});
+
 function __getArrayPos(array, object){
         let i = 0;
         for(let entry of array){
@@ -14,11 +16,30 @@ function __getArrayPos(array, object){
 class State{
     constructor(options){
         this.__identificator = options.identificator;
-        this.__data = options.data;
+        this.__data = options.data || {};
         this.__dependencies = [];
         this.__level = options.level;
         this.__version = 0;
+        this.__container = options.container;
     }
+
+    label(new_label=undefined){
+
+        if(new_label){
+            this.__data['name'] = new_label;
+            //this.__version++;
+            return true;
+        }
+        // else is a reading
+        let name = this.__data['name'] || 'Unnamed';
+
+        return name;
+    }
+
+    type(){
+        return (<span>{this.__proto__.constructor.typeIcon()} {this.__proto__.constructor.repr()}</span>);
+    }
+
     equals(other){
         if(typeof other === 'number')
             return this.__identificator == other;
@@ -80,9 +101,113 @@ class State{
         if(index != -1)
             this.__dependencies.splice(index, 1);
     }
+
+    getName(){
+        return this.__data['name'] || 'Unnamed';
+    }
+
+    detailRender(ChildComponent=dummy){
+        var self = this;
+
+        const DetailState = React.createClass({
+            getInitialState() {
+                return self.__data;
+            },
+            setTitle(e){
+                this.setState({name: e.target.value});
+            },
+            render(){
+                let dependencies = self.getDependencies().map((dependency) => {
+                    return <span key={dependency.getIdentificator()}
+                    className="state-dep-label label label-default">
+                        {dependency.label()}
+                        &nbsp;&nbsp;<i className="fa fa-times"></i>
+                        </span>
+                });
+
+                const possible_newdeps = [],
+                      abovestates = self.__container.getStates(self.getLevel());
+
+                for(let state of abovestates){
+                    if(__getArrayPos(self.getDependencies(), state) === -1)
+                        possible_newdeps.push(state);
+                }
+
+                const possibledropdown = possible_newdeps.map(
+                    (state) => {
+                        <li><a key={state.getIdentificator()}>{state.label()}</a></li>
+                    }
+                );
+
+                dependencies.push(
+                        <div className="btn-group dropup">
+                          <span type="button" className="label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Add dependency <span className="caret"></span>
+                            <span className="sr-only">Toggle Dropdown</span>
+                          </span>
+                          <ul className="dropdown-menu dropdown-menu-right" role="menu">
+                            {possibledropdown}
+                          </ul>
+                        </div>
+                    );
+
+                return (
+                <span>
+                    <div className="form-group">
+                        <div className="input-group clearfix">
+                            <span className="input-group-addon" id="state-title">
+                                <strong>State Name</strong>
+                            </span>
+                            <input type="title" className="form-control"
+                                            aria-describedby="state-title"
+                                            placeholder="Enter the state name"
+                                            onChange={this.setTitle} value={this.state.name} />
+                        </div>
+                    </div>
+                    <ChildComponent />
+                    <div className="form-group">
+                        <div className="input-group">
+                            <span className="input-group-addon" id="state-dependencies">
+                                <strong>Dependencies</strong>
+                            </span>
+                            <div className="form-control" aria-describedby="study-title">
+                             {dependencies}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="clearfix">
+                    <button onClick={this.save} className="pull-right btn btn-primary">Save Details</button>
+                    </div>
+                </span>
+                );
+            }
+        });
+
+        return DetailState;
+    }
+
+    detailProcess(data){
+        return false;
+    }
+
+    static typeIcon(){
+        return <i></i>;
+    }
+    static repr(){
+        return 'Task';
+    }
 }
 
 class SimpleState extends State {
+    constructor(options){
+        super(options);
+    }
+    static typeIcon(){
+        return <i className="fa fa-plus"></i>;
+    }
+    static repr(){
+        return 'Simple State';
+    }
 }
 
 class StateMachine{
@@ -91,24 +216,51 @@ class StateMachine{
         this.__states = [];
         this.__level = {};
         this.__nextLevel = 0;
+        this.__stateclasses = [];
     }
 
-    stateFactory(level, state, data=undefined){
+    addStateClass(options={}){
+        this.__stateclasses.push(options);
+    }
+    getStateClass(id){
+        for(let stclass of this.__stateclasses)
+            if(stclass.id === id)
+                return stclass;
+
+        return undefined;
+    }
+    getStateClasses(){
+        return this.__stateclasses;
+    }
+
+    stateFactory(level, Class, data=undefined){
+        var self = this;
+
         this.__internal_counter++;
 
-        console.log(state);
-
-        return new state({
+        return new Class({
             identificator: this.__internal_counter,
             level: level,
-            data: data
+            data: data,
+            container: this
         });
     }
 
     getLevels(){
         return this.__level;
     }
-    getStates(){
+    getStates(threshold=undefined){
+        if(threshold){
+            let okay = [];
+            for(let state of this.__states){
+                if(state.getLevel() < threshold)
+                    okay.push(state);
+            }
+
+            return okay;
+
+        }
+
         return this.__states;
     }
     getNextLevel(){
@@ -137,6 +289,25 @@ class StateMachine{
         return undefined;
 
     }
+
+    detailRender(identificator){
+        let i = __getArrayPos(this.__states, identificator);
+
+        if(i != -1)
+            return this.__states[i].detailRender();
+
+        return undefined;
+    }
+
+    detailProcess(identificator, data){
+        let i = __getArrayPos(this.__states, identificator);
+
+        if(i != -1)
+            return this.__states[i].detailProcess(data);
+
+        return false;
+    }
+
     addToLevel(state){
         if(this.__level[state.getLevel()] === undefined)
             this.__level[state.getLevel()] = [state];

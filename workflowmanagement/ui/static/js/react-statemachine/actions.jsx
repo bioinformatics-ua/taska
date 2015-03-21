@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 const StateMachineActions = Reflux.createActions([
+    'calibrate',
     'addState',
     'moveState',
     'deleteState',
@@ -13,7 +14,8 @@ const StateMachineActions = Reflux.createActions([
     'clearSelect',
     'setTitle',
     'insertAbove',
-    'removeRow'
+    'removeRow',
+    'setStateTitle'
 ]);
 
 export default StateMachineActions;
