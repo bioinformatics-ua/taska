@@ -55177,10 +55177,15 @@ var SimpleTask = (function (SimpleState) {
                     displayName: "SimpleFields",
 
                     getInitialState: function getInitialState() {
-                        return self.__data;
+                        return {
+                            parent: this.props.main
+                        };
                     },
                     setDescription: function setDescription(e) {
-                        this.setState({ name: e.target.value });
+                        this.state.parent.setState({ description: e.target.value });
+                    },
+                    parent: function parent() {
+                        return this.state.parent.state;
                     },
                     render: function render() {
                         return React.createElement(
@@ -55201,14 +55206,10 @@ var SimpleTask = (function (SimpleState) {
                                             "Task Description"
                                         )
                                     ),
-                                    React.createElement(
-                                        "textarea",
-                                        { rows: "6", type: "description", className: "form-control",
-                                            "aria-describedby": "state-description",
-                                            placeholder: "Enter the state description here",
-                                            onChange: this.setDescription },
-                                        this.state.description
-                                    )
+                                    React.createElement("textarea", { rows: "6", type: "description", className: "form-control",
+                                        "aria-describedby": "state-description",
+                                        placeholder: "Enter the state description here",
+                                        onChange: this.setDescription, value: this.parent().description })
                                 )
                             )
                         );
@@ -55771,7 +55772,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["calibrate", "addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow", "setStateTitle"]);
+var StateMachineActions = Reflux.createActions(["calibrate", "addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow", "setStateTitle", "dataChange"]);
 
 module.exports = StateMachineActions;
 
@@ -55990,6 +55991,13 @@ var State = (function () {
             writable: true,
             configurable: true
         },
+        dataChange: {
+            value: function dataChange(field_dict) {
+                this.__data = $.extend(this.__data, field_dict);
+            },
+            writable: true,
+            configurable: true
+        },
         detailRender: {
             value: function detailRender() {
                 var ChildComponent = arguments[0] === undefined ? dummy : arguments[0];
@@ -56004,8 +56012,23 @@ var State = (function () {
                     },
                     setTitle: function setTitle(e) {
                         this.setState({ name: e.target.value });
+                        //this.props.dataChange(self.getIdentificator(), 'name', e.target.value);
+                    },
+                    addDependency: function addDependency(e) {
+                        this.props.addDependency(self.getIdentificator(), Number.parseInt($(e.target).data("id")));
+                    },
+                    deleteConnection: function deleteConnection(e) {
+                        this.props.deleteConnection(self.getIdentificator(), Number.parseInt($(e.target).data("id")));
+                    },
+                    update: function update(dict) {
+                        this.setState(dict);
+                    },
+                    save: function save(e) {
+                        this.props.dataChange(self.getIdentificator(), this.state);
                     },
                     render: function render() {
+                        var _this9 = this;
+
                         var dependencies = self.getDependencies().map(function (dependency) {
                             return React.createElement(
                                 "span",
@@ -56013,7 +56036,8 @@ var State = (function () {
                                     className: "state-dep-label label label-default" },
                                 dependency.label(),
                                 "  ",
-                                React.createElement("i", { className: "fa fa-times" })
+                                React.createElement("i", { "data-id": dependency.getIdentificator(),
+                                    onClick: _this9.deleteConnection, className: "fa fa-times" })
                             );
                         });
 
@@ -56027,23 +56051,23 @@ var State = (function () {
                         }
 
                         var possibledropdown = possible_newdeps.map(function (state) {
-                            React.createElement(
+                            return React.createElement(
                                 "li",
-                                null,
+                                { key: state.getIdentificator() },
                                 React.createElement(
                                     "a",
-                                    { key: state.getIdentificator() },
+                                    { className: "point", "data-id": state.getIdentificator(), onClick: _this9.addDependency },
                                     state.label()
                                 )
                             );
                         });
 
-                        dependencies.push(React.createElement(
+                        if (possibledropdown.length > 0) dependencies.push(React.createElement(
                             "div",
                             { className: "btn-group dropup" },
                             React.createElement(
                                 "span",
-                                { type: "button", className: "label label-success dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false" },
+                                { type: "button", className: "point label label-success dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false" },
                                 "Add dependency ",
                                 React.createElement("span", { className: "caret" }),
                                 React.createElement(
@@ -56083,7 +56107,7 @@ var State = (function () {
                                         onChange: this.setTitle, value: this.state.name })
                                 )
                             ),
-                            React.createElement(ChildComponent, null),
+                            React.createElement(ChildComponent, { main: this }),
                             React.createElement(
                                 "div",
                                 { className: "form-group" },
@@ -56102,7 +56126,7 @@ var State = (function () {
                                     React.createElement(
                                         "div",
                                         { className: "form-control", "aria-describedby": "study-title" },
-                                        dependencies
+                                        dependencies.length === 0 ? "There's no possible dependencies for this task." : dependencies
                                     )
                                 )
                             ),
@@ -56291,6 +56315,17 @@ var StateMachine = (function () {
             writable: true,
             configurable: true
         },
+        dataChange: {
+            value: function dataChange(identificator, field_dict) {
+                var state = this.getState(identificator);
+
+                if (state) {
+                    return state.dataChange(field_dict);
+                }return false;
+            },
+            writable: true,
+            configurable: true
+        },
         detailRender: {
             value: function detailRender(identificator) {
                 var i = __getArrayPos(this.__states, identificator);
@@ -56363,7 +56398,7 @@ var StateMachine = (function () {
                         var deps = state.getDependencies();
                         var valid_deps = [];
                         for (var i = 0; i < deps.length; i++) {
-                            console.log("IS " + deps[i].getLevel() + " < " + level + " ? " + (deps[i].getLevel() < level));
+                            //console.log(`IS ${deps[i].getLevel()} < ${level} ? ${deps[i].getLevel()<level }`);
                             if (deps[i].getLevel() < level) valid_deps.push(deps[i]);
                         }
                         state.setDependencies(valid_deps);
@@ -56575,7 +56610,9 @@ var StateMachineComponent = React.createClass({
         // http://facebook.github.io/react/docs/events.html#keyboard-events
         if (e.keyCode === 8 && e.target === document.body && this.state.selected) {
             var selection = this.state.selected.split("-");
-            if (selection.length == 2) this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]));else if (selection.length == 1) this.deleteState(selection[0]);
+            if (selection.length == 2) this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]));else if (selection.length == 1) {
+                this.deleteState(selection[0]);
+            }
             // else theres something wrong...
         } else if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
             console.log("SAVE ME PLEASE I BEG YOU!!!");
@@ -56755,8 +56792,8 @@ var StateMachineComponent = React.createClass({
         label.css("visibility", "visible");
         StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
     },
-    saveDetail: function saveDetail(event) {
-        console.log(event);
+    dataChange: function dataChange(state, field_dict) {
+        StateMachineActions.dataChange(state, field_dict);
     },
     getLevels: function getLevels() {
         var _this = this;
@@ -57014,7 +57051,10 @@ var StateMachineComponent = React.createClass({
                 return React.createElement(
                     "span",
                     null,
-                    React.createElement(DRender, { saveDetail: _this.saveDetail })
+                    React.createElement(DRender, {
+                        deleteConnection: _this.deleteConnection,
+                        addDependency: _this.addDependency,
+                        dataChange: _this.dataChange })
                 );
             }
 
@@ -57193,7 +57233,7 @@ var StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onDeleteState: function onDeleteState() {
-        //console.log(`Delete state ${this.__selected}`);
+        console.log("Delete state " + this.__selected);
 
         this.__sm.deleteState(Number.parseInt(this.__selected));
 
@@ -57208,6 +57248,11 @@ var StateMachineStore = Reflux.createStore({
         elem_obj.label(new_title);
 
         this.__selected = elem;
+
+        this.trigger();
+    },
+    onDataChange: function onDataChange(elem, field_dict) {
+        this.__sm.dataChange(elem, field_dict);
 
         this.trigger();
     },

@@ -65,8 +65,9 @@ const StateMachineComponent = React.createClass({
             let selection = this.state.selected.split('-');
             if(selection.length == 2)
                 this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]))
-            else if(selection.length == 1)
+            else if(selection.length == 1){
                 this.deleteState(selection[0]);
+            }
             // else theres something wrong...
         } else if(
             e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
@@ -263,8 +264,8 @@ const StateMachineComponent = React.createClass({
         label.css('visibility', 'visible');
         StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
     },
-    saveDetail(event){
-        console.log(event);
+    dataChange(state, field_dict){
+        StateMachineActions.dataChange(state, field_dict);
     },
     getLevels(){
         let getLevel = (level => {
@@ -490,7 +491,10 @@ const StateMachineComponent = React.createClass({
             if(this.state.selected){
                 const DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected));
 
-                return <span><DRender saveDetail={this.saveDetail} /></span>;
+                return <span><DRender
+                deleteConnection={this.deleteConnection}
+                addDependency={this.addDependency}
+                dataChange={this.dataChange} /></span>;
             }
 
             return <center>Please select a state to see his data options.</center>;

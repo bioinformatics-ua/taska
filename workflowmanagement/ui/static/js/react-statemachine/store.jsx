@@ -57,7 +57,7 @@ const StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onDeleteState(){
-        //console.log(`Delete state ${this.__selected}`);
+        console.log(`Delete state ${this.__selected}`);
 
         this.__sm.deleteState(Number.parseInt(this.__selected));
 
@@ -72,6 +72,11 @@ const StateMachineStore = Reflux.createStore({
         elem_obj.label(new_title);
 
         this.__selected = elem;
+
+        this.trigger();
+    },
+    onDataChange(elem, field_dict){
+        this.__sm.dataChange(elem, field_dict);
 
         this.trigger();
     },

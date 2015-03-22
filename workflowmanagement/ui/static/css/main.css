@@ -505,3 +505,7 @@ footer {
 .state-dep-label {
     margin-right: 10px;
 }
+
+.point{
+    cursor: pointer;
+}

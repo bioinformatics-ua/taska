@@ -106,6 +106,10 @@ class State{
         return this.__data['name'] || 'Unnamed';
     }
 
+    dataChange(field_dict){
+        this.__data = $.extend(this.__data, field_dict);
+    }
+
     detailRender(ChildComponent=dummy){
         var self = this;
 
@@ -115,13 +119,32 @@ class State{
             },
             setTitle(e){
                 this.setState({name: e.target.value});
+                //this.props.dataChange(self.getIdentificator(), 'name', e.target.value);
+            },
+            addDependency(e){
+                this.props.addDependency(
+                    self.getIdentificator(),
+                    Number.parseInt($(e.target).data('id'))
+                );
+            },
+            deleteConnection(e){
+                this.props.deleteConnection(
+                    self.getIdentificator(), Number.parseInt($(e.target).data('id'))
+                );
+            },
+            update(dict){
+                this.setState(dict);
+            },
+            save(e){
+                this.props.dataChange(self.getIdentificator(), this.state);
             },
             render(){
                 let dependencies = self.getDependencies().map((dependency) => {
                     return <span key={dependency.getIdentificator()}
                     className="state-dep-label label label-default">
                         {dependency.label()}
-                        &nbsp;&nbsp;<i className="fa fa-times"></i>
+                        &nbsp;&nbsp;<i data-id={dependency.getIdentificator()}
+                        onClick={this.deleteConnection} className="fa fa-times"></i>
                         </span>
                 });
 
@@ -134,22 +157,26 @@ class State{
                 }
 
                 const possibledropdown = possible_newdeps.map(
-                    (state) => {
-                        <li><a key={state.getIdentificator()}>{state.label()}</a></li>
-                    }
+                        (state) => {
+                            return <li key={state.getIdentificator()}>
+                                <a className="point" data-id={state.getIdentificator()} onClick={this.addDependency}>{state.label()}</a>
+                                </li>;
+                        }
                 );
 
-                dependencies.push(
-                        <div className="btn-group dropup">
-                          <span type="button" className="label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            Add dependency <span className="caret"></span>
-                            <span className="sr-only">Toggle Dropdown</span>
-                          </span>
-                          <ul className="dropdown-menu dropdown-menu-right" role="menu">
-                            {possibledropdown}
-                          </ul>
-                        </div>
-                    );
+                if(possibledropdown.length > 0)
+                    dependencies.push(
+                            <div className="btn-group dropup">
+                              <span type="button" className="point label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                Add dependency <span className="caret"></span>
+                                <span className="sr-only">Toggle Dropdown</span>
+                              </span>
+
+                              <ul className="dropdown-menu dropdown-menu-right" role="menu">
+                                {possibledropdown}
+                              </ul>
+                            </div>
+                        );
 
                 return (
                 <span>
@@ -164,14 +191,15 @@ class State{
                                             onChange={this.setTitle} value={this.state.name} />
                         </div>
                     </div>
-                    <ChildComponent />
+                    <ChildComponent main={this} />
                     <div className="form-group">
                         <div className="input-group">
                             <span className="input-group-addon" id="state-dependencies">
                                 <strong>Dependencies</strong>
                             </span>
                             <div className="form-control" aria-describedby="study-title">
-                             {dependencies}
+                             {dependencies.length === 0?
+                                "There's no possible dependencies for this task.": dependencies}
                             </div>
                         </div>
                     </div>
@@ -290,6 +318,15 @@ class StateMachine{
 
     }
 
+    dataChange(identificator, field_dict){
+        let state = this.getState(identificator);
+
+        if(state)
+            return state.dataChange(field_dict);
+
+        return false;
+    }
+
     detailRender(identificator){
         let i = __getArrayPos(this.__states, identificator);
 
@@ -351,7 +388,7 @@ class StateMachine{
                 let deps = state.getDependencies();
                 let valid_deps = [];
                 for(let i=0;i<deps.length;i++){
-                    console.log(`IS ${deps[i].getLevel()} < ${level} ? ${deps[i].getLevel()<level }`);
+                    //console.log(`IS ${deps[i].getLevel()} < ${level} ? ${deps[i].getLevel()<level }`);
                     if(deps[i].getLevel()<level)
                         valid_deps.push(deps[i]);
                 }
