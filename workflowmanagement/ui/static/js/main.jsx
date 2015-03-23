@@ -1,6 +1,8 @@
 'use strict';
 window.$ = window.jQuery = require('jquery');
 
+require('babelify/polyfill');
+
 import jquery from 'jquery';
 import React from 'react';
 import Router from 'react-router';

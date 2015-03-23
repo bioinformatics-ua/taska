@@ -494,7 +494,7 @@ footer {
 .savestate{
     position: absolute;
     right: 20px;
-    z-index: 2000;
+    z-index: 1010;
 }
 
 .input-group-addon {
