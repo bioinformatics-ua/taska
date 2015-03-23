@@ -58659,7 +58659,6 @@ var State = (function () {
                 // we need a state map because dependencies have to point to the new copies
                 // i presume data is a flat basic type structure so only shallow cloning
                 // if the children of state are complex, a proper clone override must be implemented
-                console.log(this);
                 var sc = Object.assign({ __proto__: this.__proto__ }, this);
                 /*let sc = Object.create(Object.getPrototypeOf(this)).constructor(
                     {
@@ -58677,8 +58676,7 @@ var State = (function () {
                     var dep = _step.value;
 
                     sc.__dependencies.push(state_map[dep.getIdentificator()]);
-                }console.log(sc);
-                return sc;
+                }return sc;
             },
             writable: true,
             configurable: true
@@ -60089,25 +60087,31 @@ var StateMachineStore = Reflux.createStore({
         this.__title = undefined;
         this.__selected = undefined;
         this.__actionstack = [];
-        this.__initial = this.__sm;
+        this.__initial = this.__sm.clone();
+        this.__final = this.__sm.clone();
         this.__timemachine = -1;
     },
     addHistory: function addHistory() {
-        this.__actionstack.push(this.__sm.clone());
+
+        this.__actionstack.splice(0, this.__timemachine + 1, this.__sm.clone());
+
+        if (this.__actionstack.length > 20) {
+            this.__actionstack.pop();
+        }
+
+        this.__timemachine = -1;
+        this.__final = null;
     },
     onUndo: function onUndo() {
-        console.log("UNDO");
-        console.log("CURRENT TIME" + this.__timemachine);
-
         if (this.canUndo()) {
+            if (this.__timemachine === -1) this.__final = this.__sm.clone();
+
             this.__timemachine++;
 
             this.setTime();
         }
     },
     onRedo: function onRedo() {
-        console.log("REDO");
-        console.log("CURRENT TIME" + this.__timemachine);
         if (this.canRedo()) {
             this.__timemachine--;
 
@@ -60116,7 +60120,7 @@ var StateMachineStore = Reflux.createStore({
     },
     setTime: function setTime() {
         console.log("SET TIME TO " + this.__timemachine);
-        if (this.__timemachine === -1) this.__sm = this.__initial;else this.__sm = this.__actionstack[this.__timemachine];
+        if (this.__timemachine === this.__actionstack.length) this.__sm = this.__initial;else if (this.__timemachine === -1) this.__sm = this.__final;else this.__sm = this.__actionstack[this.__timemachine];
 
         this.trigger();
     },
@@ -60124,7 +60128,6 @@ var StateMachineStore = Reflux.createStore({
         return this.__timemachine < this.__actionstack.length - 1;
     },
     canRedo: function canRedo() {
-        console.log(this.__timemachine > -1);
         return this.__timemachine > -1;
     },
     onCalibrate: function onCalibrate(sm) {
@@ -60138,7 +60141,7 @@ var StateMachineStore = Reflux.createStore({
         this.__selected = undefined;
         this.__actionstack = [];
 
-        this.__initial = sm;
+        this.__initial = sm.clone();
 
         if (refresh) {
             this.trigger();
@@ -60162,9 +60165,9 @@ var StateMachineStore = Reflux.createStore({
 
         var new_state = this.__sm.stateFactory(level, type);
 
-        this.__sm.addState(new_state);
-
         this.addHistory();
+
+        this.__sm.addState(new_state);
 
         this.trigger();
     },
@@ -60175,6 +60178,9 @@ var StateMachineStore = Reflux.createStore({
 
         // There must be a state with the correct identifier, and its meaningless to move it to the same level as it already is
         if (e != undefined && e.getLevel() != level) {
+
+            this.addHistory();
+
             this.__sm.moveState(e, level);
         }
 
@@ -60183,9 +60189,9 @@ var StateMachineStore = Reflux.createStore({
     onDeleteState: function onDeleteState() {
         console.log("Delete state " + this.__selected);
 
-        this.__sm.deleteState(Number.parseInt(this.__selected));
+        this.addHistory();
 
-        this.__sm.debug();
+        this.__sm.deleteState(Number.parseInt(this.__selected));
 
         this.__selected = undefined;
 
@@ -60200,12 +60206,16 @@ var StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onDataChange: function onDataChange(elem, field_dict) {
+
+        this.addHistory();
+
         this.__sm.dataChange(elem, field_dict);
 
         this.trigger();
     },
     onDeleteDependency: function onDeleteDependency(dependant, dependency) {
         console.log("Delete " + dependency + " from " + dependant);
+        this.addHistory();
 
         this.__sm.deleteDependency(dependant, dependency);
 
@@ -60217,6 +60227,8 @@ var StateMachineStore = Reflux.createStore({
         var e2 = this.__sm.getState(elem2);
 
         if (e1 != undefined && e2 != undefined) {
+            this.addHistory();
+
             if (e1.getLevel() > e2.getLevel()) this.__sm.addDependency(e1, e2);else if (e2.getLevel() > e1.getLevel()) this.__sm.addDependency(e2, e1);
         }
 
@@ -60240,11 +60252,16 @@ var StateMachineStore = Reflux.createStore({
     onInsertAbove: function onInsertAbove(level) {
         console.log("Insert above " + level);
 
+        this.addHistory();
+
         this.__sm.insertAbove(level);
 
         this.trigger();
     },
     onRemoveRow: function onRemoveRow() {
+
+        this.addHistory();
+
         this.__sm.removeDiscontinuities();
 
         this.trigger();

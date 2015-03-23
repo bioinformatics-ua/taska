@@ -10,25 +10,33 @@ const StateMachineStore = Reflux.createStore({
         this.__title = undefined;
         this.__selected = undefined;
         this.__actionstack = [];
-        this.__initial = this.__sm;
+        this.__initial = this.__sm.clone();
+        this.__final = this.__sm.clone();
         this.__timemachine = -1;
     },
     addHistory(){
-        this.__actionstack.push(this.__sm.clone());
+
+        this.__actionstack.splice(0, this.__timemachine+1, this.__sm.clone());
+
+        if(this.__actionstack.length > 20){
+            this.__actionstack.pop();
+        }
+
+        this.__timemachine = -1;
+        this.__final = null;
+
     },
     onUndo(){
-        console.log('UNDO');
-        console.log('CURRENT TIME'+this.__timemachine);
-
         if(this.canUndo()){
+            if(this.__timemachine === -1)
+                this.__final = this.__sm.clone();
+
             this.__timemachine++;
 
             this.setTime();
         }
     },
     onRedo(){
-        console.log('REDO');
-        console.log('CURRENT TIME'+this.__timemachine);
         if(this.canRedo()){
             this.__timemachine--;
 
@@ -37,8 +45,11 @@ const StateMachineStore = Reflux.createStore({
     },
     setTime(){
         console.log('SET TIME TO '+ this.__timemachine);
-        if(this.__timemachine === -1)
+        if(this.__timemachine === this.__actionstack.length)
             this.__sm = this.__initial;
+
+        else if(this.__timemachine === -1)
+            this.__sm = this.__final;
         else
             this.__sm = this.__actionstack[this.__timemachine];
 
@@ -48,7 +59,6 @@ const StateMachineStore = Reflux.createStore({
         return this.__timemachine < this.__actionstack.length-1;
     },
     canRedo(){
-        console.log(this.__timemachine > -1);
         return this.__timemachine > -1;
     },
     onCalibrate(sm, title=""){
@@ -61,7 +71,7 @@ const StateMachineStore = Reflux.createStore({
         this.__selected = undefined;
         this.__actionstack = [];
 
-        this.__initial = sm;
+        this.__initial = sm.clone();
 
         if(refresh){
             this.trigger();
@@ -85,9 +95,9 @@ const StateMachineStore = Reflux.createStore({
 
         let new_state = this.__sm.stateFactory(level, type);
 
-        this.__sm.addState(new_state);
-
         this.addHistory();
+
+        this.__sm.addState(new_state);
 
         this.trigger();
     },
@@ -98,6 +108,9 @@ const StateMachineStore = Reflux.createStore({
 
         // There must be a state with the correct identifier, and its meaningless to move it to the same level as it already is
         if(e != undefined && e.getLevel()!=level){
+
+            this.addHistory();
+
             this.__sm.moveState(e, level);
         }
 
@@ -106,9 +119,9 @@ const StateMachineStore = Reflux.createStore({
     onDeleteState(){
         console.log(`Delete state ${this.__selected}`);
 
-        this.__sm.deleteState(Number.parseInt(this.__selected));
+        this.addHistory();
 
-        this.__sm.debug();
+        this.__sm.deleteState(Number.parseInt(this.__selected));
 
         this.__selected = undefined;
 
@@ -123,12 +136,16 @@ const StateMachineStore = Reflux.createStore({
         this.trigger();
     },
     onDataChange(elem, field_dict){
+
+        this.addHistory();
+
         this.__sm.dataChange(elem, field_dict);
 
         this.trigger();
     },
     onDeleteDependency(dependant, dependency){
         console.log(`Delete ${dependency} from ${dependant}`);
+        this.addHistory();
 
         this.__sm.deleteDependency(dependant, dependency);
 
@@ -139,7 +156,10 @@ const StateMachineStore = Reflux.createStore({
         let e1 = this.__sm.getState(elem1);
         let e2 = this.__sm.getState(elem2);
 
+
         if(e1 != undefined && e2 != undefined){
+            this.addHistory();
+
             if(e1.getLevel() > e2.getLevel())
                 this.__sm.addDependency(e1, e2);
             else if(e2.getLevel() > e1.getLevel())
@@ -166,11 +186,16 @@ const StateMachineStore = Reflux.createStore({
     onInsertAbove(level){
         console.log(`Insert above ${level}`);
 
+        this.addHistory();
+
         this.__sm.insertAbove(level);
 
         this.trigger();
     },
     onRemoveRow(){
+
+        this.addHistory();
+
         this.__sm.removeDiscontinuities();
 
         this.trigger();

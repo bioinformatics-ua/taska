@@ -27,7 +27,6 @@ class State{
         // we need a state map because dependencies have to point to the new copies
         // i presume data is a flat basic type structure so only shallow cloning
         // if the children of state are complex, a proper clone override must be implemented
-        console.log(this);
         let sc= Object.assign({ __proto__: this.__proto__ }, this);
         /*let sc = Object.create(Object.getPrototypeOf(this)).constructor(
             {
@@ -44,7 +43,6 @@ class State{
         for(let dep of this.__dependencies)
             sc.__dependencies.push(state_map[dep.getIdentificator()]);
 
-        console.log(sc);
         return sc;
     }
 
