@@ -9,14 +9,22 @@ const StateMachineStore = Reflux.createStore({
         this.__sm = new StateMachine();
         this.__title = undefined;
         this.__selected = undefined;
+        this.__actionstack = [];
+    },
+    addHistory(sm){
+        this.__actionstack.push(sm.clone());
+
+        console.log(this.__actionstack);
     },
     onCalibrate(sm, title=""){
         let refresh = false;
             if(this.__sm)
                 refresh=true;
+
         this.__sm = sm;
         this.__title = title;
         this.__selected = undefined;
+        this.__actionstack = [];
 
         if(refresh){
             this.trigger();
@@ -41,6 +49,8 @@ const StateMachineStore = Reflux.createStore({
         let new_state = this.__sm.stateFactory(level, type);
 
         this.__sm.addState(new_state);
+
+        this.addHistory(this.__sm);
 
         this.trigger();
     },

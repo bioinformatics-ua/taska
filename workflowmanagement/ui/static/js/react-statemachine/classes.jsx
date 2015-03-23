@@ -19,8 +19,28 @@ class State{
         this.__data = options.data || {};
         this.__dependencies = [];
         this.__level = options.level;
-        this.__version = 0;
+        this.__version = options.version || 0;
         this.__container = options.container;
+    }
+
+    clone(state_map, container){
+        // we need a state map because dependencies have to point to the new copies
+        // i presume data is a flat basic type structure so only shallow cloning
+        // if the children of state are complex, a proper clone override must be implemented
+        let sc = new State({
+            identificator: this.__identificator,
+            level: this.__level,
+            version: this.__version,
+            container: this.__container,
+            data: $.extend(true, {}, this.__data)
+        })
+
+        // trickiest are data and dependencies
+        sc.__dependencies = [];
+        for(let dep of this.__dependencies)
+            sc.__dependencies.push(state_map[dep.getIdentificator()]);
+
+        return sc;
     }
 
     label(new_label=undefined){
@@ -245,6 +265,34 @@ class StateMachine{
         this.__level = {};
         this.__nextLevel = 0;
         this.__stateclasses = [];
+    }
+
+    clone(){
+        let sm = new StateMachine();
+
+        sm.__internal_counter = this.__internal_counter;
+        sm.__nextLevel = this.__nextLevel;
+        sm.__stateclasses = this.__stateclasses;
+
+        // It's very very tricky to clone this, because states reference each other
+        // So we also must change the dependencies...
+        let tmp = [];
+        let state_map = {};
+
+        for(var i in this.__level){
+            let l = [];
+            for(let state of this.__level[i]){
+                let sc = state.clone(state_map, sm);
+                state_map[sc.getIdentificator()] = sc;
+
+                l.push(sc);
+                tmp.push(sc);
+            }
+            sm.__level[i] = l;
+        }
+        sm.__states = tmp;
+
+        return sm;
     }
 
     addStateClass(options={}){

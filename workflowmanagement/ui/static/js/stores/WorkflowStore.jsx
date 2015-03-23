@@ -7,7 +7,11 @@ import {ListLoader, DetailLoader} from '../actions/api.jsx'
 
 let loader = new ListLoader({model: 'workflow'});
 
-export default Reflux.createStore({
+const WorkflowStore = Reflux.createStore({
+    statics: {
+        DETAIL: 0,
+        LIST: 1
+    },
     mixins: [TableStoreMixin,
         DetailStoreMixin.factory(
             new DetailLoader({model: 'workflow'}),
@@ -23,4 +27,24 @@ export default Reflux.createStore({
             WorkflowActions.loadSuccess(data);
         }, state);
     },
+    getWorkflow: function(){
+        return this.__detaildata;
+    },
+    setPublic(status){
+        this.__detaildata.permissions.public = status;
+
+        this.trigger(WorkflowStore.DETAIL);
+    },
+    setSearchable(status){
+        this.__detaildata.permissions.searchable = status;
+
+        this.trigger(WorkflowStore.DETAIL);
+    },
+    setForkable(status){
+        this.__detaildata.permissions.forkable = status;
+
+        this.trigger(WorkflowStore.DETAIL);
+    }
 });
+
+export default {WorkflowStore};

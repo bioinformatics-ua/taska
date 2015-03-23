@@ -64,7 +64,8 @@ class HistoryViewSet(   mixins.ListModelMixin,
 
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
-        return History.all(user=self.request.user)
+        # well accesses fill too much the history i dont think they should show
+        return History.all(user=self.request.user).exclude(event=History.ACCESS)
 
     def list(self, request, *args, **kwargs):
         """

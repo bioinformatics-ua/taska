@@ -509,3 +509,13 @@ footer {
 .point{
     cursor: pointer;
 }
+
+.selectBox{
+    margin-right: 10px;
+    margin-top: -2px;
+    display: inline-block;
+}
+
+.selectLabel{
+    vertical-align: super;
+}

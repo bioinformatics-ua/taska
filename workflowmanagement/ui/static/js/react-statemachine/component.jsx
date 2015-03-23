@@ -474,7 +474,6 @@ const StateMachineComponent = React.createClass({
         StateMachineActions.setTitle(event.target.value);
     },
     render(){
-        console.log('RENDER');
         let chart = this.getRepresentation();
 
         let state_list = this.state.sm.getStateClasses().map(
@@ -514,23 +513,33 @@ const StateMachineComponent = React.createClass({
                         <div className="col-md-10 table-col no-select">
                                 <div className="row">
                               <div className="col-md-12">
-                                    <div className="input-group">
-                                      <span className="input-group-addon" id="study-title"><strong>Study Title</strong></span>
-                                      <input type="title" className="form-control"
-                                        id="exampleInputEmail1" aria-describedby="study-title"
-                                        placeholder="Enter the workflow title"
-                                        onChange={this.setTitle} value={this.state.title} />
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                          <span className="input-group-addon" id="study-title"><strong>Study Title</strong></span>
+                                          <input type="title" className="form-control"
+                                            id="exampleInputEmail1" aria-describedby="study-title"
+                                            placeholder="Enter the workflow title"
+                                            onChange={this.setTitle} value={this.state.title} />
+                                        </div>
                                     </div>
+                                    {this.props.extra}
                                     <hr />
                                 </div>
                               </div>
+                              <div className="row">
+                                <div className="col-md-12">
+                            <div className="pull-left btn-group" role="group">
+                                <button className="btn btn-default" onClick={this.undo}>
+                                    <i title="Undo action" className="fa fa-undo"></i>
+                                </button>
+                                <button className="btn btn-default" onClick={this.redo}>
+                                    <i title="Redo action" className="fa fa-repeat"></i>
+                                </button>
+                                </div>
 
                                   <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
                                   <i className="fa fa-floppy-o"></i> &nbsp;Save Study
                                   </button>
-
-                              <div className="row">
-                                <div className="col-md-12">
                                     <div ref="chart" id="state_machine_chart">
                                         <div ref="movable">
                                             {chart}
