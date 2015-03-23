@@ -10,11 +10,46 @@ const StateMachineStore = Reflux.createStore({
         this.__title = undefined;
         this.__selected = undefined;
         this.__actionstack = [];
+        this.__initial = this.__sm;
+        this.__timemachine = -1;
     },
-    addHistory(sm){
-        this.__actionstack.push(sm.clone());
+    addHistory(){
+        this.__actionstack.push(this.__sm.clone());
+    },
+    onUndo(){
+        console.log('UNDO');
+        console.log('CURRENT TIME'+this.__timemachine);
 
-        console.log(this.__actionstack);
+        if(this.canUndo()){
+            this.__timemachine++;
+
+            this.setTime();
+        }
+    },
+    onRedo(){
+        console.log('REDO');
+        console.log('CURRENT TIME'+this.__timemachine);
+        if(this.canRedo()){
+            this.__timemachine--;
+
+            this.setTime();
+        }
+    },
+    setTime(){
+        console.log('SET TIME TO '+ this.__timemachine);
+        if(this.__timemachine === -1)
+            this.__sm = this.__initial;
+        else
+            this.__sm = this.__actionstack[this.__timemachine];
+
+        this.trigger();
+    },
+    canUndo(){
+        return this.__timemachine < this.__actionstack.length-1;
+    },
+    canRedo(){
+        console.log(this.__timemachine > -1);
+        return this.__timemachine > -1;
     },
     onCalibrate(sm, title=""){
         let refresh = false;
@@ -25,6 +60,8 @@ const StateMachineStore = Reflux.createStore({
         this.__title = title;
         this.__selected = undefined;
         this.__actionstack = [];
+
+        this.__initial = sm;
 
         if(refresh){
             this.trigger();
@@ -50,7 +87,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__sm.addState(new_state);
 
-        this.addHistory(this.__sm);
+        this.addHistory();
 
         this.trigger();
     },

@@ -58588,7 +58588,7 @@ var Reflux = _interopRequire(require("reflux"));
 // Each action is like an event channel for one specific event. Actions are called by components.
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
-var StateMachineActions = Reflux.createActions(["calibrate", "addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow", "setStateTitle", "dataChange"]);
+var StateMachineActions = Reflux.createActions(["calibrate", "addState", "moveState", "deleteState", "addDependency", "deleteDependency", "select", "clearSelect", "setTitle", "insertAbove", "removeRow", "setStateTitle", "dataChange", "undo", "redo"]);
 
 module.exports = StateMachineActions;
 
@@ -58659,13 +58659,17 @@ var State = (function () {
                 // we need a state map because dependencies have to point to the new copies
                 // i presume data is a flat basic type structure so only shallow cloning
                 // if the children of state are complex, a proper clone override must be implemented
-                var sc = new State({
-                    identificator: this.__identificator,
-                    level: this.__level,
-                    version: this.__version,
-                    container: this.__container,
-                    data: $.extend(true, {}, this.__data)
-                });
+                console.log(this);
+                var sc = Object.assign({ __proto__: this.__proto__ }, this);
+                /*let sc = Object.create(Object.getPrototypeOf(this)).constructor(
+                    {
+                            identificator: this.__identificator,
+                            level: this.__level,
+                            version: this.__version,
+                            container: this.__container,
+                            data: $.extend(true, {}, this.__data)
+                    }
+                );*/
 
                 // trickiest are data and dependencies
                 sc.__dependencies = [];
@@ -58673,7 +58677,8 @@ var State = (function () {
                     var dep = _step.value;
 
                     sc.__dependencies.push(state_map[dep.getIdentificator()]);
-                }return sc;
+                }console.log(sc);
+                return sc;
             },
             writable: true,
             configurable: true
@@ -59460,7 +59465,9 @@ var StateMachineComponent = React.createClass({
         return {
             sm: StateMachineStore.getStateMachine(),
             selected: StateMachineStore.getSelected(),
-            title: StateMachineStore.getTitle()
+            title: StateMachineStore.getTitle(),
+            canUndo: StateMachineStore.canUndo(),
+            canRedo: StateMachineStore.canRedo()
         };
     },
     getInitialState: function getInitialState() {
@@ -59899,6 +59906,12 @@ var StateMachineComponent = React.createClass({
     setTitle: function setTitle(event) {
         StateMachineActions.setTitle(event.target.value);
     },
+    undo: function undo(e) {
+        StateMachineActions.undo();
+    },
+    redo: function redo(e) {
+        StateMachineActions.redo();
+    },
     render: function render() {
         var _this = this;
 
@@ -60005,12 +60018,12 @@ var StateMachineComponent = React.createClass({
                                         { className: "pull-left btn-group", role: "group" },
                                         React.createElement(
                                             "button",
-                                            { className: "btn btn-default", onClick: this.undo },
+                                            { className: "btn btn-default", onClick: this.undo, disabled: !this.state.canUndo },
                                             React.createElement("i", { title: "Undo action", className: "fa fa-undo" })
                                         ),
                                         React.createElement(
                                             "button",
-                                            { className: "btn btn-default", onClick: this.redo },
+                                            { className: "btn btn-default", onClick: this.redo, disabled: !this.state.canRedo },
                                             React.createElement("i", { title: "Redo action", className: "fa fa-repeat" })
                                         )
                                     ),
@@ -60076,11 +60089,43 @@ var StateMachineStore = Reflux.createStore({
         this.__title = undefined;
         this.__selected = undefined;
         this.__actionstack = [];
+        this.__initial = this.__sm;
+        this.__timemachine = -1;
     },
-    addHistory: function addHistory(sm) {
-        this.__actionstack.push(sm.clone());
+    addHistory: function addHistory() {
+        this.__actionstack.push(this.__sm.clone());
+    },
+    onUndo: function onUndo() {
+        console.log("UNDO");
+        console.log("CURRENT TIME" + this.__timemachine);
 
-        console.log(this.__actionstack);
+        if (this.canUndo()) {
+            this.__timemachine++;
+
+            this.setTime();
+        }
+    },
+    onRedo: function onRedo() {
+        console.log("REDO");
+        console.log("CURRENT TIME" + this.__timemachine);
+        if (this.canRedo()) {
+            this.__timemachine--;
+
+            this.setTime();
+        }
+    },
+    setTime: function setTime() {
+        console.log("SET TIME TO " + this.__timemachine);
+        if (this.__timemachine === -1) this.__sm = this.__initial;else this.__sm = this.__actionstack[this.__timemachine];
+
+        this.trigger();
+    },
+    canUndo: function canUndo() {
+        return this.__timemachine < this.__actionstack.length - 1;
+    },
+    canRedo: function canRedo() {
+        console.log(this.__timemachine > -1);
+        return this.__timemachine > -1;
     },
     onCalibrate: function onCalibrate(sm) {
         var title = arguments[1] === undefined ? "" : arguments[1];
@@ -60092,6 +60137,8 @@ var StateMachineStore = Reflux.createStore({
         this.__title = title;
         this.__selected = undefined;
         this.__actionstack = [];
+
+        this.__initial = sm;
 
         if (refresh) {
             this.trigger();
@@ -60117,7 +60164,7 @@ var StateMachineStore = Reflux.createStore({
 
         this.__sm.addState(new_state);
 
-        this.addHistory(this.__sm);
+        this.addHistory();
 
         this.trigger();
     },

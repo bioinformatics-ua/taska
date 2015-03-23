@@ -37,7 +37,9 @@ const StateMachineComponent = React.createClass({
         return {
             sm: StateMachineStore.getStateMachine(),
             selected: StateMachineStore.getSelected(),
-            title: StateMachineStore.getTitle()
+            title: StateMachineStore.getTitle(),
+            canUndo: StateMachineStore.canUndo(),
+            canRedo: StateMachineStore.canRedo()
         }
     },
     getInitialState(){
@@ -473,6 +475,12 @@ const StateMachineComponent = React.createClass({
     setTitle(event){
         StateMachineActions.setTitle(event.target.value);
     },
+    undo(e){
+        StateMachineActions.undo();
+    },
+    redo(e){
+        StateMachineActions.redo();
+    },
     render(){
         let chart = this.getRepresentation();
 
@@ -529,10 +537,10 @@ const StateMachineComponent = React.createClass({
                               <div className="row">
                                 <div className="col-md-12">
                             <div className="pull-left btn-group" role="group">
-                                <button className="btn btn-default" onClick={this.undo}>
+                                <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
                                     <i title="Undo action" className="fa fa-undo"></i>
                                 </button>
-                                <button className="btn btn-default" onClick={this.redo}>
+                                <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
                                     <i title="Redo action" className="fa fa-repeat"></i>
                                 </button>
                                 </div>

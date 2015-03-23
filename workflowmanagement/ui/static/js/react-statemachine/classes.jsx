@@ -27,19 +27,24 @@ class State{
         // we need a state map because dependencies have to point to the new copies
         // i presume data is a flat basic type structure so only shallow cloning
         // if the children of state are complex, a proper clone override must be implemented
-        let sc = new State({
-            identificator: this.__identificator,
-            level: this.__level,
-            version: this.__version,
-            container: this.__container,
-            data: $.extend(true, {}, this.__data)
-        })
+        console.log(this);
+        let sc= Object.assign({ __proto__: this.__proto__ }, this);
+        /*let sc = Object.create(Object.getPrototypeOf(this)).constructor(
+            {
+                    identificator: this.__identificator,
+                    level: this.__level,
+                    version: this.__version,
+                    container: this.__container,
+                    data: $.extend(true, {}, this.__data)
+            }
+        );*/
 
         // trickiest are data and dependencies
         sc.__dependencies = [];
         for(let dep of this.__dependencies)
             sc.__dependencies.push(state_map[dep.getIdentificator()]);
 
+        console.log(sc);
         return sc;
     }
 
