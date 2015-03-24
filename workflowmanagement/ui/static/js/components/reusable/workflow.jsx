@@ -77,4 +77,4 @@ const WorkflowTable = React.createClass({
 
 });
 
-export {WorkflowTable}
+export default {WorkflowTable}

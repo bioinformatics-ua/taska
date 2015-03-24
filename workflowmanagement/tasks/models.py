@@ -26,7 +26,7 @@ class Task(models.Model):
     hash            = models.CharField(max_length=50)
     sortid          = models.IntegerField()
     title           = models.CharField(max_length=100)
-    description     = models.TextField()
+    description     = models.TextField(null=True, blank=True)
     workflow        = models.ForeignKey(Workflow)
 
     # We need this to be able to properly guess the type
@@ -130,6 +130,12 @@ class Task(models.Model):
 
     def dependencies(self):
         return TaskDependency.objects.filter(maintask=self)
+
+    def remove(self):
+        self.removed = True
+        self.save()
+
+        return self
 
 
 @receiver(models.signals.post_save)

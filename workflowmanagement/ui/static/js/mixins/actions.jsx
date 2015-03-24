@@ -5,7 +5,8 @@ const DetailActionsMixin = {
     'loadDetailSuccess': {},
     'loadDetail': {asyncResult: true},
     'loadDetailIfNecessary': {asyncResult: true},
-    'unloadDetail': {}
+    'unloadDetail': {},
+    'postDetail': {asyncResult: true}
 };
 
 export default {TableActionsMixin, DetailActionsMixin}

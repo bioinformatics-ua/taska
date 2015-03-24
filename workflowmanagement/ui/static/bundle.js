@@ -56496,8 +56496,11 @@ var DetailActionsMixin = require("../mixins/actions.jsx").DetailActionsMixin;
 
 var WorkflowActions = Reflux.createActions($.extend({
     loadSuccess: {},
-    load: {}
-}, DetailActionsMixin));
+    load: {},
+    setWorkflow: {},
+    setPublic: {},
+    setSearchable: {},
+    setForkable: {} }, DetailActionsMixin));
 
 module.exports = WorkflowActions;
 
@@ -56511,6 +56514,19 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+// Adding csrf middleware token to the correct place...
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+}
+$.ajaxSetup({
+    beforeSend: function beforeSend(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", Django.csrf_token());
+        }
+    }
+});
 
 var Loader = (function () {
     function Loader(options) {
@@ -56529,6 +56545,7 @@ var Loader = (function () {
                     type: type,
                     data: serialized,
                     dataType: "json",
+                    contentType: "application/json",
                     success: (function (data) {
                         if (callback) callback(data);
                     }).bind(this),
@@ -56593,6 +56610,15 @@ var DetailLoader = (function (Loader) {
             },
             writable: true,
             configurable: true
+        },
+        put: {
+            value: function put(hash, serialized) {
+                // Adding csrf to request
+
+                return _get(Object.getPrototypeOf(DetailLoader.prototype), "load", this).call(this, "api/" + this.model + "/" + hash + "/", null, null, "PATCH", JSON.stringify(serialized));
+            },
+            writable: true,
+            configurable: true
         }
     });
 
@@ -56604,7 +56630,6 @@ var Login = (function (Loader) {
         _classCallCheck(this, Login);
 
         this.data = {
-            csrfmiddlewaretoken: Django.csrf_token(),
             username: options.username,
             password: options.password,
             remember: options.remember
@@ -57886,6 +57911,22 @@ var SimpleTask = (function (SimpleState) {
             },
             writable: true,
             configurable: true
+        },
+        deserializeOptions: {
+            value: function deserializeOptions(data) {
+                if (data.title === undefined) throw "data object is missing 'title' property";
+
+                if (data.description === undefined) throw "data object is missing 'description' property";
+
+                return {
+                    name: data.title,
+                    description: data.description,
+                    hash: data.hash,
+                    type: data.type
+                };
+            },
+            writable: true,
+            configurable: true
         }
     }, {
         detailRender: {
@@ -57935,6 +57976,30 @@ var SimpleTask = (function (SimpleState) {
                 });
 
                 return _get(Object.getPrototypeOf(SimpleTask.prototype), "detailRender", this).call(this, SimpleFields);
+            },
+            writable: true,
+            configurable: true
+        },
+        serialize: {
+            value: function serialize() {
+                var deps = [];
+                for (var _iterator = this.getDependencies()[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var dep = _step.value;
+
+                    deps.push({
+                        dependency: dep.getIdentificator()
+                    });
+                }
+
+                return {
+                    sid: this.__identificator,
+                    hash: this.getData().hash,
+                    title: this.getData().name,
+                    type: this.getData().type,
+                    sortid: this.getLevel(),
+                    description: this.getData().description || "",
+                    dependencies: deps
+                };
             },
             writable: true,
             configurable: true
@@ -58072,10 +58137,7 @@ var WorkflowTable = React.createClass({
 
 });
 
-exports.WorkflowTable = WorkflowTable;
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+module.exports = { WorkflowTable: WorkflowTable };
 
 },{"../../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../../mixins/component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/component.jsx","../../stores/WorkflowStore.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/stores/WorkflowStore.jsx","./component.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/reusable/component.jsx","griddle-react":"/home/ribeiro/git/workflow-management/node_modules/griddle-react/modules/griddle.jsx.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/components/task/simple.jsx":[function(require,module,exports){
 "use strict";
@@ -58121,7 +58183,7 @@ var Authentication = require("../mixins/component.jsx").Authentication;
 
 var WorkflowActions = _interopRequire(require("../actions/WorkflowActions.jsx"));
 
-var WorkflowStore = require("../stores/WorkflowStore.jsx").WorkflowStore;
+var WorkflowStore = _interopRequire(require("../stores/WorkflowStore.jsx"));
 
 var StateMachineComponent = require("../react-statemachine/component.jsx").StateMachineComponent;
 
@@ -58225,43 +58287,52 @@ module.exports = React.createClass({
     update: function update(status) {
         if (status == WorkflowStore.DETAIL) this.setState(this.__getState());
     },
-    serializeStateMachine: function serializeStateMachine() {
+    load: function load() {
+        var wf = this.state.workflow;
         var sm = new StateMachine();
 
         sm.addStateClass({
-            id: "task.SimpleState",
-            Class: SimpleState
-        });
-        sm.addStateClass({
-            id: "task.SimpleTask",
+            id: "tasks.SimpleTask",
             Class: SimpleTask
         });
 
-        var state1 = sm.stateFactory(1, SimpleState, { name: "Fazer a cama" });
-        var state2 = sm.stateFactory(2, SimpleTask, { name: "Ir à padaria lanchar" });
-        var state3 = sm.stateFactory(2, SimpleTask, { name: "Ir comprar pão" });
-        var state4 = sm.stateFactory(3, SimpleTask, { name: "Ir para o trabalho" });
+        // I dont know if they come ordered, so i add all tasks first, an dependencies only after
+        var map = {};
 
-        sm.addState(state1);
-        sm.addState(state2);
-        sm.addState(state3);
-        sm.addState(state4);
+        // first states
+        for (var _iterator = wf.tasks[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+            var task = _step.value;
 
-        sm.addDependency(state2, state1);
-        sm.addDependency(state3, state1);
-        sm.addDependency(state4, state2);
-        sm.addDependency(state4, state3);
+            var type = sm.getStateClass(task.type).Class;
+            var state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
 
-        return sm;
+            map[task.hash] = state;
+
+            sm.addState(state);
+        }
+
+        // then dependencies
+        for (var _iterator2 = wf.tasks[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
+            var task = _step2.value;
+
+            for (var _iterator3 = task.dependencies[Symbol.iterator](), _step3; !(_step3 = _iterator3.next()).done;) {
+                var dep = _step3.value;
+
+                sm.addDependency(map[task.hash], map[dep.dependency]);
+            }
+        }return sm;
+    },
+    save: function save(data) {
+        WorkflowActions.setWorkflow(data);
     },
     setPublic: function setPublic(e) {
-        WorkflowStore.setPublic(e.target.checked);
+        WorkflowActions.setPublic(e.target.checked);
     },
     setSearchable: function setSearchable(e) {
-        WorkflowStore.setSearchable(e.target.checked);
+        WorkflowActions.setSearchable(e.target.checked);
     },
     setForkable: function setForkable(e) {
-        WorkflowStore.setForkable(e.target.checked);
+        WorkflowActions.setForkable(e.target.checked);
     },
     render: function render() {
         return React.createElement(
@@ -58271,7 +58342,9 @@ module.exports = React.createClass({
                 extra: React.createElement(PermissionsBar, _extends({ setPublic: this.setPublic,
                     setSearchable: this.setSearchable,
                     setForkable: this.setForkable
-                }, this.state.workflow.permissions)), initialSm: this.serializeStateMachine(),
+                }, this.state.workflow.permissions)),
+                save: this.save,
+                initialSm: this.load(),
                 editable: true }, this.props))
         );
     }
@@ -58335,7 +58408,8 @@ var DetailActionsMixin = {
     loadDetailSuccess: {},
     loadDetail: { asyncResult: true },
     loadDetailIfNecessary: { asyncResult: true },
-    unloadDetail: {}
+    unloadDetail: {},
+    postDetail: { asyncResult: true }
 };
 
 module.exports = { TableActionsMixin: TableActionsMixin, DetailActionsMixin: DetailActionsMixin };
@@ -58541,6 +58615,14 @@ var DetailStoreMixin = (function () {
                             _this.__Actions.loadDetail.completed(data);
                         });
                     },
+                    onPostDetail: function onPostDetail(hash, serialized) {
+                        var _this = this;
+
+                        loader.put(hash, serialized).then(function (data) {
+                            _this.__Actions.loadDetailSuccess(data);
+                            _this.__Actions.postDetail.completed(data);
+                        });
+                    },
                     onLoadDetailIfNecessary: function onLoadDetailIfNecessary(hash) {
                         var _this = this;
 
@@ -58649,6 +58731,15 @@ var State = (function () {
         repr: {
             value: function repr() {
                 return "Task";
+            },
+            writable: true,
+            configurable: true
+        },
+        deserializeOptions: {
+            value: function deserializeOptions(data) {
+                if (data.name === undefined) throw "data object must have at least a name property to be possible to deserialize it,\n                    if it does not, a custom deserialize override method should be implemented in a\n                    class that inherits from State or SimpleState";
+
+                return { name: data.name };
             },
             writable: true,
             configurable: true
@@ -58793,7 +58884,7 @@ var State = (function () {
         },
         getData: {
             value: function getData() {
-                return this.__getData;
+                return this.__data;
             },
             writable: true,
             configurable: true
@@ -58994,6 +59085,26 @@ var State = (function () {
         detailProcess: {
             value: function detailProcess(data) {
                 return false;
+            },
+            writable: true,
+            configurable: true
+        },
+        serialize: {
+            value: function serialize() {
+                var deps = [];
+                for (var _iterator = this.getDependencies()[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                    var dep = _step.value;
+
+                    deps.push({
+                        id: dep.getIdentificator()
+                    });
+                }
+
+                return {
+                    id: this.__identificator,
+                    name: this.getData().name,
+                    dependencies: deps
+                };
             },
             writable: true,
             configurable: true
@@ -59470,6 +59581,7 @@ var StateMachineComponent = React.createClass({
     },
     getInitialState: function getInitialState() {
         StateMachineActions.calibrate(this.props.initialSm);
+        StateMachineActions.setTitle(this.props.detail.Workflow.title);
 
         return this.getState();
     },
@@ -59605,9 +59717,6 @@ var StateMachineComponent = React.createClass({
 
         $(".clickedit").off();
     },
-    componentWillMount: function componentWillMount() {
-        StateMachineActions.setTitle(this.props.detail.Workflow.title);
-    },
     componentDidMount: function componentDidMount() {
         this.__initUI();
     },
@@ -59622,6 +59731,7 @@ var StateMachineComponent = React.createClass({
     },
     saveWorkflow: function saveWorkflow() {
         console.log("SAVED WORKFLOW");
+        if (this.props.save) this.props.save(this.getState());
     },
     deleteState: function deleteState(event) {
         StateMachineActions.deleteState();
@@ -60161,9 +60271,11 @@ var StateMachineStore = Reflux.createStore({
     // Action handlers
     onAddState: function onAddState(type, level) {
         console.log("Add new state of type " + type + " into level " + level);
-        var type = this.__sm.getStateClass(type).Class;
+        var type = this.__sm.getStateClass(type);
 
-        var new_state = this.__sm.stateFactory(level, type);
+        var new_state = this.__sm.stateFactory(level, type.Class, { type: type.id, name: "Unnamed" });
+
+        console.log(new_state);
 
         this.addHistory();
 
@@ -60524,24 +60636,42 @@ var WorkflowStore = Reflux.createStore({
     getWorkflow: function getWorkflow() {
         return this.__detaildata;
     },
-    setPublic: function setPublic(status) {
+    onSetPublic: function onSetPublic(status) {
         this.__detaildata.permissions["public"] = status;
 
         this.trigger(WorkflowStore.DETAIL);
     },
-    setSearchable: function setSearchable(status) {
+    onSetSearchable: function onSetSearchable(status) {
         this.__detaildata.permissions.searchable = status;
 
         this.trigger(WorkflowStore.DETAIL);
     },
-    setForkable: function setForkable(status) {
+    onSetForkable: function onSetForkable(status) {
         this.__detaildata.permissions.forkable = status;
 
         this.trigger(WorkflowStore.DETAIL);
+    },
+
+    onSetWorkflow: function onSetWorkflow(data) {
+        var workflow = this.__detaildata;
+
+        workflow.title = data.title;
+
+        workflow.tasks = [];
+
+        var states = data.sm.getStates();
+
+        for (var _iterator = states[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+            var state = _step.value;
+
+            workflow.tasks.push(state.serialize());
+        }
+
+        WorkflowActions.postDetail(workflow.hash, workflow);
     }
 });
 
-module.exports = { WorkflowStore: WorkflowStore };
+module.exports = WorkflowStore;
 
 },{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js":[function(require,module,exports){
 "use strict";

@@ -18,6 +18,8 @@ from tasks.api import GenericTaskSerializer
 from history.models import History
 from utils.api_related import create_serializer, AliasOrderingFilter
 
+import copy
+
 @api_view(('GET',))
 def root(request, format=None):
     return Response({
@@ -169,6 +171,58 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         return super(WorkflowViewSet, self).list(request, args, kwargs)
 
 
+    def __linkTasks(self, data, workflow):
+        map = {}
+        pstates = []
+        old = copy.deepcopy(data)
+
+        if data.get('tasks', False):
+            for task in data['tasks']:
+                task.pop('dependencies', None)
+
+                t = None
+                if task.get('hash', False):
+                    try:
+                        t = Task.objects.get(hash=task['hash'])
+                    except Task.DoesNotExist:
+                        pass
+
+                if t:
+                    print "updating"
+                    print task
+                    ts = GenericTaskSerializer(t, data=task)
+                else:
+                    print "creating"
+                    task['workflow'] = workflow.id
+                    ts = GenericTaskSerializer(data=task)
+
+                valid = ts.is_valid(raise_exception=True)
+
+                print valid
+
+                if valid:
+                    t = ts.save()
+                else:
+                    print "--ERRORS FOUND ON TASK"
+
+                map[task['sid']] = t.hash
+                pstates.append(t.hash)
+
+            for task in old['tasks']:
+                print task
+                if task.get('dependencies', False):
+                    for dep in task['dependencies']:
+                        dep['dependency'] = map[dep['dependency']]
+
+            deleted_tasks = workflow.tasks().exclude(hash__in=pstates)
+
+            for task in deleted_tasks:
+                task.remove()
+
+
+
+        return old
+
     def create(self, request, *args, **kwargs):
         """
         Insert a new workflow
@@ -185,11 +239,15 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
     def update(self, request, *args, **kwargs):
         """
         Update a existing workflow
-
         """
+
         instance = self.get_object()
 
-        serializer = WorkflowSerializer(instance=instance, data=request.data, partial=True)
+        # create tasks if they dont exist, and replace links... i couldnt think of a better way to do this...
+        # without implicating several connections. or this
+        d = self.__linkTasks(request.data.copy(), instance)
+
+        serializer = WorkflowSerializer(instance=instance, data=d, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 

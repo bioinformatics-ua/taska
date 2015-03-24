@@ -1,3 +1,16 @@
+// Adding csrf middleware token to the correct place...
+function csrfSafeMethod(method) {
+  // these HTTP methods do not require CSRF protection
+  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", Django.csrf_token());
+        }
+    }
+});
+
 class Loader{
     constructor(options) {
     }
@@ -8,6 +21,7 @@ class Loader{
             type: type,
             data: serialized,
             dataType: 'json',
+            contentType: "application/json",
             success: function(data) {
               if(callback)
                 callback(data);
@@ -51,12 +65,16 @@ class DetailLoader extends Loader{
     load(hash){
         return super.load(`api/${this.model}/${hash}/`);
     }
+    put(hash, serialized){
+        // Adding csrf to request
+
+        return super.load(`api/${this.model}/${hash}/`, null, null, "PATCH", JSON.stringify(serialized));
+    }
 }
 
 class Login extends Loader{
   constructor(options){
     this.data = {
-      csrfmiddlewaretoken: Django.csrf_token(),
       username: options.username,
       password: options.password,
       remember: options.remember

@@ -47,6 +47,40 @@ class SimpleTask extends SimpleState {
 
         return super.detailRender(SimpleFields);
     }
+
+    static deserializeOptions(data){
+        if(data.title === undefined)
+            throw `data object is missing 'title' property`;
+
+        if(data.description === undefined)
+            throw `data object is missing 'description' property`;
+
+        return {
+            name: data.title,
+            description: data.description,
+            hash: data.hash,
+            type: data.type
+        };
+    }
+
+    serialize(){
+        let deps = [];
+        for(let dep of this.getDependencies()){
+            deps.push({
+                dependency: dep.getIdentificator()
+            });
+        }
+
+        return {
+            sid: this.__identificator,
+            hash: this.getData().hash,
+            title: this.getData().name,
+            type: this.getData().type,
+            sortid: this.getLevel(),
+            description: this.getData().description || '',
+            dependencies: deps
+        }
+    }
 }
 
 export default SimpleTask;

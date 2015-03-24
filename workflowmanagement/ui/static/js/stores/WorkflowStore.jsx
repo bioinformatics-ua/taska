@@ -30,21 +30,37 @@ const WorkflowStore = Reflux.createStore({
     getWorkflow: function(){
         return this.__detaildata;
     },
-    setPublic(status){
+    onSetPublic(status){
         this.__detaildata.permissions.public = status;
 
         this.trigger(WorkflowStore.DETAIL);
     },
-    setSearchable(status){
+    onSetSearchable(status){
         this.__detaildata.permissions.searchable = status;
 
         this.trigger(WorkflowStore.DETAIL);
     },
-    setForkable(status){
+    onSetForkable(status){
         this.__detaildata.permissions.forkable = status;
 
         this.trigger(WorkflowStore.DETAIL);
+    },
+
+    onSetWorkflow(data){
+        let workflow = this.__detaildata;
+
+        workflow.title = data.title;
+
+        workflow.tasks = [];
+
+        let states = data.sm.getStates();
+
+        for(let state of states){
+            workflow.tasks.push(state.serialize());
+        }
+
+        WorkflowActions.postDetail(workflow.hash, workflow);
     }
 });
 
-export default {WorkflowStore};
+export default WorkflowStore;

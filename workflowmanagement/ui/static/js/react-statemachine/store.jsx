@@ -91,9 +91,11 @@ const StateMachineStore = Reflux.createStore({
     // Action handlers
     onAddState(type, level){
         console.log(`Add new state of type ${type} into level ${level}`);
-        let type = this.__sm.getStateClass(type).Class;
+        let type = this.__sm.getStateClass(type);
 
-        let new_state = this.__sm.stateFactory(level, type);
+        let new_state = this.__sm.stateFactory(level, type.Class, {type: type.id, name: 'Unnamed'});
+
+        console.log(new_state);
 
         this.addHistory();
 

@@ -72,6 +72,14 @@ class DetailStoreMixin{
                     }
                 );
             },
+            onPostDetail(hash, serialized){
+                loader.put(hash, serialized).then(
+                    data => {
+                        this.__Actions.loadDetailSuccess(data);
+                        this.__Actions.postDetail.completed(data);
+                    }
+                );
+            },
             onLoadDetailIfNecessary(hash) {
                 if(this.loaded === hash){
                     this.__Actions.loadDetailIfNecessary.completed(this.__detaildata);

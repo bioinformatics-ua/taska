@@ -44,6 +44,7 @@ const StateMachineComponent = React.createClass({
     },
     getInitialState(){
         StateMachineActions.calibrate(this.props.initialSm);
+        StateMachineActions.setTitle(this.props.detail.Workflow.title);
 
         return this.getState();
     },
@@ -201,9 +202,6 @@ const StateMachineComponent = React.createClass({
 
         $('.clickedit').off();
     },
-    componentWillMount(){
-        StateMachineActions.setTitle(this.props.detail.Workflow.title);
-    },
     componentDidMount(){
         this.__initUI();
     },
@@ -218,6 +216,8 @@ const StateMachineComponent = React.createClass({
     },
     saveWorkflow(){
         console.log('SAVED WORKFLOW');
+        if(this.props.save)
+            this.props.save(this.getState());
     },
     deleteState(event){
         StateMachineActions.deleteState();

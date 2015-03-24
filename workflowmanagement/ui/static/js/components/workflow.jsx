@@ -9,7 +9,7 @@ import {Authentication} from '../mixins/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
-import {WorkflowStore} from '../stores/WorkflowStore.jsx';
+import WorkflowStore from '../stores/WorkflowStore.jsx';
 
 import {StateMachineComponent} from '../react-statemachine/component.jsx';
 
@@ -82,54 +82,60 @@ export default React.createClass({
         if(status == WorkflowStore.DETAIL)
             this.setState(this.__getState());
     },
-    serializeStateMachine(){
+    load(){
+        const wf = this.state.workflow;
         const sm = new StateMachine();
 
         sm.addStateClass({
-            id: 'task.SimpleState',
-            Class: SimpleState
-        })
-        sm.addStateClass({
-            id: 'task.SimpleTask',
+            id: 'tasks.SimpleTask',
             Class: SimpleTask
-        })
+        });
 
-        let state1 = sm.stateFactory(1, SimpleState, {name: 'Fazer a cama'});
-        let state2 = sm.stateFactory(2, SimpleTask, {name: 'Ir à padaria lanchar'});
-        let state3 = sm.stateFactory(2, SimpleTask, {name: 'Ir comprar pão'});
-        let state4 = sm.stateFactory(3, SimpleTask, {name: 'Ir para o trabalho'});
+        // I dont know if they come ordered, so i add all tasks first, an dependencies only after
+        let map = {};
 
-        sm.addState(state1);
-        sm.addState(state2);
-        sm.addState(state3);
-        sm.addState(state4);
+        // first states
+        for(let task of wf.tasks){
+            let type = sm.getStateClass(task.type).Class;
+            let state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
 
-        sm.addDependency(state2, state1);
-        sm.addDependency(state3, state1);
-        sm.addDependency(state4, state2);
-        sm.addDependency(state4, state3);
+            map[task.hash] = state;
+
+            sm.addState(state);
+        }
+
+        // then dependencies
+        for(let task of wf.tasks)
+            for(let dep of task.dependencies)
+                sm.addDependency(map[task.hash], map[dep.dependency]);
 
         return sm;
     },
+    save(data){
+        WorkflowActions.setWorkflow(data);
+    },
     setPublic(e){
-        WorkflowStore.setPublic(e.target.checked);
+        WorkflowActions.setPublic(e.target.checked);
     },
     setSearchable(e){
-        WorkflowStore.setSearchable(e.target.checked);
+        WorkflowActions.setSearchable(e.target.checked);
     },
     setForkable(e){
-        WorkflowStore.setForkable(e.target.checked);
+        WorkflowActions.setForkable(e.target.checked);
     },
     render() {
         return (
             <span>
               <StateMachineComponent
-                extra={
-                    <PermissionsBar setPublic={this.setPublic}
-                        setSearchable={this.setSearchable}
-                        setForkable={this.setForkable}
-                        {...this.state.workflow.permissions} />
-                } initialSm={this.serializeStateMachine()}
+                    extra={
+                        <PermissionsBar setPublic={this.setPublic}
+                            setSearchable={this.setSearchable}
+                            setForkable={this.setForkable}
+                            {...this.state.workflow.permissions} />
+                    }
+                    save={this.save}
+                    initialSm={this.load()
+                }
               editable={true} {...this.props}/>
             </span>
         );

@@ -8,7 +8,11 @@ import {DetailActionsMixin} from '../mixins/actions.jsx';
 
 const WorkflowActions = Reflux.createActions($.extend({
     'loadSuccess': {},
-    'load': {}
+    'load': {},
+    'setWorkflow': {},
+    'setPublic': {},
+    'setSearchable': {},
+    'setForkable': {},
 }, DetailActionsMixin));
 
 

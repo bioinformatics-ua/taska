@@ -48,15 +48,13 @@ class GenericTaskSerializer(serializers.ModelSerializer):
 
         return serializer.create(data)
 
-    def update(self, instance, validated_attrs):
-        print "UPDATING"
-        print instance
-        print validated_attrs
-        print "..."
-        pass
+    def update(self, instance, data):
+        serializer = data.pop('serializer')
+
+        return serializer.update(instance, data)
 
     def to_internal_value(self, data):
-        if(data['type'] != None):
+        if data.get('type', False):
             this_model = apps.get_model(data.pop('type'))
 
             serializer = this_model.init_serializer(partial=True)
@@ -88,7 +86,6 @@ class TaskSerializer(serializers.ModelSerializer):
     def __create_tasks(self, task, dependencies):
         if dependencies != None:
             for dep in dependencies:
-                print dep
                 TaskDependency.objects.create(maintask=task, **dep)
 
     @transaction.atomic
@@ -134,14 +131,14 @@ class TaskSerializer(serializers.ModelSerializer):
         #write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('id', 'removed', 'workflow', 'ttype')
-        extra_kwargs = {'hash': {'required': False}}
+        extra_kwargs = {'hash': {'required': False}, 'description': {'required': False} }
 
 class SimpleTaskSerializer(TaskSerializer):
     class Meta:
         model = SimpleTask
         #exclude = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        read_only_fields = ('workflow',)
+        #fread_only_fields = ('workflow',)
 
 class TaskFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(name="ttype")

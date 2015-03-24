@@ -107,7 +107,7 @@ class State{
         return this.__identificator;
     }
     getData(){
-        return this.__getData;
+        return this.__data;
     }
     getDependencies(){
         return this.__dependencies;
@@ -247,6 +247,30 @@ class State{
     static repr(){
         return 'Task';
     }
+
+    static deserializeOptions(data){
+        if(data.name === undefined)
+            throw `data object must have at least a name property to be possible to deserialize it,
+                    if it does not, a custom deserialize override method should be implemented in a
+                    class that inherits from State or SimpleState`;
+
+        return {name: data.name};
+    }
+
+    serialize(){
+        let deps = [];
+        for(let dep of this.getDependencies()){
+            deps.push({
+                id: dep.getIdentificator()
+            });
+        }
+
+        return {
+            id: this.__identificator,
+            name: this.getData().name,
+            dependencies: deps
+        }
+    }
 }
 
 class SimpleState extends State {
@@ -308,6 +332,7 @@ class StateMachine{
 
         return undefined;
     }
+
     getStateClasses(){
         return this.__stateclasses;
     }
