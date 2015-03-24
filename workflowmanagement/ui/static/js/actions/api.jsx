@@ -91,7 +91,7 @@ class Login extends Loader{
   authenticate(callback, unsuccessful_callback=null){
 
     return super.load('api/account/login/', callback,
-        unsuccessful_callback, "POST", this.data);
+        unsuccessful_callback, "POST", JSON.stringify(this.data));
   }
 
   logout(callback, unsuccessful_callback=null){

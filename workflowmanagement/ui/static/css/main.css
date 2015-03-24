@@ -448,7 +448,7 @@ footer {
 .breadcrumbs > span:first-child::before{
     font-family: fa;
     content: '\f015';
-    color: black;
+    color: rgb(51, 122, 183);
     margin-right: 5px;
 }
 

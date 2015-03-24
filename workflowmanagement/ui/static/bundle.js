@@ -56661,7 +56661,7 @@ var Login = (function (Loader) {
             value: function authenticate(callback) {
                 var unsuccessful_callback = arguments[1] === undefined ? null : arguments[1];
 
-                return _get(Object.getPrototypeOf(Login.prototype), "load", this).call(this, "api/account/login/", callback, unsuccessful_callback, "POST", this.data);
+                return _get(Object.getPrototypeOf(Login.prototype), "load", this).call(this, "api/account/login/", callback, unsuccessful_callback, "POST", JSON.stringify(this.data));
             },
             writable: true,
             configurable: true
@@ -58279,7 +58279,6 @@ module.exports = React.createClass({
                     fulfill({ title: "New study" });
                 });
             }return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(function (workflow) {
-                console.log(workflow);
                 return workflow;
             });
         }

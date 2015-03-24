@@ -67,7 +67,6 @@ export default React.createClass({
 
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (workflow) => {
-                    console.log(workflow);
                     return workflow
                 }
             );

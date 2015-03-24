@@ -106,11 +106,10 @@ class UserViewSet(viewsets.ModelViewSet):
             Login user
         """
         if not request.user.is_authenticated():
-            print request.POST
-            username = request.POST.get('username', None)
-            password = request.POST.get('password', None)
+            username = request.data.get('username', None)
+            password = request.data.get('password', None)
 
-            if request.POST.get('remember', False):
+            if request.data.get('remember', False):
                 request.session.set_expiry(1296000) # if set to remember, keep for 2 weeks
 
 
