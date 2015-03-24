@@ -56613,9 +56613,14 @@ var DetailLoader = (function (Loader) {
         },
         put: {
             value: function put(hash, serialized) {
-                // Adding csrf to request
-
                 return _get(Object.getPrototypeOf(DetailLoader.prototype), "load", this).call(this, "api/" + this.model + "/" + hash + "/", null, null, "PATCH", JSON.stringify(serialized));
+            },
+            writable: true,
+            configurable: true
+        },
+        post: {
+            value: function post(serialized) {
+                return _get(Object.getPrototypeOf(DetailLoader.prototype), "load", this).call(this, "api/" + this.model + "/", null, null, "POST", JSON.stringify(serialized));
             },
             writable: true,
             configurable: true
@@ -58118,15 +58123,16 @@ var WorkflowTable = React.createClass({
       React.createElement(
         "div",
         { className: "panel-heading" },
+        React.createElement("i", { className: "fa fa-cogs pull-left" }),
         React.createElement(
-          "center",
-          null,
-          React.createElement("i", { className: "fa fa-cogs pull-left" }),
-          React.createElement(
-            "h3",
-            { className: "panel-title" },
-            "My Studies"
-          )
+          "h3",
+          { style: { position: "absolute", width: "100%" }, className: "text-center panel-title" },
+          "My Studies"
+        ),
+        React.createElement(
+          Link,
+          { to: "Workflow", params: { object: "add" }, className: "pull-right btn btn-xs btn-success" },
+          React.createElement("i", { className: "fa fa-plus" })
         )
       ),
       React.createElement(Griddle, _extends({}, this.commonTableSettings(), {
@@ -58200,7 +58206,6 @@ var PermissionsBar = React.createClass({
     displayName: "PermissionsBar",
 
     render: function render() {
-        console.log(this.props);
         return React.createElement(
             "div",
             { className: "form-group" },
@@ -58268,7 +58273,13 @@ module.exports = React.createClass({
     mixins: [Router.Navigation, Router.State, Authentication, Reflux.listenTo(WorkflowStore, "update")],
     statics: {
         fetch: function fetch(params) {
-            return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(function (workflow) {
+
+            if (params.object == "add") {
+                return new Promise(function (fulfill, reject) {
+                    fulfill({ title: "New study" });
+                });
+            }return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(function (workflow) {
+                console.log(workflow);
                 return workflow;
             });
         }
@@ -58277,6 +58288,7 @@ module.exports = React.createClass({
         return "Workflow " + route.props.detail.Workflow.title;
     },
     __getState: function __getState() {
+        console.log(WorkflowStore.getWorkflow());
         return {
             workflow: WorkflowStore.getWorkflow()
         };
@@ -58300,27 +58312,30 @@ module.exports = React.createClass({
         var map = {};
 
         // first states
-        for (var _iterator = wf.tasks[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-            var task = _step.value;
+        if (wf.tasks) {
+            for (var _iterator = wf.tasks[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+                var task = _step.value;
 
-            var type = sm.getStateClass(task.type).Class;
-            var state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
+                var type = sm.getStateClass(task.type).Class;
+                var state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
 
-            map[task.hash] = state;
+                map[task.hash] = state;
 
-            sm.addState(state);
-        }
-
-        // then dependencies
-        for (var _iterator2 = wf.tasks[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
-            var task = _step2.value;
-
-            for (var _iterator3 = task.dependencies[Symbol.iterator](), _step3; !(_step3 = _iterator3.next()).done;) {
-                var dep = _step3.value;
-
-                sm.addDependency(map[task.hash], map[dep.dependency]);
+                sm.addState(state);
             }
-        }return sm;
+
+            // then dependencies
+            for (var _iterator2 = wf.tasks[Symbol.iterator](), _step2; !(_step2 = _iterator2.next()).done;) {
+                var task = _step2.value;
+
+                for (var _iterator3 = task.dependencies[Symbol.iterator](), _step3; !(_step3 = _iterator3.next()).done;) {
+                    var dep = _step3.value;
+
+                    sm.addDependency(map[task.hash], map[dep.dependency]);
+                }
+            }
+        }
+        return sm;
     },
     save: function save(data) {
         WorkflowActions.setWorkflow(data);
@@ -58335,6 +58350,7 @@ module.exports = React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     render: function render() {
+        console.log("RENDER");
         return React.createElement(
             "span",
             null,
@@ -58409,7 +58425,9 @@ var DetailActionsMixin = {
     loadDetail: { asyncResult: true },
     loadDetailIfNecessary: { asyncResult: true },
     unloadDetail: {},
-    postDetail: { asyncResult: true }
+    postDetail: { asyncResult: true },
+    addDetail: { asyncResult: true }
+
 };
 
 module.exports = { TableActionsMixin: TableActionsMixin, DetailActionsMixin: DetailActionsMixin };
@@ -58623,6 +58641,14 @@ var DetailStoreMixin = (function () {
                             _this.__Actions.postDetail.completed(data);
                         });
                     },
+                    onAddDetail: function onAddDetail(serialized) {
+                        var _this = this;
+
+                        loader.post(serialized).then(function (data) {
+                            _this.__Actions.loadDetailSuccess(data);
+                            _this.__Actions.addDetail.completed(data);
+                        });
+                    },
                     onLoadDetailIfNecessary: function onLoadDetailIfNecessary(hash) {
                         var _this = this;
 
@@ -58642,7 +58668,6 @@ var DetailStoreMixin = (function () {
                         if (ident != undefined) {
                             this.__loaded = ident;
                         }
-                        this.trigger();
                     },
                     onUnloadDetail: function onUnloadDetail() {
                         this.__detaildata = {};
@@ -58715,7 +58740,7 @@ var State = (function () {
         this.__identificator = options.identificator;
         this.__data = options.data || {};
         this.__dependencies = [];
-        this.__level = options.level;
+        this.__level = Number.parseInt(options.level);
         this.__version = options.version || 0;
         this.__container = options.container;
     }
@@ -60403,6 +60428,7 @@ module.exports = React.createElement(
     React.createElement(Route, { name: "home", path: "/", handler: require("./components/home.jsx") }),
     React.createElement(Route, { name: "about", handler: require("./components/about.jsx") }),
     React.createElement(Route, { name: "Workflow", path: "workflow/:object", handler: require("./components/workflow.jsx") }),
+    React.createElement(Route, { name: "WorkflowAdd", path: "workflow/add", handler: require("./components/workflow.jsx") }),
     React.createElement(Route, { name: "Process", path: "process/:object", handler: require("./components/process.jsx") }),
     React.createElement(Route, { name: "Request", path: "request/:object", handler: require("./components/request.jsx") }),
     React.createElement(Route, { name: "SimpleResult", path: "simpleresult/:object", handler: require("./components/result/simple.jsx") }),
@@ -60634,6 +60660,13 @@ var WorkflowStore = Reflux.createStore({
         }, state);
     },
     getWorkflow: function getWorkflow() {
+        if (!this.__detaildata.permissions) this.__detaildata = {
+            permissions: {
+                "public": true,
+                forkable: true,
+                searchable: true
+            }
+        };
         return this.__detaildata;
     },
     onSetPublic: function onSetPublic(status) {
@@ -60653,6 +60686,8 @@ var WorkflowStore = Reflux.createStore({
     },
 
     onSetWorkflow: function onSetWorkflow(data) {
+        var _this = this;
+
         var workflow = this.__detaildata;
 
         workflow.title = data.title;
@@ -60666,8 +60701,13 @@ var WorkflowStore = Reflux.createStore({
 
             workflow.tasks.push(state.serialize());
         }
-
-        WorkflowActions.postDetail(workflow.hash, workflow);
+        if (workflow.hash) WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(function (workflow) {
+            console.log("loaded after put");
+            _this.trigger();
+        });else WorkflowActions.addDetail.triggerPromise(workflow).then(function (workflow) {
+            console.log("loaded after post");
+            _this.trigger();
+        });
     }
 });
 

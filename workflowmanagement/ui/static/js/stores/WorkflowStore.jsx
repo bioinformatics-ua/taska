@@ -28,6 +28,14 @@ const WorkflowStore = Reflux.createStore({
         }, state);
     },
     getWorkflow: function(){
+        if(!this.__detaildata.permissions)
+            this.__detaildata = {
+                        permissions: {
+                            public: true,
+                            forkable: true,
+                            searchable: true
+                        }
+                    };
         return this.__detaildata;
     },
     onSetPublic(status){
@@ -58,8 +66,20 @@ const WorkflowStore = Reflux.createStore({
         for(let state of states){
             workflow.tasks.push(state.serialize());
         }
-
-        WorkflowActions.postDetail(workflow.hash, workflow);
+        if(workflow.hash)
+            WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
+                    (workflow) => {
+                        console.log('loaded after put');
+                        this.trigger();
+                    }
+            );
+        else
+              WorkflowActions.addDetail.triggerPromise(workflow).then(
+                    (workflow) => {
+                        console.log('loaded after post');
+                        this.trigger();
+                    }
+            );
     }
 });
 

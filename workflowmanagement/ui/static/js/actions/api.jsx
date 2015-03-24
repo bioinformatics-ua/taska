@@ -66,9 +66,10 @@ class DetailLoader extends Loader{
         return super.load(`api/${this.model}/${hash}/`);
     }
     put(hash, serialized){
-        // Adding csrf to request
-
         return super.load(`api/${this.model}/${hash}/`, null, null, "PATCH", JSON.stringify(serialized));
+    }
+    post(serialized){
+        return super.load(`api/${this.model}/`, null, null, "POST", JSON.stringify(serialized));
     }
 }
 

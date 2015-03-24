@@ -21,7 +21,6 @@ import Toggle from 'react-toggle';
 
 const PermissionsBar = React.createClass({
     render(){
-        console.log(this.props);
         return (<div className="form-group">
                   <div className="input-group">
                         <span className="input-group-addon" id="permissions">
@@ -60,8 +59,15 @@ export default React.createClass({
                 Reflux.listenTo(WorkflowStore, 'update')],
     statics: {
         fetch(params) {
+
+            if(params.object == 'add')
+                return new Promise(function (fulfill, reject){
+                    fulfill({title: 'New study'});
+                });
+
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (workflow) => {
+                    console.log(workflow);
                     return workflow
                 }
             );
@@ -71,6 +77,7 @@ export default React.createClass({
         return `Workflow ${route.props.detail.Workflow.title}`;
     },
     __getState(){
+        console.log(WorkflowStore.getWorkflow());
         return {
             ***REMOVED*** WorkflowStore.getWorkflow()
         }
@@ -95,20 +102,21 @@ export default React.createClass({
         let map = {};
 
         // first states
-        for(let task of wf.tasks){
-            let type = sm.getStateClass(task.type).Class;
-            let state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
+        if(wf.tasks){
+            for(let task of wf.tasks){
+                let type = sm.getStateClass(task.type).Class;
+                let state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
 
-            map[task.hash] = state;
+                map[task.hash] = state;
 
-            sm.addState(state);
+                sm.addState(state);
+            }
+
+            // then dependencies
+            for(let task of wf.tasks)
+                for(let dep of task.dependencies)
+                    sm.addDependency(map[task.hash], map[dep.dependency]);
         }
-
-        // then dependencies
-        for(let task of wf.tasks)
-            for(let dep of task.dependencies)
-                sm.addDependency(map[task.hash], map[dep.dependency]);
-
         return sm;
     },
     save(data){
@@ -124,6 +132,7 @@ export default React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     render() {
+        console.log('RENDER');
         return (
             <span>
               <StateMachineComponent

@@ -80,6 +80,14 @@ class DetailStoreMixin{
                     }
                 );
             },
+            onAddDetail(serialized){
+                loader.post(serialized).then(
+                    data => {
+                        this.__Actions.loadDetailSuccess(data);
+                        this.__Actions.addDetail.completed(data);
+                    }
+                );
+            },
             onLoadDetailIfNecessary(hash) {
                 if(this.loaded === hash){
                     this.__Actions.loadDetailIfNecessary.completed(this.__detaildata);
@@ -99,7 +107,6 @@ class DetailStoreMixin{
                 if(ident != undefined){
                     this.__loaded = ident;
                 }
-                this.trigger();
             },
             onUnloadDetail(){
                 this.__detaildata = {};

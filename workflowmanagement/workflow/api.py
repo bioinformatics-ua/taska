@@ -198,8 +198,6 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
                 valid = ts.is_valid(raise_exception=True)
 
-                print valid
-
                 if valid:
                     t = ts.save()
                 else:
@@ -209,10 +207,11 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
                 pstates.append(t.hash)
 
             for task in old['tasks']:
-                print task
+                task['hash'] = map[task['sid']];
                 if task.get('dependencies', False):
                     for dep in task['dependencies']:
                         dep['dependency'] = map[dep['dependency']]
+
 
             deleted_tasks = workflow.tasks().exclude(hash__in=pstates)
 
@@ -230,7 +229,23 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         """
         request.data[u'owner'] = request.user.id
 
+        d = copy.deepcopy(request.data)
+
+        request.data.pop('tasks')
+        # first round without tasks, to get reference to workflow instance
         serializer, headers = create_serializer(self, request)
+
+        # create tasks...
+        wf = serializer.save()
+
+        d = self.__linkTasks(d, wf)
+
+        print d
+
+        serializer = WorkflowSerializer(instance=wf, data=d, partial=True)
+        serializer.is_valid(raise_exception=True)
+        # add tasks dependencies
+        serializer.save()
 
         History.new(event=History.ADD, actor=request.user, object=serializer.instance)
 

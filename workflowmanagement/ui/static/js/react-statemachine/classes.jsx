@@ -18,7 +18,7 @@ class State{
         this.__identificator = options.identificator;
         this.__data = options.data || {};
         this.__dependencies = [];
-        this.__level = options.level;
+        this.__level = Number.parseInt(options.level);
         this.__version = options.version || 0;
         this.__container = options.container;
     }

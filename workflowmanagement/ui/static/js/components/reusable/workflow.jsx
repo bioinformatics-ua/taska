@@ -66,7 +66,9 @@ const WorkflowTable = React.createClass({
     ];
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Studies</h3></center>
+                <i className="fa fa-cogs pull-left"></i>
+                <h3 style={{position: 'absolute', width: '100%'}} className="text-center panel-title">My Studies</h3>
+                <Link to="Workflow" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
                   {...this.commonTableSettings()}

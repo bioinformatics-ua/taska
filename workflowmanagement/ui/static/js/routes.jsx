@@ -16,6 +16,8 @@ module.exports = (
 
         <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} />
 
+        <Route name="WorkflowAdd" path="workflow/add" handler={require('./components/workflow.jsx')} />
+
         <Route name="Process" path="process/:object" handler={require('./components/process.jsx')} />
 
         <Route name="Request" path="request/:object" handler={require('./components/request.jsx')} />

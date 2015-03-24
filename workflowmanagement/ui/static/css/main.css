@@ -445,6 +445,13 @@ footer {
     line-height: 0;
 }
 
+.breadcrumbs > span:first-child::before{
+    font-family: fa;
+    content: '\f015';
+    color: black;
+    margin-right: 5px;
+}
+
 .state_line:hover{
   border-color: rgba(51, 122, 183, 0.61);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 122, 0, 1);
