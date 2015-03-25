@@ -1,0 +1,16 @@
+/* font awesome import */
+@import url("font-awesome/css/font-awesome.min.css");
+
+@font-face {
+    font-family: opensans;
+    src: url("fonts/OpenSans-Regular.ttf");
+}
+@font-face {
+    font-family: opensansbold;
+    src: url("fonts/OpenSans-Bold.ttf");
+}
+
+@font-face {
+    font-family: fa;
+    src: url("font-awesome/fonts/FontAwesome.otf");
+}

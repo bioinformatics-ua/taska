@@ -44,6 +44,7 @@ module.exports = function (b, opts) {
         if (queue.length === 0) return;
         queueing = true;
         var q = queue.shift();
+
         q.pipe(output, { end: false });
         q.once('end', function () {
             queueing = false;

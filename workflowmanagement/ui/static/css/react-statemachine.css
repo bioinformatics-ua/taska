@@ -1,0 +1,172 @@
+.task-type .task-type-icon{
+  vertical-align: middle;
+}
+
+.task-type-title {
+    height: 34px;
+}
+
+#state_machine_chart{
+    min-height: 300px;
+}
+.state{
+    margin:5px 15px;
+    display: inline-block;
+}
+.state-container{
+
+}
+.state-handler{
+    z-index: 1000;
+    position: relative;
+}
+ .state-start{
+    color: black;
+    display: inline-block;
+    margin:20px;
+ }
+.state-level{
+    background: none;
+    border: 0;
+    box-shadow: none;
+}
+
+.btn-dotted{
+    border: 4px dotted #C7C7C7;
+    background-color: white;
+    min-width: 100px;
+}
+.state-options, .line-options{
+    display: none;
+
+}
+
+.state-options > .destroy-state{
+    position:absolute;
+    z-index: 3000;
+    margin-right:-25px;
+    top:0;
+    right:0;
+}
+
+.state-options > .connect-state{
+    position:absolute;
+    bottom:-20px;
+    right: 0;
+    width: 16px;
+    margin-left: -8px;
+    left: 50%;
+}
+
+.state-selected > .state-options, .state_line_selected > .line-options{
+    display: block;
+}
+
+.state-handler-selected, .state_line_selected{
+  border-color: rgba(51, 122, 183, 0.61);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
+  outline: 0 none;
+}
+
+.line-options{
+    position: absolute;
+    z-index:1001;
+    margin-left: 20px;
+    margin-top: -8px;
+}
+
+.initial_state {
+    display: block;
+}
+.state {
+    position: relative;
+}
+.new-state{
+    z-index:1000;
+}
+
+.connect-state{
+}
+
+.state_line{
+    font-family: fa;
+}
+.state_line::after{
+    color: black;
+    content: '\f060';
+    font-size: 20px;
+    margin-left: -4px;
+    position: absolute;
+    top: 2px;
+    line-height: 0;
+}
+
+.state_line:hover{
+  border-color: rgba(51, 122, 183, 0.61);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 122, 0, 1);
+
+  outline: 0 none;
+  z-index:999;
+}
+
+.level-separator{
+    height: 5px;
+    position: absolute;
+    width: 100%;
+    margin-top: -20px;
+    background-color: rgb(199, 199, 199);
+}
+.level-separator:hover{
+    background-color: rgb(199, 199, 199);
+}
+.level-label{
+    position: absolute;
+    right:0;
+    margin-top: -15px;
+    color: rgb(199, 199, 199);
+    cursor: pointer;
+}
+.level-separator-container{
+    opacity: 0.2;
+    position:relative;
+}
+
+.level-separator-container:hover{
+    opacity: 1;
+}
+.taskaddgroup ul{
+    z-index: 3000;
+}
+
+.clickedit{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 1001;
+}
+
+.savestate{
+    position: absolute;
+    right: 20px;
+    z-index: 1010;
+}
+
+.state-dep-label {
+    margin-right: 10px;
+}
+
+.point{
+    cursor: pointer;
+}
+
+.selectBox{
+    margin-right: 10px;
+    margin-top: -2px;
+    display: inline-block;
+}
+
+.selectLabel{
+    vertical-align: super;
+}
