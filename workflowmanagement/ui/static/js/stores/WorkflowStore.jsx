@@ -29,15 +29,16 @@ const WorkflowStore = Reflux.createStore({
             WorkflowActions.loadSuccess(data);
         }, state);
     },
-    getWorkflow: function(){
-        if(!this.__detaildata.permissions)
-            this.__detaildata = {
+    resetDetail: function(){
+        this.__detaildata = {
                         permissions: {
                             public: true,
                             forkable: true,
                             searchable: true
                         }
                     };
+    },
+    getWorkflow: function(){
         return this.__detaildata;
     },
     onSetPublic(status){

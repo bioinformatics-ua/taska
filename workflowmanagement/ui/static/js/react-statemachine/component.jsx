@@ -75,7 +75,7 @@ const StateMachineComponent = React.createClass({
         } else if(
             e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
         ){
-            console.log('SAVE ME PLEASE I BEG YOU!!!');
+
         }
 
     },

@@ -60,11 +60,13 @@ export default React.createClass({
     statics: {
         fetch(params) {
 
-            if(params.object == 'add')
+            if(params.object == 'add'){
+
                 return new Promise(function (fulfill, reject){
+                    WorkflowStore.resetDetail();
                     fulfill({title: 'New study'});
                 });
-
+            }
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (workflow) => {
                     return workflow
@@ -84,13 +86,15 @@ export default React.createClass({
         return this.__getState();
     },
     update(status){
-        if(status == WorkflowStore.DETAIL)
+        if(status == WorkflowStore.DETAIL){
+            console.log('update');
             this.setState(this.__getState());
+        }
     },
     load(){
         const wf = this.state.workflow;
         const sm = new StateMachine();
-
+        console.log(wf);
         sm.addStateClass({
             id: 'tasks.SimpleTask',
             Class: SimpleTask
@@ -115,6 +119,7 @@ export default React.createClass({
                 for(let dep of task.dependencies)
                     sm.addDependency(map[task.hash], map[dep.dependency]);
         }
+
         return sm;
     },
     save(data){

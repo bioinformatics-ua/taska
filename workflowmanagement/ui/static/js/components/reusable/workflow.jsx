@@ -10,6 +10,7 @@ import Griddle from 'griddle-react';
 
 import {Loading} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
+import Popup from 'react-popup';
 
 const WorkflowManage = React.createClass({
   render: function(){
@@ -18,8 +19,7 @@ const WorkflowManage = React.createClass({
     return <div className="btn-group" role="group" aria-label="...">
             <Link className="btn btn-primary" to="Workflow" params={object}><i className="fa fa-play"></i></Link>
             <Link className="btn btn-warning" to="Workflow" params={object}><i className="fa fa-pencil"></i></Link>
-            <Link className="btn btn-danger" to="Workflow" params={object}><i className="fa fa-times"></i>
-</Link>
+            <button className="btn btn-danger" onClick={Popup.alert('teste :)')}><i className="fa fa-times"></i></button>
            </div>;
   }
 });
@@ -33,6 +33,7 @@ const WorkflowLink = React.createClass({
            </small>;
   }
 });
+
 
 const WorkflowTable = React.createClass({
     tableAction: WorkflowActions.load,

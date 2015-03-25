@@ -33,8 +33,10 @@
   },
   "scripts": {
     "start": "npm run watchjs & npm run watchcss",
-    "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] -p [ minifyify --map bundle.map.json --output workflowmanagement/ui/static/bundle.map.json] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
-    "watchcss": "catw -c 'uglifycss $FILE' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
+    "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
+    "prodjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] -p [ minifyify --map bundle.map.json --output workflowmanagement/ui/static/bundle.map.json] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
+    "watchcss": "catw -c 'uglifycss' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
+    "uglifycss": "uglifycss ./workflowmanagement/ui/static/bundle.min.css ./workflowmanagement/ui/static/bundle.min.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
