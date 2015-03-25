@@ -13,15 +13,36 @@ import UserStore from '../stores/UserStore.jsx';
 import StateActions from '../actions/StateActions.jsx';
 import StateStore from '../stores/StateStore.jsx';
 
+const LoadingBar = React.createClass({
+    mixins: [Reflux.listenTo(StateStore, 'update'),
+    Reflux.listenTo(StateStore, 'update')    ],
+    __getState(){
+      return {
+        loading: StateStore.isLoading(),
+      }
+    },
+    getInitialState() {
+      return this.__getState();
+    },
+    update(status){
+      this.setState(this.__getState());
+    },
+    render(){
+      return (
+        <span>
+        {(this.state.loading)?<div className="loading"><i className="fa fa-2x fa-cog fa-spin"></i></div>:''}
+        </span>
+      );
+    }
+  });
+
 export default React.createClass({
   displayName: "Home",
-    mixins: [Reflux.listenTo(UserStore, 'update'),
-    Reflux.listenTo(StateStore, 'update')    ],
+    mixins: [Reflux.listenTo(UserStore, 'update')],
     __getState: function(){
       return {
         user: UserStore.getDetail(),
-        failed: UserStore.getDetailFailed(),
-        loading: StateStore.isLoading(),
+        failed: UserStore.getDetailFailed()
       }
     },
     getInitialState: function() {
@@ -61,7 +82,7 @@ export default React.createClass({
         </header>
         <div className="container">
           <Breadcrumbs separator='' {...this.props} />
-          {this.state.loading ?<i className="fa fa-4x fa-cog fa-spin"></i>:''}
+          <LoadingBar />
             <RouteHandler key={name} {...this.props} />
         </div>
         <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>

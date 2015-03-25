@@ -56768,14 +56768,41 @@ var StateActions = _interopRequire(require("../actions/StateActions.jsx"));
 
 var StateStore = _interopRequire(require("../stores/StateStore.jsx"));
 
+var LoadingBar = React.createClass({
+  displayName: "LoadingBar",
+
+  mixins: [Reflux.listenTo(StateStore, "update"), Reflux.listenTo(StateStore, "update")],
+  __getState: function __getState() {
+    return {
+      loading: StateStore.isLoading() };
+  },
+  getInitialState: function getInitialState() {
+    return this.__getState();
+  },
+  update: function update(status) {
+    this.setState(this.__getState());
+  },
+  render: function render() {
+    return React.createElement(
+      "span",
+      null,
+      this.state.loading ? React.createElement(
+        "div",
+        { className: "loading" },
+        React.createElement("i", { className: "fa fa-2x fa-cog fa-spin" })
+      ) : ""
+    );
+  }
+});
+
 module.exports = React.createClass({
   displayName: "Home",
-  mixins: [Reflux.listenTo(UserStore, "update"), Reflux.listenTo(StateStore, "update")],
+  mixins: [Reflux.listenTo(UserStore, "update")],
   __getState: function __getState() {
     return {
       user: UserStore.getDetail(),
-      failed: UserStore.getDetailFailed(),
-      loading: StateStore.isLoading() };
+      failed: UserStore.getDetailFailed()
+    };
   },
   getInitialState: function getInitialState() {
     return this.__getState();
@@ -56842,7 +56869,7 @@ module.exports = React.createClass({
         "div",
         { className: "container" },
         React.createElement(Breadcrumbs, _extends({ separator: "" }, this.props)),
-        this.state.loading ? React.createElement("i", { className: "fa fa-4x fa-cog fa-spin" }) : "",
+        React.createElement(LoadingBar, null),
         React.createElement(RouteHandler, _extends({ key: name }, this.props))
       ),
       React.createElement(
@@ -58287,7 +58314,6 @@ module.exports = React.createClass({
         return "Workflow " + route.props.detail.Workflow.title;
     },
     __getState: function __getState() {
-        console.log(WorkflowStore.getWorkflow());
         return {
             workflow: WorkflowStore.getWorkflow()
         };
@@ -58349,7 +58375,6 @@ module.exports = React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     render: function render() {
-        console.log("RENDER");
         return React.createElement(
             "span",
             null,
@@ -58390,6 +58415,8 @@ var touchpunch = _interopRequire(require("jquery-ui-touch-punch"));
 
 var Login = require("./actions/api.jsx").Login;
 
+var StateActions = _interopRequire(require("./actions/StateActions.jsx"));
+
 var content = document.getElementById("playground");
 
 // For each route, if the route specifies a fetch function, treat it as an async-data needy route
@@ -58409,12 +58436,14 @@ function fetch(routes, params) {
 }
 
 Router.run(routes, Router.HistoryLocation, function (Handler, state) {
+    StateActions.loadingStart();
     fetch(state.routes, state.params).then(function (detail) {
         React.render(React.createElement(Handler, { detail: detail }), content);
+        StateActions.loadingEnd();
     });
 });
 
-},{"./actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","babelify/polyfill":"/home/ribeiro/git/workflow-management/node_modules/babelify/polyfill.js","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","jquery-ui":"/home/ribeiro/git/workflow-management/node_modules/jquery-ui/jquery-ui.js","jquery-ui-touch-punch":"/home/ribeiro/git/workflow-management/node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/actions.jsx":[function(require,module,exports){
+},{"./actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","./actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","./routes.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/routes.jsx","babelify/polyfill":"/home/ribeiro/git/workflow-management/node_modules/babelify/polyfill.js","bootstrap":"/home/ribeiro/git/workflow-management/node_modules/bootstrap/dist/js/npm.js","jquery":"/home/ribeiro/git/workflow-management/node_modules/jquery/dist/jquery.js","jquery-ui":"/home/ribeiro/git/workflow-management/node_modules/jquery-ui/jquery-ui.js","jquery-ui-touch-punch":"/home/ribeiro/git/workflow-management/node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.js","react":"/home/ribeiro/git/workflow-management/node_modules/react/react.js","react-router":"/home/ribeiro/git/workflow-management/node_modules/react-router/lib/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/actions.jsx":[function(require,module,exports){
 "use strict";
 
 var TableActionsMixin = [];
@@ -60540,12 +60569,10 @@ module.exports = Reflux.createStore({
 
     // Action handlers
     onLoadingStart: function onLoadingStart() {
-        console.log("loading");
         this.__loading = true;
         this.trigger();
     },
     onLoadingEnd: function onLoadingEnd() {
-        console.log("finished loading");
         this.__loading = false;
         this.trigger();
     }
@@ -60644,6 +60671,8 @@ var DetailLoader = _actionsApiJsx.DetailLoader;
 
 var loader = new ListLoader({ model: "workflow" });
 
+var StateActions = _interopRequire(require("../actions/StateActions.jsx"));
+
 var WorkflowStore = Reflux.createStore({
     statics: {
         DETAIL: 0,
@@ -60700,11 +60729,12 @@ var WorkflowStore = Reflux.createStore({
 
             workflow.tasks.push(state.serialize());
         }
+        StateActions.loadingStart();
         if (workflow.hash) WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(function (workflow) {
-            console.log("loaded after put");
+            StateActions.loadingEnd();
             _this.trigger();
         });else WorkflowActions.addDetail.triggerPromise(workflow).then(function (workflow) {
-            console.log("loaded after post");
+            StateActions.loadingEnd();
             _this.trigger();
         });
     }
@@ -60712,7 +60742,7 @@ var WorkflowStore = Reflux.createStore({
 
 module.exports = WorkflowStore;
 
-},{"../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js":[function(require,module,exports){
+},{"../actions/StateActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/StateActions.jsx","../actions/WorkflowActions.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/WorkflowActions.jsx","../actions/api.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/actions/api.jsx","../mixins/store.jsx":"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/mixins/store.jsx","reflux":"/home/ribeiro/git/workflow-management/node_modules/reflux/index.js"}],"/home/ribeiro/git/workflow-management/workflowmanagement/ui/static/js/vendor/jquery.domline.js":[function(require,module,exports){
 "use strict";
 
 /*!

@@ -76,7 +76,6 @@ export default React.createClass({
         return `Workflow ${route.props.detail.Workflow.title}`;
     },
     __getState(){
-        console.log(WorkflowStore.getWorkflow());
         return {
             ***REMOVED*** WorkflowStore.getWorkflow()
         }
@@ -131,10 +130,9 @@ export default React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     render() {
-        console.log('RENDER');
         return (
             <span>
-              <StateMachineComponent
+                <StateMachineComponent
                     extra={
                         <PermissionsBar setPublic={this.setPublic}
                             setSearchable={this.setSearchable}

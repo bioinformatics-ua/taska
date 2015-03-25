@@ -7,6 +7,8 @@ import {ListLoader, DetailLoader} from '../actions/api.jsx'
 
 let loader = new ListLoader({model: 'workflow'});
 
+import StateActions from '../actions/StateActions.jsx';
+
 const WorkflowStore = Reflux.createStore({
     statics: {
         DETAIL: 0,
@@ -66,17 +68,18 @@ const WorkflowStore = Reflux.createStore({
         for(let state of states){
             workflow.tasks.push(state.serialize());
         }
+        StateActions.loadingStart();
         if(workflow.hash)
             WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
                     (workflow) => {
-                        console.log('loaded after put');
+                        StateActions.loadingEnd();
                         this.trigger();
                     }
             );
         else
               WorkflowActions.addDetail.triggerPromise(workflow).then(
                     (workflow) => {
-                        console.log('loaded after post');
+                        StateActions.loadingEnd();
                         this.trigger();
                     }
             );

@@ -45,7 +45,15 @@ footer {
     text-align: center;
     background-color: #f8f8f8;
 }
-
+.container {
+    position: relative;
+}
+.loading{
+    z-index: 3000;
+    position: absolute;
+    right: 20px;
+    top: 4px;
+}
 .breadcrumbs {
     padding: 8px 15px;
     margin-bottom: 20px;
@@ -526,3 +534,5 @@ footer {
 .selectLabel{
     vertical-align: super;
 }
+
+

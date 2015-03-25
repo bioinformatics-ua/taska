@@ -15,6 +15,8 @@ import touchpunch from 'jquery-ui-touch-punch';
 
 import {Login} from './actions/api.jsx';
 
+import StateActions from './actions/StateActions.jsx';
+
 const content = document.getElementById('playground');
 
 
@@ -35,8 +37,10 @@ function fetch(routes, params) {
 }
 
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
+    StateActions.loadingStart();
     fetch(state.routes, state.params).then((detail) => {
         React.render(<Handler detail={detail} />, content);
+        StateActions.loadingEnd();
     });
 });
 

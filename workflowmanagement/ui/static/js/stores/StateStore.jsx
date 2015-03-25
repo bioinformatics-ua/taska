@@ -14,12 +14,10 @@ export default Reflux.createStore({
 
     // Action handlers
     onLoadingStart: function(){
-        console.log('loading');
         this.__loading = true;
         this.trigger();
     },
     onLoadingEnd: function(){
-        console.log('finished loading');
         this.__loading = false;
         this.trigger();
     }
