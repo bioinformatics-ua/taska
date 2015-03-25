@@ -8,18 +8,52 @@ import WorkflowStore from '../../stores/WorkflowStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading} from './component.jsx'
-import {TableComponentMixin} from '../../mixins/component.jsx';
-import Popup from 'react-popup';
+import {Loading, Modal} from './component.jsx'
+import {TableComponentMixin, LayeredComponentMixin} from '../../mixins/component.jsx';
+
+var ButtonWithDialog = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    render: function() {
+        return <button className="btn btn-danger" onClick={this.handleClick}><i className="fa fa-times"></i></button>;
+    },
+    renderLayer: function() {
+        if (this.state.clicked) {
+            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        } else {
+            return <span />;
+        }
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
 
 const WorkflowManage = React.createClass({
+  delete(row){
+    console.log('DELETE '+row.hash)
+  },
   render: function(){
     const row = this.props.rowData;
     const object = {object: row.hash}
     return <div className="btn-group" role="group" aria-label="...">
             <Link className="btn btn-primary" to="Workflow" params={object}><i className="fa fa-play"></i></Link>
             <Link className="btn btn-warning" to="Workflow" params={object}><i className="fa fa-pencil"></i></Link>
-            <button className="btn btn-danger" onClick={Popup.alert('teste :)')}><i className="fa fa-times"></i></button>
+            <ButtonWithDialog
+              success={this.delete}
+              identificator = {row}
+              title={`Delete '${row.title}'`}
+              message={`Are you sure you want to delete  '${row.title} ?'`}  />
            </div>;
   }
 });
