@@ -9,7 +9,7 @@ export default React.createClass({
     displayName: route => {
         return `Request ${route.getParams().object}`;
     },
-    mixins: [ Router.Navigation, Router.State, Authentication],
+    mixins: [ Router.Navigation, Authentication],
       render() {
         return (
           <div>

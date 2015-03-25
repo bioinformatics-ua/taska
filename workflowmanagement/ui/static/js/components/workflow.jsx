@@ -54,7 +54,7 @@ const PermissionsBar = React.createClass({
 });
 
 export default React.createClass({
-    mixins: [   Router.Navigation, Router.State,
+    mixins: [   Router.Navigation,
                 Authentication,
                 Reflux.listenTo(WorkflowStore, 'update')],
     statics: {

@@ -6,15 +6,14 @@
   "dependencies": {
     "jquery": "~2.1.3",
     "bootstrap": "~3.3.2",
-    "react": "~0.12.2",
-    "react-bootstrap": "~0.14.0",
-    "react-router": "~0.12.2",
+    "react": "~0.13.1",
+    "react-router": "~0.13.2",
     "envify": "~3.2.0",
     "reflux": "~0.2.5",
     "font-awesome": "~4.3.0",
-    "react-breadcrumbs": "~0.2.9",
+    "react-breadcrumbs": "~0.13.0",
     "underscore": "~1.8.2",
-    "griddle-react": "~0.2.4",
+    "griddle-react": "~ 0.2.11",
     "events": "~1.0.2",
     "jquery-ui": "~1.10.5",
     "jquery-ui-touch-punch": "~0.2.3",
@@ -24,9 +23,10 @@
   },
   "style": "./workflowmanagement/ui/css/main.css",
   "devDependencies": {
-    "watchify": "~2.3.0",
     "babelify": "~5.0.3",
-    "duplexer": "~0.1.1"
+    "duplexer": "~0.1.1",
+    "glob": "^5.0.3",
+    "watchify": "~2.3.0"
   },
   "scripts": {
     "start": "watchify -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js -w",

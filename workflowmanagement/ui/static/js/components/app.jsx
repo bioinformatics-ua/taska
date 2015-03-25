@@ -3,7 +3,7 @@
 import Reflux from 'reflux';
 
 import React from 'react';
-import {RouteHandler, Link, State} from 'react-router';
+import {RouteHandler, Link} from 'react-router';
 import Breadcrumbs from 'react-breadcrumbs';
 import {Tab, UserDropdown} from './reusable/navigation.jsx';
 

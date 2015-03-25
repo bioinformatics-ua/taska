@@ -2,7 +2,7 @@
 
 import Reflux from 'reflux';
 import React from 'react';
-import {RouteHandler, Link, State} from 'react-router';
+import {RouteHandler, Link} from 'react-router';
 import Router from 'react-router';
 
 import UserActions from '../actions/UserActions.jsx';
@@ -12,7 +12,7 @@ import {CheckLog} from '../mixins/component.jsx';
 
 export default React.createClass({
     displayName: "Login",
-    mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State, CheckLog],
+    mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, CheckLog],
     __getState: function(){
       return {
         failed: UserStore.loginFailed()

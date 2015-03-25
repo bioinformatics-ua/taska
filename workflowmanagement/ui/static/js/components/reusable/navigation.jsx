@@ -1,17 +1,17 @@
 'use strict';
 import Reflux from 'reflux';
 import React from 'react';
-import {RouteHandler, Link, State} from 'react-router';
+import {RouteHandler, Link} from 'react-router';
 import Router from 'react-router';
 import UserActions from '../../actions/UserActions.jsx';
 import UserStore from '../../stores/UserStore.jsx';
 
 var Tab = React.createClass({
-
-  mixins: [ State ],
-
-  render: function () {
-    var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+  render() {
+    var isActive = this.context.router.isActive(this.props.to, this.props.params, this.props.query);
     var className = isActive ? 'active' : '';
     var link = (
       <Link {...this.props} />
@@ -22,7 +22,7 @@ var Tab = React.createClass({
 });
 
 var UserDropdown = React.createClass({
-      mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, State],
+      mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation],
     __getState: function(){
       return {
         user: UserStore.getDetail()
