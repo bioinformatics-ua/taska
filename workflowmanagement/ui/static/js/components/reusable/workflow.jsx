@@ -41,14 +41,17 @@ var ButtonWithDialog = React.createClass({
 
 const WorkflowManage = React.createClass({
   delete(row){
-    console.log('DELETE '+row.hash)
+    WorkflowActions.deleteWorkflow(row.hash);
   },
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.hash}
+    const object = {object: row.hash, mode: 'edit'};
+    const object2 = {object: row.hash, mode: 'run'};
     return <div className="btn-group" role="group" aria-label="...">
-            <Link className="btn btn-primary" to="Workflow" params={object}><i className="fa fa-play"></i></Link>
-            <Link className="btn btn-warning" to="Workflow" params={object}><i className="fa fa-pencil"></i></Link>
+            <Link className="btn btn-primary" to="WorkflowEdit"
+              params={object2}><i className="fa fa-play"></i></Link>
+            <Link className="btn btn-warning" to="WorkflowEdit"
+            params={object}><i className="fa fa-pencil"></i></Link>
             <ButtonWithDialog
               success={this.delete}
               identificator = {row}

@@ -19,6 +19,12 @@
 .state-handler{
     z-index: 1000;
     position: relative;
+    max-width:180px;
+}
+.state-handler label{
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
  .state-start{
     color: black;

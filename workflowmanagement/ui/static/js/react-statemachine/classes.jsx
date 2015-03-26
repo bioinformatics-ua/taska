@@ -133,7 +133,7 @@ class State{
         this.__data = $.extend(this.__data, field_dict);
     }
 
-    detailRender(ChildComponent=dummy){
+    detailRender(editable=true, ChildComponent=dummy){
         var self = this;
 
         const DetailState = React.createClass({
@@ -166,8 +166,11 @@ class State{
                     return <span key={dependency.getIdentificator()}
                     className="state-dep-label label label-default">
                         {dependency.label()}
-                        &nbsp;&nbsp;<i data-id={dependency.getIdentificator()}
+                        &nbsp;&nbsp;
+                        {editable?
+                        <i data-id={dependency.getIdentificator()}
                         onClick={this.deleteConnection} className="fa fa-times"></i>
+                        :''}
                         </span>
                 });
 
@@ -178,29 +181,29 @@ class State{
                     if(__getArrayPos(self.getDependencies(), state) === -1)
                         possible_newdeps.push(state);
                 }
+                if(editable){
+                    const possibledropdown = possible_newdeps.map(
+                            (state) => {
+                                return <li key={state.getIdentificator()}>
+                                    <a className="point" data-id={state.getIdentificator()} onClick={this.addDependency}>{state.label()}</a>
+                                    </li>;
+                            }
+                    );
 
-                const possibledropdown = possible_newdeps.map(
-                        (state) => {
-                            return <li key={state.getIdentificator()}>
-                                <a className="point" data-id={state.getIdentificator()} onClick={this.addDependency}>{state.label()}</a>
-                                </li>;
-                        }
-                );
+                    if(possibledropdown.length > 0)
+                        dependencies.push(
+                                <div className="btn-group dropup">
+                                  <span type="button" className="point label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    Add dependency <span className="caret"></span>
+                                    <span className="sr-only">Toggle Dropdown</span>
+                                  </span>
 
-                if(possibledropdown.length > 0)
-                    dependencies.push(
-                            <div className="btn-group dropup">
-                              <span type="button" className="point label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                Add dependency <span className="caret"></span>
-                                <span className="sr-only">Toggle Dropdown</span>
-                              </span>
-
-                              <ul className="dropdown-menu dropdown-menu-right" role="menu">
-                                {possibledropdown}
-                              </ul>
-                            </div>
-                        );
-
+                                  <ul className="dropdown-menu dropdown-menu-right" role="menu">
+                                    {possibledropdown}
+                                  </ul>
+                                </div>
+                            );
+                }
                 return (
                 <span>
                     <div className="form-group">
@@ -211,10 +214,9 @@ class State{
                             <input type="title" className="form-control"
                                             aria-describedby="state-title"
                                             placeholder="Enter the state name"
-                                            onChange={this.setTitle} value={this.state.name} />
+                                            onChange={this.setTitle} value={this.state.name} disabled={!editable} />
                         </div>
                     </div>
-                    <ChildComponent main={this} />
                     <div className="form-group">
                         <div className="input-group">
                             <span className="input-group-addon" id="state-dependencies">
@@ -226,8 +228,11 @@ class State{
                             </div>
                         </div>
                     </div>
+                    <ChildComponent main={this} />
                     <div className="clearfix">
+                    {editable?
                     <button onClick={this.save} className="pull-right btn btn-primary">Save Details</button>
+                    :''}
                     </div>
                 </span>
                 );
@@ -403,11 +408,11 @@ class StateMachine{
         return false;
     }
 
-    detailRender(identificator){
+    detailRender(identificator, editable){
         let i = __getArrayPos(this.__states, identificator);
 
         if(i != -1)
-            return this.__states[i].detailRender();
+            return this.__states[i].detailRender(editable);
 
         return undefined;
     }

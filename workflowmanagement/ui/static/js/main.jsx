@@ -25,6 +25,7 @@ function fetch(routes, params) {
     return Promise.all(routes
         .filter(route => route.handler.fetch)
         .map(route => {
+
             return route.handler.fetch(params).then(d => {data[route.name] = d;});
         })
     ).then(() => data)
@@ -38,6 +39,7 @@ function fetch(routes, params) {
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
     StateActions.loadingStart();
     fetch(state.routes, state.params).then((detail) => {
+
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
     });

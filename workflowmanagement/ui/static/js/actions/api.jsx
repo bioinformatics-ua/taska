@@ -71,6 +71,9 @@ class DetailLoader extends Loader{
     post(serialized){
         return super.load(`api/${this.model}/`, null, null, "POST", JSON.stringify(serialized));
     }
+    delete(hash){
+        return super.load(`api/${this.model}/${hash}/`, null, null, "DELETE");
+    }
 }
 
 class Login extends Loader{

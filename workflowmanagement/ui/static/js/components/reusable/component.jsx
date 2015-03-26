@@ -1,5 +1,6 @@
 'use strict';
 
+import Router from 'react-router';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
@@ -47,4 +48,19 @@ const Modal = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken}
+const Label = React.createClass({
+            mixins: [Router.Navigation],
+            contextTypes: {
+                router: React.PropTypes.func.isRequired
+            },
+            displayName: route => {
+                let params = route.context.router.getCurrentParams();
+                let label = params.mode || 'Label';
+                return params.mode[0].toUpperCase() + params.mode.slice(1);;
+            },
+            render(){
+                return <span>a</span>;
+            }
+    });
+
+export {Loading, Modal, DjangoCSRFToken, Label}

@@ -7,6 +7,7 @@ const TableStoreMixin = {
         this.__count = 0;
         this.__sortcolumn = null;
         this.__sortascending = true;
+        this.__current={};
     },
     onLoadSuccess: function (data) {
         if(this.merge)
@@ -23,6 +24,8 @@ const TableStoreMixin = {
         this.__page = state.currentPage;
         this.__sortcolumn = state.externalSortColumn;
         this.__sortascending = state.externalSortAscending;
+
+        this.__current = state;
     },
     getList: function(){
         return this.__list;
@@ -85,6 +88,13 @@ class DetailStoreMixin{
                     data => {
                         this.__Actions.loadDetailSuccess(data);
                         this.__Actions.addDetail.completed(data);
+                    }
+                );
+            },
+            onDeleteDetail(hash){
+                loader.delete(hash).then(
+                    data => {
+                        this.__Actions.deleteDetail.completed(data);
                     }
                 );
             },

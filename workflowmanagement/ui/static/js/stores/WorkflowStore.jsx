@@ -29,7 +29,7 @@ const WorkflowStore = Reflux.createStore({
             WorkflowActions.loadSuccess(data);
         }, state);
     },
-    resetDetail: function(){
+    resetDetail(){
         this.__detaildata = {
                         permissions: {
                             public: true,
@@ -38,7 +38,14 @@ const WorkflowStore = Reflux.createStore({
                         }
                     };
     },
-    getWorkflow: function(){
+    onDeleteWorkflow(hash){
+        WorkflowActions.deleteDetail.triggerPromise(hash).then(
+            (result) => {
+                this.load(this.__current);
+            }
+        );
+    },
+    getWorkflow(){
         return this.__detaildata;
     },
     onSetPublic(status){

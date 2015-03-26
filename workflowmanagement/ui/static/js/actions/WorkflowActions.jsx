@@ -13,7 +13,8 @@ const WorkflowActions = Reflux.createActions($.extend({
     'setPublic': {},
     'setSearchable': {},
     'setForkable': {},
-    'resetDetail': {}
+    'resetDetail': {},
+    'deleteWorkflow': {}
 }, DetailActionsMixin));
 
 

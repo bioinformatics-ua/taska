@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 
 import React from 'react';
 import Router from 'react-router';
+import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
@@ -15,13 +16,20 @@ import {StateMachineComponent} from '../react-statemachine/component.jsx';
 
 import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
-import SimpleTask from './reusable/states/SimpleTask.jsx';
+import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
 import Toggle from 'react-toggle';
 
 const PermissionsBar = React.createClass({
+    getDefaultProps() {
+        return {
+            editable: true,
+            object: undefined
+        };
+    },
     render(){
-        return (<div className="form-group">
+        return (<span>
+                <div className="form-group">
                   <div className="input-group">
                         <span className="input-group-addon" id="permissions">
                             <strong>Permissions</strong>
@@ -31,25 +39,35 @@ const PermissionsBar = React.createClass({
                                 <Toggle id="public"
                                     checked={this.props.public}
                                     defaultChecked={this.props.public}
-                                    onChange={this.props.setPublic} />
+                                    onChange={this.props.setPublic} disabled={!this.props.editable} />
                                 <span className="selectLabel">&nbsp;Public</span>
                             </span>
                           <span className="selectBox">
                               <Toggle id="searchable"
                                 checked={this.props.searchable}
                                 defaultChecked={this.props.searchable}
-                                onChange={this.props.setSearchable} />
+                                onChange={this.props.setSearchable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Searchable</span>
                           </span>
                           <span className="selectBox">
                               <Toggle id="public"
                                 checked={this.props.forkable}
                                 defaultChecked={this.props.searchable}
-                                onChange={this.props.setForkable} />
+                                onChange={this.props.setForkable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Forkable</span>
                           </span>
                         </div>
-                </div></div>);
+                </div>
+                {!this.props.editable?
+                    <Link style={{zIndex: 3001, position: 'absolute', right: '15px', bottom: '-40px'}} className="pull-right btn btn-warning" to="WorkflowEdit"
+                    params={{object: this.props.object, mode:'edit'}}>
+                    <i className="fa fa-pencil"></i> &nbsp;Edit
+                    </Link>
+                :''}
+                </div>
+
+                </span>
+        );
     }
 });
 
@@ -74,7 +92,11 @@ export default React.createClass({
             );
         }
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     displayName: route => {
+
         return `Workflow ${route.props.detail.Workflow.title}`;
     },
     __getState(){
@@ -91,14 +113,20 @@ export default React.createClass({
             this.setState(this.__getState());
         }
     },
-    load(){
+    load(run){
         const wf = this.state.workflow;
         const sm = new StateMachine();
-        console.log(wf);
-        sm.addStateClass({
-            id: 'tasks.SimpleTask',
-            Class: SimpleTask
-        });
+
+        if(run)
+            sm.addStateClass({
+                id: 'tasks.SimpleTask',
+                Class: SimpleTaskRun
+            });
+        else
+            sm.addStateClass({
+                id: 'tasks.SimpleTask',
+                Class: SimpleTask
+            });
 
         // I dont know if they come ordered, so i add all tasks first, an dependencies only after
         let map = {};
@@ -135,19 +163,23 @@ export default React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     render() {
+        let params = this.context.router.getCurrentParams();
+        if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
+            this.context.router.replaceWith('/404');
         return (
             <span>
                 <StateMachineComponent
                     extra={
-                        <PermissionsBar setPublic={this.setPublic}
+                        <PermissionsBar editable={params.mode === 'edit'} setPublic={this.setPublic}
                             setSearchable={this.setSearchable}
                             setForkable={this.setForkable}
+                            object={params.object}
                             {...this.state.workflow.permissions} />
                     }
+                    editable={params.mode === 'edit'}
                     save={this.save}
-                    initialSm={this.load()
-                }
-              editable={true} {...this.props}/>
+                    initialSm={this.load(params.mode === 'run')
+                } {...this.props}/>
             </span>
         );
     }

@@ -493,10 +493,9 @@ const StateMachineComponent = React.createClass({
             }
         );
 
-        const state_detail = () => {
-
+        const state_detail = (editable) => {
             if(this.state.selected){
-                const DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected));
+                const DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
 
                 return <span><DRender
                 deleteConnection={this.deleteConnection}
@@ -512,12 +511,14 @@ const StateMachineComponent = React.createClass({
           <div className="col-md-12 no-select">
                 <div ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
+                        {this.props.editable ?
                         <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
                             <h3 className="task-type-title panel-title">Type of Tasks</h3>
                             <hr />
                             {state_list}
 
                         </div>
+                        :''}
                         <div className="col-md-10 table-col no-select">
                                 <div className="row">
                               <div className="col-md-12">
@@ -527,7 +528,8 @@ const StateMachineComponent = React.createClass({
                                           <input type="title" className="form-control"
                                             id="exampleInputEmail1" aria-describedby="study-title"
                                             placeholder="Enter the workflow title"
-                                            onChange={this.setTitle} value={this.state.title} />
+                                            onChange={this.setTitle} value={this.state.title}
+                                            disabled={!this.props.editable} />
                                         </div>
                                     </div>
                                     {this.props.extra}
@@ -536,18 +538,22 @@ const StateMachineComponent = React.createClass({
                               </div>
                               <div className="row">
                                 <div className="col-md-12">
-                            <div className="pull-left btn-group" role="group">
-                                <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
-                                    <i title="Undo action" className="fa fa-undo"></i>
-                                </button>
-                                <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
-                                    <i title="Redo action" className="fa fa-repeat"></i>
-                                </button>
+                            {this.props.editable?
+                            <span>
+                                <div className="pull-left btn-group" role="group">
+                                    <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
+                                        <i title="Undo action" className="fa fa-undo"></i>
+                                    </button>
+                                    <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
+                                        <i title="Redo action" className="fa fa-repeat"></i>
+                                    </button>
                                 </div>
 
-                                  <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                  <i className="fa fa-floppy-o"></i> &nbsp;Save Study
-                                  </button>
+                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                    <i className="fa fa-floppy-o"></i> &nbsp;Save Study
+                                </button>
+                                </span>
+                            :''}
                                     <div ref="chart" id="state_machine_chart">
                                         <div ref="movable">
                                             {chart}
@@ -559,7 +565,7 @@ const StateMachineComponent = React.createClass({
                                 <div className="col-md-12">
                                     <div className="panel panel-default">
                                       <div className="panel-body">
-                                        {state_detail()}
+                                        {state_detail(this.props.editable)}
                                       </div>
                                     </div>
                                 </div>

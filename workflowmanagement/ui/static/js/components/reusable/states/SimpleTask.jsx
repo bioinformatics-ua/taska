@@ -1,6 +1,9 @@
 import React from 'react';
 
-import {SimpleState} from '../../../react-statemachine/classes.jsx'
+import {SimpleState} from '../../../react-statemachine/classes.jsx';
+
+
+const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
     constructor(options){
@@ -13,7 +16,7 @@ class SimpleTask extends SimpleState {
         return 'Simple Task';
     }
 
-    detailRender(){
+    detailRender(editable=true, ChildComponent=dummy){
         let self = this;
         const SimpleFields = React.createClass({
             getInitialState(){
@@ -36,16 +39,17 @@ class SimpleTask extends SimpleState {
                             </span>
                             <textarea rows="6" type="description" className="form-control"
                                             aria-describedby="state-description"
-                                            placeholder="Enter the state description here"
+                                            placeholder="Enter the state description here"  disabled={!editable}
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
                         </div>
                     </div>
+                    <ChildComponent main={this} />
                 </span>
             }
         });
 
-        return super.detailRender(SimpleFields);
+        return super.detailRender(editable, SimpleFields);
     }
 
     static deserializeOptions(data){
@@ -83,4 +87,54 @@ class SimpleTask extends SimpleState {
     }
 }
 
-export default SimpleTask;
+class SimpleTaskRun extends SimpleTask{
+    constructor(options){
+        super(options);
+        this.assignee = -1;
+        this.deadline = undefined;
+    }
+    detailRender(editable=true, ChildComponent=dummy){
+        let self = this;
+        const SimpleRun = React.createClass({
+            getInitialState(){
+                return {
+                    parent: this.props.main
+                }
+            },
+            setAssignee(){
+
+            },
+            render(){
+                return <span>
+                    <div className="form-group">
+                        <div className="input-group clearfix">
+                            <span className="input-group-addon" id="state-description">
+                                <strong>Assignee</strong>
+                            </span>
+                            <input type="text" className="form-control"
+                                            aria-describedby="state-assignee"
+                                            placeholder="Choose the assignee"
+                                            onChange={this.setAssignee} value={this.state.assignee} />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <div className="input-group clearfix">
+                            <span className="input-group-addon" id="state-description">
+                                <strong>Deadline</strong>
+                            </span>
+                            <input type="datetime-local" className="form-control"
+                                            aria-describedby="state-deadline"
+                                            placeholder="Deadline"
+                                            onChange={this.setDeadline} value={this.state.deadline} />
+                        </div>
+                    </div>
+                    <ChildComponent main={this} />
+                </span>
+            }
+        });
+
+        return super.detailRender(editable, SimpleRun);
+    }
+}
+
+export default {SimpleTask, SimpleTaskRun};

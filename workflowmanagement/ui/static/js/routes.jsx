@@ -3,6 +3,8 @@
 import React from 'react';
 import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
 
+import {Label} from './components/reusable/component.jsx'
+
 module.exports = (
     <Route name='app' path='/' handler={require('./components/app.jsx')}>
 
@@ -14,9 +16,9 @@ module.exports = (
 
         <Route name="about" handler={require('./components/about.jsx')} />
 
-        <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} />
-
-        <Route name="WorkflowAdd" path="workflow/add" handler={require('./components/workflow.jsx')} />
+        <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} >
+            <Route name="WorkflowEdit" path=":mode" handler={Label} />
+        </Route>
 
         <Route name="Process" path="process/:object" handler={require('./components/process.jsx')} />
 

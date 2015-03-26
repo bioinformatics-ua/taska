@@ -17,6 +17,7 @@
     "react-breadcrumbs": "~0.13.0",
     "react-hotkey": "~0.3.0",
     "react-router": "~0.13.2",
+    "react-select": "^0.4.4",
     "react-toggle": "~0.1.1",
     "reflux": "~0.2.5",
     "underscore": "~1.8.2"
