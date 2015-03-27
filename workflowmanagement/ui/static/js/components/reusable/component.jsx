@@ -40,7 +40,7 @@ const Modal = React.createClass({
                         </div>
                         <div className="modal-footer">
                           <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                          <button type="button" onClick={this.props.success} className="btn btn-primary">Yes</button>
+                          <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
                         </div>
                       </div>
                     </div>

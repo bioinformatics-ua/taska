@@ -8,6 +8,8 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
+import {Modal} from './reusable/component.jsx';
+
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
 import WorkflowStore from '../stores/WorkflowStore.jsx';
@@ -27,6 +29,25 @@ const PermissionsBar = React.createClass({
             object: undefined
         };
     },
+    getInitialState(){
+       return {
+            public: this.props.public,
+            searchable: this.props.searchable,
+            forkable: this.props.forkable
+        }
+    },
+    setPublic(e){
+        this.setState({public: e.target.checked});
+        this.props.setPublic(e);
+    },
+    setSearchable(e){
+        this.setState({searchable: e.target.checked});
+        this.props.setSearchable(e);
+    },
+    setForkable(e){
+        this.setState({forkable: e.target.checked});
+        this.props.setForkable(e);
+    },
     render(){
         return (<span>
                 <div className="form-group">
@@ -39,21 +60,21 @@ const PermissionsBar = React.createClass({
                                 <Toggle id="public"
                                     checked={this.props.public}
                                     defaultChecked={this.props.public}
-                                    onChange={this.props.setPublic} disabled={!this.props.editable} />
+                                    onChange={this.setPublic} disabled={!this.props.editable} />
                                 <span className="selectLabel">&nbsp;Public</span>
                             </span>
                           <span className="selectBox">
                               <Toggle id="searchable"
                                 checked={this.props.searchable}
                                 defaultChecked={this.props.searchable}
-                                onChange={this.props.setSearchable} disabled={!this.props.editable} />
+                                onChange={this.setSearchable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Searchable</span>
                           </span>
                           <span className="selectBox">
                               <Toggle id="public"
                                 checked={this.props.forkable}
                                 defaultChecked={this.props.searchable}
-                                onChange={this.props.setForkable} disabled={!this.props.editable} />
+                                onChange={this.setForkable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Forkable</span>
                           </span>
                         </div>
@@ -86,7 +107,6 @@ export default React.createClass({
                 Reflux.listenTo(WorkflowStore, 'update')],
     statics: {
         fetch(params) {
-
             if(params.object == 'add'){
 
                 return new Promise(function (fulfill, reject){
@@ -96,7 +116,7 @@ export default React.createClass({
             }
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (workflow) => {
-                    return workflow
+                    return workflow;
                 }
             );
         }
@@ -110,15 +130,18 @@ export default React.createClass({
     },
     __getState(){
         return {
-            ***REMOVED*** WorkflowStore.getWorkflow()
+            ***REMOVED*** WorkflowStore.getWorkflow(),
+            missing: WorkflowStore.getMissing()
         }
     },
     getInitialState(){
         return this.__getState();
     },
+    componentWillMount(){
+        WorkflowActions.calibrate();
+    },
     update(status){
         if(status == WorkflowStore.DETAIL){
-            console.log('update');
             this.setState(this.__getState());
         }
     },
@@ -126,7 +149,6 @@ export default React.createClass({
         const wf = this.state.workflow;
         const sm = new StateMachine();
 
-        console.log(sm);
         if(run)
             sm.addStateClass({
                 id: 'tasks.SimpleTask',
@@ -159,6 +181,8 @@ export default React.createClass({
                     sm.addDependency(map[task.hash], map[dep.dependency]);
         }
 
+        sm.hash = Math.random().toString(36).substring(7);
+
         return sm;
     },
     save(data){
@@ -176,15 +200,35 @@ export default React.createClass({
     runProcess(data){
         WorkflowActions.runProcess(data);
     },
+    closePopup(){
+        WorkflowActions.calibrate();
+    },
     render() {
         let params = this.context.router.getCurrentParams();
-        console.log(params);
-        console.log(params.mode === 'edit');
+
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
             this.context.router.replaceWith('/404');
+
+        let sm = this.load(params.mode === 'run');
+
         return (
             <span>
-                <StateMachineComponent
+                {this.state.missing.length > 0?
+                    <Modal title="Missing information"
+                        message={<span>You have to specify deadlines and assignee's for all tasks.<br />
+                            <br />
+                            The following tasks don't have deadlines or assignee's:
+                            <ul>
+                                {this.state.missing.map((state) => {
+                                        return <li key={state.name}>{state.name}</li>;
+                                })}
+                            </ul>
+
+                            </span>}
+                        success={this.closePopup} close={this.closePopup}
+                    />
+                :''}
+                <StateMachineComponent key={sm.hash}
                     extra={
                         <PermissionsBar
                             editable={params.mode === 'edit'}
@@ -201,7 +245,7 @@ export default React.createClass({
                     saveLabel={params.mode !== 'run'?
                     <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
                     : <span><i className="fa fa-play"></i> Run</span>}
-                    initialSm={this.load(params.mode === 'run')}
+                    initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
                     {...this.props}/>
             </span>

@@ -8,6 +8,8 @@ import Select from 'react-select';
 import UserActions from '../../../actions/UserActions.jsx';
 import UserStore from '../../../stores/UserStore.jsx';
 
+import moment from 'moment';
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -102,6 +104,23 @@ class SimpleTaskRun extends SimpleTask{
         this.assignee = -1;
         this.deadline = undefined;
     }
+
+    serialize(){
+        let users = [];
+        let assignee = this.getData().assignee || '';
+
+        for(let user of assignee.split(','))
+            if(user.length > 0)
+                users.push({user: user});
+
+        return {
+            task: this.getData().hash,
+            deadline: this.getData().deadline,
+            users: users,
+            name: this.getData().name
+        }
+    }
+
     detailRender(editable=true, ChildComponent=dummy){
         let self = this;
         const SimpleRun = React.createClass({
@@ -149,10 +168,14 @@ class SimpleTaskRun extends SimpleTask{
                         );
                     }
                 );
+                if(!this.parent().deadline)
+                    this.setDeadline({
+                        target: {
+                            value: moment().format('YYYY-MM-DDTHH:mm')
+                        }
+                    });
             },
             render(){
-
-
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <div className="input-group">

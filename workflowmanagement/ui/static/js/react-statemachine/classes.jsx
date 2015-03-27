@@ -136,7 +136,7 @@ class State{
     detailRender(editable=true, ChildComponent=dummy){
         var self = this;
 
-        const DetailState = React.createClass({
+        return React.createClass({
             getInitialState() {
                 return self.__data;
             },
@@ -233,8 +233,6 @@ class State{
                 );
             }
         });
-
-        return DetailState;
     }
 
     detailProcess(data){

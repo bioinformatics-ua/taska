@@ -29,6 +29,17 @@ const WorkflowStore = Reflux.createStore({
             WorkflowActions.loadSuccess(data);
         }, state);
     },
+    init(){
+        this.__missing=[];
+    },
+    onCalibrate(){
+        this.__missing=[];
+
+        this.trigger();
+    },
+    getMissing(){
+        return this.__missing;
+    },
     resetDetail(){
         this.__detaildata = {
                         permissions: {
@@ -51,17 +62,17 @@ const WorkflowStore = Reflux.createStore({
     onSetPublic(status){
         this.__detaildata.permissions.public = status;
 
-        this.trigger(WorkflowStore.DETAIL);
+        //this.trigger(WorkflowStore.DETAIL);
     },
     onSetSearchable(status){
         this.__detaildata.permissions.searchable = status;
 
-        this.trigger(WorkflowStore.DETAIL);
+        //this.trigger(WorkflowStore.DETAIL);
     },
     onSetForkable(status){
         this.__detaildata.permissions.forkable = status;
 
-        this.trigger(WorkflowStore.DETAIL);
+        //this.trigger(WorkflowStore.DETAIL);
     },
 
     onSetWorkflow(data){
@@ -94,11 +105,29 @@ const WorkflowStore = Reflux.createStore({
     },
 
     onRunProcess(data){
-        let workflow = this.__detaildata;
-        console.log(workflow);
+        let process = {
+            ***REMOVED*** this.__detaildata.hash,
+            tasks: []
+        };
 
         let states = data.sm.getStates();
-        console.log(states);
+        let missing = [];
+
+        for(let state of states){
+            let serialized = state.serialize();
+
+            if(!serialized.deadline || serialized.users.length == 0){
+                missing.push(serialized);
+            }
+
+            process.tasks.push(serialized);
+        }
+
+        console.log(process);
+
+        this.__missing = missing;
+
+        this.trigger();
 
     }
 });

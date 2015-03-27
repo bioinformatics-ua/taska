@@ -31,7 +31,7 @@ import cline from '../vendor/jquery.domline';
             e.preventDefault();
     });
 
-const StateMachineComponent = React.createClass({
+let StateMachineComponent = React.createClass({
     mixins: [Reflux.listenTo(StateMachineStore, 'update'), hotkey.Mixin('handleHotkey')],
     getState(){
         return {
@@ -47,6 +47,8 @@ const StateMachineComponent = React.createClass({
         StateMachineActions.setTitle(this.props.detail.Workflow.title);
 
         return this.getState();
+    },
+    componentWillMount(){
     },
     getDefaultProps() {
         return {
@@ -496,7 +498,7 @@ const StateMachineComponent = React.createClass({
 
         const state_detail = (editable) => {
             if(this.state.selected){
-                const DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
+                let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
 
                 return <span><DRender
                 deleteConnection={this.deleteConnection}
