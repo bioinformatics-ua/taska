@@ -91,6 +91,15 @@ const WorkflowStore = Reflux.createStore({
                         this.trigger();
                     }
             );
+    },
+
+    onRunProcess(data){
+        let workflow = this.__detaildata;
+        console.log(workflow);
+
+        let states = data.sm.getStates();
+        console.log(states);
+
     }
 });
 

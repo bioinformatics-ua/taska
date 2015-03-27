@@ -4,14 +4,15 @@ import Reflux from 'reflux';
 // The store is listening to all actions, and the components in turn are listening to the store.
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 
-import {DetailActionsMixin} from '../mixins/actions.jsx';
+import {DetailActionsMixin, ListActionsMixin} from '../mixins/actions.jsx';
 
 const UserActions = Reflux.createActions($.extend({
     'login': {},
     'logout': {},
     'logoutSuccess': {},
     'loginFailed': {},
-    'loginSuccess': {}
-}, DetailActionsMixin));
+    'loginSuccess': {},
+    'loadUsers': {}
+}, DetailActionsMixin, ListActionsMixin));
 
 export default UserActions;

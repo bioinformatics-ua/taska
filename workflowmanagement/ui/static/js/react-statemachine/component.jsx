@@ -230,6 +230,7 @@ const StateMachineComponent = React.createClass({
     },
     select(event){
         event.stopPropagation();
+
         StateMachineActions.select(event.currentTarget.id);
     },
     editLabel(event){
@@ -266,8 +267,8 @@ const StateMachineComponent = React.createClass({
         label.css('visibility', 'visible');
         StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
     },
-    dataChange(state, field_dict){
-        StateMachineActions.dataChange(state, field_dict);
+    dataChange(state, field_dict, refresh=true){
+        StateMachineActions.dataChange(state, field_dict, refresh);
     },
     getLevels(){
         let getLevel = (level => {
@@ -519,7 +520,7 @@ const StateMachineComponent = React.createClass({
 
                         </div>
                         :''}
-                        <div className="col-md-10 table-col no-select">
+                        <div className={this.props.editable?"col-md-10 table-col no-select":"col-md-12 table-col no-select"}>
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="form-group">
@@ -538,7 +539,7 @@ const StateMachineComponent = React.createClass({
                               </div>
                               <div className="row">
                                 <div className="col-md-12">
-                            {this.props.editable?
+                            {this.props.savebar?
                             <span>
                                 <div className="pull-left btn-group" role="group">
                                     <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
@@ -550,7 +551,7 @@ const StateMachineComponent = React.createClass({
                                 </div>
 
                                 <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                    <i className="fa fa-floppy-o"></i> &nbsp;Save Study
+                                    {this.props.saveLabel}
                                 </button>
                                 </span>
                             :''}

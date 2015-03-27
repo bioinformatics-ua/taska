@@ -137,13 +137,14 @@ const StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
-    onDataChange(elem, field_dict){
+    onDataChange(elem, field_dict, refresh=true){
 
         this.addHistory();
 
         this.__sm.dataChange(elem, field_dict);
 
-        this.trigger();
+        if(refresh)
+            this.trigger();
     },
     onDeleteDependency(dependant, dependency){
         console.log(`Delete ${dependency} from ${dependant}`);

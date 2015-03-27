@@ -58,12 +58,21 @@ const PermissionsBar = React.createClass({
                           </span>
                         </div>
                 </div>
-                {!this.props.editable?
-                    <Link style={{zIndex: 3001, position: 'absolute', right: '15px', bottom: '-40px'}} className="pull-right btn btn-warning" to="WorkflowEdit"
-                    params={{object: this.props.object, mode:'edit'}}>
-                    <i className="fa fa-pencil"></i> &nbsp;Edit
-                    </Link>
-                :''}
+                    <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
+                    {!this.props.editable && !this.props.runnable ?
+                        <Link className="btn btn-warning" to="WorkflowEdit"
+                        params={{object: this.props.object, mode:'edit'}}>
+                        <i className="fa fa-pencil"></i> &nbsp;Edit
+                        </Link>
+                    :''}
+
+                    &nbsp;{!this.props.runnable && !this.props.editable?
+                        <Link className="btn btn-primary" to="WorkflowEdit"
+                        params={{object: this.props.object, mode:'run'}}>
+                        <i className="fa fa-play"></i> &nbsp;Run
+                        </Link>
+                    :''}
+                    </div>
                 </div>
 
                 </span>
@@ -117,6 +126,7 @@ export default React.createClass({
         const wf = this.state.workflow;
         const sm = new StateMachine();
 
+        console.log(sm);
         if(run)
             sm.addStateClass({
                 id: 'tasks.SimpleTask',
@@ -127,6 +137,7 @@ export default React.createClass({
                 id: 'tasks.SimpleTask',
                 Class: SimpleTask
             });
+
 
         // I dont know if they come ordered, so i add all tasks first, an dependencies only after
         let map = {};
@@ -162,24 +173,37 @@ export default React.createClass({
     setForkable(e){
         WorkflowActions.setForkable(e.target.checked);
     },
+    runProcess(data){
+        WorkflowActions.runProcess(data);
+    },
     render() {
         let params = this.context.router.getCurrentParams();
+        console.log(params);
+        console.log(params.mode === 'edit');
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
             this.context.router.replaceWith('/404');
         return (
             <span>
                 <StateMachineComponent
                     extra={
-                        <PermissionsBar editable={params.mode === 'edit'} setPublic={this.setPublic}
+                        <PermissionsBar
+                            editable={params.mode === 'edit'}
+                            runnable={params.mode === 'run'}
+                            setPublic={this.setPublic}
                             setSearchable={this.setSearchable}
                             setForkable={this.setForkable}
                             object={params.object}
+                            runProcess={this.runProcess}
                             {...this.state.workflow.permissions} />
                     }
                     editable={params.mode === 'edit'}
-                    save={this.save}
-                    initialSm={this.load(params.mode === 'run')
-                } {...this.props}/>
+                    save={params.mode === 'run'? this.runProcess:this.save}
+                    saveLabel={params.mode !== 'run'?
+                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    : <span><i className="fa fa-play"></i> Run</span>}
+                    initialSm={this.load(params.mode === 'run')}
+                    savebar={!params.mode || params.mode === 'view'? false: true}
+                    {...this.props}/>
             </span>
         );
     }

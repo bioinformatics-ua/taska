@@ -1,11 +1,11 @@
 'use strict';
 import Reflux from 'reflux';
 import UserActions from '../actions/UserActions.jsx';
-import {ListLoader, DetailLoader} from '../actions/api.jsx';
+import {ListLoader, SimpleListLoader, DetailLoader} from '../actions/api.jsx';
 
 import {Login} from '../actions/api.jsx';
 
-import {DetailStoreMixin} from '../mixins/store.jsx';
+import {DetailStoreMixin, ListStoreMixin} from '../mixins/store.jsx';
 
 export default Reflux.createStore({
     listenables: [UserActions],
@@ -13,6 +13,10 @@ export default Reflux.createStore({
         DetailStoreMixin.factory(
             new DetailLoader({model: 'account'}),
             'email',
+            UserActions
+        ),
+        ListStoreMixin.factory(
+            new SimpleListLoader({model: 'account'}),
             UserActions
         )
     ],
@@ -70,5 +74,16 @@ export default Reflux.createStore({
         if(data.authenticated === false)
             UserActions.loadDetail('me')
 
+    },
+    onLoadUsers(){
+        console.log('load users');
+        UserActions.loadListIfNecessary.triggerPromise().then(
+            (users) => {
+                return users;
+            }
+        );
+    },
+    getUsers(){
+        return this.__list;
     }
 });

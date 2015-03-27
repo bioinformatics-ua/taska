@@ -142,7 +142,7 @@ class State{
             },
             setTitle(e){
                 this.setState({name: e.target.value});
-                //this.props.dataChange(self.getIdentificator(), 'name', e.target.value);
+                this.props.dataChange(self.getIdentificator(), {name: e.target.value}, false);
             },
             addDependency(e){
                 this.props.addDependency(
@@ -155,11 +155,11 @@ class State{
                     self.getIdentificator(), Number.parseInt($(e.target).data('id'))
                 );
             },
-            update(dict){
-                this.setState(dict);
+            componentWillMount(){
             },
-            save(e){
-                this.props.dataChange(self.getIdentificator(), this.state);
+            componentWillUnmount(){
+                // keep safe in case something did not trigger datachange properly
+                this.props.dataChange(self.getIdentificator(), this.state, false);
             },
             render(){
                 let dependencies = self.getDependencies().map((dependency) => {
@@ -205,8 +205,8 @@ class State{
                             );
                 }
                 return (
-                <span>
-                    <div className="form-group">
+                <span id="detailview">
+                    <div key="state-name" className="form-group">
                         <div className="input-group clearfix">
                             <span className="input-group-addon" id="state-title">
                                 <strong>State Name</strong>
@@ -217,7 +217,7 @@ class State{
                                             onChange={this.setTitle} value={this.state.name} disabled={!editable} />
                         </div>
                     </div>
-                    <div className="form-group">
+                    <div key="state-deps" className="form-group">
                         <div className="input-group">
                             <span className="input-group-addon" id="state-dependencies">
                                 <strong>Dependencies</strong>
@@ -228,12 +228,7 @@ class State{
                             </div>
                         </div>
                     </div>
-                    <ChildComponent main={this} />
-                    <div className="clearfix">
-                    {editable?
-                    <button onClick={this.save} className="pull-right btn btn-primary">Save Details</button>
-                    :''}
-                    </div>
+                    <ChildComponent dataChange={this.props.dataChange} main={this} />
                 </span>
                 );
             }

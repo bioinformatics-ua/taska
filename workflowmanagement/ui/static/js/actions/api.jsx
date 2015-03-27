@@ -58,6 +58,15 @@ class ListLoader extends Loader{
     }
 }
 
+class SimpleListLoader extends Loader{
+    constructor(options) {
+        this.model = options.model;
+    }
+    load(){
+        return super.load(`api/${this.model}/`);
+    }
+}
+
 class DetailLoader extends Loader{
     constructor(options) {
         this.model = options.model;
@@ -103,4 +112,4 @@ class Login extends Loader{
   }
 }
 
-export default {ListLoader, DetailLoader, Login}
+export default {ListLoader,SimpleListLoader, DetailLoader, Login}

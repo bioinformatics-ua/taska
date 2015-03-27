@@ -46,6 +46,54 @@ const TableStoreMixin = {
         return this.__sortascending;
     }
 };
+// http://127.0.0.1:8000/api/account/?page_size=9000
+class ListStoreMixin{
+    // Factory that returns a DetailStoreMixin already setup
+    static factory(loader, Actions){
+        if(loader == undefined || Actions == undefined){
+            throw "You must specify a loader, a identificator and an Action source, when using the DetailStoreMixin";
+        }
+        return {
+            init() {
+                this.__list;
+                this.__listfailed = false;
+
+                this.__Actions = Actions;
+            },
+            getList(){
+                return this.__list;
+            },
+            getListFailed(){
+                return this.__listfailed;
+            },
+            onLoadList() {
+                loader.load().then(
+                    data => {
+                        this.__list = data;
+                        this.__Actions.loadList.completed(data);
+                    }
+                );
+            },
+            onLoadListIfNecessary() {
+                if(this.__list){
+                    this.__Actions.loadListIfNecessary.completed(this.__list);
+
+                } else {
+                    this.__Actions.loadList.triggerPromise().then(
+                        // success callback
+                       data => {
+                            this.__Actions.loadListIfNecessary.completed(data);
+                       }
+                    );
+                }
+            },
+            onUnloadList(){
+                this.__list = {};
+            }
+        }
+    }
+}
+
 class DetailStoreMixin{
     // Factory that returns a DetailStoreMixin already setup
     static factory(loader, identificator, Actions){
@@ -127,4 +175,4 @@ class DetailStoreMixin{
 }
 
 
-export default {TableStoreMixin, DetailStoreMixin}
+export default {TableStoreMixin, DetailStoreMixin, ListStoreMixin}

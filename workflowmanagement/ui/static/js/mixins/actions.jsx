@@ -12,4 +12,11 @@ const DetailActionsMixin = {
 
 };
 
-export default {TableActionsMixin, DetailActionsMixin}
+const ListActionsMixin = {
+    'loadListSuccess': {},
+    'loadList': {asyncResult: true},
+    'loadListIfNecessary': {asyncResult: true},
+    'unloadList': {}
+};
+
+export default {TableActionsMixin, DetailActionsMixin, ListActionsMixin}
