@@ -31,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, TokenHasScope]
         model = User
-        fields = ('url', 'username', 'email', 'is_staff', 'last_login', 'fullname')
+        fields = ('url', 'username', 'email', 'is_staff', 'last_login', 'fullname', 'id')
 
     def get_fullname(self, obj):
         tmp = obj.get_full_name()

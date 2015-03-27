@@ -4,6 +4,10 @@ import Router from 'react-router';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
+import {LayeredComponentMixin} from '../../mixins/component.jsx';
+
+import Toggle from 'react-toggle';
+
 const Loading = React.createClass({
   render: function(){
     return (
@@ -63,4 +67,114 @@ const Label = React.createClass({
             }
     });
 
-export {Loading, Modal, DjangoCSRFToken, Label}
+const DeleteButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    render: function() {
+        return <button className="btn btn-danger" onClick={this.handleClick}><i className="fa fa-times"></i></button>;
+    },
+    renderLayer: function() {
+        if (this.state.clicked) {
+            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        } else {
+            return <span />;
+        }
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
+
+const PermissionsBar = React.createClass({
+    getDefaultProps() {
+        return {
+            editable: true,
+            object: undefined,
+            setPublic: function(){},
+            setSearchable: function(){},
+            setForkable: function(){}
+        };
+    },
+    getInitialState(){
+       return {
+            public: this.props.public,
+            searchable: this.props.searchable,
+            forkable: this.props.forkable
+        }
+    },
+    setPublic(e){
+        this.setState({public: e.target.checked});
+        this.props.setPublic(e);
+    },
+    setSearchable(e){
+        this.setState({searchable: e.target.checked});
+        this.props.setSearchable(e);
+    },
+    setForkable(e){
+        this.setState({forkable: e.target.checked});
+        this.props.setForkable(e);
+    },
+    render(){
+        return (<span>
+                <div className="form-group">
+                  <div className="input-group">
+                        <span className="input-group-addon" id="permissions">
+                            <strong>Permissions</strong>
+                        </span>
+                        <div className="form-control">
+                            <span className="selectBox">
+                                <Toggle id="public"
+                                    checked={this.props.public}
+                                    defaultChecked={this.props.public}
+                                    onChange={this.setPublic} disabled={!this.props.editable} />
+                                <span className="selectLabel">&nbsp;Public</span>
+                            </span>
+                          <span className="selectBox">
+                              <Toggle id="searchable"
+                                checked={this.props.searchable}
+                                defaultChecked={this.props.searchable}
+                                onChange={this.setSearchable} disabled={!this.props.editable} />
+                              <span className="selectLabel">&nbsp;Searchable</span>
+                          </span>
+                          <span className="selectBox">
+                              <Toggle id="public"
+                                checked={this.props.forkable}
+                                defaultChecked={this.props.searchable}
+                                onChange={this.setForkable} disabled={!this.props.editable} />
+                              <span className="selectLabel">&nbsp;Forkable</span>
+                          </span>
+                        </div>
+                </div>
+                    <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
+                    {!this.props.editable && !this.props.runnable ?
+                        <Link className="btn btn-warning" to="ProcessEdit"
+                        params={{object: this.props.object, mode:'edit'}}>
+                        <i className="fa fa-pencil"></i> &nbsp;Edit
+                        </Link>
+                    :''}
+
+                    &nbsp;{!this.props.runnable && !this.props.editable?
+                        <Link className="btn btn-primary" to="ProcessEdit"
+                        params={{object: this.props.object, mode:'run'}}>
+                        <i className="fa fa-play"></i> &nbsp;Run
+                        </Link>
+                    :''}
+                    </div>
+                </div>
+
+                </span>
+        );
+    }
+});
+
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar}

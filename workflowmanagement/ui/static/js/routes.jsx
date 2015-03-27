@@ -20,7 +20,9 @@ module.exports = (
             <Route name="WorkflowEdit" path=":mode" handler={Label} />
         </Route>
 
-        <Route name="Process" path="process/:object" handler={require('./components/process.jsx')} />
+        <Route name="Process" path="process/:object" handler={require('./components/process.jsx')}>
+            <Route name="ProcessEdit" path=":mode" handler={Label} />
+        </Route>
 
         <Route name="Request" path="request/:object" handler={require('./components/request.jsx')} />
 

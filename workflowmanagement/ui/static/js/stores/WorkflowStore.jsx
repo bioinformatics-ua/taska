@@ -1,6 +1,7 @@
 'use strict';
 import Reflux from 'reflux';
 import WorkflowActions from '../actions/WorkflowActions.jsx';
+import ProcessActions from '../actions/ProcessActions.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 import {ListLoader, DetailLoader} from '../actions/api.jsx'
@@ -17,7 +18,7 @@ const WorkflowStore = Reflux.createStore({
     mixins: [TableStoreMixin,
         DetailStoreMixin.factory(
             new DetailLoader({model: 'workflow'}),
-            'email',
+            'hash',
             WorkflowActions
         )
     ],
@@ -123,9 +124,18 @@ const WorkflowStore = Reflux.createStore({
             process.tasks.push(serialized);
         }
 
-        console.log(process);
-
         this.__missing = missing;
+
+        if(this.__missing.length == 0){
+            console.log(process);
+            StateActions.loadingStart();
+            ProcessActions.addDetail.triggerPromise(process).then(
+                (process) => {
+                    StateActions.loadingEnd();
+                    this.trigger();
+                }
+            )
+        }
 
         this.trigger();
 

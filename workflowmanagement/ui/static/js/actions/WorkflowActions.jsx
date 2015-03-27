@@ -17,7 +17,6 @@ const WorkflowActions = Reflux.createActions($.extend({
     'deleteWorkflow': {},
     'runProcess': {},
     'calibrate': {}
-
 }, DetailActionsMixin));
 
 

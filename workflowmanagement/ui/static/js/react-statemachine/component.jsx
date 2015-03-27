@@ -44,7 +44,7 @@ let StateMachineComponent = React.createClass({
     },
     getInitialState(){
         StateMachineActions.calibrate(this.props.initialSm);
-        StateMachineActions.setTitle(this.props.detail.Workflow.title);
+        StateMachineActions.setTitle(this.props.title);
 
         return this.getState();
     },

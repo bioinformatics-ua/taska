@@ -8,16 +8,23 @@ import ProcessStore from '../../stores/ProcessStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading} from './component.jsx'
+import {Loading, DeleteButton, PermissionsBar} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const ProcessManage = React.createClass({
+  delete(row){
+    ProcessActions.deleteProcess(row.hash);
+  },
   render: function(){
     const row = this.props.rowData;
     const object = {object: row.hash}
 
     return <div className="btn-group" role="group" aria-label="...">
-            <Link className="btn btn-danger" to="Process" params={object}><i className="fa fa-times"></i></Link>
+           <DeleteButton
+              success={this.delete}
+              identificator = {row}
+              title={`Delete '${row["object_repr"]}'`}
+              message={`Are you sure you want to delete  '${row["object_repr"]} ?'`}  />
            </div>;
   }
 });

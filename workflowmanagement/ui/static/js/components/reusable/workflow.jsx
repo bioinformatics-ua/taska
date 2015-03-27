@@ -8,36 +8,8 @@ import WorkflowStore from '../../stores/WorkflowStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, Modal} from './component.jsx'
-import {TableComponentMixin, LayeredComponentMixin} from '../../mixins/component.jsx';
-
-var ButtonWithDialog = React.createClass({
-  mixins: [LayeredComponentMixin],
-    success(e){
-      this.props.success(this.props.identificator);
-    },
-    render: function() {
-        return <button className="btn btn-danger" onClick={this.handleClick}><i className="fa fa-times"></i></button>;
-    },
-    renderLayer: function() {
-        if (this.state.clicked) {
-            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
-        } else {
-            return <span />;
-        }
-    },
-    // {{{
-    handleClose: function() {
-        this.setState({ clicked: false });
-    },
-  handleClick: function() {
-    this.setState({ clicked: !this.state.clicked });
-  },
-  getInitialState: function() {
-    return { clicked: false };
-  }
-  // }}}
-});
+import {Loading, DeleteButton} from './component.jsx'
+import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const WorkflowManage = React.createClass({
   delete(row){
@@ -52,7 +24,7 @@ const WorkflowManage = React.createClass({
               params={object2}><i className="fa fa-play"></i></Link>
             <Link className="btn btn-warning" to="WorkflowEdit"
             params={object}><i className="fa fa-pencil"></i></Link>
-            <ButtonWithDialog
+            <DeleteButton
               success={this.delete}
               identificator = {row}
               title={`Delete '${row.title}'`}

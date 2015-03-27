@@ -185,6 +185,7 @@ class ProcessSerializer(serializers.ModelSerializer):
 
 class DetailProcessSerializer(serializers.ModelSerializer):
     tasks = ProcessTaskSerializer(many=True)
+    workflow = serializers.SlugRelatedField(slug_field='hash', queryset=Workflow.objects)
 
     class Meta:
         model = Process
@@ -269,7 +270,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         instance = self.get_object()
         History.new(event=History.ACCESS, actor=request.user, object=instance)
 
-        return Response(DetailProcessSerializer(instance).data)
+        return Response(ProcessSerializer(instance).data)
 
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):

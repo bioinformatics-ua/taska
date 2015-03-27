@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal} from './reusable/component.jsx';
+import {Modal, PermissionsBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -20,86 +20,6 @@ import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
 import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
-import Toggle from 'react-toggle';
-
-const PermissionsBar = React.createClass({
-    getDefaultProps() {
-        return {
-            editable: true,
-            object: undefined
-        };
-    },
-    getInitialState(){
-       return {
-            public: this.props.public,
-            searchable: this.props.searchable,
-            forkable: this.props.forkable
-        }
-    },
-    setPublic(e){
-        this.setState({public: e.target.checked});
-        this.props.setPublic(e);
-    },
-    setSearchable(e){
-        this.setState({searchable: e.target.checked});
-        this.props.setSearchable(e);
-    },
-    setForkable(e){
-        this.setState({forkable: e.target.checked});
-        this.props.setForkable(e);
-    },
-    render(){
-        return (<span>
-                <div className="form-group">
-                  <div className="input-group">
-                        <span className="input-group-addon" id="permissions">
-                            <strong>Permissions</strong>
-                        </span>
-                        <div className="form-control">
-                            <span className="selectBox">
-                                <Toggle id="public"
-                                    checked={this.props.public}
-                                    defaultChecked={this.props.public}
-                                    onChange={this.setPublic} disabled={!this.props.editable} />
-                                <span className="selectLabel">&nbsp;Public</span>
-                            </span>
-                          <span className="selectBox">
-                              <Toggle id="searchable"
-                                checked={this.props.searchable}
-                                defaultChecked={this.props.searchable}
-                                onChange={this.setSearchable} disabled={!this.props.editable} />
-                              <span className="selectLabel">&nbsp;Searchable</span>
-                          </span>
-                          <span className="selectBox">
-                              <Toggle id="public"
-                                checked={this.props.forkable}
-                                defaultChecked={this.props.searchable}
-                                onChange={this.setForkable} disabled={!this.props.editable} />
-                              <span className="selectLabel">&nbsp;Forkable</span>
-                          </span>
-                        </div>
-                </div>
-                    <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
-                    {!this.props.editable && !this.props.runnable ?
-                        <Link className="btn btn-warning" to="WorkflowEdit"
-                        params={{object: this.props.object, mode:'edit'}}>
-                        <i className="fa fa-pencil"></i> &nbsp;Edit
-                        </Link>
-                    :''}
-
-                    &nbsp;{!this.props.runnable && !this.props.editable?
-                        <Link className="btn btn-primary" to="WorkflowEdit"
-                        params={{object: this.props.object, mode:'run'}}>
-                        <i className="fa fa-play"></i> &nbsp;Run
-                        </Link>
-                    :''}
-                    </div>
-                </div>
-
-                </span>
-        );
-    }
-});
 
 export default React.createClass({
     mixins: [   Router.Navigation,
@@ -181,8 +101,6 @@ export default React.createClass({
                     sm.addDependency(map[task.hash], map[dep.dependency]);
         }
 
-        sm.hash = Math.random().toString(36).substring(7);
-
         return sm;
     },
     save(data){
@@ -228,7 +146,7 @@ export default React.createClass({
                         success={this.closePopup} close={this.closePopup}
                     />
                 :''}
-                <StateMachineComponent key={sm.hash}
+                <StateMachineComponent key={'teste'+params.mode}
                     extra={
                         <PermissionsBar
                             editable={params.mode === 'edit'}
@@ -240,6 +158,7 @@ export default React.createClass({
                             runProcess={this.runProcess}
                             {...this.state.workflow.permissions} />
                     }
+                    title={this.props.detail.Workflow.title}
                     editable={params.mode === 'edit'}
                     save={params.mode === 'run'? this.runProcess:this.save}
                     saveLabel={params.mode !== 'run'?

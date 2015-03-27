@@ -111,7 +111,7 @@ class SimpleTaskRun extends SimpleTask{
 
         for(let user of assignee.split(','))
             if(user.length > 0)
-                users.push({user: user});
+                users.push({user: Number.parseInt(user)});
 
         return {
             task: this.getData().hash,
@@ -156,7 +156,7 @@ class SimpleTaskRun extends SimpleTask{
                         let map = users.results.map(
                                     entry => {
                                         return {
-                                            value: entry.email,
+                                            value: ''+entry.id,
                                             label: entry.fullname
                                         }
                                     }
@@ -171,7 +171,7 @@ class SimpleTaskRun extends SimpleTask{
                 if(!this.parent().deadline)
                     this.setDeadline({
                         target: {
-                            value: moment().format('YYYY-MM-DDTHH:mm')
+                            value: moment(10, 'days').format('YYYY-MM-DDTHH:mm')
                         }
                     });
             },
