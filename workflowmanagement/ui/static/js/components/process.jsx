@@ -136,13 +136,59 @@ export default React.createClass({
                 :''}
                 <StateMachineComponent key={'teste'+params.mode}
                     extra={
-                        <PermissionsBar
-                            editable={params.mode === 'edit'}
-                            runnable={params.mode === 'run'}
-                            object={params.object}
-                            {...this.state.workflow.permissions} />
+                        <span>
+                            <PermissionsBar
+                                editable={params.mode === 'edit'}
+                                runnable={params.mode === 'run'}
+                                object={params.object}
+                                {...this.state.workflow.permissions} />
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="startdate">
+                                                <strong>Start Date</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.process['start_date']} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="enddate">
+                                                <strong>End Date</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.process['end_date']} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="status">
+                                                <strong>Status</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.process.status} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="progress">
+                                                <strong>Progress</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.process.progress} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
                     }
-                    title={this.props.detail.Process.workflow.title}
+                    title={this.state.workflow.title}
                     editable={params.mode === 'edit'}
                     save={this.save}
                     saveLabel={<span><i className="fa fa-floppy-o"></i> &nbsp;Save Process</span>}
