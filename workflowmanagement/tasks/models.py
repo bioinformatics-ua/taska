@@ -46,7 +46,7 @@ class Task(models.Model):
         ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
         '''
         if self.title:
-            return self.title
+            return self.title.encode('utf-8')
 
         return 'Unnamed'
 

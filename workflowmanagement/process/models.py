@@ -7,6 +7,8 @@ from tasks.models import Task
 
 from utils.hashes import createHash
 
+from django.db.models import Q
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -52,14 +54,34 @@ class Process(models.Model):
         return "Unknown"
 
     def __str__(self):
-        return '%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
+        return ('%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())).encode('utf-8')
 
     def tasks(self):
         return ProcessTask.all(process=self)
 
+    '''
+        Reaccess tasks status (so we can move the state machine forward)
+    '''
+    def move(self):
+        ptasks = self.tasks()
+
+        for ptask in ptasks.filter(status=ProcessTask.WAITING):
+            move = True
+            deps = ptask.task.dependencies()
+
+            for dep in deps:
+                pdep = ptasks.get(task=dep.dependency)
+
+                if pdep.status != ProcessTask.FINISHED:
+                    move=False
+
+            if move:
+                ptask.status = ProcessTask.RUNNING
+                ptask.save()
+
     def progress(self):
         all = ProcessTask.all(process=self).count()
-        missing = ProcessTask.all(process=self).filter(status=ProcessTask.RUNNING).count()
+        missing = ProcessTask.all(process=self).filter(Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.WAITING)).count()
 
         print "ALL:"
         print all
@@ -109,12 +131,14 @@ class ProcessTask(models.Model):
         :deadline (datetime): Date this Process related Task should end
     '''
     # Status literals, representing the translation to the statuses the process can be in
-    RUNNING         = 1
-    FINISHED        = 2
-    CANCELED        = 3
-    OVERDUE         = 4
+    WAITING         = 1
+    RUNNING         = 2
+    FINISHED        = 3
+    CANCELED        = 4
+    OVERDUE         = 5
 
     STATUS          = (
+            (WAITING,   'Task is waiting execution'),
             (RUNNING,   'Task is running'),
             (FINISHED,  'Task has ended successfully'),
             (CANCELED,  'Task was canceled'),
@@ -122,12 +146,12 @@ class ProcessTask(models.Model):
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)
-    status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
+    status          = models.PositiveSmallIntegerField(choices=STATUS, default=WAITING)
     deadline        = models.DateTimeField()
     removed         = models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s - %s' % (self.task, self.process)
+        return ('%s - %s' % (self.task, self.process)).encode('utf-8')
 
     def users(self):
         return ProcessTaskUser.all(processtask=self)

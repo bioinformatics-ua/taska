@@ -102,7 +102,8 @@ const PermissionsBar = React.createClass({
             object: undefined,
             setPublic: function(){},
             setSearchable: function(){},
-            setForkable: function(){}
+            setForkable: function(){},
+            showRun: true
         };
     },
     getInitialState(){
@@ -149,7 +150,7 @@ const PermissionsBar = React.createClass({
                           <span className="selectBox">
                               <Toggle id="public"
                                 checked={this.props.forkable}
-                                defaultChecked={this.props.searchable}
+                                defaultChecked={this.props.forkable}
                                 onChange={this.setForkable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Forkable</span>
                           </span>
@@ -163,7 +164,7 @@ const PermissionsBar = React.createClass({
                         </Link>
                     :''}
 
-                    &nbsp;{!this.props.runnable && !this.props.editable?
+                    &nbsp;{!this.props.runnable && !this.props.editable && this.props.showRun?
                         <Link className="btn btn-primary" to={this.props.link}
                         params={{object: this.props.object, mode:'run'}}>
                         <i className="fa fa-play"></i> &nbsp;Run

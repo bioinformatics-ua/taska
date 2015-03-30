@@ -101,8 +101,6 @@ class SimpleTask extends SimpleState {
 class SimpleTaskRun extends SimpleTask{
     constructor(options){
         super(options);
-        this.assignee = -1;
-        this.deadline = undefined;
     }
 
     serialize(){
@@ -114,11 +112,45 @@ class SimpleTaskRun extends SimpleTask{
                 users.push({user: Number.parseInt(user)});
 
         return {
-            task: this.getData().hash,
-            deadline: this.getData().deadline,
             users: users,
-            name: this.getData().name
+            deadline: this.getData().deadline,
+            //name: this.getData().name,
+            task: this.getData().hash
         }
+    }
+    stateStyle(){
+        if(this.getData().ptask)
+            switch(this.getData().ptask.status){
+                case 1:
+                    return {};
+                case 2:
+                    return {
+                          backgroundColor: '#337ab7',
+                          border: 0,
+                          color: 'white'
+                    };
+                case 3:
+                    return {
+                          backgroundColor: 'rgb(92, 184, 92)',
+                          border: 0,
+                          color: 'white'
+                    };
+                case 4:
+                    return {
+                        backgroundColor: 'grey',
+                        border: 0,
+                        color: 'white'
+                    };
+                case 5:
+                    return {
+                        backgroundColor: 'rgb(240, 173, 78)',
+                        border: 0,
+                        color: 'white'
+                    };
+            }
+
+
+        return {};
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -185,7 +217,7 @@ class SimpleTaskRun extends SimpleTask{
                             {this.state.users.length > 0?
                             <Select onChange={this.setAssignee}
                             value={this.parent().assignee} name="form-field-name"
-                            multi={true} options={this.state.users}  />
+                            multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
                         </div>
 
@@ -195,10 +227,12 @@ class SimpleTaskRun extends SimpleTask{
                             <span className="input-group-addon" id="state-deadline">
                                 <strong>Deadline</strong>
                             </span>
+
                             <input type="datetime-local" className="form-control"
                                             aria-describedby="state-deadline"
                                             placeholder="Deadline"
-                                            onChange={this.setDeadline} value={this.parent().deadline} />
+                                            onChange={this.setDeadline} disabled={this.parent().disabled}
+                                            value={this.parent().deadline} />
                         </div>
                     </div>
                     <ChildComponent main={this} />

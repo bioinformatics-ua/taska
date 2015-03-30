@@ -63,6 +63,10 @@ class State{
         return (<span>{this.__proto__.constructor.typeIcon()} {this.__proto__.constructor.repr()}</span>);
     }
 
+    stateStyle(){
+        return {};
+    }
+
     equals(other){
         if(typeof other === 'number')
             return this.__identificator == other;

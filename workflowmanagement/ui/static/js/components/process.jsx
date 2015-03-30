@@ -24,6 +24,25 @@ import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
 import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
+const ProcessLabel = React.createClass({
+    render(){
+        return <table className="process-label">
+                    <tr>
+                        <td><div className="circle circle-sm circle-default"></div></td>
+                        <td><small>&nbsp;Waiting&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-primary"></div></td>
+                        <td><small>&nbsp;Running&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-success"></div></td>
+                        <td><small>&nbsp;Finished&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-warning"></div></td>
+                        <td><small>&nbsp;Overdue&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm"></div></td>
+                        <td><small>&nbsp;Canceled&nbsp;&nbsp;</small></td>
+                    </tr>
+                </table>
+    }
+})
+
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
@@ -51,7 +70,8 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-        return `Process ${route.props.detail.Process.process['object_repr']}`;
+        let process = route.props.detail.Process.process;
+        return `Process ${process['object_repr']} (${process['start_date']})`;
     },
     __getState(){
         return {
@@ -85,10 +105,29 @@ export default React.createClass({
         let map = {};
 
         // first states
+        let ptasks = this.state.process.tasks;
+
         if(wf.tasks){
             for(let task of wf.tasks){
                 let type = sm.getStateClass(task.type).Class;
-                let state = sm.stateFactory(task.sortid, type, type.deserializeOptions(task));
+
+                let opts = type.deserializeOptions(task)
+                opts.disabled = true;
+
+                let t=ptasks.find(pt => pt.task === task.hash);
+
+                opts.assignee = t.users.reduce((prev, curr, i)=>{
+                                        if(i == 0)
+                                            return ''+curr.user;
+
+                                        return `${prev},${curr.user}`;
+                                    },''
+                                );
+
+                opts.deadline = t.deadline;
+                opts.ptask = t;
+
+                let state = sm.stateFactory(task.sortid, type, opts);
 
                 map[task.hash] = state;
 
@@ -141,6 +180,7 @@ export default React.createClass({
                                 link="ProcessEdit"
                                 editable={params.mode === 'edit'}
                                 runnable={params.mode === 'run'}
+                                showRun={false}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />
                             <div className="row">
@@ -160,7 +200,7 @@ export default React.createClass({
                                             <span className="input-group-addon" id="enddate">
                                                 <strong>End Date</strong>
                                             </span>
-                                            <input className="form-control" readOnly value={this.state.process['end_date']} />
+                                            <input className="form-control" readOnly value={this.state.process['end_date'] || '---'} />
                                         </div>
                                     </div>
                                 </div>
@@ -175,6 +215,7 @@ export default React.createClass({
                             <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
                             <div style={{backgroundColor: '#19AB27', width: this.state.process.progress, height: '10px'}}></div>
                             &nbsp;</div>
+                            <ProcessLabel />
                         </span>
                     }
                     title={this.state.workflow.title}

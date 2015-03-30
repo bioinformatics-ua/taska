@@ -150,6 +150,9 @@ class ProcessSerializer(serializers.ModelSerializer):
 
                 serializer.create(task_data)
 
+        # This will start non-dependant tasks immediately
+        process.move()
+
         return process
 
     @transaction.atomic

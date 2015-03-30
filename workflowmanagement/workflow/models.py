@@ -63,7 +63,7 @@ class Workflow(models.Model):
         '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
         '''
         if self.title:
-            return self.title
+            return self.title.encode('utf-8')
 
         return 'Unnamed'
 

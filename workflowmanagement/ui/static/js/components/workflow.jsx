@@ -50,6 +50,7 @@ export default React.createClass({
     },
     __getState(){
         return {
+            addedProcess: WorkflowStore.getProcessAddFinished(),
             ***REMOVED*** WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing()
         }
@@ -59,6 +60,11 @@ export default React.createClass({
     },
     componentWillMount(){
         WorkflowActions.calibrate();
+    },
+    componentDidUpdate(){
+        if(this.state.addedProcess){
+            this.context.router.transitionTo('Process', {object: this.state.addedProcess.hash})
+        }
     },
     update(status){
         if(status == WorkflowStore.DETAIL){

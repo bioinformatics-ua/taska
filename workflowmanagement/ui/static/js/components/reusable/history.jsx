@@ -15,7 +15,15 @@ import {TableComponentMixin} from '../../mixins/component.jsx';
 var HistoryItem = React.createClass({
   render: function(){
     function translateAction(entry){
-      const link = <Link to={entry.object_type} params={entry}>{entry.object_repr}</Link>;
+      const ty = entry.object_type;
+      let link;
+
+      if(ty === 'NoneType')
+        link = <span>{entry.object_repr}</span>;
+      else
+        link = <Link to={entry.object_type} params={entry}>{entry.object_repr}</Link>;
+
+
       var text;
       switch(entry.event){
         case 'Access':

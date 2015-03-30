@@ -195,12 +195,24 @@ footer {
     display: inline-block;
 }
 
+.circle-sm {
+    width: 12px;
+    height: 12px;
+}
+
+.circle-default{
+    background-color: white;
+    border: 1px solid grey;
+}
 .circle-success{
     background-color: #5cb85c;
 }
 
 .circle-danger{
     background-color: #D9534F;
+}
+.circle-primary{
+    background-color: #337ab7;
 }
 .circle-warning{
     background-color: #F0AD4E;

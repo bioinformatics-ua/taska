@@ -41,6 +41,9 @@ const WorkflowStore = Reflux.createStore({
     getMissing(){
         return this.__missing;
     },
+    getProcessAddFinished(){
+        return this.__pfinished || false;
+    },
     resetDetail(){
         this.__detaildata = {
                         permissions: {
@@ -117,6 +120,7 @@ const WorkflowStore = Reflux.createStore({
         for(let state of states){
             let serialized = state.serialize();
 
+            console.log(serialized);
             if(!serialized.deadline || serialized.users.length == 0){
                 missing.push(serialized);
             }
@@ -126,12 +130,13 @@ const WorkflowStore = Reflux.createStore({
 
         this.__missing = missing;
 
+
         if(this.__missing.length == 0){
-            console.log(process);
             StateActions.loadingStart();
             ProcessActions.addDetail.triggerPromise(process).then(
                 (process) => {
                     StateActions.loadingEnd();
+                    this.__pfinished = process;
                     this.trigger();
                 }
             )
