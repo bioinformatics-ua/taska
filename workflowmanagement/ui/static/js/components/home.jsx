@@ -7,6 +7,8 @@ import {HistoryTable} from './reusable/history.jsx';
 import {WorkflowTable} from './reusable/workflow.jsx';
 import {ProcessTable} from './reusable/process.jsx';
 import {RequestTable} from './reusable/request.jsx';
+import {TaskTable} from './reusable/task.jsx';
+
 
 import {Authentication} from '../mixins/component.jsx';
 
@@ -30,11 +32,15 @@ const LoggedInHome = React.createClass({
                 <ProcessTable />
               </div>
               <div className="col-md-6">
+                <TaskTable />
+              </div>
+              <div className="col-md-6">
                 <RequestTable />
               </div>
               <div className="col-md-6">
                 <HistoryTable />
               </div>
+
           </div>
       );
   }

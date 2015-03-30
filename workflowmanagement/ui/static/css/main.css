@@ -170,7 +170,17 @@ footer {
 }
 
 .footer-container{
-    padding: 5 !important;
+  padding: 0 !important;
+
+}
+
+.griddle-footer{
+  padding:5px;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  background-color: #F5F5F5;
+  border-top: 2px solid rgb(221, 221, 221);
 }
 
 .progressbar-process{

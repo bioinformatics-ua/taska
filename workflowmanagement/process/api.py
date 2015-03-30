@@ -5,7 +5,12 @@ from rest_framework import renderers, serializers, viewsets, permissions, mixins
 from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import status, filters
+from rest_framework import status, filters, generics
+
+
+from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -13,6 +18,7 @@ from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasS
 
 from process.models import *
 from history.models import History
+from django.db.models import Q
 
 from workflow.models import Workflow
 from tasks.models import Task
@@ -46,12 +52,21 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
 
 class ProcessTaskSerializer(serializers.ModelSerializer):
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
+    task_repr = serializers.SerializerMethodField()
+
     users = ProcessTaskUserSerializer(many=True, required=False)
+    deadline = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessTask
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('process', 'removed')
+
+    def get_deadline(self, obj):
+        return obj.deadline.strftime("%Y-%m-%dT%H:%M")
+
+    def get_task_repr(self, obj):
+        return obj.task.title
 
     @transaction.atomic
     def create(self, validated_data):
@@ -288,6 +303,22 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         History.new(event=History.DELETE, actor=request.user, object=instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class MyTasks(generics.ListAPIView):
+    queryset = ProcessTask.objects.none()
+    serializer_class = ProcessTaskSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+        ptasks = ProcessTaskUser.all().filter(
+                Q(processtask__status=ProcessTask.RUNNING) | Q(processtask__status = ProcessTask.WAITING),
+                user=self.request.user,
+            ).values_list('processtask')
+
+        return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
 
 #############################################################################################
 ###

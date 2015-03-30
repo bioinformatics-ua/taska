@@ -185,12 +185,19 @@ class ProcessTaskUser(models.Model):
     reassigned      = models.BooleanField(default=False)
     reassign_date   = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['-processtask__deadline']
+
     @staticmethod
-    def all(processtask=None):
+    def all(processtask=None, related=False):
         ''' Returns all valid processtask instances
 
         '''
-        tmp = ProcessTaskUser.objects.all()
+        tmp = None
+        if related:
+            tmp = ProcessTaskUser.objects.select_related('processtask').all()
+        else:
+            tmp = ProcessTaskUser.objects.all()
 
         if processtask != None:
             tmp=tmp.filter(processtask=processtask)

@@ -18,4 +18,5 @@ router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
+    url(r'^/my/tasks/', api.MyTasks.as_view())
 )

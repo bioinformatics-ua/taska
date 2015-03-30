@@ -1,0 +1,11 @@
+.Select.is-disabled .Select-item-icon,
+.Select.is-disabled .Select-placeholder,
+.Select.is-disabled .Select-input,
+.Select.is-disabled .Select-arrow{
+    display: none;
+}
+
+.process-label{
+    position: absolute;
+    bottom: -30px;
+}

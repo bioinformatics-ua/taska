@@ -200,12 +200,15 @@ class SimpleTaskRun extends SimpleTask{
                         );
                     }
                 );
+                console.log(this.parent());
+
                 if(!this.parent().deadline)
                     this.setDeadline({
                         target: {
-                            value: moment(10, 'days').format('YYYY-MM-DDTHH:mm')
+                            value: moment().add(10, 'days').format('YYYY-MM-DDTHH:mm')
                         }
                     });
+
             },
             render(){
                 return <span>
