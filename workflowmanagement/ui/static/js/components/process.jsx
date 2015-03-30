@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -138,12 +138,13 @@ export default React.createClass({
                     extra={
                         <span>
                             <PermissionsBar
+                                link="ProcessEdit"
                                 editable={params.mode === 'edit'}
                                 runnable={params.mode === 'run'}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <div className="form-group">
                                         <div className="input-group">
                                             <span className="input-group-addon" id="startdate">
@@ -153,7 +154,7 @@ export default React.createClass({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <div className="form-group">
                                         <div className="input-group">
                                             <span className="input-group-addon" id="enddate">
@@ -163,29 +164,17 @@ export default React.createClass({
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-2">
                                     <div className="form-group">
                                         <div className="input-group">
-                                            <span className="input-group-addon" id="status">
-                                                <strong>Status</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.process.status} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <span className="input-group-addon" id="progress">
-                                                <strong>Progress</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.process.progress} />
+                                            <ProcessStatus label="True" rowData={{status: this.state.process.status}} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                            <div style={{backgroundColor: '#19AB27', width: this.state.process.progress, height: '10px'}}></div>
+                            &nbsp;</div>
                         </span>
                     }
                     title={this.state.workflow.title}

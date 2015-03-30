@@ -8,7 +8,7 @@ import ProcessStore from '../../stores/ProcessStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton, PermissionsBar} from './component.jsx'
+import {Loading, DeleteButton, PermissionsBar, ProcessStatus} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const ProcessManage = React.createClass({
@@ -39,30 +39,6 @@ const ProcessProgress = React.createClass({
                 <span className="sr-only">{row.progress}% Complete</span>
               </div>
             </div></center>;
-  }
-});
-
-const ProcessStatus = React.createClass({
-  render: function(){
-    const row = this.props.rowData;
-  function translateStatus(status){
-    let extra = 'circle';
-    switch(status){
-      case 1:
-        extra+=' circle-success'; break;
-      case 2:
-        extra+=' circle-danger'; break;
-      case 3:
-        extra+=' circle-grey'; break;
-      case 3:
-        extra+=' circle-warning'; break;
-    }
-    return <div className={extra}>&nbsp;</div>;
-
-  }
-    return <center>
-            {translateStatus(row.status)}
-           </center>;
   }
 });
 

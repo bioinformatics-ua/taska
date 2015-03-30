@@ -149,6 +149,7 @@ export default React.createClass({
                 <StateMachineComponent key={'teste'+params.mode}
                     extra={
                         <PermissionsBar
+                            link="WorkflowEdit"
                             editable={params.mode === 'edit'}
                             runnable={params.mode === 'run'}
                             setPublic={this.setPublic}

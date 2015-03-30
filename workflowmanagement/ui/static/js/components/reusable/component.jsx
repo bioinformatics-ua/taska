@@ -157,14 +157,14 @@ const PermissionsBar = React.createClass({
                 </div>
                     <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
                     {!this.props.editable && !this.props.runnable ?
-                        <Link className="btn btn-warning" to="ProcessEdit"
+                        <Link className="btn btn-warning" to={this.props.link}
                         params={{object: this.props.object, mode:'edit'}}>
                         <i className="fa fa-pencil"></i> &nbsp;Edit
                         </Link>
                     :''}
 
                     &nbsp;{!this.props.runnable && !this.props.editable?
-                        <Link className="btn btn-primary" to="ProcessEdit"
+                        <Link className="btn btn-primary" to={this.props.link}
                         params={{object: this.props.object, mode:'run'}}>
                         <i className="fa fa-play"></i> &nbsp;Run
                         </Link>
@@ -177,4 +177,32 @@ const PermissionsBar = React.createClass({
     }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar}
+const ProcessStatus = React.createClass({
+  getDefaultProps(){
+    label: false
+  },
+  translateStatus(status){
+    let extra = 'circle';
+    let label = '';
+    switch(status){
+      case 1:
+        extra+=' circle-success'; label='Running'; break;
+      case 2:
+        extra+=' circle-danger'; label='Finished'; break;
+      case 3:
+        extra+=' circle-grey'; label='Canceled'; break;
+      case 3:
+        extra+=' circle-warning'; label='Overdue'; break;
+    }
+    return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label> </span>;
+  },
+  render: function(){
+    const row = this.props.rowData;
+
+    return <center>
+            {this.translateStatus(row.status)}
+           </center>;
+  }
+});
+
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar, ProcessStatus}
