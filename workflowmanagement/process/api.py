@@ -23,6 +23,8 @@ from django.db.models import Q
 from workflow.models import Workflow
 from tasks.models import Task
 
+from tasks.api import GenericTaskSerializer
+
 from utils.api_related import create_serializer, AliasOrderingFilter
 
 @api_view(('GET',))
@@ -304,9 +306,16 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class MyProcessTaskSerializer(ProcessTaskSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return Task.objects.get_subclass(id=obj.id).type()
+
+
 class MyTasks(generics.ListAPIView):
     queryset = ProcessTask.objects.none()
-    serializer_class = ProcessTaskSerializer
+    serializer_class = MyProcessTaskSerializer
     filter_backends = (filters.DjangoFilterBackend,)
 
     def get_queryset(self):
@@ -314,7 +323,7 @@ class MyTasks(generics.ListAPIView):
             Retrieves a list of user assigned process tasks
         """
         ptasks = ProcessTaskUser.all().filter(
-                Q(processtask__status=ProcessTask.RUNNING) | Q(processtask__status = ProcessTask.WAITING),
+                Q(processtask__status=ProcessTask.RUNNING),
                 user=self.request.user,
             ).values_list('processtask')
 

@@ -35,6 +35,7 @@ const RequestLink = React.createClass({
     const object = {name: row.title, object: row.hash}
     return <small>
             <Link to="Request" params={object}>{row.title}</Link>
+
            </small>;
   }
 });
@@ -102,7 +103,7 @@ const RequestTable = React.createClass({
     ];
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Received Requests</h3></center>
+                <center><i className="fa fa-life-ring pull-left"></i><h3 className="panel-title">Received Requests</h3></center>
               </div>
               <Griddle
                   {...this.commonTableSettings()}

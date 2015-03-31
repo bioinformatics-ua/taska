@@ -10,6 +10,7 @@ import Griddle from 'griddle-react';
 
 import {Loading, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
+import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 
 const WorkflowManage = React.createClass({
   delete(row){
@@ -20,6 +21,7 @@ const WorkflowManage = React.createClass({
     const object = {object: row.hash, mode: 'edit'};
     const object2 = {object: row.hash, mode: 'run'};
     return <div className="btn-group" role="group" aria-label="...">
+
             <Link className="btn btn-primary" to="WorkflowEdit"
               params={object2}><i className="fa fa-play"></i></Link>
             <Link className="btn btn-warning" to="WorkflowEdit"
@@ -76,7 +78,7 @@ const WorkflowTable = React.createClass({
     ];
     return  <div className="panel panel-default panel-overflow">
               <div className="panel-heading">
-                <i className="fa fa-cogs pull-left"></i>
+                <i className="fa fa-sitemap pull-left"></i>
                 <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Studies</h3>
                 <Link to="Workflow" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>

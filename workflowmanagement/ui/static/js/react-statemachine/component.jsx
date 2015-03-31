@@ -512,7 +512,7 @@ let StateMachineComponent = React.createClass({
         return (
           <div className="row">
           <div className="col-md-12 no-select">
-                <div ref="statemachine" className="panel panel-default table-container">
+                <div style={{width: '100%'}} ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
                         {this.props.editable ?
                         <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">

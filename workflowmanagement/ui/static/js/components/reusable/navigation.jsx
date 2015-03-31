@@ -47,6 +47,9 @@ var UserDropdown = React.createClass({
       return <span></span>;
     }
     return <ul className="nav navbar-nav navbar-right">
+                    <li>
+                        <Tab to='about'><i className="fa fa-info-circle"></i> About</Tab>
+                    </li>
                     <li className="dropdown">
                       <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                         <i className="fa fa-user"></i> {this.state.user.fullname} <span className="caret"></span>
@@ -65,6 +68,7 @@ var UserDropdown = React.createClass({
                         <li><a href="#" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
                       </ul>
                     </li>
+
                   </ul>;
   }
 

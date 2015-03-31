@@ -111,7 +111,12 @@ footer {
 .manage-td{
     width: 130px;
 }
-
+.type-td{
+  width: 48px;
+}
+.deadline-td{
+  width: 140px;
+}
 .table-prev{
     display: inline-block;
 }
@@ -560,4 +565,34 @@ footer {
   to {
     -webkit-transform: rotate(1turn);
   }
+}
+
+.task-overdue{
+  -webkit-animation-duration: 6s;
+          animation-duration: 6s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+}
+
+.task-warning{
+  color: #D38F2E;
+}
+.warnicon{
+  vertical-align: super;
+}
+
+
+.example-enter {
+opacity: 0.01;
+transition: opacity .5s ease-in;
+}
+.example-enter.example-enter-active {
+opacity: 1;
+}
+.example-leave {
+opacity: 1;
+transition: opacity .5s ease-in;
+}
+.example-leave.example-leave-active {
+opacity: 0.01;
 }

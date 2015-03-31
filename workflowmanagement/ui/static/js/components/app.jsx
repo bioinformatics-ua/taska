@@ -13,6 +13,8 @@ import UserStore from '../stores/UserStore.jsx';
 import StateActions from '../actions/StateActions.jsx';
 import StateStore from '../stores/StateStore.jsx';
 
+import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+
 const LoadingBar = React.createClass({
     mixins: [Reflux.listenTo(StateStore, 'update'),
     Reflux.listenTo(StateStore, 'update')    ],
@@ -37,6 +39,9 @@ const LoadingBar = React.createClass({
   });
 
 export default React.createClass({
+  contextTypes: {
+    router: React.PropTypes.func
+  },
   displayName: "Home",
     mixins: [Reflux.listenTo(UserStore, 'update')],
     __getState: function(){
@@ -45,13 +50,15 @@ export default React.createClass({
         failed: UserStore.getDetailFailed()
       }
     },
-    getInitialState: function() {
+    getInitialState() {
       return this.__getState();
     },
-    update: function(data){
+    update(data){
         this.setState(this.__getState());
     },
-  render: function(){
+    render(){
+    var name = this.context.router.getCurrentPath();
+
     return (
       <div>
         <header>
@@ -70,12 +77,19 @@ export default React.createClass({
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                  <ul className="nav navbar-nav">
-                    <li>
-                        <Tab to='about'>About</Tab>
-                    </li>
-                  </ul>
+
+                <form className="col-md-6 navbar-form navbar-left" role="search">
+                            <div className="form-group">
+                      <div className="input-group">
+                        <input type="text" className="form-control" placeholder="Search for..."></input>
+                        <span className="input-group-btn">
+                          <button className="btn btn-default" type="button"><i className="fa fa-search"></i></button>
+                        </span>
+                      </div>
+                    </div>
+      </form>
                   <UserDropdown url="api/account/me/" />
+
                 </div><!-- /.navbar-collapse -->
               </div><!-- /.container-fluid -->
             </nav>
@@ -83,7 +97,7 @@ export default React.createClass({
         <div className="container">
           <Breadcrumbs separator='' {...this.props} />
           <LoadingBar />
-            <RouteHandler key={name} {...this.props} />
+          <RouteHandler key={name} {...this.props} />
         </div>
         <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
       </div>
