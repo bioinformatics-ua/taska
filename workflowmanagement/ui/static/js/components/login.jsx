@@ -18,6 +18,9 @@ export default React.createClass({
         failed: UserStore.loginFailed()
       }
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     getInitialState: function() {
       return this.__getState();
     },
@@ -26,7 +29,8 @@ export default React.createClass({
     },
     __login: function(){
       if(this.refs.usr != "" && this.refs.pwd != ""){
-        var nextPath = this.getQuery().nextPath;
+
+        var nextPath = this.context.router.getCurrentQuery().nextPath;
         let self = this;
         UserActions.login({
           username: this.refs.usr.getDOMNode().value.trim(),
@@ -49,19 +53,19 @@ export default React.createClass({
                 <div className="col-sm-6 col-md-4 col-md-offset-4">
                     <div className="account-wall">
                         <h1 className="text-center login-title">Please login</h1>
-                        <img className="profile-img" src="static/images/user.png"
-                            alt="" />
+                        <i className="fa fa-user profile-img"></i>
                         <form className="form-signin">
+
                         <input name="username" ref="usr" /*value={this.state.username}*/
-                        /*onChange={this.setUsername}*/ type="text" className="form-control" placeholder="Email" required autofocus />
+                        /*onChange={this.setUsername}*/ type="text" className="form-control" placeholder="&#61664;&nbsp; Email" required autofocus />
                         <input name="password" ref="pwd" /*value={this.state.password}*/
-                        /*onChange={this.setPassword}*/ type="password" className="form-control" placeholder="Password" required />
+                        /*onChange={this.setPassword}*/ type="password" className="form-control" placeholder="&nbsp;&#61475;&nbsp; Password" required />
 
                         {this.state.failed ? (<div className="alert alert-danger" role="alert">Login failed</div>) : ''}
 
-                        <input value="Sign in" onClick={this.__login}
+                        <button onClick={this.__login}
                         className="btn btn-lg btn-primary btn-block"
-                        type="button" />
+                        type="button"><i className="fa fa-sign-in"></i> &nbsp;Sign in</button>
                         <label className="checkbox pull-left">
                             <input defaultChecked="true" ref="rmb"
                         /*onChange={this.setRememberMe}*/ name="remember_me" type="checkbox" value="remember-me" />

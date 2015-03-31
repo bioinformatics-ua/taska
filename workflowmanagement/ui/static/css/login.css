@@ -13,6 +13,10 @@
     font-weight: normal;
     margin-left: 20px;
 }
+.account-wall input{
+    font-family: fa;
+}
+
 .form-signin .form-control
 {
     position: relative;
@@ -57,13 +61,15 @@
 }
 .profile-img
 {
-    width: 96px;
+    width: 150px;
     height: 96px;
     margin: 0 auto 10px;
     display: block;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     border-radius: 50%;
+    font-size: 200px;
+    color: #6B6B6B;
 }
 .need-help
 {
