@@ -148,6 +148,7 @@ class ProcessTask(models.Model):
     task            = models.ForeignKey(Task)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=WAITING)
     deadline        = models.DateTimeField()
+    hash            = models.CharField(max_length=50)
     removed         = models.BooleanField(default=False)
 
     def __str__(self):
@@ -167,6 +168,14 @@ class ProcessTask(models.Model):
             tmp=tmp.filter(process=process)
 
         return tmp
+
+@receiver(models.signals.post_save, sender=ProcessTask)
+def __generate_processtask_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an process.
+    '''
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class ProcessTaskUser(models.Model):
     '''Model that connects a ProcessTask and a User

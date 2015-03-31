@@ -89,11 +89,31 @@ footer {
 }
 
 .panel-overflow{
-    height: 385px;
-    overflow-y: auto;
+    /*height: 385px;
+    overflow-y: auto;*/
     position: relative;
 }
+@media screen and (min-width: 992px) {
+  .panel-overflow{
+    -webkit-box-flex: 1;
+    -moz-box-flex:  1;
+    -ms-flex: 1;
+    flex:1;
+  }
+  .flex-container{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
 
+  .flex-row{
+      -webkit-box-flex: 1;
+      -moz-box-flex:  1;
+      -ms-flex: 1;
+      flex:1;
+  }
+}
 .panel-overflow > .panel-heading{
     position: absolute;
     width: 100%;
@@ -112,10 +132,10 @@ footer {
     width: 130px;
 }
 .type-td{
-  width: 48px;
+  width: 60px;
 }
 .deadline-td{
-  width: 140px;
+  width: 130px;
 }
 .table-prev{
     display: inline-block;
@@ -186,6 +206,10 @@ footer {
   bottom: 0;
   background-color: #F5F5F5;
   border-top: 2px solid rgb(221, 221, 221);
+}
+
+.griddle-pad{
+  padding-bottom: 45px;
 }
 
 .progressbar-process{
@@ -294,8 +318,14 @@ footer {
     margin-right: 5px;
 }
 
-.input-group-addon {
+.react-statemachine .input-group-addon {
     min-width:150px;
+    text-align:left;
+}
+
+.task-detail .input-group-addon,
+.request-detail .input-group-addon {
+    min-width:105px;
     text-align:left;
 }
 
@@ -579,20 +609,4 @@ footer {
 }
 .warnicon{
   vertical-align: super;
-}
-
-
-.example-enter {
-opacity: 0.01;
-transition: opacity .5s ease-in;
-}
-.example-enter.example-enter-active {
-opacity: 1;
-}
-.example-leave {
-opacity: 1;
-transition: opacity .5s ease-in;
-}
-.example-leave.example-leave-active {
-opacity: 0.01;
 }

@@ -57,14 +57,15 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
     task_repr = serializers.SerializerMethodField()
 
     users = ProcessTaskUserSerializer(many=True, required=False)
-    deadline = serializers.SerializerMethodField()
+    deadline_repr = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessTask
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('process', 'removed')
+        extra_kwargs = {'hash': {'required': False}}
 
-    def get_deadline(self, obj):
+    def get_deadline_repr(self, obj):
         return obj.deadline.strftime("%Y-%m-%dT%H:%M")
 
     def get_task_repr(self, obj):
@@ -158,6 +159,9 @@ class ProcessSerializer(serializers.ModelSerializer):
             pass
 
         process = Process.objects.create(**validated_data)
+
+        for task in tasks_data:
+            print task
 
         # create tasks (if any are passed by this webservice)
         if tasks_data:
@@ -308,9 +312,17 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
 class MyProcessTaskSerializer(ProcessTaskSerializer):
     type = serializers.SerializerMethodField()
+    process = serializers.SerializerMethodField()
+    parent = serializers.SerializerMethodField()
 
     def get_type(self, obj):
         return Task.objects.get_subclass(id=obj.id).type()
+
+    def get_process(self, obj):
+        return str(obj.process)
+
+    def get_parent(self, obj):
+        return GenericTaskSerializer(Task.objects.get_subclass(id=obj.task.id)).data
 
 
 class MyTasks(generics.ListAPIView):
@@ -328,6 +340,12 @@ class MyTasks(generics.ListAPIView):
             ).values_list('processtask')
 
         return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+
+class MyTask(generics.RetrieveAPIView):
+    queryset = ProcessTask.all()
+    serializer_class = MyProcessTaskSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    lookup_field = 'hash'
 
 #############################################################################################
 ###

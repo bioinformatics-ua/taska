@@ -101,7 +101,7 @@ const RequestTable = React.createClass({
       "displayName": "Type"
       }
     ];
-    return  <div className="panel panel-default panel-overflow">
+    return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
                 <center><i className="fa fa-life-ring pull-left"></i><h3 className="panel-title">Received Requests</h3></center>
               </div>

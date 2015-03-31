@@ -235,7 +235,7 @@ class SimpleTaskRun extends SimpleTask{
                                             aria-describedby="state-deadline"
                                             placeholder="Deadline"
                                             onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={this.parent().deadline} />
+                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
                         </div>
                     </div>
                     <ChildComponent main={this} />

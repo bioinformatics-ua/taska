@@ -159,6 +159,7 @@ class TaskViewSet(  mixins.CreateModelMixin,
     """
     queryset = Task.objects.none()
     serializer_class = GenericTaskSerializer
+    lookup_field = 'hash'
 
     filter_backends = [filters.DjangoFilterBackend, AliasOrderingFilter]
     filter_class = TaskFilter

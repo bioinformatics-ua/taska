@@ -20,14 +20,14 @@ const TaskDate = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <span className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></span>;
+      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
 
     const diff = moment.duration(now.diff(due)).asDays();
 
     if(diff < 7)
-      return <span className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></span>;
+      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
 
-    return <span className="pull-right">{moment(deadline).fromNow()}</span>;
+    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
   },
   render(){
     const row = this.props.rowData;
@@ -39,9 +39,11 @@ const TaskDate = React.createClass({
 const TaskLink = React.createClass({
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.task}
-    return <small>
-            <Link to="Task" params={object}>{row.task_repr}</Link>
+    const object = {object: row.hash}
+    return <small title={row.process}>
+            <Link id={`task_${row.hash}`}
+              key={row.hash} to="Task"
+               params={object}>{row.task_repr}</Link><br />
            </small>;
   }
 });
@@ -94,7 +96,7 @@ const TaskTable = React.createClass({
       },
       {
       "columnName": "deadline",
-      "order": 3,
+      "order": 4,
       "locked": true,
       "visible": true,
       "cssClassName": 'deadline-td',
@@ -102,7 +104,7 @@ const TaskTable = React.createClass({
       "displayName": "Deadline"
       }
     ];
-    return  <div className="panel panel-default panel-overflow">
+    return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-list-ul pull-left"></i>
                 <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Tasks</h3>

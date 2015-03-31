@@ -107,7 +107,7 @@ const ProcessTable = React.createClass({
       "displayName": " "
       }
     ];
-    return  <div className="panel panel-default panel-overflow">
+    return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
                 <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Processes</h3></center>
               </div>

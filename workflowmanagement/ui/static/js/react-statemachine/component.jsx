@@ -510,7 +510,7 @@ let StateMachineComponent = React.createClass({
         };
 
         return (
-          <div className="row">
+          <div className="react-statemachine row">
           <div className="col-md-12 no-select">
                 <div style={{width: '100%'}} ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">

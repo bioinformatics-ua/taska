@@ -23,25 +23,29 @@ export default React.createClass({
 const LoggedInHome = React.createClass({
 
   render: function(){
-    return (
-          <div className="row">
-              <div className="col-md-6">
+    return (<span>
+          <div className="row flex-container">
+              <div className="col-md-6 flex-container flex-row">
                 <WorkflowTable />
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 flex-container flex-row">
                 <ProcessTable />
               </div>
-              <div className="col-md-6">
+          </div>
+          <div className="row flex-container">
+              <div className="col-md-6 flex-container flex-row">
                 <TaskTable />
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 flex-container flex-row">
                 <RequestTable />
               </div>
-              <div className="col-md-6">
+          </div>
+          <div className="row flex-container">
+              <div className="col-md-12 flex-container flex-row">
                 <HistoryTable />
               </div>
 
           </div>
-      );
+      </span>);
   }
 })
