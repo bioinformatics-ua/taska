@@ -17,11 +17,26 @@ import TaskStore from '../../stores/TaskStore.jsx';
 import Task from '../task.jsx'
 
 class SimpleTask extends Task{
+    getTypeRepr(){
+        return <span><i className='fa fa-check'></i> Simple Task</span>;
+    }
+
+    changeComment(e){
+        super.setAnswer('comment', e.target.value);
+    }
+
     detailRender(){
+        const context = this;
         return React.createClass({
             render(){
                 return (<span>
-                    Im so simple!!
+                    <div className="form-group">
+                        <div className="input-group">
+                          <span className="input-group-addon"><strong>Commentaries</strong></span>
+                          <textarea rows="4" placeholder="Leave a comment upon task resolution (optional)"
+                            value={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
+                        </div>
+                    </div>
                 </span>);
             }
         })

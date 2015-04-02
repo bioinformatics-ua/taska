@@ -132,6 +132,8 @@ class DetailStoreMixin{
                 );
             },
             onAddDetail(serialized){
+                console.log('CHEGA AQUI');
+
                 loader.post(serialized).then(
                     data => {
                         this.__Actions.loadDetailSuccess(data);

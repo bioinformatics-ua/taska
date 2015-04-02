@@ -313,12 +313,16 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 class MyProcessTaskSerializer(ProcessTaskSerializer):
     type = serializers.SerializerMethodField()
     process = serializers.SerializerMethodField()
+    process_repr = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
 
     def get_type(self, obj):
         return Task.objects.get_subclass(id=obj.id).type()
 
     def get_process(self, obj):
+        return str(obj.process.hash)
+
+    def get_process_repr(self, obj):
         return str(obj.process)
 
     def get_parent(self, obj):

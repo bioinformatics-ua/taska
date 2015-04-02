@@ -38,12 +38,14 @@ export default React.createClass({
     __getState(){
         return {
             task: TaskStore.getDetail(),
+            answer: TaskStore.getAnswer()
         }
     },
     getInitialState(){
         return this.__getState();
     },
     componentWillMount(){
+        TaskActions.calibrate();
     },
     componentDidUpdate(){
     },
@@ -51,6 +53,12 @@ export default React.createClass({
         if(status == TaskStore.DETAIL){
             this.setState(this.__getState());
         }
+    },
+    setAnswer(prop, val){
+        TaskActions.setAnswer(prop, val);
+    },
+    saveAnswer(e){
+        TaskActions.saveAnswer();
     },
     render() {
         let DetailRender = this.detailRender();
@@ -74,7 +82,7 @@ export default React.createClass({
                                           <div className="form-group">
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Type</strong></span>
-                                              <span className="form-control">{this.state.task.type}</span>
+                                              <span className="form-control">{this.getTypeRepr()}</span>
                                             </div>
                                           </div>
                                         </div>
@@ -110,11 +118,11 @@ export default React.createClass({
                                         </div>
                             </div>
                             <hr style={{marginTop:0}} />
-                            <div className="row">
+                            <div className="form-group row">
                                 <div className="col-md-9"></div>
                                 <div className="col-md-3">
-                                        <button className="btn btn-primary btn-block btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
+                                        <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
+                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Mark as complete
                                         </button>
                                 </div>
                             </div>
