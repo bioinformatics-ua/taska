@@ -27,6 +27,8 @@ from tasks.api import GenericTaskSerializer
 
 from utils.api_related import create_serializer, AliasOrderingFilter
 
+from result.api import GenericResultSerializer
+
 @api_view(('GET',))
 def root(request, format=None):
     return Response({
@@ -43,6 +45,7 @@ Process related api calls available
 
 class ProcessTaskUserSerializer(serializers.ModelSerializer):
     user_repr = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessTaskUser
@@ -51,6 +54,9 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
 
     def get_user_repr(self, obj):
         return obj.user.get_full_name()
+
+    def get_result(self, obj):
+        return GenericResultSerializer(obj.result()).data
 
 class ProcessTaskSerializer(serializers.ModelSerializer):
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
@@ -311,6 +317,13 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @detail_route(methods=['get'])
+    def cancel(self, request, hash=None):
+        process = self.get_object()
+        process.cancel()
+
+        return Response(ProcessSerializer(process).data)
+
 class MyProcessTaskSerializer(ProcessTaskSerializer):
     type = serializers.SerializerMethodField()
     process = serializers.SerializerMethodField()
@@ -318,7 +331,7 @@ class MyProcessTaskSerializer(ProcessTaskSerializer):
     parent = serializers.SerializerMethodField()
 
     def get_type(self, obj):
-        return Task.objects.get_subclass(id=obj.id).type()
+        return Task.objects.get_subclass(id=obj.task.id).type()
 
     def get_process(self, obj):
         return str(obj.process.hash)
@@ -339,7 +352,7 @@ class MyTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all().filter(
+        ptasks = ProcessTaskUser.all(finished=False).filter(
                 Q(processtask__status=ProcessTask.RUNNING),
                 user=self.request.user,
             ).values_list('processtask')

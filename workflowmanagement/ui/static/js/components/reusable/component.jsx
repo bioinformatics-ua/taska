@@ -72,8 +72,13 @@ const DeleteButton = React.createClass({
     success(e){
       this.props.success(this.props.identificator);
     },
+    getDefaultProps(){
+      return {
+        deleteLabel: <i className="fa fa-times"></i>
+      };
+    },
     render: function() {
-        return <button className="btn btn-danger" onClick={this.handleClick}><i className="fa fa-times"></i></button>;
+        return <button className="btn btn-danger" onClick={this.handleClick}>{this.props.deleteLabel}</button>;
     },
     renderLayer: function() {
         if (this.state.clicked) {
@@ -99,6 +104,7 @@ const PermissionsBar = React.createClass({
     getDefaultProps() {
         return {
             editable: true,
+            extra: undefined,
             object: undefined,
             setPublic: function(){},
             setSearchable: function(){},
@@ -163,6 +169,7 @@ const PermissionsBar = React.createClass({
                         <i className="fa fa-pencil"></i> &nbsp;Edit
                         </Link>
                     :''}
+                     &nbsp;{this.props.extra}
 
                     &nbsp;{!this.props.runnable && !this.props.editable && this.props.showRun?
                         <Link className="btn btn-primary" to={this.props.link}

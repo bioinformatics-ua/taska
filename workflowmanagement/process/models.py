@@ -9,6 +9,7 @@ from utils.hashes import createHash
 
 from django.db.models import Q
 from django.utils import timezone
+from django.db import transaction
 
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
@@ -60,10 +61,25 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
-    '''
-        Reaccess tasks status (so we can move the state machine forward)
-    '''
+    @transaction.atomic
+    def cancel(self):
+        ''' Cancels a process, also canceling all pending tasks in it
+        '''
+        ptasks = self.tasks()
+
+        for ptask in ptasks:
+            if ptask.status == ProcessTask.WAITING or ptask.status == ProcessTask.RUNNING:
+                ptask.status = ProcessTask.CANCELED
+                ptask.save()
+
+        self.status = Process.CANCELED
+        self.save()
+
+    @transaction.atomic
     def move(self):
+        '''
+            Reaccess tasks status (so we can move the state machine forward)
+        '''
         ptasks = self.tasks()
 
         wlist = ptasks.filter(status=ProcessTask.WAITING)
@@ -82,22 +98,22 @@ class Process(models.Model):
                 ptask.status = ProcessTask.RUNNING
                 ptask.save()
 
-        if wlist.count() == 0:
+        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING)).count() == 0:
             self.status = Process.FINISHED
             self.end_date = timezone.now()
             self.save()
 
     def progress(self):
         all = ProcessTask.all(process=self).count()
-        missing = ProcessTask.all(process=self).exclude(Q(status=ProcessTask.FINISHED) | Q(status=ProcessTask.CANCELED)).count()
+        done = ProcessTask.all(process=self).filter(Q(status=ProcessTask.FINISHED) | Q(status=ProcessTask.CANCELED)).count()
 
         print "ALL:"
         print all
-        print "missing"
-        print missing
+        print "done"
+        print done
 
         try:
-            return missing*100 / all
+            return done*100 / all
         except ZeroDivisionError:
             return 0
 
@@ -216,6 +232,18 @@ class ProcessTaskUser(models.Model):
     class Meta:
         ordering = ['-processtask__deadline']
 
+    def result(self):
+        from result.models import Result
+        try:
+            results = Result.all().filter(processtaskuser=self)
+
+            if len(results) > 0:
+                return results[0]
+
+        except Result.DoesNotExist, IndexError:
+            pass
+
+        return None
     def finish(self):
         self.finished=True
         self.save()
@@ -223,18 +251,21 @@ class ProcessTaskUser(models.Model):
         self.processtask.move()
 
     @staticmethod
-    def all(processtask=None, related=False):
+    def all(processtask=None, related=False, finished=None):
         ''' Returns all valid processtask instances
 
         '''
         tmp = None
         if related:
-            tmp = ProcessTaskUser.objects.select_related('processtask').filter(finished=False)
+            tmp = ProcessTaskUser.objects.select_related('processtask').all()
         else:
-            tmp = ProcessTaskUser.objects.filter(finished=False)
+            tmp = ProcessTaskUser.objects.all()
+
+        if finished != None:
+            tmp = tmp.filter(finished=finished)
 
         if processtask != None:
-            tmp=tmp.filter(processtask=processtask)
+            tmp = tmp.filter(processtask=processtask)
 
         return tmp
 

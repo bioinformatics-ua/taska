@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus, DeleteButton} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -74,6 +74,7 @@ export default React.createClass({
         return `Process ${process['object_repr']} (${process['start_date']})`;
     },
     __getState(){
+        console.log('GET STATE');
         return {
             process: ProcessStore.getDetail(),
             ***REMOVED*** WorkflowStore.getDetail(),
@@ -87,13 +88,12 @@ export default React.createClass({
         ProcessActions.calibrate();
     },
     update(status){
-        if(status == ProcessStore.DETAIL){
-            this.setState(this.__getState());
-        }
+        this.setState(this.__getState());
     },
     load(){
         const wf = this.state.workflow;
         const sm = new StateMachine();
+        let checksum = '';
 
             sm.addStateClass({
                 id: 'tasks.SimpleTask',
@@ -127,6 +127,8 @@ export default React.createClass({
                 opts.deadline = t.deadline;
                 opts.ptask = t;
 
+                checksum += opts.ptask.status;
+
                 let state = sm.stateFactory(task.sortid, type, opts);
 
                 map[task.hash] = state;
@@ -140,7 +142,7 @@ export default React.createClass({
                     sm.addDependency(map[task.hash], map[dep.dependency]);
         }
 
-        return sm;
+        return [sm, checksum];
     },
     closePopup(){
         ProcessActions.calibrate();
@@ -148,13 +150,18 @@ export default React.createClass({
     save(){
 
     },
+    cancel(){
+        ProcessActions.cancel();
+    },
     render() {
         let params = this.context.router.getCurrentParams();
 
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view'))
             this.context.router.replaceWith('/404');
 
-        let sm = this.load();
+        let [sm, checksum] = this.load();
+
+        console.log('teste'+params.mode+checksum);
 
         return (
             <span>
@@ -173,13 +180,21 @@ export default React.createClass({
                         success={this.closePopup} close={this.closePopup}
                     />
                 :''}
-                <StateMachineComponent key={'teste'+params.mode}
+                <StateMachineComponent key={'teste'+params.mode+checksum}
                     extra={
                         <span>
                             <PermissionsBar
                                 link="ProcessEdit"
                                 editable={params.mode === 'edit'}
                                 runnable={params.mode === 'run'}
+                                extra={
+                                    <DeleteButton
+                                      success={this.cancel}
+                                      identificator = {false}
+                                      deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
+                                      title={`Cancel ${this.state.process['object_repr']}`}
+                                      message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
+                                }
                                 showRun={false}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />

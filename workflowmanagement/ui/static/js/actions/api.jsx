@@ -83,6 +83,9 @@ class DetailLoader extends Loader{
     delete(hash){
         return super.load(`api/${this.model}/${hash}/`, null, null, "DELETE");
     }
+    method(method, hash, type='GET', data={}){
+      return super.load(`api/${this.model}/${hash}/${method}/`, null, null, type, data);
+    }
 }
 
 class Login extends Loader{

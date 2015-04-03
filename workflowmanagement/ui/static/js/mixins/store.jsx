@@ -132,8 +132,6 @@ class DetailStoreMixin{
                 );
             },
             onAddDetail(serialized){
-                console.log('CHEGA AQUI');
-
                 loader.post(serialized).then(
                     data => {
                         this.__Actions.loadDetailSuccess(data);
@@ -145,6 +143,13 @@ class DetailStoreMixin{
                 loader.delete(hash).then(
                     data => {
                         this.__Actions.deleteDetail.completed(data);
+                    }
+                );
+            },
+            onMethodDetail(method, hash){
+                loader.method(method, hash).then(
+                    data => {
+                        this.__Actions.methodDetail.completed(data);
                     }
                 );
             },

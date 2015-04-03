@@ -32,6 +32,7 @@ class ResultAdmin(admin.ModelAdmin):
         return obj.processtaskuser.user
 
     list_display = (process, task, 'date', 'comment', result_type)
+    readonly_fields = ('hash', )
     # we disabled permission to edit/add, since this is for listing the generic entries only
     def has_add_permission(self, request):
         return False
@@ -45,3 +46,4 @@ class SimpleResultAdmin(admin.ModelAdmin):
     ''' Django-Admin page for listing, adding and editing :class:`process.models.SimpleResult` entries.
     '''
     list_display = ('processtaskuser', 'date', 'comment')
+    readonly_fields = ('hash', )

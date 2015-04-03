@@ -9,6 +9,10 @@ import {ListLoader, DetailLoader} from '../actions/api.jsx'
 let loader = new ListLoader({model: 'process'});
 
 export default Reflux.createStore({
+    statics: {
+        DETAIL: 0,
+        LIST: 1
+    },
     mixins: [TableStoreMixin,
         DetailStoreMixin.factory(
             new DetailLoader({model: 'process'}),
@@ -41,5 +45,13 @@ export default Reflux.createStore({
         this.__missing=[];
 
         this.trigger();
+    },
+    onCancel(){
+        ProcessActions.methodDetail.triggerPromise('cancel', this.__detaildata.hash).then(
+            (data) => {
+                this.__detaildata = data;
+                this.trigger(this.DETAIL);
+            }
+        );
     }
 });

@@ -26,11 +26,9 @@ module.exports = (
 
         <Route name="Request" path="request/:object" handler={require('./components/request.jsx')} />
 
-        <Route name="SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
-        <Route name="Result" path="result/:object" handler={require('./components/result/simple.jsx')} />
+        <Route name="result.SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
 
-        <Route name="SimpleTask" path="simpletask/:object" handler={require('./components/task/simple.jsx')} />
-        <Route name="Task" path="task/:object" handler={require('./components/task/simple.jsx')} />
+        <Route name="tasks.SimpleTask" path="simpletask/:object" handler={require('./components/task/simple.jsx')} />
 
         <NotFoundRoute handler={require('./components/404.jsx')}/>
     </Route>

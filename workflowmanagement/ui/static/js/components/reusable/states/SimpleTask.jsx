@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import React from 'react';
+import {Link} from 'react-router';
 
 import {SimpleState} from '../../../react-statemachine/classes.jsx';
 
@@ -122,7 +123,12 @@ class SimpleTaskRun extends SimpleTask{
         if(this.getData().ptask)
             switch(this.getData().ptask.status){
                 case 1:
-                    return {};
+                    return {
+                        border: '1px solid #ccc',
+                        color: 'black',
+                        backgroundColor: 'white',
+                        fontSize: '100%'
+                    };
                 case 2:
                     let end = moment(this.getData().ptask.deadline);
                     let now = moment();
@@ -131,37 +137,67 @@ class SimpleTaskRun extends SimpleTask{
                         return {
                               backgroundColor: '#337ab7',
                               border: 0,
-                              color: 'white'
+                              color: 'white',
+                              fontSize: '100%'
                         };
                     } else {
                         return {
                             backgroundColor: 'rgb(240, 173, 78)',
                             border: 0,
-                            color: 'white'
+                            color: 'white',
+                            fontSize: '100%'
                         };
                     }
                 case 3:
                     return {
                           backgroundColor: 'rgb(92, 184, 92)',
                           border: 0,
-                          color: 'white'
+                          color: 'white',
+                          fontSize: '100%'
                     };
                 case 4:
                     return {
                         backgroundColor: 'grey',
                         border: 0,
-                        color: 'white'
+                        color: 'white',
+                        fontSize: '100%'
                     };
                 case 5:
                     return {
                         backgroundColor: 'rgb(240, 173, 78)',
                         border: 0,
-                        color: 'white'
+                        color: 'white',
+                        fontSize: '100%'
                     };
             }
 
 
         return {};
+    }
+    stateDesc(){
+        if(this.getData().ptask)
+            switch(this.getData().ptask.status){
+                case 1:
+                    return 'Waiting';
+                case 2:
+                    let end = moment(this.getData().ptask.deadline);
+                    let now = moment();
+
+                    if(now.isBefore(end)){
+                        return 'Running';
+                    } else {
+                        return 'Overdue';
+                    }
+                case 3:
+                    return 'Finished';
+                case 4:
+                    return 'Canceled';
+                case 5:
+                    return 'Overdue';
+            }
+
+
+        return 'Waiting';
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -190,6 +226,74 @@ class SimpleTaskRun extends SimpleTask{
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
+            },
+            results(){
+                let users;
+                let status;
+
+                try{
+                    users = this.parent().ptask.users;
+                    status = this.parent().status;
+                } catch(ex){
+                    users = [];
+                }
+                let renderStatus = function(user){
+                    if(user.finished){
+                        return (
+                            <span>
+                                <span style={{fontSize: '100%'}} className="label label-danger">
+                                    Finished on {moment(user.result.date).format('YYYY-MM-DDTHH:mm')}
+                                </span>
+                                 &nbsp;&nbsp;&nbsp;
+                                 <Link to={user.result.type}
+                                 params={{object: user.result.hash}}>
+                                 See result</Link>
+                            </span>
+                        );
+                    } else if(user.reassigned){
+                        return (
+                            <span style={{fontSize: '100%'}} className="label label-warning">
+                                Reassigned on {moment(user.reassigned_date).format('YYYY-MM-DDTHH:mm')}
+                            </span>
+                        );
+                    } else {
+                        console.log('ELSE');
+                        return (
+                            <span className="label" style={self.stateStyle()}>
+                                {self.stateDesc()}
+                            </span>
+                        );
+                    }
+                };
+                if(users.length > 0){
+                    return (
+                        <table className="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colSpan="2"><center><h4>Status of each assignee tasks</h4></center></th>
+                                </tr>
+                                <tr>
+                                    <th style={{width: '40%'}}>User</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(
+                                    (user, index) => {
+                                            return (
+                                                <tr key={`ustatus_${index}`}>
+                                                    <td>{user['user_repr']}</td>
+                                                    <td>{renderStatus(user)}</td>
+                                                </tr>
+                                            );
+                                    })
+                                }
+                            </tbody>
+                        </table>
+                    );
+                }
+
+                return false;
             },
             componentWillMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
@@ -249,6 +353,9 @@ class SimpleTaskRun extends SimpleTask{
                                             value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
                         </div>
                     </div>
+
+                    {this.results()}
+
                     <ChildComponent main={this} />
                 </span>
             }

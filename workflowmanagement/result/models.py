@@ -20,6 +20,7 @@ class Result(models.Model):
     date            = models.DateTimeField(auto_now_add=True)
     comment         = models.TextField()
     hash            = models.CharField(max_length=50)
+
     removed         = models.BooleanField(default=False)
 
     # We need this to be able to properly guess the type
@@ -80,13 +81,18 @@ class Result(models.Model):
         ptask = self.processtaskuser.processtask
         return "Result for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
 
-@receiver(models.signals.post_save, sender=Result)
+@receiver(models.signals.post_save)
 def __generate_result_hash(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an result.
     '''
+    if not isinstance(instance, Result):
+         return
+
     if created:
         instance.hash=createHash(instance.id)
+        instance.ttype = instance.type()
         instance.save()
+
 
 class SimpleResult(Result):
     '''Basic concretization of a result for a ProcessTask.

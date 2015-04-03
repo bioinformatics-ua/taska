@@ -33,7 +33,8 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-        return `Task ${route.props.detail.Task.task_repr}`;
+        let detail = Object.keys(route.props.detail)[0];
+        return `Task ${route.props.detail[detail].task_repr}`;
     },
     __getState(){
         return {
@@ -131,7 +132,7 @@ export default React.createClass({
                             </div>
                             <div className="row">
                                 <div className="col-md-12">
-                                    <DetailRender />
+                                    <DetailRender key={this.state.task.hash} />
                                 </div>
                             </div>
                         </div>

@@ -10,7 +10,8 @@ const ProcessActions = Reflux.createActions(
     'loadSuccess':{},
     'load': {},
     'deleteProcess': {},
-    'calibrate': {}
+    'calibrate': {},
+    'cancel': {},
     }, DetailActionsMixin));
 
 export default ProcessActions;

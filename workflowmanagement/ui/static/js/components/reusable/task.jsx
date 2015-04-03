@@ -42,8 +42,9 @@ const TaskLink = React.createClass({
     const object = {object: row.hash}
     return <small title={row.process}>
             <Link id={`task_${row.hash}`}
-              key={row.hash} to="Task"
+              key={row.hash} to={row.type}
                params={object}>{row.task_repr}</Link><br />
+
            </small>;
   }
 });
