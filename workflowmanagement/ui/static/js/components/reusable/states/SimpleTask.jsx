@@ -124,11 +124,22 @@ class SimpleTaskRun extends SimpleTask{
                 case 1:
                     return {};
                 case 2:
-                    return {
-                          backgroundColor: '#337ab7',
-                          border: 0,
-                          color: 'white'
-                    };
+                    let end = moment(this.getData().ptask.deadline);
+                    let now = moment();
+
+                    if(now.isBefore(end)){
+                        return {
+                              backgroundColor: '#337ab7',
+                              border: 0,
+                              color: 'white'
+                        };
+                    } else {
+                        return {
+                            backgroundColor: 'rgb(240, 173, 78)',
+                            border: 0,
+                            color: 'white'
+                        };
+                    }
                 case 3:
                     return {
                           backgroundColor: 'rgb(92, 184, 92)',

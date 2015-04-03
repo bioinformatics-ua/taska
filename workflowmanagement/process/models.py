@@ -8,6 +8,7 @@ from tasks.models import Task
 from utils.hashes import createHash
 
 from django.db.models import Q
+from django.utils import timezone
 
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
@@ -65,23 +66,30 @@ class Process(models.Model):
     def move(self):
         ptasks = self.tasks()
 
-        for ptask in ptasks.filter(status=ProcessTask.WAITING):
+        wlist = ptasks.filter(status=ProcessTask.WAITING)
+
+        for ptask in wlist:
             move = True
             deps = ptask.task.dependencies()
 
             for dep in deps:
                 pdep = ptasks.get(task=dep.dependency)
 
-                if pdep.status != ProcessTask.FINISHED:
+                if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
                     move=False
 
             if move:
                 ptask.status = ProcessTask.RUNNING
                 ptask.save()
 
+        if wlist.count() == 0:
+            self.status = Process.FINISHED
+            self.end_date = timezone.now()
+            self.save()
+
     def progress(self):
         all = ProcessTask.all(process=self).count()
-        missing = ProcessTask.all(process=self).filter(Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.WAITING)).count()
+        missing = ProcessTask.all(process=self).exclude(Q(status=ProcessTask.FINISHED) | Q(status=ProcessTask.CANCELED)).count()
 
         print "ALL:"
         print all
@@ -89,7 +97,7 @@ class Process(models.Model):
         print missing
 
         try:
-            return (all-missing)*100 / all
+            return missing*100 / all
         except ZeroDivisionError:
             return 0
 
@@ -157,6 +165,16 @@ class ProcessTask(models.Model):
     def users(self):
         return ProcessTaskUser.all(processtask=self)
 
+    def move(self):
+
+        missing = self.users().filter(finished=False).count()
+
+        if missing == 0:
+            self.status=ProcessTask.FINISHED
+            self.save()
+
+            self.process.move()
+
     @staticmethod
     def all(process=None):
         ''' Returns all valid process task instances (excluding logically removed process tasks)
@@ -193,9 +211,16 @@ class ProcessTaskUser(models.Model):
     processtask     = models.ForeignKey(ProcessTask)
     reassigned      = models.BooleanField(default=False)
     reassign_date   = models.DateTimeField(null=True, blank=True)
+    finished        = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-processtask__deadline']
+
+    def finish(self):
+        self.finished=True
+        self.save()
+
+        self.processtask.move()
 
     @staticmethod
     def all(processtask=None, related=False):
@@ -204,9 +229,9 @@ class ProcessTaskUser(models.Model):
         '''
         tmp = None
         if related:
-            tmp = ProcessTaskUser.objects.select_related('processtask').all()
+            tmp = ProcessTaskUser.objects.select_related('processtask').filter(finished=False)
         else:
-            tmp = ProcessTaskUser.objects.all()
+            tmp = ProcessTaskUser.objects.filter(finished=False)
 
         if processtask != None:
             tmp=tmp.filter(processtask=processtask)

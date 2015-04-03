@@ -292,6 +292,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         """
         instance = self.get_object()
+
         History.new(event=History.ACCESS, actor=request.user, object=instance)
 
         return Response(ProcessSerializer(instance).data)

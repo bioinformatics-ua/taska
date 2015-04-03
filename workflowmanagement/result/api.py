@@ -85,11 +85,14 @@ class ResultSerializer(serializers.ModelSerializer):
             process = Process.objects.get(hash=process)
             task = Task.objects.get(hash=task)
 
-            validated_data[u'processtaskuser'] =  ProcessTaskUser.objects.get(
+            ptu = ProcessTaskUser.objects.get(
                     processtask__process=process,
                     processtask__task=task,
                     user__id=user
                 )
+            ptu.finish()
+
+            validated_data[u'processtaskuser'] = ptu
         except (Process.DoesNotExist, Task.DoesNotExist, ProcessTaskUser.DoesNotExist):
             return None
 

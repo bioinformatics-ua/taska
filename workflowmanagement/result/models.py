@@ -19,7 +19,7 @@ class Result(models.Model):
     processtaskuser = models.ForeignKey(ProcessTaskUser)
     date            = models.DateTimeField(auto_now_add=True)
     comment         = models.TextField()
-    hash            = models.CharField(max_length=50, unique=True)
+    hash            = models.CharField(max_length=50)
     removed         = models.BooleanField(default=False)
 
     # We need this to be able to properly guess the type

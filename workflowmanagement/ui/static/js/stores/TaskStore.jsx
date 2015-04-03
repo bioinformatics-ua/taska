@@ -53,6 +53,9 @@ export default Reflux.createStore({
 
         //this.trigger(this.DETAIL);
     },
+    answerSubmitted(){
+        return this.__rfinished || false;
+    },
     onSaveAnswer(){
         console.log(this.answer);
         StateActions.loadingStart();
@@ -60,6 +63,9 @@ export default Reflux.createStore({
         ResultActions.addDetail.triggerPromise(this.answer).then(
             (answer) => {
                 StateActions.loadingEnd();
+
+                this.__rfinished = answer;
+                this.trigger();
             }
         )
     }

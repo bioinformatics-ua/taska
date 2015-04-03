@@ -38,7 +38,8 @@ export default React.createClass({
     __getState(){
         return {
             task: TaskStore.getDetail(),
-            answer: TaskStore.getAnswer()
+            answer: TaskStore.getAnswer(),
+            submitted: TaskStore.answerSubmitted()
         }
     },
     getInitialState(){
@@ -48,6 +49,8 @@ export default React.createClass({
         TaskActions.calibrate();
     },
     componentDidUpdate(){
+        if(this.state.submitted)
+            this.context.router.transitionTo('home');
     },
     update(status){
         if(status == TaskStore.DETAIL){

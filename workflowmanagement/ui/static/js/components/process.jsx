@@ -213,7 +213,7 @@ export default React.createClass({
                                 </div>
                             </div>
                             <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
-                            <div style={{backgroundColor: '#19AB27', width: this.state.process.progress, height: '10px'}}></div>
+                            <div title={`${this.state.process.progress}% completed`} style={{backgroundColor: '#19AB27', width: `${this.state.process.progress}%`, height: '10px'}}></div>
                             &nbsp;</div>
                             <ProcessLabel />
                         </span>
