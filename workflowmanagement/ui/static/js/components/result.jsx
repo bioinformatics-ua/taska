@@ -67,7 +67,7 @@ export default React.createClass({
                             </div>
                             <div className="row">
                                 <div className="col-md-12">
-                                    <DetailRender key={this.state.result.hash} />
+                                    <DetailResultRender key={this.state.result.hash} />
                                 </div>
                             </div>
                         </div>
