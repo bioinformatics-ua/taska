@@ -153,6 +153,12 @@ export default React.createClass({
     cancel(){
         ProcessActions.cancel();
     },
+    cancelUser(e){
+        console.log('CANCELS A USER');
+    },
+    addNew(e){
+        console.log('ADDS A NEW USER');
+    },
     render() {
         let params = this.context.router.getCurrentParams();
 
@@ -186,6 +192,7 @@ export default React.createClass({
                             <PermissionsBar
                                 link="ProcessEdit"
                                 editable={params.mode === 'edit'}
+                                showEdit={false}
                                 runnable={params.mode === 'run'}
                                 extra={
                                     <DeleteButton
@@ -239,6 +246,8 @@ export default React.createClass({
                     saveLabel={<span><i className="fa fa-floppy-o"></i> &nbsp;Save Process</span>}
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
+                    addNew={this.addNew}
+                    cancelUser={this.cancelUser}
                     {...this.props}/>
             </span>
         );

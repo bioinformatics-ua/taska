@@ -503,7 +503,7 @@ let StateMachineComponent = React.createClass({
                 return <span><DRender
                 deleteConnection={this.deleteConnection}
                 addDependency={this.addDependency}
-                dataChange={this.dataChange} /></span>;
+                dataChange={this.dataChange} {...this.props}/></span>;
             }
 
             return <center>Please select a state to see his data options.</center>;

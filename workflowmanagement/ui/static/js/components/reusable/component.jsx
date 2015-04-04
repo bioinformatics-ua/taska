@@ -109,7 +109,8 @@ const PermissionsBar = React.createClass({
             setPublic: function(){},
             setSearchable: function(){},
             setForkable: function(){},
-            showRun: true
+            showRun: true,
+            showEdit: true,
         };
     },
     getInitialState(){
@@ -163,7 +164,7 @@ const PermissionsBar = React.createClass({
                         </div>
                 </div>
                     <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
-                    {!this.props.editable && !this.props.runnable ?
+                    {!this.props.editable && !this.props.runnable && this.props.showEdit ?
                         <Link className="btn btn-warning" to={this.props.link}
                         params={{object: this.props.object, mode:'edit'}}>
                         <i className="fa fa-pencil"></i> &nbsp;Edit

@@ -227,7 +227,21 @@ class SimpleTaskRun extends SimpleTask{
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
+            cancelUser(e){
+                let action = this.state.parent.props.cancelUser;
+                if(action){
+                    action(Number.parseInt($(e.target).data('user')));
+                }
+            },
+            addNew(e){
+                let action = this.state.parent.props.addNew;
+                if(action){
+                    action(Number.parseInt($(e.target).data('user')));
+                }
+            },
             results(){
+                let me=this;
+
                 let users;
                 let status;
 
@@ -237,12 +251,15 @@ class SimpleTaskRun extends SimpleTask{
                 } catch(ex){
                     users = [];
                 }
+                let desc = self.stateDesc();
+                let stillOn = desc === 'Running' || desc === 'Waiting';
+
                 let renderStatus = function(user){
                     if(user.finished){
                         return (
                             <span>
                                 <span style={{fontSize: '100%'}} className="label label-danger">
-                                    Finished on {moment(user.result.date).format('YYYY-MM-DDTHH:mm')}
+                                    Finished on {moment(user.result.date).format('YYYY-MM-DD HH:mm')}
                                 </span>
                                  &nbsp;&nbsp;&nbsp;
                                  <Link to={user.result.type}
@@ -253,20 +270,24 @@ class SimpleTaskRun extends SimpleTask{
                     } else if(user.reassigned){
                         return (
                             <span style={{fontSize: '100%'}} className="label label-warning">
-                                Reassigned on {moment(user.reassigned_date).format('YYYY-MM-DDTHH:mm')}
+                                Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
                             </span>
                         );
                     } else {
-                        console.log('ELSE');
+
                         return (
+                            <span>
                             <span className="label" style={self.stateStyle()}>
-                                {self.stateDesc()}
+                                {desc}
+                            </span> &nbsp;&nbsp;&nbsp;
+                            {stillOn ?
+                           <a data-user={user.id} onClick={me.cancelUser}>Cancel ?</a> :''}
                             </span>
                         );
                     }
                 };
                 if(users.length > 0){
-                    return (
+                    return (<span>
                         <table className="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -290,7 +311,10 @@ class SimpleTaskRun extends SimpleTask{
                                 }
                             </tbody>
                         </table>
-                    );
+                        { stillOn ?
+                        <button onClick={me.addNew} className="pull-right btn btn-success">Add new assignee</button>
+                        : ''}
+                    </span>);
                 }
 
                 return false;
