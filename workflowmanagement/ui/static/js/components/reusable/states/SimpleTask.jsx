@@ -11,6 +11,8 @@ import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
 
+import checksum from 'json-checksum';
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -65,6 +67,7 @@ class SimpleTask extends SimpleState {
     }
 
     static deserializeOptions(data){
+
         if(data.title === undefined)
             throw `data object is missing 'title' property`;
 
@@ -206,7 +209,9 @@ class SimpleTaskRun extends SimpleTask{
             getState(){
                 return {
                     parent: this.props.main,
-                    users: []
+                    users: [],
+                    new_assignee: undefined
+
                 };
             },
             getInitialState(){
@@ -230,20 +235,29 @@ class SimpleTaskRun extends SimpleTask{
             cancelUser(e){
                 let action = this.state.parent.props.cancelUser;
                 if(action){
-                    action(Number.parseInt($(e.target).data('user')));
+                    action(self.getData().ptask.hash,
+                        Number.parseInt($(e.target).data('assignee')),
+                        $(e.target).data('cancel'));
                 }
             },
             addNew(e){
                 let action = this.state.parent.props.addNew;
                 if(action){
-                    action(Number.parseInt($(e.target).data('user')));
+                    action(self.getData().ptask.hash, this.state.new_assignee);
                 }
+            },
+            newAssignee(e){
+                this.setState({
+                    new_assignee: e
+                })
             },
             results(){
                 let me=this;
 
                 let users;
                 let status;
+
+                let alreadyusers = this.parent().assignee.split(',');
 
                 try{
                     users = this.parent().ptask.users;
@@ -268,9 +282,12 @@ class SimpleTaskRun extends SimpleTask{
                             </span>
                         );
                     } else if(user.reassigned){
-                        return (
+                        return (<span>
                             <span style={{fontSize: '100%'}} className="label label-warning">
                                 Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
+                            </span>&nbsp;&nbsp;&nbsp;
+                            {stillOn ?
+                            <a data-assignee={user.user} data-cancel="false" onClick={me.cancelUser}>Uncancel ?</a> :''}
                             </span>
                         );
                     } else {
@@ -281,7 +298,7 @@ class SimpleTaskRun extends SimpleTask{
                                 {desc}
                             </span> &nbsp;&nbsp;&nbsp;
                             {stillOn ?
-                           <a data-user={user.id} onClick={me.cancelUser}>Cancel ?</a> :''}
+                           <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> :''}
                             </span>
                         );
                     }
@@ -311,15 +328,19 @@ class SimpleTaskRun extends SimpleTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn ?
+                        { stillOn ?<span>
                         <button onClick={me.addNew} className="pull-right btn btn-success">Add new assignee</button>
-                        : ''}
+                        <Select placeholder="Search for assignee" className="pull-right col-md-5" onChange={this.newAssignee}
+                            value={this.state.new_assignee} name="form-field-name"
+                         options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                        } />
+                        </span>: ''}
                     </span>);
                 }
 
                 return false;
             },
-            componentWillMount(){
+            componentDidMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
                 UserActions.loadListIfNecessary.triggerPromise().then(
@@ -332,14 +353,15 @@ class SimpleTaskRun extends SimpleTask{
                                         }
                                     }
                         );
-                        this.setState(
-                            {
-                                users: map
-                            }
-                        );
+                        if(this.isMounted()){
+                            this.setState(
+                                {
+                                    users: map
+                                }
+                            );
+                        }
                     }
                 );
-                console.log(this.parent());
 
                 if(!this.parent().deadline)
                     this.setDeadline({

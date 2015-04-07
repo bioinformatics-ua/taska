@@ -84,6 +84,8 @@ class DetailLoader extends Loader{
         return super.load(`api/${this.model}/${hash}/`, null, null, "DELETE");
     }
     method(method, hash, type='GET', data={}){
+      if(typeof data !== 'string')
+        data = JSON.stringify(data);
       return super.load(`api/${this.model}/${hash}/${method}/`, null, null, type, data);
     }
 }

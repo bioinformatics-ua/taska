@@ -49,6 +49,7 @@ let StateMachineComponent = React.createClass({
         return this.getState();
     },
     componentWillMount(){
+        console.log('MOUNT');
     },
     getDefaultProps() {
         return {
@@ -208,6 +209,7 @@ let StateMachineComponent = React.createClass({
         this.__initUI();
     },
     componentWillUnmount(){
+        console.log('UNMOUNT');
         this.killUI();
     },
     componentWillUpdate(){

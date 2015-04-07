@@ -42,7 +42,7 @@ const ProcessLabel = React.createClass({
                 </table>
     }
 })
-
+var i = 0;
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
@@ -78,7 +78,9 @@ export default React.createClass({
         return {
             process: ProcessStore.getDetail(),
             ***REMOVED*** WorkflowStore.getDetail(),
-            missing: ProcessStore.getMissing()
+            workflowrepr: ProcessStore.getRepr(),
+            missing: ProcessStore.getMissing(),
+            version: ProcessStore.getVersion(),
         }
     },
     getInitialState(){
@@ -88,61 +90,12 @@ export default React.createClass({
         ProcessActions.calibrate();
     },
     update(status){
-        this.setState(this.__getState());
+        if(status === ProcessStore.DETAIL){
+            this.setState(this.__getState());
+        }
     },
     load(){
-        const wf = this.state.workflow;
-        const sm = new StateMachine();
-        let checksum = '';
 
-            sm.addStateClass({
-                id: 'tasks.SimpleTask',
-                Class: SimpleTaskRun
-            });
-
-
-        // I dont know if they come ordered, so i add all tasks first, an dependencies only after
-        let map = {};
-
-        // first states
-        let ptasks = this.state.process.tasks;
-
-        if(wf.tasks){
-            for(let task of wf.tasks){
-                let type = sm.getStateClass(task.type).Class;
-
-                let opts = type.deserializeOptions(task)
-                opts.disabled = true;
-
-                let t=ptasks.find(pt => pt.task === task.hash);
-
-                opts.assignee = t.users.reduce((prev, curr, i)=>{
-                                        if(i == 0)
-                                            return ''+curr.user;
-
-                                        return `${prev},${curr.user}`;
-                                    },''
-                                );
-
-                opts.deadline = t.deadline;
-                opts.ptask = t;
-
-                checksum += opts.ptask.status;
-
-                let state = sm.stateFactory(task.sortid, type, opts);
-
-                map[task.hash] = state;
-
-                sm.addState(state);
-            }
-
-            // then dependencies
-            for(let task of wf.tasks)
-                for(let dep of task.dependencies)
-                    sm.addDependency(map[task.hash], map[dep.dependency]);
-        }
-
-        return [sm, checksum];
     },
     closePopup(){
         ProcessActions.calibrate();
@@ -153,40 +106,27 @@ export default React.createClass({
     cancel(){
         ProcessActions.cancel();
     },
-    cancelUser(e){
-        console.log('CANCELS A USER');
+    cancelUser(task, user, val){
+        console.log(`CANCEL USER ${user} on process task ${task}`);
+        ProcessActions.cancelUser(task, user, val);
     },
-    addNew(e){
-        console.log('ADDS A NEW USER');
+    addNew(task, user){
+        console.log(`ADD USER ${user} on process task ${task}`);
+        ProcessActions.addUser(task, user);
     },
     render() {
+        i++;
+        console.log('RENDER PROCESS ');
         let params = this.context.router.getCurrentParams();
 
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view'))
             this.context.router.replaceWith('/404');
 
-        let [sm, checksum] = this.load();
-
-        console.log('teste'+params.mode+checksum);
+        let [sm, checksum] = this.state.workflowrepr;
 
         return (
             <span>
-                {this.state.missing.length > 0?
-                    <Modal title="Missing information"
-                        message={<span>You have to specify deadlines and assignee's for all tasks.<br />
-                            <br />
-                            The following tasks don't have deadlines or assignee's:
-                            <ul>
-                                {this.state.missing.map((state) => {
-                                        return <li key={state.name}>{state.name}</li>;
-                                })}
-                            </ul>
-
-                            </span>}
-                        success={this.closePopup} close={this.closePopup}
-                    />
-                :''}
-                <StateMachineComponent key={'teste'+params.mode+checksum}
+                <StateMachineComponent key={'process'+params.mode+checksum}
                     extra={
                         <span>
                             <PermissionsBar

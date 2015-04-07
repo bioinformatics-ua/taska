@@ -146,8 +146,8 @@ class DetailStoreMixin{
                     }
                 );
             },
-            onMethodDetail(method, hash){
-                loader.method(method, hash).then(
+            onMethodDetail(method, hash, type='GET', data={}){
+                loader.method(method, hash, type, data).then(
                     data => {
                         this.__Actions.methodDetail.completed(data);
                     }

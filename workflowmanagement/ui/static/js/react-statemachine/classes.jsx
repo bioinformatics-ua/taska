@@ -163,7 +163,8 @@ class State{
             },
             componentWillUnmount(){
                 // keep safe in case something did not trigger datachange properly
-                this.props.dataChange(self.getIdentificator(), this.state, false);
+                // cant do this because it messes data state from children (dont know why :( )
+                //this.props.dataChange(self.getIdentificator(), this.state, false);
             },
             render(){
                 let dependencies = self.getDependencies().map((dependency) => {
@@ -339,10 +340,12 @@ class StateMachine{
         return this.__stateclasses;
     }
 
-    stateFactory(level, Class, data=undefined){
+    stateFactory(level, Class, data){
         var self = this;
 
         this.__internal_counter++;
+
+        console.log(data);
 
         return new Class({
             identificator: this.__internal_counter,

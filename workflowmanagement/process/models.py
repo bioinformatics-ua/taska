@@ -244,6 +244,21 @@ class ProcessTaskUser(models.Model):
             pass
 
         return None
+
+    def reassign(self):
+        self.reassigned=True
+        self.reassign_date = timezone.now()
+        self.save()
+
+        self.processtask.move()
+
+    def assign(self):
+        self.reassigned=False
+        self.reassign_date = None
+        self.save()
+
+        self.processtask.move()
+
     def finish(self):
         self.finished=True
         self.save()

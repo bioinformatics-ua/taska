@@ -12,6 +12,8 @@ const ProcessActions = Reflux.createActions(
     'deleteProcess': {},
     'calibrate': {},
     'cancel': {},
+    'cancelUser': {},
+    'addUser': {}
     }, DetailActionsMixin));
 
 export default ProcessActions;

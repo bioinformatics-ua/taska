@@ -29,6 +29,8 @@ from utils.api_related import create_serializer, AliasOrderingFilter
 
 from result.api import GenericResultSerializer
 
+import json
+
 @api_view(('GET',))
 def root(request, format=None):
     return Response({
@@ -323,6 +325,56 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         process.cancel()
 
         return Response(ProcessSerializer(process).data)
+
+    @detail_route(methods=['post'])
+    def adduser(self, request, hash=None):
+        process = self.get_object()
+
+        ptask = None
+        user = None
+        try:
+            ptask = ProcessTask.all(process=process).get(hash=request.data['ptask'])
+        except:
+            pass
+
+        try:
+            user = User.objects.get(id=request.data['user'])
+        except:
+            pass
+
+        if ptask and user:
+            try:
+                ptaskuser = ProcessTaskUser.objects\
+                        .get(processtask=ptask,
+                             user=user
+                        )
+
+
+            except ProcessTaskUser.DoesNotExist:
+                ptaskuser = ProcessTaskUser(user=user, processtask=ptask)
+                ptaskuser.save()
+
+                return Response(ProcessSerializer(process).data)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @detail_route(methods=['post'])
+    def canceluser(self, request, hash=None):
+        try:
+            ptask = ProcessTaskUser.objects\
+                    .get(processtask__hash=request.data['ptask'],
+                         user__id=request.data['user']
+                    )
+            print request.data['val']
+            if request.data['val'] == True:
+                ptask.reassign()
+            else:
+                ptask.assign()
+
+        except ProcessTaskUser.DoesNotExist, KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(ProcessSerializer(self.get_object()).data)
 
 class MyProcessTaskSerializer(ProcessTaskSerializer):
     type = serializers.SerializerMethodField()
