@@ -256,6 +256,8 @@ class SimpleTaskRun extends SimpleTask{
 
                 let users;
                 let status;
+                if(!this.parent().assignee)
+                    return;
 
                 let alreadyusers = this.parent().assignee.split(',');
 
