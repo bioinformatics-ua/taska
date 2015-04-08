@@ -183,7 +183,9 @@ class ProcessTask(models.Model):
 
     def move(self):
 
-        missing = self.users().filter(finished=False).count()
+        missing = ProcessTaskUser\
+            .all(processtask=self, reassigned=False) \
+            .filter(finished=False).count()
 
         if missing == 0:
             self.status=ProcessTask.FINISHED
@@ -266,7 +268,7 @@ class ProcessTaskUser(models.Model):
         self.processtask.move()
 
     @staticmethod
-    def all(processtask=None, related=False, finished=None):
+    def all(processtask=None, related=False, finished=None, reassigned=None):
         ''' Returns all valid processtask instances
 
         '''
@@ -275,6 +277,9 @@ class ProcessTaskUser(models.Model):
             tmp = ProcessTaskUser.objects.select_related('processtask').all()
         else:
             tmp = ProcessTaskUser.objects.all()
+
+        if reassigned != None:
+            tmp = tmp.filter(reassigned=reassigned)
 
         if finished != None:
             tmp = tmp.filter(finished=finished)

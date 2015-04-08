@@ -49,8 +49,8 @@ export default React.createClass({
     render: function() {
       return (
           <div key="logincomponent" className="container">
-            <div className="row">
-                <div className="col-sm-6 col-md-4 col-md-offset-4">
+            <div className="clearfix row">
+                <div className="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
                     <div className="account-wall">
                         <h1 className="text-center login-title">Please login</h1>
                         <i className="fa fa-user profile-img"></i>
