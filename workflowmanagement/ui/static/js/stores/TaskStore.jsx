@@ -40,9 +40,9 @@ export default Reflux.createStore({
     },
     onCalibrate(){
         this.answer = {
-            task: this.__detaildata.task,
-            process: this.__detaildata.process,
-            type: depmap[this.__detaildata.parent.type]
+            task: this.__detaildata.processtask.task,
+            process: this.__detaildata.processtask.process,
+            type: depmap[this.__detaildata.processtask.parent.type]
         };
     },
     getAnswer(){

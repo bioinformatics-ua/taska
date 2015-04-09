@@ -110,6 +110,9 @@ const TableComponentMixin = {
             sortAscendingComponent: <i className="pull-right fa fa-sort-asc"></i>,
             sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>
         }
+    },
+    commonTableStyle: function(){
+
     }
 };
 

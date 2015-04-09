@@ -28,8 +28,11 @@ from tasks.api import GenericTaskSerializer
 from utils.api_related import create_serializer, AliasOrderingFilter
 
 from result.api import GenericResultSerializer
+from django.http import Http404
 
 import json
+
+from django.shortcuts import get_object_or_404
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -58,7 +61,12 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         return obj.user.get_full_name()
 
     def get_result(self, obj):
-        return GenericResultSerializer(obj.result()).data
+        result = obj.result()
+
+        if result:
+            return GenericResultSerializer(obj.result()).data
+
+        return None
 
 class ProcessTaskSerializer(serializers.ModelSerializer):
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
@@ -378,11 +386,17 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(ProcessSerializer(self.get_object()).data)
 
-class MyProcessTaskSerializer(ProcessTaskSerializer):
+class MyProcessTaskSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     process = serializers.SerializerMethodField()
     process_repr = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
+    task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
+
+    deadline_repr = serializers.SerializerMethodField()
+
+    def get_deadline_repr(self, obj):
+        return obj.deadline.strftime("%Y-%m-%dT%H:%M")
 
     def get_type(self, obj):
         return Task.objects.get_subclass(id=obj.task.id).type()
@@ -396,10 +410,50 @@ class MyProcessTaskSerializer(ProcessTaskSerializer):
     def get_parent(self, obj):
         return GenericTaskSerializer(Task.objects.get_subclass(id=obj.task.id)).data
 
+    class Meta:
+        model = ProcessTask
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        exclude = ('process', 'removed')
+        extra_kwargs = {'hash': {'required': False}}
+
+class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
+    processtask = MyProcessTaskSerializer()
+    task_repr = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+    deadline = serializers.SerializerMethodField()
+
+    def get_task_repr(self, obj):
+        return obj.processtask.task.title
+
+    def get_type(self, obj):
+        return Task.objects.get_subclass(id=obj.processtask.task.id).type()
+
+    def get_deadline(self, obj):
+        return obj.processtask.deadline
+
+class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
+    processtask = MyProcessTaskSerializer()
+    requests = serializers.SerializerMethodField()
+    task_repr = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+    deadline = serializers.SerializerMethodField()
+
+    def get_task_repr(self, obj):
+        return obj.processtask.task.title
+
+    def get_type(self, obj):
+        return Task.objects.get_subclass(id=obj.processtask.task.id).type()
+
+    def get_deadline(self, obj):
+        return obj.processtask.deadline
+    def get_requests(self, obj):
+        rq = RequestSerializer(obj.requests() ,many=True).data
+
+        return RequestSerializer(obj.requests() ,many=True).data
 
 class MyTasks(generics.ListAPIView):
-    queryset = ProcessTask.objects.none()
-    serializer_class = MyProcessTaskSerializer
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
     filter_backends = (filters.DjangoFilterBackend,)
 
     def get_queryset(self):
@@ -409,15 +463,27 @@ class MyTasks(generics.ListAPIView):
         ptasks = ProcessTaskUser.all(finished=False).filter(
                 Q(processtask__status=ProcessTask.RUNNING),
                 user=self.request.user,
-            ).values_list('processtask')
+            ).order_by('processtask__deadline') #.values_list('processtask')
 
-        return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        return ptasks
 
 class MyTask(generics.RetrieveAPIView):
-    queryset = ProcessTask.all()
-    serializer_class = MyProcessTaskSerializer
+    queryset = ProcessTaskUser.all()
+    serializer_class = MyProcessTaskUserDetailSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     lookup_field = 'hash'
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        filter = {
+            'processtask__hash': self.kwargs['hash'],
+            'user': self.request.user
+        }
+
+        obj = get_object_or_404(queryset, **filter)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 #############################################################################################
 ###
@@ -574,6 +640,23 @@ class RequestsViewSet(  mixins.CreateModelMixin,
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
         return Request.all(executioner=self.request.user)
+
+    def get_object(self):
+        obj = None
+        try:
+            obj = Request.objects.get(
+                Q(processtaskuser__processtask__process__executioner=self.request.user) |
+                Q(processtaskuser__user=self.request.user),
+                hash=self.kwargs['hash']
+            )
+        except Request.DoesNotExist:
+            pass
+
+        if obj == None:
+            raise Http404('No object')
+
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def list(self, request, *args, **kwargs):
         """

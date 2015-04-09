@@ -16,6 +16,42 @@ import TaskStore from '../stores/TaskStore.jsx';
 
 import moment from 'moment';
 
+import Tabs from 'react-simpletabs';
+
+import Griddle from 'griddle-react';
+
+const RequestTitle = React.createClass({
+    render(){
+        var row = this.props.rowData;
+
+        return <span>
+            <Link to="Request" params={{object: row.hash}}>
+                {row.title}
+            </Link>
+        </span>;
+    }
+});
+
+const RequestType = React.createClass({
+    render(){
+        var row = this.props.rowData;
+
+        return <span>{row['type_repr']}</span>;
+    }
+});
+
+const RequestStatus = React.createClass({
+
+    render(){
+        var row = this.props.rowData;
+        console.log(row.resolved);
+        if(row.resolved)
+            return <span>Solved(Response)</span>;
+
+        return  <span>Waiting</span>;
+    }
+});
+
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
@@ -66,8 +102,44 @@ export default React.createClass({
     },
     render() {
         let DetailRender = this.detailRender();
-
         let deadline = moment(this.state.task.deadline);
+
+        let table_style = { bodyHeight:375,
+            tableClassName: "table table-bordered table-striped",
+            useGriddleStyles: false,
+            nextClassName: "table-prev",
+            previousClassName: "table-next",
+            sortAscendingComponent: <i className="pull-right fa fa-sort-asc"></i>,
+            sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>};
+        let table_meta =[
+                {
+                  "columnName": "title",
+                  "order": 1,
+                  "locked": false,
+                  "visible": true,
+                  "customComponent": RequestTitle,
+                  "displayName": "Title"
+                },
+                {
+                  "columnName": "type",
+                  "order": 2,
+                  "locked": false,
+                  "visible": true,
+                  "customComponent": RequestType,
+                  "displayName": "Type",
+                  "cssClassName": 'status-td'
+                },
+                {
+                  "columnName": "resolved",
+                  "order": 4,
+                  "locked": false,
+                  "visible": true,
+                  "cssClassName": 'status-td',
+                  "customComponent": RequestStatus,
+                  "displayName": "Status"
+                }
+            ];
+
         return (
             <div className="task-detail row">
                 <div className="col-md-12">
@@ -115,24 +187,40 @@ export default React.createClass({
                                                 <div className="input-group">
                                                   <span className="input-group-addon"><strong>Description</strong></span>
                                                   <span style={{float: 'none'}} className="form-control">
-                                                    {this.state.task.parent.description}
+                                                    {this.state.task.processtask.parent.description}
                                                   </span>
                                                 </div>
                                             </div>
                                         </div>
                             </div>
-                            <hr style={{marginTop:0}} />
-                            <div className="form-group row">
-                                <div className="col-md-9"></div>
-                                <div className="col-md-3">
-                                        <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Mark as complete
-                                        </button>
-                                </div>
-                            </div>
-                            <div className="row">
+                            <div className="clearfix row">
                                 <div className="col-md-12">
-                                    <DetailRender key={this.state.task.hash} />
+                                    <Tabs>
+                                        <Tabs.Panel
+                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Task</span>}>
+                                            <div className="form-group row">
+                                                <div className="col-md-9"></div>
+                                                <div className="col-md-3">
+                                                        <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
+                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Mark as complete
+                                                        </button>
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                    <DetailRender key={this.state.task.hash} />
+                                                </div>
+                                            </div>
+                                        </Tabs.Panel>
+                                            <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;My Requests</span>}>
+                                                <Griddle
+                                                {...table_style}
+                                                results={this.state.task.requests}
+                                                      columns={["title", "type", "resolved"]}
+                                                columnMetadata={table_meta}
+                                                />
+                                            </Tabs.Panel>
+                                    </Tabs>
                                 </div>
                             </div>
                         </div>

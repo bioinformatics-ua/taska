@@ -181,6 +181,9 @@ class ProcessTask(models.Model):
     def users(self):
         return ProcessTaskUser.all(processtask=self)
 
+    def user(self, user):
+        return ProcessTaskUser.all(processtask=self).get(user=user)
+
     def move(self):
 
         missing = ProcessTaskUser\
@@ -233,6 +236,9 @@ class ProcessTaskUser(models.Model):
 
     class Meta:
         ordering = ['-processtask__deadline']
+
+    def requests(self):
+        return Request.objects.filter(processtaskuser=self)
 
     def result(self):
         from result.models import Result

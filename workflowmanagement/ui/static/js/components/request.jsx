@@ -69,7 +69,7 @@ export default React.createClass({
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Type</strong></span>
-                                          <span className="form-control">{this.state.request.type}</span>
+                                          <span className="form-control">{this.state.request['type_repr']}</span>
                                         </div>
                                       </div>
                                 </div>

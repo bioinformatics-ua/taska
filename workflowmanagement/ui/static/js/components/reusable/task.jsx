@@ -38,12 +38,12 @@ const TaskDate = React.createClass({
 
 const TaskLink = React.createClass({
   render: function(){
-    const row = this.props.rowData;
+    const row = this.props.rowData.processtask;
     const object = {object: row.hash}
     return <small title={row.process}>
             <Link id={`task_${row.hash}`}
-              key={row.hash} to={row.type}
-               params={object}>{row.task_repr}</Link><br />
+              key={row.hash} to={this.props.rowData.type}
+               params={object}>{this.props.rowData.task_repr}</Link><br />
 
            </small>;
   }
@@ -59,7 +59,7 @@ const TaskType = React.createClass({
     return 'fa-times-circle-o';
   },
   render: function(){
-    const row = this.props.rowData;
+    const row = this.props.rowData.processtask;
     return <span><i className={`fa fa-2x ${this.getIcon(row.type)}`}></i></span>;
   }
 });

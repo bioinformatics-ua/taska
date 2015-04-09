@@ -134,12 +134,16 @@ footer {
 .type-td{
   width: 60px;
 }
+.status-td{
+  width: 260px;
+}
 .deadline-td{
   width: 130px;
 }
 .table-prev{
     display: inline-block;
 }
+
 .griddle-page{
     display: inline-block;
 }
@@ -147,10 +151,10 @@ footer {
     display: inline-block;
 }
 
-.griddle-footer{
+.flex-row .griddle-footer{
     text-align: center;
 }
-.table-prev button, .table-next button {
+.table-prev button,  .table-next button {
     padding: 6px 12px;
     margin-bottom: 0;
     font-size: 14px;
@@ -173,7 +177,7 @@ footer {
     background-color: #fff;
     border-color: #ccc;
 }
-.table-prev button {
+ .table-prev button {
     margin-left: 10px;
 }
 .griddle-page select{
@@ -194,12 +198,12 @@ footer {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
-.footer-container{
+.flex-row .footer-container{
   padding: 0 !important;
 
 }
 
-.griddle-footer{
+.flex-row .griddle-footer{
   padding:5px;
   position: absolute;
   width: 100%;
@@ -208,7 +212,7 @@ footer {
   border-top: 2px solid rgb(221, 221, 221);
 }
 
-.griddle-pad{
+.flex-row .griddle-pad{
   padding-bottom: 45px;
 }
 
