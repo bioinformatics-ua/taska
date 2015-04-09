@@ -144,7 +144,8 @@ export default React.createClass({
                             The following tasks don't have deadlines or assignee's:
                             <ul>
                                 {this.state.missing.map((state) => {
-                                        return <li key={state.name}>{state.name}</li>;
+                                    let name = state.name || 'Unnamed';
+                                        return <li key={state.hash}>{name}</li>;
                                 })}
                             </ul>
 
