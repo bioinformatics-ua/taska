@@ -60,27 +60,28 @@ let StateMachineComponent = React.createClass({
         this.setState(this.getState());
     },
     handleHotkey(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        // receives a React Keyboard Event
-        // http://facebook.github.io/react/docs/events.html#keyboard-events
-        if(    e.keyCode === 8
-            && e.target === document.body
-            && this.state.selected
-        ){
-            let selection = this.state.selected.split('-');
-            if(selection.length == 2)
-                this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]))
-            else if(selection.length == 1){
-                this.deleteState(selection[0]);
+        if(this.props.editable){
+            e.stopPropagation();
+            e.preventDefault();
+            // receives a React Keyboard Event
+            // http://facebook.github.io/react/docs/events.html#keyboard-events
+            if(    e.keyCode === 8
+                && e.target === document.body
+                && this.state.selected
+            ){
+                let selection = this.state.selected.split('-');
+                if(selection.length == 2)
+                    this.deleteConnection(Number.parseInt(selection[0]), Number.parseInt(selection[1]))
+                else if(selection.length == 1){
+                    this.deleteState(selection[0]);
+                }
+                // else theres something wrong...
+            } else if(
+                e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+            ){
+
             }
-            // else theres something wrong...
-        } else if(
-            e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
-        ){
-
         }
-
     },
     __initUI(){
         let self = this;
@@ -176,27 +177,29 @@ let StateMachineComponent = React.createClass({
             $('.state_line').remove();
             this.renderLines();
         });
+        var cdit = $('.clickedit').css('visibility', 'hidden');
+        if(this.props.editable){
+            cdit
+            .focusout(self.setStateTitle)
+            .keyup(function (e) {
+                if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                    self.setStateTitle(e);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .prev().dblclick(function (event) {
+                event.stopPropagation();
 
-        $('.clickedit').css('visibility', 'hidden')
-        .focusout(self.setStateTitle)
-        .keyup(function (e) {
-            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                self.setStateTitle(e);
-                return false;
-            } else {
-                return true;
-            }
-        })
-        .prev().dblclick(function (event) {
-            event.stopPropagation();
-
-            $(this).css('visibility', 'hidden');
-            let the_input = $(this).next();
-            let text = the_input.val();
-            the_input.val('');
-            the_input.css('visibility', 'visible').focus();
-            the_input.val(text);
-        });
+                $(this).css('visibility', 'hidden');
+                let the_input = $(this).next();
+                let text = the_input.val();
+                the_input.val('');
+                the_input.css('visibility', 'visible').focus();
+                the_input.val(text);
+            });
+        }
     },
     killUI(){
         $('.ui-draggable').draggable( "destroy" );
