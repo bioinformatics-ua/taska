@@ -315,6 +315,8 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         instance.removed = True
         instance.save()
 
+        instance.cancel()
+
         History.new(event=History.DELETE, actor=request.user, object=instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -423,15 +425,31 @@ class MyTask(generics.RetrieveAPIView):
 ###
 #############################################################################################
 
+class RequestResponseSerializer(serializers.ModelSerializer):
+    status_repr = serializers.SerializerMethodField()
+
+    def get_status_repr(self, obj):
+        return dict(Request.TYPES)[obj.status]
+
+    class Meta:
+        model = RequestResponse
+        exclude = ['id']
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
 class RequestSerializer(serializers.ModelSerializer):
     processtaskuser = ProcessTaskUserSerializer(read_only=True)
     process = serializers.CharField(max_length=50)
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField(write_only=True)
     date = serializers.SerializerMethodField()
+    type_repr = serializers.SerializerMethodField()
+    response = RequestResponseSerializer()
 
     def get_date(self, obj):
         return obj.date.strftime("%Y-%m-%d %H:%M")
+
+    def get_type_repr(self, obj):
+        return dict(Request.TYPES)[obj.type]
 
     @transaction.atomic
     def create(self, validated_data):
@@ -460,6 +478,15 @@ class RequestSerializer(serializers.ModelSerializer):
             return Response({'error': 'User %f is not performing task %s' %(request.user, request.data['task'])}, status=404)
 
 
+        response = validated_data.pop('response', None)
+        rserializer = None
+        if response:
+            rserializer = RequestResponseSerializer(data=response)
+
+            rserializer.is_valid()
+
+            rserializer.save()
+
         request = Request.objects.create(**validated_data)
 
         return request
@@ -475,6 +502,23 @@ class RequestSerializer(serializers.ModelSerializer):
             processtaskuser = validated_data.pop('processtaskuser')
         except KeyError:
             pass
+
+        response = validated_data.pop('response', None)
+        rserializer = None
+        if response:
+            response['request'] = instance.id
+            try:
+                rserializer = RequestResponseSerializer(
+                    instance=instance.response,
+                    data=response,
+                    partial=True
+                )
+            except RequestResponse.DoesNotExist:
+                rserializer = RequestResponseSerializer(data=response)
+
+            rserializer.is_valid()
+
+            rserializer.save()
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -566,6 +610,8 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         serializer = RequestSerializer(instance=instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        serializer = RequestSerializer(instance=instance, data=request.data, partial=True)
 
         History.new(event=History.EDIT, actor=request.user, object=instance)
 

@@ -94,6 +94,12 @@ class ProcessTaskUserAdmin(admin.ModelAdmin):
         RequestInline
     ]
 
+class RequestResponseInline(admin.TabularInline):
+    ''' Django-Admin page for listing, adding and editing :class:`process.models.RequestResponse` entries.
+    '''
+    exclude = ['hash']
+    model=RequestResponse
+
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
     ''' Django-Admin page for listing, adding and editing :class:`process.models.Request` entries.
@@ -103,3 +109,6 @@ class RequestAdmin(admin.ModelAdmin):
         '''
         return obj.processtaskuser.processtask
     list_display = (ptask, 'type', 'title', 'message', 'date')
+    inlines = [
+        RequestResponseInline
+    ]

@@ -351,3 +351,38 @@ def __generate_request_hash(sender, instance, created, *args, **kwargs):
     if created:
         instance.hash=createHash(instance.id)
         instance.save()
+
+class RequestResponse(models.Model):
+    '''Represents a request response made over a ProcessTask assignment.
+
+    Each request can have a response, explaining the way the problem was solved.
+
+    Attributes:
+        :request (Request): :class:`Request` related with this Request response
+        :title (str): Title of the request response message (if any message annexed)
+        :message (str): Content of the request response message (if any message annexed)
+        :date (datetime): Date the request response was made on
+    '''
+    # TYPE literals, representing the translation to the type of requests responses available
+    SOLVED        = 1
+    WONTSOLVE     = 2
+
+    TYPES           = (
+            (SOLVED,   'The request was solved'),
+            (WONTSOLVE,  'The request won\'t or can\'t be solved'),
+        )
+
+    hash            = models.CharField(max_length=50, default="ERROR")
+    request         = models.OneToOneField(Request, related_name='response')
+    title           = models.CharField(max_length=100, null=True)
+    message         = models.TextField(null=True)
+    date            = models.DateTimeField(auto_now_add=True)
+    status          = models.PositiveSmallIntegerField(choices=TYPES, default=SOLVED)
+
+@receiver(models.signals.post_save, sender=RequestResponse)
+def __generate_requestresponse_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an request response.
+    '''
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()
