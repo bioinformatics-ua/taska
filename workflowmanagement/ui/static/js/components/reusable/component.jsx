@@ -195,9 +195,9 @@ const ProcessStatus = React.createClass({
     let label = '';
     switch(status){
       case 1:
-        extra+=' circle-success'; label='Running'; break;
+        extra+=' circle-primary'; label='Running'; break;
       case 2:
-        extra+=' circle-danger'; label='Finished'; break;
+        extra+=' circle-success'; label='Finished'; break;
       case 3:
         extra+=' circle-grey'; label='Canceled'; break;
       case 3:
