@@ -392,23 +392,23 @@ let StateMachineComponent = React.createClass({
             );
         return list;
     },
-    __renderLine(elem1, elem2){
+    __renderLine(elem1, elem2, variate=true){
 
         let offset1 = elem1.offset();
         let offset2 = elem2.offset();
-        let width1 = elem1.width()/2;
-        let width2 = elem2.width()/2;
-        let height1 = elem1.height()/2;
-        let height2 = elem2.height()/2;
+        let width1 = Math.floor(elem1.outerWidth()/2);
+        let width2 = Math.floor(elem2.outerWidth()/2);
+        let height1 = Math.floor(elem1.outerHeight()/2);
+        let height2 = Math.floor(elem2.outerHeight()/2);
 
         let maximum_referential = ($('#state_machine_chart').width()/2) - width1;
-        //console.log(`Maximum Referential ${maximum_referential}`);
+        console.log(`Maximum Referential ${maximum_referential}`);
         let referential_zero = offset1.left+width1;
-        //console.log(`Referential zero ${referential_zero}`);
+        console.log(`Referential zero ${referential_zero}`);
         let relative_ref = offset2.left-referential_zero;
-        //console.log(`Relative referencial ${relative_ref}`);
+        console.log(`Relative referencial ${relative_ref}`);
         let horizontal_variation = width1 + ((relative_ref * width1) / maximum_referential);
-        //console.log(`Horizontal_variation ${horizontal_variation}`);
+        console.log(`Horizontal_variation ${horizontal_variation}`);
 
         let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
 
@@ -416,6 +416,9 @@ let StateMachineComponent = React.createClass({
 
         // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
         let exists = elem2.attr('id') != undefined;
+        console.log(width1);
+        console.log([{x:offset1.left+width1, y:offset1.top-4},
+            {x:offset2.left+width2, y:offset2.top+height2}]);
 
         $.line(
             {x:offset1.left+horizontal_variation, y:offset1.top-4},
