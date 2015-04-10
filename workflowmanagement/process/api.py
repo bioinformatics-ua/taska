@@ -505,17 +505,21 @@ class RequestResponseSerializer(serializers.ModelSerializer):
 class RequestSerializer(serializers.ModelSerializer):
     processtaskuser = ProcessTaskUserSerializer(read_only=True)
     process = serializers.CharField(max_length=50)
+    process_owner = serializers.SerializerMethodField()
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField(write_only=True)
     date = serializers.SerializerMethodField()
     type_repr = serializers.SerializerMethodField()
-    response = RequestResponseSerializer()
+    response = RequestResponseSerializer(required=False)
 
     def get_date(self, obj):
         return obj.date.strftime("%Y-%m-%d %H:%M")
 
     def get_type_repr(self, obj):
         return dict(Request.TYPES)[obj.type]
+
+    def get_process_owner(self, obj):
+        return obj.processtaskuser.processtask.process.executioner.id
 
     @transaction.atomic
     def create(self, validated_data):
@@ -545,15 +549,21 @@ class RequestSerializer(serializers.ModelSerializer):
 
 
         response = validated_data.pop('response', None)
+
+        request = Request.objects.create(**validated_data)
+
         rserializer = None
         if response:
+            response['request'] = request.id
+
             rserializer = RequestResponseSerializer(data=response)
 
             rserializer.is_valid()
 
             rserializer.save()
 
-        request = Request.objects.create(**validated_data)
+        if rserializer:
+            request.resolve()
 
         return request
 
@@ -572,6 +582,7 @@ class RequestSerializer(serializers.ModelSerializer):
         response = validated_data.pop('response', None)
         rserializer = None
         if response:
+            print instance.id
             response['request'] = instance.id
             try:
                 rserializer = RequestResponseSerializer(
@@ -585,6 +596,8 @@ class RequestSerializer(serializers.ModelSerializer):
             rserializer.is_valid()
 
             rserializer.save()
+
+            instance.resolve()
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

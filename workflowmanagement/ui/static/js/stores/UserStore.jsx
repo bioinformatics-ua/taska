@@ -23,6 +23,9 @@ export default Reflux.createStore({
     init(){
         this.__loginfail = false;
     },
+    getUser(){
+        return this.__detaildata;
+    },
     loggedIn: function(){
         return this.__detaildata.email != undefined;
     },

@@ -333,6 +333,17 @@ class Request(models.Model):
     def task(self):
         return self.processtaskuser.processtask.task.hash
 
+    def resolve(self):
+        try:
+            if self.response:
+                self.resolved=True
+            else:
+                self.resolved=False
+        except RequestResponse.DoesNotExist:
+            self.resolved=True
+
+        self.save()
+
     @staticmethod
     def all(executioner=None, requester=None):
         tmp = Request.objects.filter(removed=False)

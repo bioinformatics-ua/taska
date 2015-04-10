@@ -44,11 +44,10 @@ const RequestStatus = React.createClass({
 
     render(){
         var row = this.props.rowData;
-        console.log(row.resolved);
         if(row.resolved)
-            return <span>Solved(Response)</span>;
+            return <span className="text-success"><i className="fa fa-check-circle"></i> Solved</span>;
 
-        return  <span>Waiting</span>;
+        return <span><i className="fa fa-clock-o"></i> Waiting response</span>;
     }
 });
 
@@ -101,6 +100,8 @@ export default React.createClass({
         TaskActions.saveAnswer();
     },
     render() {
+        console.log(this.state.task);
+
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
 
@@ -150,7 +151,7 @@ export default React.createClass({
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Task</strong></span>
-                                          <span className="form-control">{this.state.task['task_repr']}</span>
+                                          <span disabled className="form-control">{this.state.task['task_repr']}</span>
                                         </div>
                                       </div>
                                       <div className="row">
@@ -158,7 +159,7 @@ export default React.createClass({
                                           <div className="form-group">
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Type</strong></span>
-                                              <span className="form-control">{this.getTypeRepr()}</span>
+                                              <span disabled className="form-control">{this.getTypeRepr()}</span>
                                             </div>
                                           </div>
                                         </div>
@@ -166,7 +167,7 @@ export default React.createClass({
                                             <div className="form-group">
                                                 <div className="input-group">
                                                   <span className="input-group-addon"><strong>Deadline</strong></span>
-                                                  <span className="form-control">
+                                                  <span disabled className="form-control">
                                                     {deadline.fromNow()}&nbsp;
                                                     <small>({deadline.format('YYYY-MM-DD HH:mm')})</small>
                                                   </span>
@@ -178,15 +179,29 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3">
                                     <div className="btn-group-vertical btn-block" role="group">
-                                        <button className="btn btn-default"><i style={{marginTop: '3px'}} className="pull-left fa fa-retweet"></i> Ask for reassignment</button>
-                                        <button className="btn btn-default"><i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification</button>
+                                        <Link to="RequestAdd" params={{
+                                            object: 'add',
+                                            process: this.state.task.processtask.process,
+                                            task: this.state.task.processtask.task,
+                                            default: 1
+                                        }} className="btn btn-default">
+                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-retweet"></i> Ask for reassignment
+                                        </Link>
+                                        <Link to="RequestAdd" params={{
+                                            object: 'add',
+                                            process: this.state.task.processtask.process,
+                                            task: this.state.task.processtask.task,
+                                            default: 1
+                                        }} className="btn btn-default">
+                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification
+                                        </Link>
                                     </div>
                                 </div>
                                      <div className="col-md-12">
                                             <div className="form-group">
                                                 <div className="input-group">
                                                   <span className="input-group-addon"><strong>Description</strong></span>
-                                                  <span style={{float: 'none'}} className="form-control">
+                                                  <span disabled style={{float: 'none'}} className="form-control">
                                                     {this.state.task.processtask.parent.description}
                                                   </span>
                                                 </div>

@@ -1,10 +1,14 @@
 .Select.is-disabled .Select-item-icon,
-.Select.is-disabled .Select-placeholder,
 .Select.is-disabled .Select-input,
+.Select.is-disabled.is-multi .Select-placeholder,
 .Select.is-disabled .Select-arrow{
     display: none;
 }
 
+.Select.is-disabled .Select-control{
+    background-color: #EEE;
+    height:34px;
+}
 .process-label{
     position: absolute;
     bottom: -30px;

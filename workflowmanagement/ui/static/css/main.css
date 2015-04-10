@@ -392,7 +392,7 @@ footer {
   color: #333333;
   cursor: default;
   outline: none;
-  padding: 8px 52px 8px 10px;
+  padding: 6px 52px 6px 10px;
   transition: all 200ms ease;
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
@@ -422,7 +422,7 @@ footer {
 }
 .Select-placeholder {
   color: #aaaaaa;
-  padding: 8px 52px 8px 10px;
+  padding: 6px 52px 6px 10px;
   position: absolute;
   top: 0;
   left: 0;

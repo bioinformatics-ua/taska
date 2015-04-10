@@ -24,7 +24,11 @@ module.exports = (
             <Route name="ProcessEdit" path=":mode" handler={Label} />
         </Route>
 
-        <Route name="Request" path="request/:object" handler={require('./components/request.jsx')} />
+        <Route name="Request" path="request/:object" handler={require('./components/request.jsx')}>
+        </Route>
+
+        <Route name="RequestAdd" path="request/:object/:process/:task/?:default?" handler={require('./components/request.jsx')}>
+        </Route>
 
         <Route name="result.SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
         <Route name="SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />

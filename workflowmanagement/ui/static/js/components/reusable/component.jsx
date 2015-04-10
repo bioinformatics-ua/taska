@@ -57,10 +57,19 @@ const Label = React.createClass({
             contextTypes: {
                 router: React.PropTypes.func.isRequired
             },
+            defaultProps(){
+              return {
+                source: 'mode'
+              }
+            },
             displayName: route => {
                 let params = route.context.router.getCurrentParams();
-                let label = params.mode || 'Label';
-                return params.mode[0].toUpperCase() + params.mode.slice(1);;
+                let label = params[route.props.source] || 'Label';
+                try{
+                  return params[route.props.source][0].toUpperCase() + params[this.props.source].slice(1);
+                } catch(err){
+                  return 'Add';
+                }
             },
             render(){
                 return <span>a</span>;
