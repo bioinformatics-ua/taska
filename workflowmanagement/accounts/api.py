@@ -128,7 +128,7 @@ class UserViewSet(viewsets.ModelViewSet):
                         'error': 'This login username and password are invalid'
                     })
 
-        return Response({'authenticated': True})
+        return self.me(request)
 
     @list_route(methods=['get'])
     def logout(self, request):

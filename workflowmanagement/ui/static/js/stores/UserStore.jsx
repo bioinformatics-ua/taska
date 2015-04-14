@@ -48,18 +48,17 @@ export default Reflux.createStore({
        let success = function(data){
             UserActions.loginSuccess(data);
             callback();
-
         };
 
         log.authenticate(success, UserActions.loginFailed);
     },
     onLoginSuccess: function(data){
-        if(data.authenticated){
-            UserActions.loadDetail('me');
-        } else {
+        if(data.authenticated === false){
             UserActions.loginFailed();
+        } else {
+            this.__detaildata=data;
         }
-
+        this.trigger();
     },
     onLogout: function(callback){
         let log = new Login({});
@@ -68,15 +67,18 @@ export default Reflux.createStore({
             self.__loginfail = false;
             UserActions.unloadDetail();
 
+            console.log(data);
+
             UserActions.logoutSuccess(data);
             if(callback)
                 callback();
         });
     },
     onLogoutSuccess: function(data){
-        if(data.authenticated === false)
-            UserActions.loadDetail('me')
-
+        if(data.authenticated === false){
+            this.__detaildata = data;
+            this.trigger();
+        }
     },
     onLoadUsers(){
         console.log('load users');

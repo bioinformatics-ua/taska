@@ -396,19 +396,19 @@ let StateMachineComponent = React.createClass({
 
         let offset1 = elem1.offset();
         let offset2 = elem2.offset();
-        let width1 = Math.floor(elem1.outerWidth()/2);
-        let width2 = Math.floor(elem2.outerWidth()/2);
-        let height1 = Math.floor(elem1.outerHeight()/2);
-        let height2 = Math.floor(elem2.outerHeight()/2);
+        let width1 = elem1.outerWidth()/2;
+        let width2 = elem2.outerWidth()/2;
+        let height1 = elem1.outerHeight()/2;
+        let height2 = elem2.outerHeight()/2;
 
-        let maximum_referential = ($('#state_machine_chart').width()/2) - width1;
-        console.log(`Maximum Referential ${maximum_referential}`);
+        let maximum_referential = ($('#state_machine_chart').width()/2);
+        //console.log(`Maximum Referential ${maximum_referential}`);
         let referential_zero = offset1.left+width1;
-        console.log(`Referential zero ${referential_zero}`);
-        let relative_ref = offset2.left-referential_zero;
-        console.log(`Relative referencial ${relative_ref}`);
-        let horizontal_variation = width1 + ((relative_ref * width1) / maximum_referential);
-        console.log(`Horizontal_variation ${horizontal_variation}`);
+        //console.log(`Referential zero ${referential_zero}`);
+        let relative_ref = Math.round((offset2.left+width2)-referential_zero);
+        //console.log(`Relative referencial ${relative_ref}`);
+        let horizontal_variation = width1+((relative_ref * (width1)) / maximum_referential);
+        //console.log(`Horizontal_variation ${horizontal_variation}`);
 
         let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
 
@@ -416,13 +416,10 @@ let StateMachineComponent = React.createClass({
 
         // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
         let exists = elem2.attr('id') != undefined;
-        console.log(width1);
-        console.log([{x:offset1.left+width1, y:offset1.top-4},
-            {x:offset2.left+width2, y:offset2.top+height2}]);
 
         $.line(
-            {x:offset1.left+horizontal_variation, y:offset1.top-4},
-            {x:offset2.left+width2, y:offset2.top+height2},
+            {x:Math.round(offset1.left+horizontal_variation), y:offset1.top-4},
+            {x:Math.round(offset2.left+width2), y:offset2.top+height2},
             {
                 lineWidth: 5,
                 className: `${conn} state_line ${selected}`,
@@ -439,8 +436,8 @@ let StateMachineComponent = React.createClass({
     },
     __tempLine(pos, elem){
         let offset = elem.offset();
-        let width = elem.width()/2;
-        let height = elem.height()/2;
+        let width = elem.outerWidth()/2;
+        let height = elem.outerHeight()/2;
 
         $.line(
             {x:offset.left+width, y:offset.top+height},

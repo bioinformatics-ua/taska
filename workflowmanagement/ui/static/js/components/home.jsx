@@ -14,7 +14,7 @@ import {Authentication} from '../mixins/component.jsx';
 
 export default React.createClass({
   displayName: "",
-  mixins: [Router.Navigation, Authentication],
+  mixins: [Authentication],
   render: function () {
     return <LoggedInHome />;
   }

@@ -12,7 +12,7 @@ import {CheckLog} from '../mixins/component.jsx';
 
 export default React.createClass({
     displayName: "Login",
-    mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation, CheckLog],
+    mixins: [Reflux.listenTo(UserStore, 'update'), CheckLog],
     __getState: function(){
       return {
         failed: UserStore.loginFailed()
@@ -37,10 +37,11 @@ export default React.createClass({
           password: this.refs.pwd.getDOMNode().value.trim(),
           remember: this.refs.rmb.getDOMNode().checked,
           callback: function(){
+                console.log('LOGIN CALLBACK');
                 if (nextPath) {
-                    self.transitionTo(nextPath);
+                    self.context.router.transitionTo(nextPath);
                 } else {
-                    self.replaceWith('/');
+                    self.context.router.replaceWith('/');
                 }
           }
         });

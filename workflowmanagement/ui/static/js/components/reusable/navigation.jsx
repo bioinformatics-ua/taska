@@ -25,7 +25,7 @@ var UserDropdown = React.createClass({
       mixins: [Reflux.listenTo(UserStore, 'update'), Router.Navigation],
     __getState: function(){
       return {
-        user: UserStore.getDetail()
+        user: UserStore.getUser()
       }
     },
     getInitialState: function() {
@@ -39,14 +39,14 @@ var UserDropdown = React.createClass({
     logout: function(){
       let self = this;
       UserActions.logout(function(){
-        self.replaceWith('/login');
+        self.context.router.replaceWith('/login');
       });
     },
   render: function () {
     if(this.state.user.authenticated === false){
-      return <span></span>;
+      return <span key="loggedout"></span>;
     }
-    return <ul className="nav navbar-nav navbar-right">
+    return <ul key="loggedin" className="nav navbar-nav navbar-right">
                     <li>
                         <Tab to='about'><i className="fa fa-info-circle"></i> About</Tab>
                     </li>

@@ -153,7 +153,7 @@ export default React.createClass({
                         success={this.closePopup} close={this.closePopup}
                     />
                 :''}
-                <StateMachineComponent key={'teste'+params.mode}
+                <StateMachineComponent key={'workflow'+params.mode}
                     extra={
                         <PermissionsBar
                             link="WorkflowEdit"
