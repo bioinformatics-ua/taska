@@ -345,8 +345,6 @@ class StateMachine{
 
         this.__internal_counter++;
 
-        console.log(data);
-
         return new Class({
             identificator: this.__internal_counter,
             level: level,
