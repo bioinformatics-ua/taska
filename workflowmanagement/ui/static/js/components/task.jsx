@@ -84,6 +84,9 @@ export default React.createClass({
     componentWillMount(){
         TaskActions.calibrate();
     },
+    componentWillUnmount(){
+        TaskActions.unloadAnswer();
+    },
     componentDidUpdate(){
         if(this.state.submitted)
             this.context.router.transitionTo('home');
@@ -223,7 +226,7 @@ export default React.createClass({
                                             </div>
                                             <div className="row">
                                                 <div className="col-md-12">
-                                                    <DetailRender key={this.state.task.hash} />
+                                                    <DetailRender key={this.state.task.processtask.hash} />
                                                 </div>
                                             </div>
                                         </Tabs.Panel>

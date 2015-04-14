@@ -48,6 +48,9 @@ export default Reflux.createStore({
     getAnswer(){
         return this.answer || {};
     },
+    onUnloadAnswer(){
+        this.answer = {};
+    },
     onSetAnswer(prop, val){
         this.answer[prop] = val;
 

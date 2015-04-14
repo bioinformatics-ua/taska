@@ -29,6 +29,7 @@ class SimpleTask extends Task{
         const context = this;
         return React.createClass({
             render(){
+
                 return (<span>
                     <div className="form-group">
                         <div className="input-group">

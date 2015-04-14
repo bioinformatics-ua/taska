@@ -11,7 +11,8 @@ const TaskActions = Reflux.createActions(
     'load': {},
     'calibrate': {},
     'setAnswer': {},
-    'saveAnswer': {}
+    'saveAnswer': {},
+    'unloadAnswer': {}
     }, DetailActionsMixin));
 
 export default TaskActions;
