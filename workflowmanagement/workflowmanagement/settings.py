@@ -61,6 +61,7 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'rest_framework',
     'rest_framework_swagger',
+    'material',
     'workflow',
     'tasks',
     'process',
@@ -177,6 +178,8 @@ TEMPLATE_LOADERS = (
 
 )
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates'), os.path.join(BASE_DIR, 'ui/templates')]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
 
 # by default it never expires
 SESSION_COOKIE_AGE = 12*3600

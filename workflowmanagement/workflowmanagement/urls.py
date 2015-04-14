@@ -36,6 +36,9 @@ urlpatterns = patterns('',
     url(r'^api/task/__possibledeps/$', TaskDependenciesView.as_view(), name='__possibledeps'),
 
     url(r'^api/task', include('tasks.urls')),
+
+    url(r'^api/resource', include('material.urls')),
+
     url(r'^api/index', api.root),
 
     url(r'^djangojs/', include('djangojs.urls')),
