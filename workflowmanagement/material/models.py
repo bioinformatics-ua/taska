@@ -1,9 +1,12 @@
 from django.db import models
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 from model_utils.managers import InheritanceManager
 
 from utils.hashes import createHash
+
+import django.dispatch
 
 # Create your models here.
 class Resource(models.Model):
@@ -20,16 +23,21 @@ class Resource(models.Model):
     ttype           = models.CharField(max_length=100)
     create_date     = models.DateTimeField(auto_now_add=True)
     latest_update   = models.DateTimeField(auto_now=True)
+    creator         = models.ForeignKey(User)
+
     removed         = models.BooleanField(default=False)
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
 
     @staticmethod
-    def all(subclasses=True):
+    def all(subclasses=True, creator=None):
         ''' Returns all valid resource instances (excluding logically removed)
 
         '''
         tmp = Resource.objects.filter(removed=False)
+
+        if creator != None:
+            tmp = tmp.filter(creator=creator)
 
         if subclasses:
             tmp = tmp.select_subclasses()
@@ -57,10 +65,11 @@ class Resource(models.Model):
     def get_serializer(self):
         serializer_name = '__%s'%(self.type())
         serializer = None
+
         if hasattr(Resource, serializer_name):
             serializer = getattr(Resource, serializer_name)
         else:
-            serializer = Resource.init_serializer()
+            serializer = self.init_serializer()
             setattr(Resource, serializer_name, serializer)
 
         return serializer
@@ -81,11 +90,19 @@ def __generate_resource_hash(sender, instance, created, *args, **kwargs):
         instance.ttype = instance.type()
         instance.save()
 
+### File resource
+
+def fileHash(instance, filename):
+    ''' Callable to be called by the FileField, this renames the file to the generic hash
+        so we avoid collisions
+    '''
+    return 'file/{0}/{1}'.format(instance.creator.id, instance.hash)
 
 class File(Resource):
     ''' A type of resource that represents a file.
     '''
-    file    = models.FileField(upload_to='file')
+    filename = models.CharField(max_length=100)
+    file     = models.FileField(upload_to=fileHash)
 
     @staticmethod
     def init_serializer(instance=None, data=None, many=False, partial=False):
@@ -93,8 +110,8 @@ class File(Resource):
 
         Without init_serializer() wouldnt be possible using to process the MTI.
         '''
-        from .api import ResourceSerializer
-        return ResourceSerializer(instance=instance, data=data, many=many, partial=partial)
+        from .api import FileSerializer
+        return FileSerializer(instance=instance, data=data, many=many, partial=partial)
     pass
 
     def __str__(self):

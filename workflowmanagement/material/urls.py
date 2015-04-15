@@ -16,5 +16,6 @@ router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
+    url(r'my/upload/', api.FileUpload.as_view(), name='file-create')
 )
 

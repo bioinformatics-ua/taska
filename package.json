@@ -8,6 +8,7 @@
     "bootstrap": "~3.3.2",
     "envify": "~3.2.0",
     "events": "~1.0.2",
+    "filedrop": "^2.0.0",
     "font-awesome": "~4.3.0",
     "griddle-react": "~ 0.2.11",
     "jquery": "~2.1.3",

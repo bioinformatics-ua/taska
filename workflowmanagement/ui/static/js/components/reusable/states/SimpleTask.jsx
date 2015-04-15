@@ -13,6 +13,8 @@ import moment from 'moment';
 
 import checksum from 'json-checksum';
 
+import Uploader from '../uploader.jsx'
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -58,6 +60,9 @@ class SimpleTask extends SimpleState {
                             </textarea>
                         </div>
                     </div>
+                    {editable?
+                        <Uploader />
+                    :''}
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
                 </span>
             }

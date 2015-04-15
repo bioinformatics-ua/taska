@@ -134,11 +134,9 @@ class TaskSerializer(serializers.ModelSerializer):
         extra_kwargs = {'hash': {'required': False}, 'description': {'required': False} }
 
 class SimpleTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = SimpleTask
-        #exclude = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        #fread_only_fields = ('workflow',)
 
 class TaskFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(name="ttype")

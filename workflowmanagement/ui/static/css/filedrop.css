@@ -1,0 +1,51 @@
+.fd-zone {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.fd-file {
+  opacity: 0;
+  font-size: 118px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  filter: alpha(opacity=0);
+  font-family: sans-serif;
+}
+
+.fd-zone {
+  border: 4px dotted #c7c7c7;
+  background-color: white;    /* IE */
+  height: 60px;
+}
+
+.fd-zone.over { border: 3px solid orange; }
+.fd-zone:hover { border-color: #C9C9C9; }
+fieldset.fd-zone p { margin: 0.5em 0; }
+fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
+
+.fd-zone > img {
+  margin: 2px;
+  max-width: 150px;
+  border: 1px solid silver;
+  padding: 1px;
+}
+
+.fd-zone textarea {
+  width: 88%;
+  font-size: 11px;
+  height: 6em;
+  overflow: auto;
+  display: block;
+  margin: 1em auto;
+  border: 1px solid silver;
+  background: #f1f1f1;
+  padding: 0.2em 0.4em;
+}

@@ -114,10 +114,11 @@ class Task(models.Model):
     def get_serializer(self):
         serializer_name = '__%s'%(self.type())
         serializer = None
+
         if hasattr(Task, serializer_name):
             serializer = getattr(Task, serializer_name)
         else:
-            serializer = Task.init_serializer()
+            serializer = self.init_serializer()
             setattr(Task, serializer_name, serializer)
 
         return serializer
