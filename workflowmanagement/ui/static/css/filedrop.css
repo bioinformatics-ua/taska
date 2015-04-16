@@ -49,3 +49,19 @@ fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
   background: #f1f1f1;
   padding: 0.2em 0.4em;
 }
+
+.statusRow{
+  width: 50px;
+  text-align: center;
+}
+
+.progressRow{
+  width: 200px;
+}
+.sizeRow{
+  width: 100px;
+}
+
+#fuploader{
+  margin-bottom: 15px;
+}

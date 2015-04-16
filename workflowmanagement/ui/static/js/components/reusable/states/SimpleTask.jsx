@@ -43,6 +43,10 @@ class SimpleTask extends SimpleState {
                 this.state.parent.setState({description: e.target.value});
                 this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
             },
+            setResources(related_resources){
+                this.state.parent.setState({resources: related_resources});
+                this.props.dataChange(self.getIdentificator(), {resources: related_resources}, false);
+            },
             parent(){
                 return this.state.parent.state;
             },
@@ -61,7 +65,7 @@ class SimpleTask extends SimpleState {
                         </div>
                     </div>
                     {editable?
-                        <Uploader />
+                        <Uploader uploads={this.parent().resources} done={this.setResources} />
                     :''}
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
                 </span>

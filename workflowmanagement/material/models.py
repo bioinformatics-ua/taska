@@ -103,7 +103,10 @@ class File(Resource):
     '''
     filename = models.CharField(max_length=100)
     file     = models.FileField(upload_to=fileHash)
-
+    # Since file uploads are detached from the actual place where they are used,
+    # we must have an indicator that they are already linked or not, so we can
+    # periodically remove unlinked temporary files with a background task such as celery(TODO)
+    linked   = models.BooleanField(default=False)
     @staticmethod
     def init_serializer(instance=None, data=None, many=False, partial=False):
         ''' This method must override default init_serializer behaviour for a resource.
