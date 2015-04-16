@@ -8,7 +8,7 @@ from django.dispatch import receiver
 
 from utils.hashes import createHash
 
-#from material.models import Resource
+from material.models import Resource
 
 class Task(models.Model):
     '''Represents generically a task, executed in relation to an Workflow instance.
@@ -38,7 +38,7 @@ class Task(models.Model):
 
     ttype           = models.CharField(max_length=100)
 
-    #resources       = models.ManyToManyField(File)
+    resources       = models.ManyToManyField(Resource)
 
     class Meta:
         ordering = ['-id']

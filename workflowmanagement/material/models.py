@@ -29,6 +29,13 @@ class Resource(models.Model):
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
 
+    def remove(self):
+        self.removed=True
+        self.save()
+
+    def link(self):
+        pass
+
     @staticmethod
     def all(subclasses=True, creator=None):
         ''' Returns all valid resource instances (excluding logically removed)
@@ -107,6 +114,18 @@ class File(Resource):
     # we must have an indicator that they are already linked or not, so we can
     # periodically remove unlinked temporary files with a background task such as celery(TODO)
     linked   = models.BooleanField(default=False)
+
+    def remove(self):
+        self.linked=False
+        self.save()
+        super(File, self).remove()
+
+    def link(self):
+        linked=True
+        self.save()
+
+        super(File, self).link()
+
     @staticmethod
     def init_serializer(instance=None, data=None, many=False, partial=False):
         ''' This method must override default init_serializer behaviour for a resource.

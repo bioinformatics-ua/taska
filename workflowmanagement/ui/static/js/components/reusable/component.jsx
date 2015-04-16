@@ -79,11 +79,12 @@ const DeleteButton = React.createClass({
     },
     getDefaultProps(){
       return {
-        deleteLabel: <i className="fa fa-times"></i>
+        deleteLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
       };
     },
     render: function() {
-        return <button className="btn btn-danger" onClick={this.handleClick}>{this.props.deleteLabel}</button>;
+        return <button className={`btn ${this.props.extraCss} btn-danger`} onClick={this.handleClick}>{this.props.deleteLabel}</button>;
     },
     renderLayer: function() {
         if (this.state.clicked) {

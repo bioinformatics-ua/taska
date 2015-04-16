@@ -64,9 +64,12 @@ class SimpleTask extends SimpleState {
                             </textarea>
                         </div>
                     </div>
-                    {editable?
-                        <Uploader uploads={this.parent().resources} done={this.setResources} />
-                    :''}
+                        <span>
+                        {(this.parent().resources && this.parent().resources.length > 0)?
+                            <h3>File Inputs</h3>
+                        :''}
+                        <Uploader editable={editable} uploads={this.parent().resources} done={this.setResources} />
+                        </span>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
                 </span>
             }
@@ -83,11 +86,27 @@ class SimpleTask extends SimpleState {
         if(data.description === undefined)
             throw `data object is missing 'description' property`;
 
+        // We only generically consider file resources
+        // Other files should be considered by each child class when
+        // deserializing/serializing as we have no idea how to interpret the resource
+        let resources = [];
+        for(let resource of data.resources){
+            if(resource.type === 'material.File')
+                resources.push({
+                    hash: resource.hash,
+                    filename: resource.filename,
+                    size: resource.size,
+                    status: 'Finished',
+                    progress: 100,
+                    manage: ''
+                });
+        }
         return {
             name: data.title,
             description: data.description,
             hash: data.hash,
-            type: data.type
+            type: data.type,
+            resources: resources
         };
     }
 
@@ -98,6 +117,12 @@ class SimpleTask extends SimpleState {
                 dependency: dep.getIdentificator()
             });
         }
+        let resources = [];
+        let full = this.getData().resources || [];
+
+        for(let resource of full){
+            resources.push(resource.hash);
+        }
 
         return {
             sid: this.__identificator,
@@ -106,7 +131,8 @@ class SimpleTask extends SimpleState {
             type: this.getData().type,
             sortid: this.getLevel(),
             description: this.getData().description || '',
-            dependencies: deps
+            dependencies: deps,
+            resourceswrite: resources
         }
     }
 }

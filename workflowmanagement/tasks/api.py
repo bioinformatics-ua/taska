@@ -24,6 +24,8 @@ from history.models import History
 
 from utils.api_related import create_serializer, AliasOrderingFilter
 
+from material.api import GenericResourceSerializer
+
 #@api_view(('GET',))
 #def root(request, format=None):
 #    return Response({
@@ -79,6 +81,17 @@ class GenericTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     dependencies = TaskDepSerializer(many=True, required=False)
+    resources = serializers.SerializerMethodField()
+    resourceswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
+
+
+    def get_resources(self, obj):
+        serializer = GenericResourceSerializer(
+                obj.resources.all().select_subclasses(),
+                many=True
+            )
+
+        return serializer.data
 
     def get_type(self, obj):
         return obj.type()
@@ -88,27 +101,43 @@ class TaskSerializer(serializers.ModelSerializer):
             for dep in dependencies:
                 TaskDependency.objects.create(maintask=task, **dep)
 
+    def __create_resources(self, task, resources):
+        if resources != None:
+            old_resources = task.resources.exclude(hash__in=resources).select_subclasses()
+
+            for old in old_resources:
+                # mark the resource as removed
+                old.remove()
+                task.resources.remove(old)
+
+
+            for resource in resources:
+                try:
+                    r = Resource.objects.get(hash=resource)
+                    r.link()
+                    task.resources.add(r)
+                    task.save()
+                except Resource.DoesNotExist:
+                    print "-- ERROR: Couldnt add resource to task"
+
     @transaction.atomic
     def create (self, data):
-        dependencies = []
-        try:
-            dependencies = data.pop('dependencies')
-        except KeyError:
-            pass
+        dependencies = data.pop('dependencies', None)
+        resources = data.pop('resourceswrite', None)
+
         # this is generically, some custom tasks can override this behaviour
         task =  self.Meta.model.objects.create(**data)
 
         self.__create_tasks(task, dependencies)
 
+        self.__create_resources(task, resources)
+
         return task
 
     @transaction.atomic
     def update(self, instance, data):
-        dependencies = None
-        try:
-            dependencies = data.pop('dependencies')
-        except KeyError:
-            pass
+        dependencies = data.pop('dependencies', None)
+        resources = data.pop('resourceswrite', None)
 
         for attr, value in data.items():
             setattr(instance, attr, value)
@@ -121,6 +150,7 @@ class TaskSerializer(serializers.ModelSerializer):
         TaskDependency.objects.filter(maintask=instance).delete()
 
         self.__create_tasks(instance, dependencies)
+        self.__create_resources(instance, resources)
 
         return instance
 
@@ -131,7 +161,11 @@ class TaskSerializer(serializers.ModelSerializer):
         #write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('id', 'removed', 'workflow', 'ttype')
-        extra_kwargs = {'hash': {'required': False}, 'description': {'required': False} }
+        extra_kwargs = {
+            'hash': {'required': False},
+            'description': {'required': False},
+            'resources': {'read_only': True}
+        }
 
 class SimpleTaskSerializer(TaskSerializer):
     class Meta(TaskSerializer.Meta):

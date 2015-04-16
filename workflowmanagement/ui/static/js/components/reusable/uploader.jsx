@@ -3,6 +3,7 @@
 import Router from 'react-router';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
+import {DeleteButton} from './component.jsx'
 
 import Griddle from 'griddle-react';
 
@@ -16,7 +17,7 @@ const FileTitle = React.createClass({
         return  <small>
                     <a  target="_blank"
                         href={`api/resource/${row.hash}/download/`}>
-                        {row.name}
+                        {row.filename}
                     </a>
                 </small>;
     }
@@ -55,6 +56,19 @@ const FileStatus = React.createClass({
     }
 });
 
+const FileManage = React.createClass({
+    render(){
+        let row = this.props.rowData;
+
+        return <DeleteButton
+              success={this.props.metadata.delete}
+              identificator = {row.filename}
+              title={`Delete '${row.filename}'`}
+              extraCss='btn-xs'
+              message={`Are you sure you want to delete '${row.filename} ?'`}  />
+    }
+});
+
 const FileProgress = React.createClass({
     render(){
         let row = this.props.rowData;
@@ -75,9 +89,9 @@ const Uploader = React.createClass({
             uploads: {}
         };
     },
-    getupload(name){
+    getupload(filename){
         try{
-            return this.state.uploads[checksum(name)];
+            return this.state.uploads[checksum(filename)];
         } catch(err){
             return undefined;
         }
@@ -85,7 +99,7 @@ const Uploader = React.createClass({
     changeupload(uprow){
         let tmp = this.state.uploads;
 
-        tmp[checksum(uprow.name)] = uprow;
+        tmp[checksum(uprow.filename)] = uprow;
 
         this.setState({
             uploads: tmp
@@ -97,6 +111,24 @@ const Uploader = React.createClass({
                 )
             );
 
+    },
+    delete(filename){
+        let tmp = this.state.uploads;
+
+        try {
+            delete tmp[checksum(filename)];
+        } catch(err){
+            console.log("Can't remove file");
+        }
+        this.setState({
+            uploads: tmp
+        });
+
+        if(this.props.done)
+            this.props.done(this.flatUploads().filter(
+                    value => value.hash != undefined
+                )
+            );
     },
     __initUploader(){
         const self=this;
@@ -113,10 +145,11 @@ const Uploader = React.createClass({
         zone.event('send', function (files) {
           files.each(function (file) {
             self.changeupload({
-                name: decodeURI(file.name),
+                filename: decodeURI(file.name),
                 size: file.size,
                 status: 'Waiting',
-                progress: 0
+                progress: 0,
+                manage: ''
             });
 
              // Update progress when browser reports it:
@@ -168,13 +201,14 @@ const Uploader = React.createClass({
         if(this.props.uploads){
             let map = {};
             for(let upload of this.props.uploads){
-                map[checksum(upload.name)] = upload;
+                map[checksum(upload.filename)] = upload;
             }
             this.setState({uploads: map});
         }
     },
     componentDidMount(){
-        this.__initUploader();
+        if(this.props.editable)
+            this.__initUploader();
     },
     componentDidUpdate(){
         //this.__initUploader();
@@ -194,7 +228,12 @@ const Uploader = React.createClass({
                     sortAscendingComponent: <i className="pull-right fa fa-sort-asc"></i>,
                     sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>
                 },
-            metadata: [
+            done: undefined,
+            editable: true
+        };
+    },
+    render(){
+        let metadata =[
                 {
                   "columnName": "name",
                   "order": 1,
@@ -223,29 +262,39 @@ const Uploader = React.createClass({
                 },
                 {
                   "columnName": "progress",
-                  "order": 3,
+                  "order": 4,
                   "locked": false,
                   "visible": true,
                   "customComponent": FileProgress,
                   "displayName": "Progress",
                   "cssClassName": "progressRow"
+                },
+                {
+                  "columnName": "manage",
+                  "order": 5,
+                  "locked": false,
+                  "visible": true,
+                  "delete": this.delete,
+                  "customComponent": FileManage,
+                  "displayName": " ",
+                  "cssClassName": "statusRow"
                 }
-            ],
-            done: undefined
-        };
-    },
-    render(){
-        console.log('RENDERING');
+            ];
         return (
             <span>
-            <fieldset id="fuploader">
-                <p className="lead">Drop files here, or click to browse...</p>
-            </fieldset>
+            {this.props.editable ?
+                <fieldset id="fuploader">
+                    <p className="lead">Drop files here, or click to browse...</p>
+                </fieldset>
+            :''}
             <Griddle
                   {...this.props.tableSettings}
                   results={this.flatUploads()}
-                  columnMetadata={this.props.metadata}
-                  columns={["name", "size", "status", "progress"]}/>
+                  columnMetadata={metadata}
+                  columns={ this.props.editable ?
+                    ["name", "size", "status", "progress", "manage"]:
+                    ["name", "size"]
+                  }/>
             </span>
         );
     }

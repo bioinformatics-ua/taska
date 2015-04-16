@@ -49,7 +49,7 @@
 
 .state-options > .destroy-state{
     position:absolute;
-    z-index: 3000;
+    z-index: 1040;
     margin-right:-25px;
     top:0;
     right:0;

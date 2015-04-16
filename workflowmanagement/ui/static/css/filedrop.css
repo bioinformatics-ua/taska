@@ -56,10 +56,10 @@ fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
 }
 
 .progressRow{
-  width: 200px;
+  width: 170px;
 }
 .sizeRow{
-  width: 100px;
+  width: 80px;
 }
 
 #fuploader{

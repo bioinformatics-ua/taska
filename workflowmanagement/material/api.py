@@ -35,6 +35,7 @@ import tempfile
 from django.core.files import File as DjangoFile
 
 class GenericResourceSerializer(serializers.ModelSerializer):
+
     type = serializers.CharField(write_only=True)
 
     def to_representation(self, obj):
@@ -97,6 +98,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 class FileSerializer(ResourceSerializer):
     path = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
 
     def get_path(self, obj):
 
@@ -105,6 +107,9 @@ class FileSerializer(ResourceSerializer):
             })
 
         return '%sdownload/' % (baseurl)
+
+    def get_size(self, obj):
+        return obj.file.size
 
     class Meta(ResourceSerializer.Meta):
         model = File
@@ -259,7 +264,6 @@ class FileUpload(generics.CreateAPIView):
         serializer.instance.save()
 
         headers = self.get_success_headers(serializer.data)
-
 
         return Response(serializer.data, status=200, headers=headers)
 
