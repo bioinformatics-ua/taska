@@ -46,7 +46,7 @@ export default React.createClass({
     },
     displayName: route => {
 
-        return `Workflow ${route.props.detail.Workflow.title}`;
+        return `Study - ${route.props.detail.Workflow.title}`;
     },
     __getState(){
         return {

@@ -71,10 +71,9 @@ export default React.createClass({
     },
     displayName: route => {
         let process = route.props.detail.Process.process;
-        return `Process ${process['object_repr']} (${process['start_date']})`;
+        return `Process - ${process['object_repr']} (${process['start_date']})`;
     },
     __getState(){
-        console.log('GET STATE');
         return {
             process: ProcessStore.getDetail(),
             ***REMOVED*** WorkflowStore.getDetail(),

@@ -69,7 +69,7 @@ export default React.createClass({
     },
     displayName: route => {
         let detail = Object.keys(route.props.detail)[0];
-        return `Task ${route.props.detail[detail].task_repr}`;
+        return `Task - ${route.props.detail[detail].task_repr}`;
     },
     __getState(){
         return {

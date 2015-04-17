@@ -12,6 +12,8 @@ import {Loading} from './component.jsx'
 
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
+import moment from 'moment';
+
 var HistoryItem = React.createClass({
   render: function(){
     function translateAction(entry){
@@ -45,7 +47,7 @@ var HistoryItem = React.createClass({
             <span>
               {translateAction(this.props.rowData)}
               <br />
-              <small>On {this.props.rowData.date}</small>
+              <small>On {moment(this.props.rowData.date).fromNow()}</small>
             </span>
       );
   }

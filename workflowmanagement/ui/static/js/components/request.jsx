@@ -44,7 +44,7 @@ export default React.createClass({
         if(route.props.detail.RequestAdd)
             return `Add Request`;
         else
-            return `Request ${route.props.detail.Request.title}`;
+            return `Request - ${route.props.detail.Request.title}`;
 
     },
     __getState(){
