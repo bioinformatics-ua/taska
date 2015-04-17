@@ -24,6 +24,8 @@ import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
 import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
+import {ProcessResume} from './ProcessResume.jsx';
+
 const ProcessLabel = React.createClass({
     render(){
         return <table className="process-label">
@@ -187,6 +189,7 @@ export default React.createClass({
                     savebar={!params.mode || params.mode === 'view'? false: true}
                     addNew={this.addNew}
                     cancelUser={this.cancelUser}
+                    endDetail={ProcessResume}
                     {...this.props}/>
             </span>
         );

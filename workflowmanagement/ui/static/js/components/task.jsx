@@ -56,6 +56,14 @@ const RequestStatus = React.createClass({
     }
 });
 
+const StatusShow = React.createClass({
+    render(){
+        return  <span disabled className="form-control">
+                    {moment(this.props.data['date']).fromNow()}
+                </span>
+    }
+});
+
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
@@ -197,7 +205,7 @@ export default React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-body">
                             <div className="row">
-                                <div className={this.didWrite()? "cold-md-9": "col-md-12"}>
+                                <div className={this.didWrite()? "col-md-9": "col-md-12"}>
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Task</strong></span>
@@ -265,14 +273,26 @@ export default React.createClass({
                                     </div>
                                 {this.state.answer.hash?(
                                     <div className="col-md-12">
-                                            <div className="form-group">
-                                                <div className="input-group">
-                                                  <span className="input-group-addon"><strong>Executioner</strong></span>
-                                                  <span disabled style={{float: 'none'}} className="form-control">
-                                                    {this.state.answer['user_repr']}
-                                                  </span>
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <div className="input-group">
+                                                      <span className="input-group-addon"><strong>Executioner</strong></span>
+                                                      <span disabled style={{float: 'none'}} className="form-control">
+                                                        {this.state.answer['user_repr']}
+                                                      </span>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <div className="input-group">
+                                                      <span className="input-group-addon"><strong>Finish Date</strong></span>
+                                                     <StatusShow data={this.state.answer} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ):''}
                             </div>

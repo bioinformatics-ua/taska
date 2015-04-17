@@ -30,11 +30,15 @@
     color: black;
     display: inline-block;
     margin:20px;
+    position: relative;
+    z-index: 1000;
  }
 
  .state-end{
     display: inline-block;
     margin: 20px;
+    position: relative;
+    z-index: 1000;
  }
  .state-end .fa-stack{
     margin-top: -3px;

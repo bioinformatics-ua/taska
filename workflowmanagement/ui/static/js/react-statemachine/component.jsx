@@ -238,6 +238,12 @@ let StateMachineComponent = React.createClass({
     select(event){
         event.stopPropagation();
 
+        let id = event.currentTarget.id;
+        if(id === 'state-start' && !this.props.startDetail)
+            return;
+        if(id === 'state-end' && !this.props.endDetail)
+            return;
+
         StateMachineActions.select(event.currentTarget.id);
     },
     editLabel(event){
@@ -346,7 +352,7 @@ let StateMachineComponent = React.createClass({
             ):'';
         };
         list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
-                        <div title="Origin of study Workflow diagram" className="state-start">
+                        <div title="Origin of study Workflow diagram" id="state-start"  onClick={this.select} className="state-start">
                             <i className="fa fa-3x fa-circle"/>
                         </div>
                         {drop(0,initial_state)}
@@ -387,7 +393,7 @@ let StateMachineComponent = React.createClass({
             list.push(
 
                 <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level no-select text-center">
-                    <div title="End of diagram" className="state-end">
+                    <div title="End of diagram" id="state-end"  onClick={this.select} className="state-end">
                         <span className="fa-stack fa-2x">
                           <i className="fa fa-stack-2x fa-circle-thin"></i>
                           <i className="insidecircle fa fa-stack-1x fa-circle"></i>
@@ -421,7 +427,9 @@ let StateMachineComponent = React.createClass({
         let selected = (this.state.selected == conn)? 'state_line_selected': '';
 
         // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
-        let exists = (elem2.attr('id') != undefined && elem1.attr('id') != undefined);
+        let exists = (elem2.attr('id') != 'undefined' && elem1.attr('id') != undefined)
+        && (elem2.attr('id') != 'state-start' && elem1.attr('id') != 'state-start')
+        && (elem2.attr('id') != 'state-end' && elem1.attr('id') != 'state-end');
 
         $.line(
             {x:Math.round(offset1.left+horizontal_variation), y:offset1.top-4},
@@ -512,12 +520,25 @@ let StateMachineComponent = React.createClass({
 
         const state_detail = (editable) => {
             if(this.state.selected){
-                let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
+                if(this.state.selected === 'state-start'){
 
-                return <span><DRender
-                deleteConnection={this.deleteConnection}
-                addDependency={this.addDependency}
-                dataChange={this.dataChange} {...this.props}/></span>;
+                    let DRender = this.props.startDetail;
+                    return <DRender context={this} />;
+
+                } else if(this.state.selected === 'state-end'){
+
+                    let DRender = this.props.endDetail;
+                    return <DRender context={this} />;
+
+                } else{
+                    let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
+
+                    return <span><DRender
+                    deleteConnection={this.deleteConnection}
+                    addDependency={this.addDependency}
+                    dataChange={this.dataChange} {...this.props}/></span>;
+                }
+
             }
 
             return <center>Please select a state to see his data options.</center>;
