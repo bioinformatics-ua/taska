@@ -60,9 +60,8 @@ export default Reflux.createStore({
         return this.__rfinished || false;
     },
     onSaveAnswer(){
-        console.log(this.answer);
         StateActions.loadingStart();
-        console.log(ResultActions);
+
         ResultActions.addDetail.triggerPromise(this.answer).then(
             (answer) => {
                 StateActions.loadingEnd();

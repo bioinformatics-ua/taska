@@ -16,20 +16,30 @@ import TaskStore from '../../stores/TaskStore.jsx';
 
 import Task from '../task.jsx'
 
+import Uploader from '../reusable/uploader.jsx'
+
 class SimpleTask extends Task{
     getTypeRepr(){
         return <span><i className='fa fa-check'></i> Simple Task</span>;
     }
-
     changeComment(e){
         super.setAnswer('comment', e.target.value);
+    }
+
+    setResources(all_resources){
+        let resources = [];
+        let full = all_resources || [];
+
+        for(let resource of full){
+            resources.push(resource.hash);
+        }
+        super.setAnswer('outputswrite', resources);
     }
 
     detailRender(){
         const context = this;
         return React.createClass({
             render(){
-
                 return (<span>
                     <div className="form-group">
                         <div className="input-group">
@@ -38,6 +48,8 @@ class SimpleTask extends Task{
                             value={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
                         </div>
                     </div>
+                    <Uploader uploads={[]} done={context.setResources} />
+
                 </span>);
             }
         })

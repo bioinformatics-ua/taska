@@ -14,7 +14,7 @@ def create_serializer(viewset, request):
 class AliasOrderingFilter(filters.OrderingFilter):
     ordering_map = {}
     def filter_queryset(self, request, queryset, view):
-        ordering = self.get_ordering(request)
+        ordering = self.get_ordering(request, queryset, view)
 
         if ordering:
             # Skip any incorrect parameters

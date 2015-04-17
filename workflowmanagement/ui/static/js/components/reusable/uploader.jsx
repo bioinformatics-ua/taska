@@ -104,7 +104,7 @@ const Uploader = React.createClass({
         this.setState({
             uploads: tmp
         });
-
+        console.log('CHANGE UPLOAD ?'+this.props.done)
         if(this.props.done)
             this.props.done(this.flatUploads().filter(
                     value => value.hash != undefined

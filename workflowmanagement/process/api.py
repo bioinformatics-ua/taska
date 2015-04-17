@@ -708,6 +708,7 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         self.perform_update(serializer)
 
         serializer = RequestSerializer(instance=instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
 
         History.new(event=History.EDIT, actor=request.user, object=instance)
 

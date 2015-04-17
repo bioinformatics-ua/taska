@@ -6,6 +6,8 @@ from model_utils.managers import InheritanceManager
 
 from utils.hashes import createHash
 
+from material.models import Resource
+
 class Result(models.Model):
     ''' Generic representation of a result for a given ProcessTask, given by a given User.
 
@@ -20,6 +22,7 @@ class Result(models.Model):
     date            = models.DateTimeField(auto_now_add=True)
     comment         = models.TextField()
     hash            = models.CharField(max_length=50)
+    outputs         = models.ManyToManyField(Resource)
 
     removed         = models.BooleanField(default=False)
 

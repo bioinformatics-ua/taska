@@ -20,6 +20,8 @@ from history.models import History
 
 from django.apps import apps
 
+from material.api import GenericResourceSerializer
+
 class GenericResultSerializer(serializers.ModelSerializer):
     type = serializers.CharField(write_only=True)
 
@@ -65,22 +67,54 @@ class ResultSerializer(serializers.ModelSerializer):
     process = serializers.CharField(max_length=50)
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField()
+    outputs = serializers.SerializerMethodField()
+    outputswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
+
+
+    def get_outputs(self, obj):
+        serializer = GenericResourceSerializer(
+                obj.outputs.all().select_subclasses(),
+                many=True
+            )
+        return serializer.data
 
     class Meta:
         model = Result
         exclude = ('id', 'processtaskuser', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        extra_kwargs = {'hash': {'required': False}}
+        extra_kwargs = {
+            'hash': {'required': False},
+            'outputs': {'read_only': True}
+        }
 
     def get_type(self, obj):
         return obj.type()
+
+    def __create_resources(self, result, resources):
+        if resources != None:
+            old_resources = result.outputs.exclude(hash__in=resources).select_subclasses()
+
+            for old in old_resources:
+                # mark the resource as removed
+                old.remove()
+                result.outputs.remove(old)
+
+
+            for resource in resources:
+                try:
+                    r = Resource.objects.get(hash=resource)
+                    r.link()
+                    result.outputs.add(r)
+                    result.save()
+                except Resource.DoesNotExist:
+                    print "-- ERROR: Couldnt add resource to result"
 
     @transaction.atomic
     def create(self, validated_data):
         process = validated_data.pop('process')
         task    = validated_data.pop('task')
         user    = validated_data.pop('user')
-
+        outputs = validated_data.pop('outputswrite', None)
         try:
             process = Process.objects.get(hash=process)
             task = Task.objects.get(hash=task)
@@ -99,13 +133,13 @@ class ResultSerializer(serializers.ModelSerializer):
 
         result = self.Meta.model.objects.create(**validated_data)
 
+        self.__create_resources(result, outputs)
+
         return result
 
 class SimpleResultSerializer(ResultSerializer):
-    class Meta:
+    class Meta(ResultSerializer.Meta):
         model = SimpleResult
-        #exclude = ('workflow',)
-        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         read_only_fields = ('workflow',)
 
 class ResultFilter(django_filters.FilterSet):

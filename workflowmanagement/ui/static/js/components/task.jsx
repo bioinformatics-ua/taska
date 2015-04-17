@@ -215,7 +215,7 @@ export default React.createClass({
                                 <div className="col-md-12">
                                     <Tabs>
                                         <Tabs.Panel
-                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Task</span>}>
+                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Resolve Task</span>}>
                                             <div className="form-group row">
                                                 <div className="col-md-9"></div>
                                                 <div className="col-md-3">

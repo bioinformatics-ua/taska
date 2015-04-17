@@ -2,3 +2,4 @@
 documentation/build
 *.pyc
 /node_modules
+workflowmanagement/upload/file
