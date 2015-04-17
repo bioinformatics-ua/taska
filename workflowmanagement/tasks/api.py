@@ -158,9 +158,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        #write_only_fields = ('workflow',)
+        write_only_fields = ('workflow',)
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        exclude = ('id', 'removed', 'workflow', 'ttype')
+        exclude = ('id', 'removed', 'ttype')
         extra_kwargs = {
             'hash': {'required': False},
             'description': {'required': False},

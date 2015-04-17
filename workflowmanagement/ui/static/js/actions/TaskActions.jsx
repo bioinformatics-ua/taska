@@ -8,11 +8,7 @@ import {DetailActionsMixin} from '../mixins/actions.jsx';
 const TaskActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
-    'load': {},
-    'calibrate': {},
-    'setAnswer': {},
-    'saveAnswer': {},
-    'unloadAnswer': {}
+    'load': {}
     }, DetailActionsMixin));
 
 export default TaskActions;

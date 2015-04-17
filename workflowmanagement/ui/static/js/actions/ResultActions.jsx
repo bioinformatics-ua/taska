@@ -8,7 +8,11 @@ import {DetailActionsMixin} from '../mixins/actions.jsx';
 const ResultActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
-    'load': {}
+    'load': {},
+    'setAnswer': {},
+    'saveAnswer': {},
+    'unloadAnswer': {},
+    'calibrate': {}
     }, DetailActionsMixin));
 
 export default ResultActions;

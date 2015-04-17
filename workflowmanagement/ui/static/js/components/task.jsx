@@ -20,6 +20,11 @@ import Tabs from 'react-simpletabs';
 
 import Griddle from 'griddle-react';
 
+import ResultActions from '../actions/ResultActions.jsx';
+import ResultStore from '../stores/ResultStore.jsx';
+
+import UserStore from '../stores/UserStore.jsx';
+
 const RequestTitle = React.createClass({
     render(){
         var row = this.props.rowData;
@@ -54,14 +59,27 @@ const RequestStatus = React.createClass({
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
-                Reflux.listenTo(TaskStore, 'update')],
+                Reflux.listenTo(TaskStore, 'update'), Reflux.listenTo(ResultStore, 'update')],
     statics: {
-        fetch(params) {
-            return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
-                (Task) => {
-                    return Task;
-                }
-            );
+        fetch(params, route) {
+            if(route.name.toLowerCase().indexOf('result') !== -1){
+                return new Promise(function (fulfill, reject){
+
+                ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
+                    (result) => {
+                                fulfill({
+                                    result: result,
+                                });
+                    }
+                );
+                });
+            } else{
+                return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
+                    (Task) => {
+                        return Task;
+                    }
+                );
+            }
         }
     },
     contextTypes: {
@@ -69,23 +87,54 @@ export default React.createClass({
     },
     displayName: route => {
         let detail = Object.keys(route.props.detail)[0];
-        return `Task - ${route.props.detail[detail].task_repr}`;
+        if(route.props.detail[detail].result)
+            return `Result - ${route.props.detail[detail].result.hash}`;
+        else
+            return `Task - ${route.props.detail[detail].task_repr}`;
     },
-    __getState(){
-        return {
-            task: TaskStore.getDetail(),
-            answer: TaskStore.getAnswer(),
-            submitted: TaskStore.answerSubmitted()
+    __getState(result=false){
+        let tmp = {
+            answer: ResultStore.getAnswer(),
+            submitted: ResultStore.answerSubmitted(),
+            user: UserStore.getUser()
+        };
+
+        if(result || (this.state && this.state.isResult)){
+            tmp.task = tmp.answer.processtaskuser;
+        } else {
+            tmp.task = TaskStore.getDetail();
         }
+
+        return tmp;
+    },
+    isMine(){
+        if(this.state.user.id===this.state.answer['process_owner'])
+            return true;
+
+        return false;
+    },
+    didWrite(){
+        if(!this.state.answer.hash)
+            return true;
+
+        if(this.state.user.id === this.state.answer.user)
+            return true;
+
+        return false;
     },
     getInitialState(){
+        let detail = Object.keys(this.props.detail)[0];
+
+        if(this.props.detail[detail].result)
+            return this.__getState(true);
+
         return this.__getState();
     },
     componentWillMount(){
-        TaskActions.calibrate();
+        ResultActions.calibrate(this.state.task);
     },
     componentWillUnmount(){
-        TaskActions.unloadAnswer();
+        ResultActions.unloadAnswer();
     },
     componentDidUpdate(){
         if(this.state.submitted)
@@ -97,14 +146,12 @@ export default React.createClass({
         }
     },
     setAnswer(prop, val){
-        TaskActions.setAnswer(prop, val);
+        ResultActions.setAnswer(prop, val);
     },
     saveAnswer(e){
-        TaskActions.saveAnswer();
+        ResultActions.saveAnswer();
     },
     render() {
-        console.log(this.state.task);
-
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
 
@@ -150,7 +197,7 @@ export default React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-body">
                             <div className="row">
-                                <div className="col-md-9">
+                                <div className={this.didWrite()? "cold-md-9": "col-md-12"}>
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Task</strong></span>
@@ -181,14 +228,15 @@ export default React.createClass({
 
                                 </div>
                                 <div className="col-md-3">
-                                    <div className="btn-group-vertical btn-block" role="group">
+                                    {this.didWrite()?
+                                    (<div className="btn-group-vertical btn-block" role="group">
                                         <Link to="RequestAdd" params={{
                                             object: 'add',
                                             process: this.state.task.processtask.process,
                                             task: this.state.task.processtask.task,
                                             default: 1
                                         }} className="btn btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-retweet"></i> Ask for reassignment
+                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-retweet" /> Ask for reassignment
                                         </Link>
                                         <Link to="RequestAdd" params={{
                                             object: 'add',
@@ -199,29 +247,48 @@ export default React.createClass({
                                             <i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification
                                         </Link>
                                     </div>
+                                    ):(
+                                        <div></div>
+                                    )
+                                    }
+
                                 </div>
-                                     <div className="col-md-12">
+                                 <div className="col-md-12">
+                                        <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Description</strong></span>
+                                              <span disabled style={{float: 'none'}} className="form-control">
+                                                {this.state.task.processtask.parent.description}
+                                              </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {this.state.answer.hash?(
+                                    <div className="col-md-12">
                                             <div className="form-group">
                                                 <div className="input-group">
-                                                  <span className="input-group-addon"><strong>Description</strong></span>
+                                                  <span className="input-group-addon"><strong>Executioner</strong></span>
                                                   <span disabled style={{float: 'none'}} className="form-control">
-                                                    {this.state.task.processtask.parent.description}
+                                                    {this.state.answer['user_repr']}
                                                   </span>
                                                 </div>
                                             </div>
-                                        </div>
+                                    </div>
+                                ):''}
                             </div>
                             <div className="clearfix row">
                                 <div className="col-md-12">
                                     <Tabs>
                                         <Tabs.Panel
-                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Resolve Task</span>}>
+                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Answer</span>}>
                                             <div className="form-group row">
                                                 <div className="col-md-9"></div>
                                                 <div className="col-md-3">
+                                                        {this.didWrite() ?
                                                         <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Mark as complete
+                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
                                                         </button>
+                                                        : ''}
                                                 </div>
                                             </div>
                                             <div className="row">
@@ -230,7 +297,7 @@ export default React.createClass({
                                                 </div>
                                             </div>
                                         </Tabs.Panel>
-                                            <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;My Requests</span>}>
+                                            <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;Related Requests</span>}>
                                                 <Griddle
                                                 {...table_style}
                                                 results={this.state.task.requests}

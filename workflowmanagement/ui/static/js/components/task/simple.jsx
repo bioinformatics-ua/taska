@@ -35,20 +35,41 @@ class SimpleTask extends Task{
         }
         super.setAnswer('outputswrite', resources);
     }
-
+    translateResources(){
+        if(this.state.answer.hash){
+            let resources = this.state.answer.outputs;
+            let files = [];
+            for(let resource of resources){
+                if(resource.type === 'material.File')
+                    files.push({
+                        hash: resource.hash,
+                        filename: resource.filename,
+                        size: resource.size,
+                        status: 'Finished',
+                        progress: 100,
+                        manage: ''
+                    });
+            }
+            return files;
+        }
+        return [];
+    }
     detailRender(){
         const context = this;
+        let editable = super.didWrite();
+
         return React.createClass({
             render(){
                 return (<span>
                     <div className="form-group">
                         <div className="input-group">
                           <span className="input-group-addon"><strong>Commentaries</strong></span>
-                          <textarea rows="4" placeholder="Leave a comment upon task resolution (optional)"
+                          <textarea disabled={!editable} rows="4" placeholder="Leave a comment upon task resolution (optional)"
                             value={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
                         </div>
                     </div>
-                    <Uploader uploads={[]} done={context.setResources} />
+                    <h3>File outputs</h3>
+                    <Uploader editable={editable} uploads={context.translateResources()} done={context.setResources} />
 
                 </span>);
             }

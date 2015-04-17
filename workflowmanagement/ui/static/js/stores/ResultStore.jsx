@@ -1,6 +1,8 @@
 'use strict';
 import Reflux from 'reflux';
 import ResultActions from '../actions/ResultActions.jsx';
+import StateActions from '../actions/StateActions.jsx';
+import depmap from '../map.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 
@@ -33,5 +35,38 @@ export default Reflux.createStore({
                 this.load(this.__current);
             }
         );
+    },
+    onCalibrate(data){
+        this.__detaildata = {
+            task: data.processtask.task,
+            process: data.processtask.process,
+            type: depmap[data.processtask.parent.type]
+        };
+    },
+    getAnswer(){
+        return this.__detaildata || {};
+    },
+    onUnloadAnswer(){
+        this.__detaildata = {};
+    },
+    onSetAnswer(prop, val){
+        this.__detaildata[prop] = val;
+
+        //this.trigger(this.DETAIL);
+    },
+    answerSubmitted(){
+        return this.__rfinished || false;
+    },
+    onSaveAnswer(){
+        StateActions.loadingStart();
+
+        ResultActions.addDetail.triggerPromise(this.__detaildata).then(
+            (answer) => {
+                StateActions.loadingEnd();
+
+                this.__rfinished = answer;
+                this.trigger();
+            }
+        )
     }
 });

@@ -194,6 +194,7 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
                 else:
                     print "creating"
                     task['workflow'] = workflow.id
+                    print task
                     ts = GenericTaskSerializer(data=task)
 
                 valid = ts.is_valid(raise_exception=True)
@@ -222,6 +223,7 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
         return old
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         """
         Insert a new workflow
@@ -251,6 +253,7 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         """
         Update a existing workflow

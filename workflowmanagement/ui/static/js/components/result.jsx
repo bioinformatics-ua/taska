@@ -11,8 +11,10 @@ import {Authentication} from '../mixins/component.jsx';
 import {Modal, PermissionsBar} from './reusable/component.jsx';
 
 import ResultActions from '../actions/ResultActions.jsx';
+import TaskActions from '../actions/TaskActions.jsx';
 
 import ResultStore from '../stores/ResultStore.jsx';
+import TaskStore from '../stores/TaskStore.jsx';
 
 import moment from 'moment';
 
@@ -22,23 +24,37 @@ export default React.createClass({
                 Reflux.listenTo(ResultStore, 'update')],
     statics: {
         fetch(params) {
-            return ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
+            return new Promise(function (fulfill, reject){
+
+            ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                 (result) => {
-                    return result;
+                    TaskActions.loadDetailIfNecessary.triggerPromise(result.task).then(
+                        (task) => {
+                            fulfill({
+                                result: result,
+                                task: task
+                            });
+                        }
+                    );
                 }
             );
+            });
+
         }
     },
     contextTypes: {
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
+        console.log(route.props);
+
         let detail = Object.keys(route.props.detail)[0];
-        return `Result ${route.props.detail[detail].hash}`;
+        return `Result ${route.props.detail[detail].result.hash}`;
     },
     __getState(){
         return {
-            result: ResultStore.getDetail()
+            result: ResultStore.getDetail(),
+            task: TaskStore.getDetail()
         }
     },
     getInitialState(){

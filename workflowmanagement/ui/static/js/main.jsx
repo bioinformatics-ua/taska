@@ -26,7 +26,7 @@ function fetch(routes, params) {
         .filter(route => route.handler.fetch)
         .map(route => {
 
-            return route.handler.fetch(params).then(d => {data[route.name] = d;});
+            return route.handler.fetch(params, route).then(d => {data[route.name] = d;});
         })
     ).then(() => data)
     .catch(

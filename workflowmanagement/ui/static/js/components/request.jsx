@@ -84,7 +84,6 @@ export default React.createClass({
         return false;
     },
     didWrite(){
-        console.log(this.state);
         if(!this.state.request.processtaskuser)
             return true;
 

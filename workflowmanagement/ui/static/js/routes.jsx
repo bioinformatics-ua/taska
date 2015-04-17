@@ -5,6 +5,19 @@ import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
 
 import {Label} from './components/reusable/component.jsx'
 
+// Allows defaulting a route to a given path
+const Defaulter = {
+    to(prepath, path){
+        return React.createClass({
+            willTransitionTo (transition, params) {
+                console.log('WILL TRANSITION to');
+                transition.redirect(`${prepath}/${params.object}/${path}`);
+            },
+            render () { return null; }
+        });
+    }
+};
+
 module.exports = (
     <Route name='app' path='/' handler={require('./components/app.jsx')}>
 
@@ -30,11 +43,11 @@ module.exports = (
         <Route name="RequestAdd" path="request/:object/:process/:task/?:default?" handler={require('./components/request.jsx')}>
         </Route>
 
-        <Route name="result.SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
-        <Route name="SimpleResult" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
+        <Route name="SimpleResult" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
+        <Route name="result.SimpleResult" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
 
         <Route name="tasks.SimpleTask" path="simpletask/:object" handler={require('./components/task/simple.jsx')} />
-        <Route name="SimpleTask" path="simpleresult/:object" handler={require('./components/result/simple.jsx')} />
+        <Route name="SimpleTask" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
 
         <NotFoundRoute handler={require('./components/404.jsx')}/>
     </Route>

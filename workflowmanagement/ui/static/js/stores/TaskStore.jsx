@@ -37,38 +37,5 @@ export default Reflux.createStore({
     init(){
         this.answer = {};
 
-    },
-    onCalibrate(){
-        this.answer = {
-            task: this.__detaildata.processtask.task,
-            process: this.__detaildata.processtask.process,
-            type: depmap[this.__detaildata.processtask.parent.type]
-        };
-    },
-    getAnswer(){
-        return this.answer || {};
-    },
-    onUnloadAnswer(){
-        this.answer = {};
-    },
-    onSetAnswer(prop, val){
-        this.answer[prop] = val;
-
-        //this.trigger(this.DETAIL);
-    },
-    answerSubmitted(){
-        return this.__rfinished || false;
-    },
-    onSaveAnswer(){
-        StateActions.loadingStart();
-
-        ResultActions.addDetail.triggerPromise(this.answer).then(
-            (answer) => {
-                StateActions.loadingEnd();
-
-                this.__rfinished = answer;
-                this.trigger();
-            }
-        )
     }
 });

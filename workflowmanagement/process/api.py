@@ -27,7 +27,6 @@ from tasks.api import GenericTaskSerializer
 
 from utils.api_related import create_serializer, AliasOrderingFilter
 
-from result.api import GenericResultSerializer
 from django.http import Http404
 
 import json
@@ -50,7 +49,6 @@ Process related api calls available
 
 class ProcessTaskUserSerializer(serializers.ModelSerializer):
     user_repr = serializers.SerializerMethodField()
-    result = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessTaskUser
@@ -60,7 +58,12 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
     def get_user_repr(self, obj):
         return obj.user.get_full_name()
 
+class PTUWithResult(ProcessTaskUserSerializer):
+    result = serializers.SerializerMethodField()
+
     def get_result(self, obj):
+        from result.api import GenericResultSerializer
+
         result = obj.result()
 
         if result:
@@ -72,7 +75,7 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
     task_repr = serializers.SerializerMethodField()
 
-    users = ProcessTaskUserSerializer(many=True, required=False)
+    users =PTUWithResult(many=True, required=False)
     deadline_repr = serializers.SerializerMethodField()
 
     class Meta:
@@ -447,9 +450,7 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
     def get_deadline(self, obj):
         return obj.processtask.deadline
     def get_requests(self, obj):
-        rq = RequestSerializer(obj.requests() ,many=True).data
-
-        return RequestSerializer(obj.requests() ,many=True).data
+        return SimpleRequestSerializer(obj.requests() ,many=True).data
 
 class MyTasks(generics.ListAPIView):
     queryset = ProcessTaskUser.objects.none()
@@ -611,6 +612,10 @@ class RequestSerializer(serializers.ModelSerializer):
         exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
+
+class SimpleRequestSerializer(RequestSerializer):
+    class Meta(RequestSerializer.Meta):
+        exclude = ('id', 'removed', 'processtaskuser')
 
 class RequestFilter(django_filters.FilterSet):
     process = django_filters.CharFilter(name="processtaskuser__processtask__process__hash")

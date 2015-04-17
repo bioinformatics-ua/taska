@@ -22,6 +22,8 @@ from django.apps import apps
 
 from material.api import GenericResourceSerializer
 
+from process.api import MyProcessTaskUserDetailSerializer
+
 class GenericResultSerializer(serializers.ModelSerializer):
     type = serializers.CharField(write_only=True)
 
@@ -61,15 +63,18 @@ class GenericResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
 
+
 # Serializers define the API representation.
 class ResultSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     process = serializers.CharField(max_length=50)
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField()
+    user_repr = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
     outputswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
-
+    processtaskuser = MyProcessTaskUserDetailSerializer()
+    process_owner = serializers.SerializerMethodField()
 
     def get_outputs(self, obj):
         serializer = GenericResourceSerializer(
@@ -78,9 +83,16 @@ class ResultSerializer(serializers.ModelSerializer):
             )
         return serializer.data
 
+
+    def get_process_owner(self, obj):
+        return obj.processtaskuser.processtask.process.executioner.id
+
+    def get_user_repr(self, obj):
+        return obj.processtaskuser.user.get_full_name()
+
     class Meta:
         model = Result
-        exclude = ('id', 'processtaskuser', 'removed')
+        exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         extra_kwargs = {
             'hash': {'required': False},
