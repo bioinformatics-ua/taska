@@ -31,6 +31,17 @@
     display: inline-block;
     margin:20px;
  }
+
+ .state-end{
+    display: inline-block;
+    margin: 20px;
+ }
+ .state-end .fa-stack{
+    margin-top: -3px;
+ }
+ .state-end .insidecircle{
+    font-size: 37px !important;
+ }
 .state-level{
     background: none;
     border: 0;

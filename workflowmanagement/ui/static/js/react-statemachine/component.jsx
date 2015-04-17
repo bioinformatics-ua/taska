@@ -347,7 +347,7 @@ let StateMachineComponent = React.createClass({
         };
         list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
                         <div title="Origin of study Workflow diagram" className="state-start">
-                        <i className="fa fa-3x fa-circle"/>
+                            <i className="fa fa-3x fa-circle"/>
                         </div>
                         {drop(0,initial_state)}
             </div>
@@ -385,8 +385,14 @@ let StateMachineComponent = React.createClass({
         }
         if(this.state.sm.getNextLevel() > 1)
             list.push(
-                <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level no-select text-center">
 
+                <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level no-select text-center">
+                    <div title="End of diagram" className="state-end">
+                        <span className="fa-stack fa-2x">
+                          <i className="fa fa-stack-2x fa-circle-thin"></i>
+                          <i className="insidecircle fa fa-stack-1x fa-circle"></i>
+                        </span>
+                    </div>
                     {drop(this.state.sm.getNextLevel())}
                 </div>
             );
@@ -415,7 +421,7 @@ let StateMachineComponent = React.createClass({
         let selected = (this.state.selected == conn)? 'state_line_selected': '';
 
         // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
-        let exists = elem2.attr('id') != undefined;
+        let exists = (elem2.attr('id') != undefined && elem1.attr('id') != undefined);
 
         $.line(
             {x:Math.round(offset1.left+horizontal_variation), y:offset1.top-4},
@@ -455,7 +461,10 @@ let StateMachineComponent = React.createClass({
                 this.__renderLine($(`#${state.getIdentificator()}`), $(`#${dependency.getIdentificator()}`));
             }
             if(state.getLevel() == 1)
-                this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'))
+                this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'));
+
+            if(state.getLevel() == (this.state.sm.getNextLevel() -1))
+                this.__renderLine($('.state-end'), $(`#${state.getIdentificator()}`))
         }
 
         $('.state_line').click(event =>{
