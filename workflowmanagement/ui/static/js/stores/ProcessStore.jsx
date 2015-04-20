@@ -135,8 +135,6 @@ export default Reflux.createStore({
 
                 dataopts.i = i;
 
-                console.log(i);
-
                 dataopts.assignee = t.users.reduce((prev, curr, i)=>{
                                         if(i == 0)
                                             return ''+curr.user;

@@ -35,6 +35,7 @@ const WorkflowStore = Reflux.createStore({
     },
     onCalibrate(){
         this.__missing=[];
+        this.__pfinished=false;
 
         this.trigger();
     },

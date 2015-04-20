@@ -70,9 +70,13 @@ class GenericResourceSerializer(serializers.ModelSerializer):
 # Serializers define the API representation.
 class ResourceSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
+    creator_repr = serializers.SerializerMethodField()
 
     def get_type(self, obj):
         return obj.type()
+
+    def get_creator_repr(self, obj):
+        return obj.creator.get_full_name()
 
     @transaction.atomic
     def create (self, data):

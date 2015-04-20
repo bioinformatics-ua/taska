@@ -13,7 +13,9 @@ import moment from 'moment';
 
 import checksum from 'json-checksum';
 
-import Uploader from '../uploader.jsx'
+import Uploader from '../uploader.jsx';
+
+import {stateColor} from '../../../map.jsx';
 
 const dummy = React.createClass({render(){return <span></span>; }});
 
@@ -159,56 +161,7 @@ class SimpleTaskRun extends SimpleTask{
     }
     stateStyle(){
         if(this.getData().ptask)
-            switch(this.getData().ptask.status){
-                case 1:
-                    return {
-                        border: '1px solid #ccc',
-                        color: 'black',
-                        backgroundColor: 'white',
-                        fontSize: '100%'
-                    };
-                case 2:
-                    let end = moment(this.getData().ptask.deadline);
-                    let now = moment();
-
-                    if(now.isBefore(end)){
-                        return {
-                              backgroundColor: '#337ab7',
-                              border: 0,
-                              color: 'white',
-                              fontSize: '100%'
-                        };
-                    } else {
-                        return {
-                            backgroundColor: 'rgb(240, 173, 78)',
-                            border: 0,
-                            color: 'white',
-                            fontSize: '100%'
-                        };
-                    }
-                case 3:
-                    return {
-                          backgroundColor: 'rgb(92, 184, 92)',
-                          border: 0,
-                          color: 'white',
-                          fontSize: '100%'
-                    };
-                case 4:
-                    return {
-                        backgroundColor: 'grey',
-                        border: 0,
-                        color: 'white',
-                        fontSize: '100%'
-                    };
-                case 5:
-                    return {
-                        backgroundColor: 'rgb(240, 173, 78)',
-                        border: 0,
-                        color: 'white',
-                        fontSize: '100%'
-                    };
-            }
-
+            return stateColor(this.getData().ptask);
 
         return {};
     }

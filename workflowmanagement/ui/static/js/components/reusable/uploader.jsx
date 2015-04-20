@@ -229,7 +229,8 @@ const Uploader = React.createClass({
                     sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>
                 },
             done: undefined,
-            editable: true
+            editable: true,
+            extraFields: []
         };
     },
     render(){
@@ -278,6 +279,22 @@ const Uploader = React.createClass({
                   "customComponent": FileManage,
                   "displayName": " ",
                   "cssClassName": "statusRow"
+                },
+                {
+                  "columnName": "date",
+                  "order": 5,
+                  "locked": false,
+                  "visible": true,
+                  "displayName": "Date",
+                  "cssClassName": "creatorRow"
+                },
+                {
+                  "columnName": "creator",
+                  "order": 6,
+                  "locked": false,
+                  "visible": true,
+                  "displayName": "Creator",
+                  "cssClassName": "creatorRow"
                 }
             ];
         return (
@@ -293,7 +310,7 @@ const Uploader = React.createClass({
                   columnMetadata={metadata}
                   columns={ this.props.editable ?
                     ["name", "size", "status", "progress", "manage"]:
-                    ["name", "size"]
+                    ["name", "size", ...this.props.extraFields]
                   }/>
             </span>
         );

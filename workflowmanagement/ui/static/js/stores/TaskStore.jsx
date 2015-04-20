@@ -6,7 +6,7 @@ import ResultActions from '../actions/ResultActions.jsx';
 
 import ResultStore from './ResultStore.jsx';
 
-import depmap from '../map.jsx';
+import {depmap} from '../map.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 import {ListLoader, DetailLoader} from '../actions/api.jsx'

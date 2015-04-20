@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 import ResultActions from '../actions/ResultActions.jsx';
 import StateActions from '../actions/StateActions.jsx';
-import depmap from '../map.jsx';
+import {depmap} from '../map.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 

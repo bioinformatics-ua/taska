@@ -55,6 +55,11 @@ fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
   text-align: center;
 }
 
+.creatorRow{
+  width: 200px;
+}
+
+
 .progressRow{
   width: 170px;
 }

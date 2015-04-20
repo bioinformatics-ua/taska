@@ -389,11 +389,16 @@ let StateMachineComponent = React.createClass({
                 </div>
             );
         }
-        if(this.state.sm.getNextLevel() > 1)
-            list.push(
+        if(this.state.sm.getNextLevel() > 1){
+            let classes = "state-end";
 
+            if(this.state.selected === 'state-end')
+                classes += " state-end-selected";
+
+            list.push(
                 <div key={`level${this.state.sm.getNextLevel()}`} onClick={this.clearSelect}  className="well well-sm state-level no-select text-center">
-                    <div title="End of diagram" id="state-end"  onClick={this.select} className="state-end">
+                    <div title="End of diagram" id="state-end"
+                            onClick={this.select} className={classes}>
                         <span className="fa-stack fa-2x">
                           <i className="fa fa-stack-2x fa-circle-thin"></i>
                           <i className="insidecircle fa fa-stack-1x fa-circle"></i>
@@ -402,6 +407,7 @@ let StateMachineComponent = React.createClass({
                     {drop(this.state.sm.getNextLevel())}
                 </div>
             );
+        }
         return list;
     },
     __renderLine(elem1, elem2, variate=true){
