@@ -62,9 +62,9 @@ export default React.createClass({
                                         ***REMOVED*** Workflow
                                     });
                                 }
-                            )
+                            ).catch(ex=>reject(ex));
                         }
-                    );
+                    ).catch(ex=>reject(ex));
                 });
         }
     },
@@ -72,8 +72,12 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-        let process = route.props.detail.Process.process;
-        return `Process - ${process['object_repr']} (${process['start_date']})`;
+        try {
+            let process = route.props.detail.Process.process;
+            return `Process - ${process['object_repr']} (${process['start_date']})`;
+        } catch(ex){
+            return "Process Not Found";
+        }
     },
     __getState(){
         return {
@@ -116,6 +120,10 @@ export default React.createClass({
         ProcessActions.addUser(task, user);
     },
     render() {
+        if(this.props.failed){
+            let Failed = this.props.failed;
+            return <Failed />;
+        }
         i++;
         console.log('RENDER PROCESS ');
         let params = this.context.router.getCurrentParams();

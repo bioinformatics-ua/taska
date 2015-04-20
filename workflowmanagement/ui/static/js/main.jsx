@@ -16,8 +16,12 @@ import {Login} from './actions/api.jsx';
 
 import StateActions from './actions/StateActions.jsx';
 
-const content = document.getElementById('playground');
+import Http404 from './components/404.jsx';
+import Http500 from './components/500.jsx';
 
+import Http0 from './components/0.jsx';
+
+const content = document.getElementById('playground');
 
 // For each route, if the route specifies a fetch function, treat it as an async-data needy route
 function fetch(routes, params) {
@@ -26,14 +30,10 @@ function fetch(routes, params) {
         .filter(route => route.handler.fetch)
         .map(route => {
 
-            return route.handler.fetch(params, route).then(d => {data[route.name] = d;});
+            return route.handler.fetch(params, route)
+                        .then(d => {data[route.name] = d;});
         })
-    ).then(() => data)
-    .catch(
-        () => {
-            console.log('ERROR');
-        }
-    );
+    ).then(() => data);
 }
 
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
@@ -42,7 +42,21 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
 
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    });
+    }).catch(
+        (ex) => {
+            console.log(ex.status);
+            if(ex.status === 404){
+                React.render(<Handler failed={Http404} />, content);
+                StateActions.loadingEnd();
+            } else if(ex.status === 0){
+                React.render(<Handler failed={Http0} />, content);
+                StateActions.loadingEnd();
+            } else {
+                React.render(<Handler failed={Http500} />, content);
+                StateActions.loadingEnd();
+            }
+        }
+    );
 });
 
 

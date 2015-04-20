@@ -3,7 +3,7 @@ from process.models import ProcessTaskUser
 
 from django.contrib.auth.models import User
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -45,7 +45,7 @@ class History(models.Model):
     # generic foreign key that refers to the object related to this action
     object_type     = models.ForeignKey(ContentType)
     object_id       = models.PositiveIntegerField()
-    object          = generic.GenericForeignKey('object_type', 'object_id')
+    object          = GenericForeignKey('object_type', 'object_id')
 
     authorized      = models.ManyToManyField(User, related_name='authorized')
 

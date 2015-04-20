@@ -45,8 +45,11 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-
-        return `Study - ${route.props.detail.Workflow.title}`;
+        try {
+            return `Study - ${route.props.detail.Workflow.title}`;
+        } catch(ex){
+            return "Study Not Found"
+        }
     },
     __getState(){
         return {
@@ -128,6 +131,11 @@ export default React.createClass({
         WorkflowActions.calibrate();
     },
     render() {
+        if(this.props.failed){
+            let Failed = this.props.failed;
+            return <Failed />;
+        }
+
         let params = this.context.router.getCurrentParams();
 
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))

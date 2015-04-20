@@ -79,7 +79,7 @@ export default React.createClass({
                                     result: result,
                                 });
                     }
-                );
+                ).catch(ex=> reject(ex));
                 });
             } else{
                 return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
@@ -94,11 +94,15 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
+        try{
         let detail = Object.keys(route.props.detail)[0];
         if(route.props.detail[detail].result)
             return `Result - ${route.props.detail[detail].result.hash}`;
         else
             return `Task - ${route.props.detail[detail].task_repr}`;
+        } catch(ex){
+            return 'Task Not Found';
+        }
     },
     __getState(result=false){
         let tmp = {
@@ -131,12 +135,16 @@ export default React.createClass({
         return false;
     },
     getInitialState(){
-        let detail = Object.keys(this.props.detail)[0];
+        try {
+            let detail = Object.keys(this.props.detail)[0];
 
-        if(this.props.detail[detail].result)
-            return this.__getState(true);
+            if(this.props.detail[detail].result)
+                return this.__getState(true);
 
-        return this.__getState();
+            return this.__getState();
+        } catch(ex){
+            return {}
+        }
     },
     componentWillMount(){
         ResultActions.calibrate(this.state.task);
@@ -160,6 +168,11 @@ export default React.createClass({
         ResultActions.saveAnswer();
     },
     render() {
+        if(this.props.failed){
+            let Failed = this.props.failed;
+            return <Failed />;
+        }
+
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
 

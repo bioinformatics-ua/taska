@@ -16,7 +16,8 @@ class Loader{
     }
 
     load(url, callback, unsuccessful_callback=null, type="GET", serialized={}){
-      return Promise.resolve($.ajax({
+      return new Promise(function(fulfill, reject){
+        $.ajax({
             url: url,
             type: type,
             data: serialized,
@@ -25,14 +26,17 @@ class Loader{
             success: function(data) {
               if(callback)
                 callback(data);
+                fulfill(data);
             }.bind(this),
             error: function(xhr, status, err) {
                 if(unsuccessful_callback != null)
                     unsuccessful_callback();
-                console.log(xhr);
+
                 console.error(`Unable to load ${url}`);
+                reject(xhr);
             }.bind(this)
-      }));
+      });
+    });
     }
 }
 

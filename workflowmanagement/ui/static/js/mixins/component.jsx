@@ -15,7 +15,15 @@ const Authentication = {
 
                     callback();
                 }
-            );
+            ).catch(ex=>{
+                console.log(ex.status);
+
+                switch(ex.status){
+                    case 0: alert('Connection Failed, please try again, if the problem persists contact the administrator.'); break;
+                    case 404: transition.redirect('/404',{},{}); break;
+                    default: transition.redirect('/500',{},{}); break;
+                }
+            });
         }
     }
 };

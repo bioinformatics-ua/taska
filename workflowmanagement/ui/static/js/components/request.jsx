@@ -41,11 +41,14 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-        if(route.props.detail.RequestAdd)
-            return `Add Request`;
-        else
-            return `Request - ${route.props.detail.Request.title}`;
-
+        try {
+            if(route.props.detail.RequestAdd)
+                return `Add Request`;
+            else
+                return `Request - ${route.props.detail.Request.title}`;
+        } catch(ex){
+            return "Request Not Found";
+        }
     },
     __getState(){
         return {
@@ -108,6 +111,11 @@ export default React.createClass({
         RequestActions.setReqMessage(e.target.value);
     },
     render() {
+        if(this.props.failed){
+            let Failed = this.props.failed;
+            return <Failed />;
+        }
+
         return (
             <div className="request-detail row">
                 <div className="col-md-12">

@@ -121,7 +121,9 @@ class DetailStoreMixin{
                         this.__Actions.loadDetailSuccess(data);
                         this.__Actions.loadDetail.completed(data);
                     }
-                );
+                ).catch(ex=>{
+                    this.__Actions.loadDetail.failed(ex);
+                })
             },
             onPostDetail(hash, serialized){
                 loader.put(hash, serialized).then(
@@ -163,7 +165,9 @@ class DetailStoreMixin{
                        data => {
                             this.__Actions.loadDetailIfNecessary.completed(data);
                        }
-                    );
+                    ).catch(ex => {
+                        this.__Actions.loadDetailIfNecessary.failed(ex);
+                    });
                 }
             },
             onLoadDetailSuccess(data) {
