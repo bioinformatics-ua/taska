@@ -440,6 +440,7 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
     task_repr = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
+    dependencies = serializers.SerializerMethodField()
 
     def get_task_repr(self, obj):
         return obj.processtask.task.title
@@ -449,8 +450,15 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
 
     def get_deadline(self, obj):
         return obj.processtask.deadline
+
     def get_requests(self, obj):
         return SimpleRequestSerializer(obj.requests() ,many=True).data
+
+    def get_dependencies(self, obj):
+        task_deps = obj.processtask.task.dependencies().values_list('dependency')
+        process = obj.processtask.process
+
+        return ProcessTaskSerializer(ProcessTask.all().filter(process=process, task__in=task_deps), many=True).data
 
 class MyTasks(generics.ListAPIView):
     queryset = ProcessTaskUser.objects.none()
@@ -488,7 +496,7 @@ class MyTask(generics.RetrieveAPIView):
 
 class MyTaskDependencies(generics.ListAPIView):
     queryset = ProcessTaskUser.objects.none()
-    serializer_class = MyProcessTaskSerializer
+    serializer_class = ProcessTaskSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     lookup_field = 'hash'
 
