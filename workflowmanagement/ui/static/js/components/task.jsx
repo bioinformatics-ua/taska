@@ -25,6 +25,8 @@ import ResultStore from '../stores/ResultStore.jsx';
 
 import UserStore from '../stores/UserStore.jsx';
 
+import {TaskDependencies} from './TaskDependencies.jsx';
+
 const RequestTitle = React.createClass({
     render(){
         var row = this.props.rowData;
@@ -330,14 +332,17 @@ export default React.createClass({
                                                 </div>
                                             </div>
                                         </Tabs.Panel>
-                                            <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;Related Requests</span>}>
-                                                <Griddle
-                                                {...table_style}
-                                                results={this.state.task.requests}
-                                                      columns={["title", "type", "resolved"]}
-                                                columnMetadata={table_meta}
-                                                />
-                                            </Tabs.Panel>
+                                        <Tabs.Panel title={<span><i className="fa fa-level-down"></i> &nbsp;Resource Inputs</span>}>
+                                            <TaskDependencies context={this} />
+                                        </Tabs.Panel>
+                                        <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;Related Requests</span>}>
+                                            <Griddle
+                                            {...table_style}
+                                            results={this.state.task.requests}
+                                                  columns={["title", "type", "resolved"]}
+                                            columnMetadata={table_meta}
+                                            />
+                                        </Tabs.Panel>
                                     </Tabs>
                                 </div>
                             </div>
