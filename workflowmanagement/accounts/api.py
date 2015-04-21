@@ -31,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, TokenHasScope]
         model = User
-        fields = ('url', 'username', 'email', 'is_staff', 'last_login', 'fullname', 'id')
+        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id')
 
     def get_fullname(self, obj):
         tmp = obj.get_full_name()
@@ -88,13 +88,17 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
 
-    @list_route(methods=['get'], permission_classes=[permissions.AllowAny])
+    @list_route(methods=['get', 'patch'], permission_classes=[permissions.AllowAny])
     def me(self, request):
         """
         Get personal account details
         """
         if request.user.is_authenticated():
             serializer = UserSerializer(instance = request.user, context={'request': request})
+
+            if request.method == 'PATCH':
+                serializer.update(request.user, request.data)
+                print serializer.data
 
             return Response(serializer.data)
         else:

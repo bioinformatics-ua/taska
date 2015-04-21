@@ -7,6 +7,8 @@ import {Login} from '../actions/api.jsx';
 
 import {DetailStoreMixin, ListStoreMixin} from '../mixins/store.jsx';
 
+import StateActions from '../actions/StateActions.jsx';
+
 export default Reflux.createStore({
     listenables: [UserActions],
     mixins: [
@@ -87,6 +89,24 @@ export default Reflux.createStore({
                 return users;
             }
         );
+    },
+    onSaveUser(){
+        StateActions.loadingStart();
+        console.log(this.__detaildata);
+        UserActions.postDetail.triggerPromise('me', {
+            'first_name': this.__detaildata['first_name'],
+            'last_name': this.__detaildata['last_name']
+        }).then(
+                (user) => {
+                    StateActions.loadingEnd();
+                    this.trigger();
+                }
+        );
+    },
+    onSetField(field, value){
+        this.__detaildata[field] = value;
+
+        this.trigger();
     },
     getUsers(){
         return this.__list;

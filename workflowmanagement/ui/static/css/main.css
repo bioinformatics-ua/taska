@@ -322,7 +322,7 @@ footer {
     margin-right: 5px;
 }
 
-.react-statemachine .input-group-addon {
+.react-statemachine .input-group-addon, .profileform .input-group-addon{
     min-width:150px;
     text-align:left;
 }
