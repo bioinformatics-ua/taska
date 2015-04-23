@@ -41,7 +41,10 @@ class UserSerializer(serializers.ModelSerializer):
         return tmp
 
     def get_last_login(self, obj):
-        return obj.last_login.strftime("%Y-%m-%d %H:%M")
+        if obj.last_login:
+            return obj.last_login.strftime("%Y-%m-%d %H:%M")
+
+        return None
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
