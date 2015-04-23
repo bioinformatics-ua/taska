@@ -31,6 +31,38 @@ import cline from '../vendor/jquery.domline';
             e.preventDefault();
     });
 
+const ModalDetail = React.createClass({
+  getInitialState(){
+    return {
+        visible: true
+    }
+  },
+  close(){
+    this.setState({visible: false});
+  },
+  componentWillReceiveProps(next){
+    this.setState({visible: true});
+  },
+  render(){
+    if(!this.props.component || !this.state.visible)
+        return <span />;
+
+    return <div className="modal modalback show">
+                    <div style={{width:'80%'}} className="modal-dialog">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <button type="button" onClick={this.close} className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 className="modal-title">Detail View</h4>
+                        </div>
+                        <div className="modal-body">
+                          {this.props.component}
+                        </div>
+                      </div>
+                    </div>
+                  </div>;
+  }
+});
+
 let StateMachineComponent = React.createClass({
     mixins: [Reflux.listenTo(StateMachineStore, 'update'), hotkey.Mixin('handleHotkey')],
     getState(){
@@ -308,7 +340,7 @@ let StateMachineComponent = React.createClass({
                         </div>
                 ):'';
               return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
-                        <div style={state.stateStyle()} onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
+                        <div title={state.label()} style={state.stateStyle()} onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
                             <label onClick={this.cancel}>{state.label()}</label>
                             <input type="text" className="clickedit form-control" defaultValue={state.label()} ></input>
                             <div>
@@ -547,7 +579,7 @@ let StateMachineComponent = React.createClass({
 
             }
 
-            return <center>Please select a state to see his data options.</center>;
+            return undefined;
         };
 
         return (
@@ -609,7 +641,7 @@ let StateMachineComponent = React.createClass({
                                 <div className="col-md-12">
                                     <div className="panel panel-default">
                                       <div className="panel-body">
-                                        {state_detail(this.props.editable)}
+                                        <ModalDetail component={state_detail(this.props.editable)} />
                                       </div>
                                     </div>
                                 </div>

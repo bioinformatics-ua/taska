@@ -15,7 +15,7 @@ const FileTitle = React.createClass({
         let row = this.props.rowData;
 
         return  <small>
-                    <a  target="_blank"
+                    <a style={{wordBreak: 'break-word'}} target="_blank"
                         href={`api/resource/${row.hash}/download/`}>
                         {row.filename}
                     </a>
