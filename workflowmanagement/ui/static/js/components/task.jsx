@@ -227,6 +227,12 @@ export default React.createClass({
                                           <span disabled className="form-control">{this.state.task['task_repr']}</span>
                                         </div>
                                       </div>
+                                      <div className="form-group">
+                                        <div className="input-group">
+                                          <span className="input-group-addon"><strong>Process</strong></span>
+                                          <span disabled className="form-control">{this.state.task.processtask['process_repr']}</span>
+                                        </div>
+                                      </div>
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="form-group">
