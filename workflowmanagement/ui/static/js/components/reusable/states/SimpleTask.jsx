@@ -155,7 +155,7 @@ class SimpleTaskRun extends SimpleTask{
         return {
             users: users,
             deadline: this.getData().deadline,
-            //name: this.getData().name,
+            name: this.getData().name,
             task: this.getData().hash
         }
     }
@@ -318,7 +318,7 @@ class SimpleTaskRun extends SimpleTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn ?<span>
+                        { stillOn ?<span className="clearfix">
                         <button onClick={me.addNew} className="pull-right btn btn-success">Add new assignee</button>
                         <Select placeholder="Search for assignee" className="pull-right col-md-5" onChange={this.newAssignee}
                             value={this.state.new_assignee} name="form-field-name"

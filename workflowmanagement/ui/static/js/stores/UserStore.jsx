@@ -95,7 +95,8 @@ export default Reflux.createStore({
         console.log(this.__detaildata);
         UserActions.postDetail.triggerPromise('me', {
             'first_name': this.__detaildata['first_name'],
-            'last_name': this.__detaildata['last_name']
+            'last_name': this.__detaildata['last_name'],
+            'profile': this.__detaildata['profile']
         }).then(
                 (user) => {
                     StateActions.loadingEnd();
@@ -105,6 +106,14 @@ export default Reflux.createStore({
     },
     onSetField(field, value){
         this.__detaildata[field] = value;
+
+        this.trigger();
+    },
+    onSetProfileField(field, value){
+        if(!this.__detaildata.profile)
+            this.__detaildata.profile = {};
+
+        this.__detaildata.profile[field] = value;
 
         this.trigger();
     },

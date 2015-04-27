@@ -47,6 +47,7 @@ const TaskDependencies = React.createClass({
                             filename: resource.filename,
                             size: resource.size,
                             creator: resource['creator_repr'],
+                            task: user.result.processtaskuser.processtask.parent.title,
                             date: moment(resource['create_date']).fromNow(),
                             status: 'Finished',
                             progress: 100,
@@ -61,31 +62,41 @@ const TaskDependencies = React.createClass({
 
     },
     __renderTask(task){
-        let resources = this.translateResources(task.users);
+        return this.translateResources(task.users);
         return (
-            <div    key={`resumeTaskPanel${task.hash}`}
+                <Uploader
+                    editable={false}
+                    extraFields={['date', 'creator', 'task']}
+                    uploads={resources}
+                />);
+    },
+    renderTasks(){
+        let tasks = this.deps();
+
+        let resources = tasks.reduce(
+            (array, task) =>
+                $.extend(array, this.__renderTask(task))
+            ,[]
+        );
+        return (
+            <div key={`resumeDependencyPanel`}
                     className="panel panel-default"
                 >
-              <div className="panel-heading">{task.task_repr}</div>
                 {resources.length == 0? (
                     <div className="panel-body">
-                        <center>There are no output resources for this task</center>
+                        <center>There are no output resources for this task dependencies</center>
                     </div>
                 ):(
                 <div style={{marginBottom: '-20px'}}>
                 <Uploader
                     editable={false}
-                    extraFields={['date', 'creator']}
+                    extraFields={['date', 'creator', 'task']}
                     uploads={resources}
                 />
                 </div>)}
             </div>
             );
-    },
-    renderTasks(){
-        let tasks = this.deps();
 
-        return tasks.map(task => this.__renderTask(task));
     },
     render(){
         let resources = this.translateOwn(this.resources());
@@ -93,13 +104,19 @@ const TaskDependencies = React.createClass({
         return(
         <span>
             <h3>Task Resources</h3>
-            <Uploader
-                    editable={false}
-                    extraFields={['date', 'creator']}
-                    uploads={resources}
-                />
+            <div key={`resumeTaskPanel`}
+                    className="panel panel-default"
+            >
+                <div className="panel-body">
+                    <Uploader
+                            editable={false}
+                            extraFields={['date', 'creator']}
+                            uploads={resources}
+                        />
+                </div>
+            </div>
 
-            <h3>Inputs From Dependencies</h3>
+            <h3>Input Resources From Dependencies</h3>
             {this.renderTasks()}
         </span>);
     }

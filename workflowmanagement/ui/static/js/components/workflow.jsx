@@ -14,6 +14,8 @@ import WorkflowActions from '../actions/WorkflowActions.jsx';
 
 import WorkflowStore from '../stores/WorkflowStore.jsx';
 
+import UserStore from '../stores/UserStore.jsx';
+
 import {StateMachineComponent} from '../react-statemachine/component.jsx';
 
 import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
@@ -55,7 +57,8 @@ export default React.createClass({
         return {
             addedProcess: WorkflowStore.getProcessAddFinished(),
             ***REMOVED*** WorkflowStore.getWorkflow(),
-            missing: WorkflowStore.getMissing()
+            missing: WorkflowStore.getMissing(),
+            user: UserStore.getUser()
         }
     },
     getInitialState(){
@@ -143,6 +146,8 @@ export default React.createClass({
 
         let sm = this.load(params.mode === 'run');
 
+        console.log(this.state.missing);
+
         return (
             <span>
                 {this.state.missing.length > 0?
@@ -182,6 +187,7 @@ export default React.createClass({
                     : <span><i className="fa fa-play"></i> Run</span>}
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
+                    detailMode={this.state.user.profile['detail_mode']}
                     {...this.props}/>
             </span>
         );

@@ -195,3 +195,12 @@
 .state-end-selected{
     text-shadow: 0px 0px 56px rgba(90, 160, 219, 1);
 }
+
+.detail-dialog{
+    width: 992px;
+}
+@media (max-width: 992px) {
+    .detail-dialog{
+        width: 100%;
+    }
+}

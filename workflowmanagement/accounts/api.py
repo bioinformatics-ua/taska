@@ -7,11 +7,13 @@ from rest_framework.reverse import reverse
 from rest_framework import permissions
 
 from django.contrib.auth.models import User
+from django.db import transaction
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from django.contrib.auth import authenticate, login, logout
 
+from models import Profile
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -22,16 +24,32 @@ def root(request, format=None):
         #'User Listing   ': reverse('user-list', request=request, format=format),
     })
 
+# Serializers user profile
+class ProfileSerializer(serializers.ModelSerializer):
+    detail_mode_repr = serializers.SerializerMethodField()
+
+    def get_detail_mode_repr(self, obj):
+        try:
+            return dict(Profile.DETAIL_MODES)[obj.detail_mode]
+        except KeyError:
+            return None
+
+    class Meta:
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+        model = Profile
+        exclude = ['id', 'user']
+
 
 # Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField(required=False)
     last_login = serializers.SerializerMethodField(required=False)
+    profile = ProfileSerializer()
 
     class Meta:
         permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, TokenHasScope]
         model = User
-        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id')
+        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id', 'profile')
 
     def get_fullname(self, obj):
         tmp = obj.get_full_name()
@@ -41,10 +59,52 @@ class UserSerializer(serializers.ModelSerializer):
         return tmp
 
     def get_last_login(self, obj):
-        if obj.last_login:
+        if isinstance(obj.last_login, basestring):
+            return obj.last_login
+        elif obj.last_login:
             return obj.last_login.strftime("%Y-%m-%d %H:%M")
 
+
         return None
+
+    @transaction.atomic
+    def create(self, validated_data):
+        profile_data = None
+
+        try:
+            profile_data = validated_data.pop('profile')
+        except KeyError:
+            pass
+
+        user = User.objects.create(**validated_data)
+
+        # create profile data
+        if profile_data:
+            Profile.objects.create(user=user, **profile_data)
+
+        return user
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        profile_data = None
+
+        try:
+            profile_data = validated_data.pop('profile')
+        except KeyError:
+            pass
+
+        if profile_data:
+            p_instance = instance.profile
+            serializer = ProfileSerializer(p_instance, partial=True)
+
+            serializer.update(p_instance, profile_data)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        return instance
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
@@ -97,6 +157,13 @@ class UserViewSet(viewsets.ModelViewSet):
         Get personal account details
         """
         if request.user.is_authenticated():
+            try:
+                profile = request.user.profile
+
+            except Profile.DoesNotExist:
+                p = Profile(user=request.user)
+                p.save()
+
             serializer = UserSerializer(instance = request.user, context={'request': request})
 
             if request.method == 'PATCH':

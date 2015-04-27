@@ -14,6 +14,8 @@ import WorkflowActions from '../actions/WorkflowActions.jsx';
 
 import ProcessActions from '../actions/ProcessActions.jsx';
 
+import UserStore from '../stores/UserStore.jsx';
+
 import WorkflowStore from '../stores/WorkflowStore.jsx';
 
 import ProcessStore from '../stores/ProcessStore.jsx';
@@ -86,6 +88,7 @@ export default React.createClass({
             workflowrepr: ProcessStore.getRepr(),
             missing: ProcessStore.getMissing(),
             version: ProcessStore.getVersion(),
+            user: UserStore.getUser()
         }
     },
     getInitialState(){

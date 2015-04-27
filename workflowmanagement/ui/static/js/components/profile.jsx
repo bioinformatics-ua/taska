@@ -35,10 +35,18 @@ export default React.createClass({
     setLast(e){
         UserActions.setField('last_name', e.target.value);
     },
+    setDetailMode(e){
+        let n = Number.parseInt(e)
+
+        if(isNaN(n))
+            n = '';
+        UserActions.setProfileField('detail_mode', n);
+    },
     save(e){
         UserActions.saveUser()
     },
     render: function () {
+        console.log(this.state.user.profile['detail_mode']);
         return (
             <span>
                 <div className="row">
@@ -66,6 +74,16 @@ export default React.createClass({
                                     <strong>Last Name</strong>
                                 </span>
                                 <input className="form-control" onChange={this.setLast} value={this.state.user['last_name']} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="detailmode">
+                                    <strong>Detail Render</strong>
+                                </span>
+                                <Select placeholder="Select a Detail Render Mode" onChange={this.setDetailMode}
+                                    value={''+this.state.user.profile['detail_mode']} searchable={false}
+                                    options={[{value: '0', label: 'Popup'},{value: '1', label: 'Below'}]} />
                             </div>
                         </div>
                         {/*<div className="form-group">

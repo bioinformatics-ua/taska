@@ -34,11 +34,12 @@ import cline from '../vendor/jquery.domline';
 const ModalDetail = React.createClass({
   getInitialState(){
     return {
-        visible: true
+        visible: false
     }
   },
-  close(){
+  close(event){
     this.setState({visible: false});
+    this.props.clearSelect(event);
   },
   componentWillReceiveProps(next){
     this.setState({visible: true});
@@ -48,7 +49,7 @@ const ModalDetail = React.createClass({
         return <span />;
 
     return <div className="modal modalback show">
-                    <div style={{width:'80%'}} className="modal-dialog">
+                    <div className="modal-dialog detail-dialog">
                       <div className="modal-content">
                         <div className="modal-header">
                           <button type="button" onClick={this.close} className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -85,7 +86,8 @@ let StateMachineComponent = React.createClass({
     },
     getDefaultProps() {
         return {
-            editable: true
+            editable: true,
+            detailMode: 0
         };
     },
     update(data){
@@ -637,16 +639,10 @@ let StateMachineComponent = React.createClass({
                                     </div>
                                 </div>
                               </div>
-                              <div className="row">
-                                <div className="col-md-12">
-                                    <div className="panel panel-default">
-                                      <div className="panel-body">
-                                        <ModalDetail component={state_detail(this.props.editable)} />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-
+                            {this.props.detailMode === 0?
+                                <ModalDetail clearSelect={this.clearSelect} component={state_detail(this.props.editable)} />
+                            :   <span>{state_detail(this.props.editable)}</span>
+                            }
                         </div>
                     </div>
                 </div>

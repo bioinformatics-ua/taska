@@ -219,7 +219,7 @@ const Uploader = React.createClass({
     getDefaultProps(){
         return {
             tableSettings:
-                {   noDataMessage: '',
+                {   noDataMessage: <center>There are no associated resources currently.</center>,
                     bodyHeight:375,
                     tableClassName: "table table-bordered table-striped",
                     useGriddleStyles: false,
@@ -294,6 +294,14 @@ const Uploader = React.createClass({
                   "locked": false,
                   "visible": true,
                   "displayName": "Creator",
+                  "cssClassName": "creatorRow"
+                },
+                {
+                  "columnName": "task",
+                  "order": 7,
+                  "locked": false,
+                  "visible": true,
+                  "displayName": "Task",
                   "cssClassName": "creatorRow"
                 }
             ];

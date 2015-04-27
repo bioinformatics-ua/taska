@@ -25,6 +25,7 @@ const ProcessResume = React.createClass({
                             filename: resource.filename,
                             size: resource.size,
                             creator: resource['creator_repr'],
+                            task: user.result.processtaskuser.processtask.parent.title,
                             date: moment(resource['create_date']).fromNow(),
                             status: 'Finished',
                             progress: 100,
@@ -39,36 +40,26 @@ const ProcessResume = React.createClass({
 
     },
     __renderTask(task){
-        let resources = this.translateResources(task.users);
-        return (
-            <div    key={`resumeTaskPanel${task.hash}`}
-                    className="panel panel-default"
-                >
-              <div style={stateColor(task)} className="panel-heading">{task.task_repr}</div>
-                {resources.length == 0? (
-                    <div className="panel-body">
-                        <center>There are no output resources for this task</center>
-                    </div>
-                ):(
-                <div style={{marginBottom: '-20px'}}>
-                <Uploader
-                    editable={false}
-                    extraFields={['date', 'creator']}
-                    uploads={resources}
-                />
-                </div>)}
-            </div>
-            );
+        return this.translateResources(task.users);
     },
     renderTasks(){
         let tasks = this.process().tasks;
 
-        return tasks.map(task => this.__renderTask(task));
+        //return tasks.map(task => this.__renderTask(task));
+        let resources = tasks.reduce(
+            (array, task) =>
+                $.extend(array, this.__renderTask(task))
+            ,[]
+        );
+
+        return <Uploader
+                editable={false}
+                extraFields={['date', 'creator', 'task']}
+                uploads={resources}
+            />
     },
     render(){
         let process = this.process();
-
-        console.log(process);
 
         return (
         <span>
