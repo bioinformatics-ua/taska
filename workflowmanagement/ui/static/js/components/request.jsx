@@ -18,6 +18,8 @@ import UserStore from '../stores/UserStore.jsx';
 
 import Select from 'react-select';
 
+import Toggle from 'react-toggle';
+
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
@@ -110,6 +112,9 @@ export default React.createClass({
     setReqMessage(e){
         RequestActions.setReqMessage(e.target.value);
     },
+    setPublic(e){
+        RequestActions.setPublic(e.target.checked);
+    },
     render() {
         if(this.props.failed){
             let Failed = this.props.failed;
@@ -155,13 +160,32 @@ export default React.createClass({
                             </div>
                             <div className="form-group row">
                                 <div className="col-md-9">
-                                    <strong>Status: </strong> {this.state.request.resolved?
-                                        <span className="text-success"><i className="fa fa-check-circle"></i> Solved</span>
-                                        :
-                                            <span>{this.state.request.resolved === false?
-                                                <span><i className="fa fa-clock-o"></i> Waiting response</span>
-                                            :'---'}</span>
-                                        }
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <div className="input-group">
+                                                      <span className="input-group-addon"><strong>Is Public?</strong></span>
+                                                        <div className="form-control">
+                                                        <span className="selectBox">
+                                                            <Toggle id="public"
+                                                                checked={this.state.request.public}
+                                                                defaultChecked={this.state.request.public}
+                                                                onChange={this.setPublic} disabled={!this.didWrite()} />
+                                                        </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                        <strong>Status: </strong> {this.state.request.resolved?
+                                            <span className="text-success"><i className="fa fa-check-circle"></i> Solved</span>
+                                            :
+                                                <span>{this.state.request.resolved === false?
+                                                    <span><i className="fa fa-clock-o"></i> Waiting response</span>
+                                                :'---'}</span>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-3">
                                         {this.didWrite()?
@@ -179,9 +203,14 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3">
                                         {this.isMe()?
-                                            <button onClick={this.setResponse} className="btn btn-primary btn-block btn-default">
+                                            <span>
+                                            <button onClick={this.setResponsePublic} className="pull-left btn btn-warning btn-block">
+                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Reply & Make Public
+                                            </button>
+                                            <button onClick={this.setResponse} className="pull-left btn btn-primary btn-block btn-default">
                                                 <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Reply
                                             </button>
+                                            </span>
                                         :''}
                                 </div>
                             </div>

@@ -68,6 +68,10 @@ export default Reflux.createStore({
         this.__detaildata.type=type;
         this.trigger();
     },
+    onSetPublic(pub){
+        this.__detaildata.public = pub;
+        this.trigger();
+    },
     onSubmitResponse(){
         delete this.__response.request;
 

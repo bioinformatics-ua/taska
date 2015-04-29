@@ -16,6 +16,7 @@ const RequestActions = Reflux.createActions(
     'setReqTitle': {},
     'setReqType': {},
     'setReqMessage': {},
+    'setPublic': {},
     'calibrate': {}
     }, DetailActionsMixin));
 

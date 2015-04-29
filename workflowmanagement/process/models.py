@@ -238,7 +238,7 @@ class ProcessTaskUser(models.Model):
         ordering = ['-processtask__deadline']
 
     def requests(self):
-        return Request.objects.filter(processtaskuser=self)
+        return Request.objects.filter(Q(processtaskuser=self) | Q(processtaskuser__processtask=self.processtask, public=True))
 
     def result(self):
         from result.models import Result
@@ -322,6 +322,7 @@ class Request(models.Model):
     message         = models.TextField(null=True)
     date            = models.DateTimeField(auto_now_add=True)
     resolved        = models.BooleanField(default=False)
+    public          = models.BooleanField(default=False)
     removed         = models.BooleanField(default=False)
 
     class Meta:
