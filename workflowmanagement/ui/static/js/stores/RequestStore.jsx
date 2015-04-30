@@ -72,11 +72,15 @@ export default Reflux.createStore({
         this.__detaildata.public = pub;
         this.trigger();
     },
-    onSubmitResponse(){
+    onSubmitResponse(make_public=false){
         delete this.__response.request;
 
         if(this.__response.title != "" && this.__response.message != ""){
             StateActions.loadingStart();
+
+            this.__response.public=make_public;
+
+            console.log(this.__response);
 
             RequestActions.postDetail.triggerPromise(this.__detaildata.hash,
                 {response: this.__response}).then(

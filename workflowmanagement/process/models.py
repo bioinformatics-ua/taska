@@ -237,8 +237,14 @@ class ProcessTaskUser(models.Model):
     class Meta:
         ordering = ['-processtask__deadline']
 
+    def __str__(self):
+        return ('%s - %s' % (self.processtask, self.user)).encode('utf-8')
+
     def requests(self):
-        return Request.objects.filter(Q(processtaskuser=self) | Q(processtaskuser__processtask=self.processtask, public=True))
+        return Request.objects.filter(
+            Q(processtaskuser=self)
+            | Q(processtaskuser__processtask=self.processtask, public=True)
+            )
 
     def result(self):
         from result.models import Result

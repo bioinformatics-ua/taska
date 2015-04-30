@@ -58,6 +58,14 @@ const RequestStatus = React.createClass({
     }
 });
 
+const RequestRequester = React.createClass({
+
+    render(){
+        var row = this.props.rowData;
+        return <span>{row.processtaskuser['user_repr']}</span>;
+    }
+});
+
 const StatusShow = React.createClass({
     render(){
         return  <span disabled className="form-control">
@@ -211,6 +219,15 @@ export default React.createClass({
                   "cssClassName": 'status-td',
                   "customComponent": RequestStatus,
                   "displayName": "Status"
+                },
+                {
+                  "columnName": "hash",
+                  "order": 5,
+                  "locked": false,
+                  "visible": true,
+                  "cssClassName": 'status-td',
+                  "customComponent": RequestRequester,
+                  "displayName": "Requester"
                 }
             ];
 
@@ -345,7 +362,7 @@ export default React.createClass({
                                             <Griddle
                                             {...table_style}
                                             results={this.state.task.requests}
-                                                  columns={["title", "type", "resolved"]}
+                                                  columns={["title", "type", "resolved", "hash"]}
                                             columnMetadata={table_meta}
                                             />
                                         </Tabs.Panel>

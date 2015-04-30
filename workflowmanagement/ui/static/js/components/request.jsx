@@ -53,8 +53,10 @@ export default React.createClass({
         }
     },
     __getState(){
+        let detail = RequestStore.getDetail();
+        console.log(detail);
         return {
-            request: RequestStore.getDetail(),
+            request:detail ,
             user: UserStore.getUser(),
             response: RequestStore.getResponse(),
             addedRequest: RequestStore.getRequestAddFinished()
@@ -72,9 +74,7 @@ export default React.createClass({
         }
     },
     update(status){
-        if(status == RequestStore.DETAIL){
-            this.setState(this.__getState());
-        }
+        this.setState(this.__getState());
     },
     setTitle(e){
         RequestActions.setTitle(e.target.value);
@@ -99,6 +99,9 @@ export default React.createClass({
     },
     setResponse(){
         RequestActions.submitResponse();
+    },
+    setResponsePublic(){
+        RequestActions.submitResponse(true);
     },
     setRequest(){
         RequestActions.submitRequest();
@@ -167,7 +170,7 @@ export default React.createClass({
                                                       <span className="input-group-addon"><strong>Is Public?</strong></span>
                                                         <div className="form-control">
                                                         <span className="selectBox">
-                                                            <Toggle id="public"
+                                                            <Toggle key={`ptoggle_${this.state.request.public}`}
                                                                 checked={this.state.request.public}
                                                                 defaultChecked={this.state.request.public}
                                                                 onChange={this.setPublic} disabled={!this.didWrite()} />
@@ -199,18 +202,19 @@ export default React.createClass({
                             {this.state.response.title || this.isMe() ?
                             <span>
                             <div className="form-group row">
-                                <div className="col-md-9">
+                                <div className="col-md-6">
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-6">
                                         {this.isMe()?
-                                            <span>
-                                            <button onClick={this.setResponsePublic} className="pull-left btn btn-warning btn-block">
-                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Reply & Make Public
-                                            </button>
-                                            <button onClick={this.setResponse} className="pull-left btn btn-primary btn-block btn-default">
+                                            <div className="pull-right">
+                                            <button onClick={this.setResponsePublic} className="btn btn-warning">
+                                                <i style={{marginTop: '3px'}} className="fa fa-floppy-o"></i> Reply & Make Public
+                                            </button>&nbsp;
+                                            <button onClick={this.setResponse} className="btn btn-primary">
                                                 <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Reply
                                             </button>
-                                            </span>
+
+                                            </div>
                                         :''}
                                 </div>
                             </div>

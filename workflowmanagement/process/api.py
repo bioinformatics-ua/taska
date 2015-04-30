@@ -56,7 +56,12 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         exclude = ('id', 'processtask')
 
     def get_user_repr(self, obj):
-        return obj.user.get_full_name()
+        tmp = obj.user.get_full_name()
+
+        if not tmp:
+            tmp = obj.user.email
+
+        return tmp
 
 class PTUWithResult(ProcessTaskUserSerializer):
     result = serializers.SerializerMethodField()
@@ -525,7 +530,7 @@ class MyTaskDependencies(generics.ListAPIView):
 
 class RequestResponseSerializer(serializers.ModelSerializer):
     status_repr = serializers.SerializerMethodField()
-
+    public = serializers.BooleanField(write_only=True)
     def get_status_repr(self, obj):
         return dict(Request.TYPES)[obj.status]
 
@@ -588,11 +593,18 @@ class RequestSerializer(serializers.ModelSerializer):
         if response:
             response['request'] = request.id
 
+            make_public = response.pop('public', False)
+
+            print response
+
             rserializer = RequestResponseSerializer(data=response)
 
             rserializer.is_valid()
 
             rserializer.save()
+
+            request.public = make_public
+            request.save()
 
         if rserializer:
             request.resolve()
@@ -614,8 +626,11 @@ class RequestSerializer(serializers.ModelSerializer):
         response = validated_data.pop('response', None)
         rserializer = None
         if response:
-            print instance.id
             response['request'] = instance.id
+
+            make_public = response.pop('public', False)
+            print response
+
             try:
                 rserializer = RequestResponseSerializer(
                     instance=instance.response,
@@ -628,6 +643,8 @@ class RequestSerializer(serializers.ModelSerializer):
             rserializer.is_valid()
 
             rserializer.save()
+
+            instance.public = make_public
 
             instance.resolve()
 
@@ -694,6 +711,7 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         obj = None
         try:
             obj = Request.objects.get(
+                Q(public=True) |
                 Q(processtaskuser__processtask__process__executioner=self.request.user) |
                 Q(processtaskuser__user=self.request.user),
                 hash=self.kwargs['hash']
