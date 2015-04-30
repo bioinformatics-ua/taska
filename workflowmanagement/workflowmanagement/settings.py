@@ -69,7 +69,10 @@ INSTALLED_APPS = (
     'history',
     'accounts',
     'djangojs',
-    'ui'
+    'ui',
+
+    # Extra types of task/result
+    'form'
 )
 
 MIDDLEWARE_CLASSES = (

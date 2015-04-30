@@ -659,7 +659,9 @@ class RequestSerializer(serializers.ModelSerializer):
         model = Request
         exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-
+        extra_kwargs = {
+            'hash': {'required': False}
+        }
 
 class SimpleRequestSerializer(RequestSerializer):
     class Meta(RequestSerializer.Meta):

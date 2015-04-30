@@ -43,5 +43,8 @@ urlpatterns = patterns('',
 
     url(r'^djangojs/', include('djangojs.urls')),
 
+    # extra task/result types
+    url(r'^api/form', include('form.urls')),
+
     url(r'^', include('ui.urls'))
 )
