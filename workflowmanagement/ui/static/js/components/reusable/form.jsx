@@ -8,7 +8,7 @@ import FormStore from '../../stores/FormStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading} from './component.jsx'
+import {Loading, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import moment from 'moment';
@@ -24,10 +24,21 @@ const FormLink = React.createClass({
   }
 });
 
-const FormCreate = React.createClass({
+const FormManage = React.createClass({
+  delete(row){
+    FormActions.deleteForm(row.hash);
+  },
   render: function(){
     const row = this.props.rowData;
-    return <small>{moment(row.created_date).fromNow()}</small>;
+    const object = {object: row.hash}
+
+    return <div className="btn-group" role="group" aria-label="...">
+           <DeleteButton
+              success={this.delete}
+              identificator = {row}
+              title={`Delete '${row["title"]}'`}
+              message={`Are you sure you want to delete  '${row["title"]} ?'`}  />
+           </div>;
   }
 });
 
@@ -73,14 +84,16 @@ const FormTable = React.createClass({
       "order": 3,
       "locked": true,
       "visible": true,
-      "customComponent": FormCreate,
-      "cssClassName": "date-td",
-      "displayName": "Created Date"
+      "customComponent": FormManage,
+      "cssClassName": "process-td",
+      "displayName": ""
       }
     ];
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
-                <center><i className="fa fa-life-ring pull-left"></i><h3 className="panel-title">My Forms</h3></center>
+                <i className="fa fa-list-ul pull-left"></i>
+                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Forms</h3>
+                <Link to="Form" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
                   {...this.commonTableSettings()}

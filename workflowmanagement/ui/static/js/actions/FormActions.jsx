@@ -11,7 +11,9 @@ const FormActions = Reflux.createActions(
     'load': {},
     'setTitle': {},
     'submitForm': {},
-    'calibrate': {}
+    'calibrate': {},
+    'setSchema': {},
+    'deleteForm': {}
     }, DetailActionsMixin));
 
 export default FormActions;

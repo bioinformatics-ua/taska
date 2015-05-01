@@ -40,9 +40,20 @@ export default Reflux.createStore({
         this.__detaildata.title=title;
         this.trigger();
     },
+    onSetSchema(schema){
+        this.__detaildata.schema=JSON.parse(schema).fields;
+        this.trigger();
+    },
+    onDeleteForm(hash){
+        FormActions.deleteDetail.triggerPromise(hash).then(
+            (result) => {
+                this.load(this.__current);
+            }
+        );
+    },
     onSubmitForm(){
         let sForm = $.extend({}, this.__detaildata);
-
+        console.log(sForm);
         if(sForm.title != ""){
             StateActions.loadingStart();
 
@@ -63,6 +74,8 @@ export default Reflux.createStore({
                 );
             }
 
+        } else {
+            alert('The form must have a title!');
         }
     }
 });

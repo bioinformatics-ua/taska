@@ -71,10 +71,11 @@ export default React.createClass({
             bootstrapData: this.state.form.schema
         });
         fb.on('save', function(payload){
-            console.log(payload);
+            FormActions.setSchema(payload);
         });
     },
     componentDidUpdate(){
+        console.log(this.state.form);
         if(this.state.addedform){
             this.context.router.transitionTo('Form', {object: this.state.addedform.hash})
         }
@@ -110,17 +111,13 @@ export default React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-body">
                             <div className="row">
-                                <div className="col-md-7">
+                                <div className="col-md-9">
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Title</strong></span>
                                           <input disabled={!this.didWrite()} onChange={this.setTitle} className="form-control" value={this.state.form.title}/>
                                         </div>
                                       </div>
-                                </div>
-                            </div>
-                            <div className="form-group row">
-                                <div className="col-md-9">
                                 </div>
                                 <div className="col-md-3">
                                         {this.didWrite()?
@@ -130,7 +127,6 @@ export default React.createClass({
                                         :''}
                                 </div>
                             </div>
-                            <hr style={{marginTop:0}} />
                             <span>
                             <div className="form-group row">
                                 <div className="col-md-6">
@@ -139,7 +135,7 @@ export default React.createClass({
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="col-md-12">
+                                <div>
                                     <div id="form_manager"></div>
                                 </div>
                             </div>
