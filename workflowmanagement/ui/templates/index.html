@@ -12,6 +12,8 @@
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link rel="stylesheet" href="{% static "bundle.min.css" %}">
+  <link rel="stylesheet" href="{% static "css/vendor/formbuilder-min.css" %}">
+
 </head>
 
 <body>
@@ -32,7 +34,11 @@
        </script>
       </div>
     </div>
+
     <script src="{% static "bundle.js" %}"></script>
+    <script src='{% static "js/vendor/dobtco-formbuilder-vendor.js" %}'></script>
+    <script src='{% static "js/vendor/formbuilder-min.js" %}'></script>
+
     {% django_js jquery=false %}
 
 </body>

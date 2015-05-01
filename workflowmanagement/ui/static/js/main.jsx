@@ -1,6 +1,8 @@
 'use strict';
 window.$ = window.jQuery = require('jquery');
 
+window.rivets = require('rivets');
+
 require('babelify/polyfill');
 
 import React from 'react';

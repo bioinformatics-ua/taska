@@ -4,6 +4,7 @@
   "description": "Workflow Management for Biomedical exploration",
   "main": "index.js",
   "dependencies": {
+    "backbone": "^1.1.2",
     "baobab": "~0.4.2",
     "bootstrap": "~3.3.2",
     "envify": "~3.2.0",
@@ -24,7 +25,8 @@
     "react-simpletabs": "^0.6.1",
     "react-toggle": "~0.1.1",
     "reflux": "~0.2.5",
-    "underscore": "~1.8.2"
+    "rivets": "^0.8.1",
+    "underscore": "^1.8.3"
   },
   "style": "workflowmanagement/ui/css/main.css",
   "devDependencies": {

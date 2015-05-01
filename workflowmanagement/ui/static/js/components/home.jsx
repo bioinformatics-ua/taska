@@ -8,6 +8,7 @@ import {WorkflowTable} from './reusable/workflow.jsx';
 import {ProcessTable} from './reusable/process.jsx';
 import {RequestTable} from './reusable/request.jsx';
 import {TaskTable} from './reusable/task.jsx';
+import {FormTable} from './reusable/form.jsx';
 
 
 import {Authentication} from '../mixins/component.jsx';
@@ -41,10 +42,12 @@ const LoggedInHome = React.createClass({
               </div>
           </div>
           <div className="row flex-container">
-              <div className="col-md-12 flex-container flex-row">
+              <div className="col-md-6 flex-container flex-row">
+                <FormTable />
+              </div>
+              <div className="col-md-6 flex-container flex-row">
                 <HistoryTable />
               </div>
-
           </div>
       </span>);
   }

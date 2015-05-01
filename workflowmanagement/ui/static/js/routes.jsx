@@ -27,6 +27,9 @@ module.exports = (
         <Route name="Request" path="request/:object" handler={require('./components/request.jsx')}>
         </Route>
 
+        <Route name="Form" path="form/:object" handler={require('./components/form.jsx')}>
+        </Route>
+
         <Route name="RequestAdd" path="request/:object/:process/:task/?:default?" handler={require('./components/request.jsx')}>
         </Route>
 

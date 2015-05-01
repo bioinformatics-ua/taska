@@ -134,6 +134,9 @@ footer {
 .type-td{
   width: 60px;
 }
+.date-td{
+  width: 110px;
+}
 .status-td{
   width: 260px;
 }
