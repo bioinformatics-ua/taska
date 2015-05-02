@@ -22,6 +22,8 @@ import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
 import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
+import {FormTask, FormTaskRun} from './reusable/states/FormTask.jsx';
+
 
 export default React.createClass({
     mixins: [   Router.Navigation,
@@ -81,16 +83,26 @@ export default React.createClass({
         const wf = this.state.workflow;
         const sm = new StateMachine();
 
-        if(run)
+        if(run){
             sm.addStateClass({
                 id: 'tasks.SimpleTask',
                 Class: SimpleTaskRun
             });
-        else
+            sm.addStateClass({
+                id: 'form.FormTask',
+                Class: FormTaskRun
+            });
+        }
+        else{
             sm.addStateClass({
                 id: 'tasks.SimpleTask',
                 Class: SimpleTask
             });
+            sm.addStateClass({
+                id: 'form.FormTask',
+                Class: FormTask
+            });
+        }
 
 
         // I dont know if they come ordered, so i add all tasks first, an dependencies only after

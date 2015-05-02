@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 import React from 'react';
 import {Link} from 'react-router';
 
-import {SimpleState} from '../../../react-statemachine/classes.jsx';
+import {SimpleTask, dummy} from './SimpleTask.jsx';
 
 import Select from 'react-select';
 
@@ -11,28 +11,20 @@ import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
 
-import checksum from 'json-checksum';
-
-import Uploader from '../uploader.jsx';
-
-import {stateColor} from '../../../map.jsx';
-
-const dummy = React.createClass({render(){return <span></span>; }});
-
-class SimpleTask extends SimpleState {
+class FormTask extends SimpleTask {
     constructor(options){
         super(options);
     }
     static typeIcon(){
-        return <i className="fa fa-check"></i>;
+        return <i className="fa fa-list-ul"></i>;
     }
     static repr(){
-        return 'Simple Task';
+        return 'Form Task';
     }
 
     detailRender(editable=true, ChildComponent=dummy){
         let self = this;
-        const SimpleFields = React.createClass({
+        const FormFields = React.createClass({
             getState(){
                 return {
                     parent: this.props.main
@@ -41,105 +33,40 @@ class SimpleTask extends SimpleState {
             getInitialState(){
                 return this.getState();
             },
-            setDescription(e){
-                this.state.parent.setState({description: e.target.value});
-                this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
-            },
-            setResources(related_resources){
-                this.state.parent.setState({resources: related_resources});
-                this.props.dataChange(self.getIdentificator(), {resources: related_resources}, false);
-            },
             parent(){
                 return this.state.parent.state;
             },
             render(){
-                return <span>
-                    <div key="state-descr" className="form-group">
-                        <div className="input-group clearfix">
-                            <span className="input-group-addon" id="state-description">
-                                <strong>Task Description</strong>
-                            </span>
-                            <textarea rows="6" type="description" className="form-control"
-                                            aria-describedby="state-description"
-                                            placeholder="Enter the state description here"  disabled={!editable}
-                                            onChange={this.setDescription} value={this.parent().description}>
-                            </textarea>
-                        </div>
-                    </div>
-                        <span>
-                        {(this.parent().resources && this.parent().resources.length > 0)?
-                            <h3>File Inputs</h3>
-                        :''}
-                        <Uploader editable={editable} uploads={this.parent().resources} done={this.setResources} />
-                        </span>
-                    <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
-                </span>
+                return <span>FORM FIELD</span>;
             }
         });
 
-        return super.detailRender(editable, SimpleFields);
+        return super.detailRender(editable, FormFields);
     }
 
     static deserializeOptions(data){
+        if(data.schema === undefined)
+            throw `data object is missing 'schema' property`;
 
-        if(data.title === undefined)
-            throw `data object is missing 'title' property`;
+        let tmp = super.deserializeOptions(data);
 
-        if(data.description === undefined)
-            throw `data object is missing 'description' property`;
+        tmp.schema = data.schema;
 
-        // We only generically consider file resources
-        // Other files should be considered by each child class when
-        // deserializing/serializing as we have no idea how to interpret the resource
-        let resources = [];
-        for(let resource of data.resources){
-            if(resource.type === 'material.File')
-                resources.push({
-                    hash: resource.hash,
-                    filename: resource.filename,
-                    size: resource.size,
-                    status: 'Finished',
-                    progress: 100,
-                    manage: ''
-                });
-        }
-        return {
-            name: data.title,
-            description: data.description,
-            hash: data.hash,
-            type: data.type,
-            resources: resources
-        };
+        return tmp;
     }
 
     serialize(){
-        let deps = [];
-        for(let dep of this.getDependencies()){
-            deps.push({
-                dependency: dep.getIdentificator()
-            });
-        }
-        let resources = [];
-        let full = this.getData().resources || [];
 
-        for(let resource of full){
-            resources.push(resource.hash);
-        }
+        let tmp = super.serialize();
 
-        return {
-            sid: this.__identificator,
-            hash: this.getData().hash,
-            title: this.getData().name,
-            type: this.getData().type,
-            sortid: this.getLevel(),
-            description: this.getData().description || '',
-            dependencies: deps,
-            resourceswrite: resources
-        }
+        tmp.schema=this.getData().schema;
+
+        return tmp;
     }
 }
 
-class SimpleTaskRun extends SimpleTask{
+
+class FormTaskRun extends FormTask{
     constructor(options){
         super(options);
     }
@@ -400,5 +327,4 @@ class SimpleTaskRun extends SimpleTask{
         return super.detailRender(editable, SimpleRun);
     }
 }
-
-export default {SimpleTask, SimpleTaskRun, dummy};
+export default {FormTask, FormTaskRun};

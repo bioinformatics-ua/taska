@@ -57,7 +57,8 @@ const stateColor = function(ptask){
 
 // Map that represents task relations with respective results
 const depmap = {
-    'tasks.SimpleTask': 'result.SimpleResult'
+    'tasks.SimpleTask': 'result.SimpleResult',
+    'form.FormTask': 'form.ResultTask'
 };
 
 export default {stateColor, depmap};
