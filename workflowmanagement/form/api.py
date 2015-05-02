@@ -57,6 +57,8 @@ class FormSerializer(serializers.ModelSerializer):
 
 
 class FormTaskSerializer(TaskSerializer):
+    form = serializers.SlugRelatedField(queryset=Form.all(), slug_field='hash')
+
     class Meta(TaskSerializer.Meta):
         model = FormTask
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]

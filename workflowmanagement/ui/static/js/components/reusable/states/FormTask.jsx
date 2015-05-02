@@ -6,10 +6,14 @@ import {SimpleTask, dummy} from './SimpleTask.jsx';
 
 import Select from 'react-select';
 
+import FormActions from '../../../actions/FormActions.jsx';
+
 import UserActions from '../../../actions/UserActions.jsx';
 import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
+
+import {stateColor} from '../../../map.jsx';
 
 class FormTask extends SimpleTask {
     constructor(options){
@@ -27,7 +31,8 @@ class FormTask extends SimpleTask {
         const FormFields = React.createClass({
             getState(){
                 return {
-                    parent: this.props.main
+                    parent: this.props.main,
+                    forms: [],
                 };
             },
             getInitialState(){
@@ -36,8 +41,57 @@ class FormTask extends SimpleTask {
             parent(){
                 return this.state.parent.state;
             },
+            setform(val){
+                let data = {form: val};
+
+                this.state.parent.setState(data);
+                this.props.dataChange(self.getIdentificator(), data, false);
+            },
+            componentDidMount(){
+                // For some reason i was getting a refresh loop, when getting the action result from the store...
+                // so exceptionally, i decided to do it directly, the result is still cached anyway
+                console.log(FormActions);
+                FormActions.loadListIfNecessary.triggerPromise(200).then(
+                    (forms) => {
+                        let map = forms.results.map(
+                                    entry => {
+                                        return {
+                                            value: ''+entry.hash,
+                                            label: `${entry.title} (${entry.hash})`
+                                        }
+                                    }
+                        );
+                        if(this.isMounted()){
+                            this.setState(
+                                {
+                                    forms: map
+                                }
+                            );
+                        }
+                    }
+                );
+            },
             render(){
-                return <span>FORM FIELD</span>;
+                console.log(this.parent());
+                return (
+                    <span>
+                        <div key="state-form" className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="state-form">
+                                    <strong>Form schema</strong>
+                                </span>
+                                {this.state.forms.length > 0?
+                                <Select onChange={this.setform}
+                                value={this.parent().form} name="form-field-name"
+                                multi={false} options={this.state.forms} disabled={!editable} />
+                                :''}
+                            </div>
+
+                        </div>
+                    <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
+
+                    </span>
+                );
             }
         });
 
@@ -45,12 +99,12 @@ class FormTask extends SimpleTask {
     }
 
     static deserializeOptions(data){
-        if(data.schema === undefined)
-            throw `data object is missing 'schema' property`;
+        if(data.form === undefined)
+            throw `data object is missing 'form' property`;
 
         let tmp = super.deserializeOptions(data);
 
-        tmp.schema = data.schema;
+        tmp.form = data.form;
 
         return tmp;
     }
@@ -59,7 +113,7 @@ class FormTask extends SimpleTask {
 
         let tmp = super.serialize();
 
-        tmp.schema=this.getData().schema;
+        tmp.form=this.getData().form;
 
         return tmp;
     }

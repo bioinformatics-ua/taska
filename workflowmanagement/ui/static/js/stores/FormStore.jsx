@@ -2,8 +2,8 @@
 import Reflux from 'reflux';
 import FormActions from '../actions/FormActions.jsx';
 
-import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
-import {ListLoader, DetailLoader} from '../actions/api.jsx'
+import {TableStoreMixin, DetailStoreMixin, ListStoreMixin} from '../mixins/store.jsx';
+import {ListLoader, SimpleListLoader, DetailLoader} from '../actions/api.jsx'
 
 let loader = new ListLoader({model: 'form'});
 
@@ -16,6 +16,10 @@ export default Reflux.createStore({
         DetailStoreMixin.factory(
             new DetailLoader({model: 'form'}),
             'hash',
+            FormActions
+        ),
+        ListStoreMixin.factory(
+            new SimpleListLoader({model: 'form'}),
             FormActions
         )
     ],

@@ -17,7 +17,7 @@ export default Reflux.createStore({
             new DetailLoader({model: 'process/requests'}),
             'hash',
             RequestActions
-        )
+        ),
     ],
     listenables: [RequestActions],
     load: function (state) {

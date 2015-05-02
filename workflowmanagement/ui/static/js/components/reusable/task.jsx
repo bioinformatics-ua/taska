@@ -54,6 +54,8 @@ const TaskType = React.createClass({
     switch(type){
       case 'tasks.SimpleTask':
         return 'fa-check';
+      case 'form.FormTask':
+        return 'fa-list-ul';
     }
 
     return 'fa-times-circle-o';

@@ -15,6 +15,8 @@ import {StateMachine, SimpleState} from '../react-statemachine/classes.jsx';
 
 import {SimpleTask, SimpleTaskRun} from '../components/reusable/states/SimpleTask.jsx';
 
+import {FormTask, FormTaskRun} from '../components/reusable/states/FormTask.jsx';
+
 var i = 0;
 export default Reflux.createStore({
     statics: {
@@ -117,7 +119,10 @@ export default Reflux.createStore({
                 Class: SimpleTaskRun
             });
 
-
+            process_sm.addStateClass({
+                id: 'form.FormTask',
+                Class: FormTaskRun
+            });
         // I dont know if they come ordered, so i add all tasks first, an dependencies only after
         let map = {};
 

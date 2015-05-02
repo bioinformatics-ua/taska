@@ -39,6 +39,11 @@ module.exports = (
         <Route name="tasks.SimpleTask" path="simpletask/:object" handler={require('./components/task/simple.jsx')} />
         <Route name="SimpleTask" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
 
+        // TODO : REPLACE RESULT VIEW
+        <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/simple.jsx')} />
+        <Route name="FormTask" path="formresult/:object" handler={require('./components/task/simple.jsx')} />
+
+
         <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>
         <Route name="InternalError" path="/500" handler={require('./components/500.jsx')}/>
 
