@@ -18,7 +18,9 @@ import Task from '../task.jsx'
 
 import Uploader from '../reusable/uploader.jsx'
 
-class SimpleTask extends Task{
+let fr;
+
+class FormTask extends Task{
     getTypeRepr(){
         return <span><i className='fa fa-check'></i> Simple Task</span>;
     }
@@ -54,15 +56,53 @@ class SimpleTask extends Task{
         }
         return [];
     }
+    saveCallback(responses){
+        console.log(responses);
+    }
     validate(){
-        // always validate, description is optional
-        return true;
+        return fr.validate();
     }
     detailRender(){
         const context = this;
         let editable = super.didWrite();
 
         return React.createClass({
+            componentDidMount(){
+                let options = {
+                    saveCallback: context.saveCallback,
+                    project_id: 1,
+                    response_fields: [{
+                            "label": "Please enter your clearance number",
+                            "field_type": "text",
+                            "required": true,
+                            "field_options": {},
+                            "cid": "c6"
+                        }, {
+                            "label": "Security personnel #82?",
+                            "field_type": "radio",
+                            "required": true,
+                            "field_options": {
+                                "options": [{
+                                    "label": "Yes",
+                                    "checked": false
+                                }, {
+                                    "label": "No",
+                                    "checked": false
+                                }],
+                                "include_other_option": true
+                            },
+                            "cid": "c10"
+                    }],
+                    response: {
+                        id: 'xxx',
+                        responses: {}
+                    }
+                };
+                fr = new FormRenderer(
+                    options
+                );
+
+            },
             render(){
                 return (<span>
                     <div className="form-group">
@@ -75,10 +115,11 @@ class SimpleTask extends Task{
                     <h3>File outputs</h3>
                     <Uploader editable={editable} uploads={context.translateResources()} done={context.setResources} />
 
+                    <form data-formrenderer></form>
                 </span>);
             }
         })
     }
 }
 
-export default SimpleTask;
+export default FormTask;

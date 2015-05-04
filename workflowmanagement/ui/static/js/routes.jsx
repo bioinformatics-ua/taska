@@ -40,8 +40,8 @@ module.exports = (
         <Route name="SimpleTask" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
 
         // TODO : REPLACE RESULT VIEW
-        <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/simple.jsx')} />
-        <Route name="FormTask" path="formresult/:object" handler={require('./components/task/simple.jsx')} />
+        <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/form.jsx')} />
+        <Route name="FormTask" path="formresult/:object" handler={require('./components/task/form.jsx')} />
 
 
         <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>

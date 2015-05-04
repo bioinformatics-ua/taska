@@ -175,7 +175,8 @@ export default React.createClass({
         ResultActions.setAnswer(prop, val);
     },
     saveAnswer(e){
-        ResultActions.saveAnswer();
+        if(this.validate())
+            ResultActions.saveAnswer();
     },
     render() {
         if(this.props.failed){
