@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from models import Form, FormTask
+from models import Form, FormTask, FormResult
 
 from tasks.admin import TaskForm
 
@@ -20,3 +20,11 @@ class FormTaskAdmin(admin.ModelAdmin):
     list_display = ('title', 'workflow', 'sortid', 'description', 'id', 'form')
     readonly_fields = ('id', 'hash', 'ttype')
     ordering = ('workflow','sortid', 'title', 'form')
+
+
+@admin.register(FormResult)
+class FormResultAdmin(admin.ModelAdmin):
+    ''' Django-Admin page for listing, adding and editing :class:`process.models.FormResult` entries.
+    '''
+    list_display = ('processtaskuser', 'date', 'comment')
+    readonly_fields = ('hash', )

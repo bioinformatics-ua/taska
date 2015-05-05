@@ -352,8 +352,11 @@ function() {
     Formbuilder.registerField("email", {
         order: 40,
         view: "<input type='text' class='rf-size-<%= rf.get(Formbuilder.options.mappings.SIZE) %>' />",
-        edit: "",
-        addButton: '<span class="symbol"><span class="fa fa-envelope-o"></span></span> Email'
+        edit: "<%= Formbuilder.templates['edit/size']() %>",
+        addButton: '<span class="symbol"><span class="fa fa-envelope-o"></span></span> Email',
+        defaultAttributes: function(a) {
+            return a.field_options.size = "large", a
+        }
     })
 }.call(this), /*function(){Formbuilder.registerField("file",{order:55,view:"<input type='file' />",edit:"",addButton:'<span class="symbol"><span class="fa fa-cloud-upload"></span></span> File'})}.call(this),*/
 function() {

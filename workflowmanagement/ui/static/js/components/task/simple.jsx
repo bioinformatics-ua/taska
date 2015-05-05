@@ -69,7 +69,7 @@ class SimpleTask extends Task{
                         <div className="input-group">
                           <span className="input-group-addon"><strong>Commentaries</strong></span>
                           <textarea disabled={!editable} rows="4" placeholder="Leave a comment upon task resolution (optional)"
-                            value={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
+                            defaultValue={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
                         </div>
                     </div>
                     <h3>File outputs</h3>

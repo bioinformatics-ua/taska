@@ -60,38 +60,38 @@ class ListStoreMixin{
 
                 this.__Actions = Actions;
             },
-            getList(){
+            getSimpleList(){
                 return this.__simplelist;
             },
-            getListFailed(){
+            getSimpleListFailed(){
                 return this.__simplelistfailed;
             },
-            onLoadList(page_size) {
+            onLoadSimpleList(page_size) {
                 if(page_size){
                     this.__page_size = page_size;
                 }
                 loader.load().then(
                     data => {
                         this.__simplelist = data;
-                        this.__Actions.loadList.completed(data);
+                        this.__Actions.loadSimpleList.completed(data);
                     }
                 );
             },
-            onLoadListIfNecessary(page_size) {
+            onLoadSimpleListIfNecessary(page_size) {
 
                 if(this.__simplelist && page_size === this.__page_size){
-                    this.__Actions.loadListIfNecessary.completed(this.__simplelist);
+                    this.__Actions.loadSimpleListIfNecessary.completed(this.__simplelist);
 
                 } else {
-                    this.__Actions.loadList.triggerPromise(page_size).then(
+                    this.__Actions.loadSimpleList.triggerPromise(page_size).then(
                         // success callback
                        data => {
-                            this.__Actions.loadListIfNecessary.completed(data);
+                            this.__Actions.loadSimpleListIfNecessary.completed(data);
                        }
                     );
                 }
             },
-            onUnloadList(){
+            onUnloadSimpleList(){
                 this.__simplelist = {};
             }
         }

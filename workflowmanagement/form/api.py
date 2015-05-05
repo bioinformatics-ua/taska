@@ -58,12 +58,18 @@ class FormSerializer(serializers.ModelSerializer):
 
 class FormTaskSerializer(TaskSerializer):
     form = serializers.SlugRelatedField(queryset=Form.all(), slug_field='hash')
+    form_repr = serializers.SerializerMethodField()
 
     class Meta(TaskSerializer.Meta):
         model = FormTask
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
+    def get_form_repr(self, obj):
+        return FormSerializer(obj.form).data
+
 class FormResultSerializer(ResultSerializer):
+    answer = JSONSerializerField()
+
     class Meta(ResultSerializer.Meta):
         model = FormResult
         read_only_fields = ('workflow',)

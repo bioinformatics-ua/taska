@@ -44,9 +44,9 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
 
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    }).catch(
+    });/*.catch(
         (ex) => {
-            console.log(ex.status);
+            console.log(ex);
             if(ex.status === 404){
                 React.render(<Handler failed={Http404} />, content);
                 StateActions.loadingEnd();
@@ -58,7 +58,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
                 StateActions.loadingEnd();
             }
         }
-    );
+    );*/
 });
 
 

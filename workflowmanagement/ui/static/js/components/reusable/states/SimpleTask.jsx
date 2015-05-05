@@ -333,7 +333,7 @@ class SimpleTaskRun extends SimpleTask{
             componentDidMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                UserActions.loadListIfNecessary.triggerPromise().then(
+                UserActions.loadSimpleListIfNecessary.triggerPromise().then(
                     (users) => {
                         let map = users.results.map(
                                     entry => {

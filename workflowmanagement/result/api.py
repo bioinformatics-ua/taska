@@ -43,6 +43,7 @@ class GenericResultSerializer(serializers.ModelSerializer):
         pass
 
     def to_internal_value(self, data):
+
         if(data['type'] != None):
             this_model = apps.get_model(data.pop('type'))
 
@@ -61,7 +62,7 @@ class GenericResultSerializer(serializers.ModelSerializer):
     #def create(self, validated_data):
     #    return HighScore.objects.create(**validated_data)
     class Meta:
-        model = Task
+        model = Result
 
 
 # Serializers define the API representation.
@@ -149,6 +150,25 @@ class ResultSerializer(serializers.ModelSerializer):
 
         return result
 
+    @transaction.atomic
+    def update(self, instance, data):
+        ptu = data.pop('processtaskuser', None)
+        process = data.pop('process')
+        task    = data.pop('task')
+        user    = data.pop('user')
+        outputs = data.pop('outputswrite', None)
+
+        print data
+
+        for attr, value in data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        self.__create_resources(instance, outputs)
+
+        return instance
+
 class SimpleResultSerializer(ResultSerializer):
     class Meta(ResultSerializer.Meta):
         model = SimpleResult
@@ -172,7 +192,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
     API for Result manipulation
 
     """
-    queryset = Result.objects.all()
+    queryset = Result.objects.none()
     serializer_class = GenericResultSerializer
     lookup_field= 'hash'
 
@@ -221,7 +241,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
 
         instance = self.get_object()
 
-        serializer = instance.init_serializer(instance=instance, data=request.data, partial=partial)
+        serializer = instance.init_serializer(instance=instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -237,7 +257,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
         instance = self.get_object()
         History.new(event=History.ACCESS, actor=request.user, object=instance)
 
-        return Response(ResultSerializer(instance).data)
+        return super(ResultViewSet, self).retrieve(request, args, kwargs)
 
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):

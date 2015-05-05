@@ -38,7 +38,7 @@ class ResultAdmin(admin.ModelAdmin):
         return False
     # we must change the queryset to allow the select to be based on the subclasses type, since the Result is generic
     def get_queryset(self, request):
-        qs = super(ResultAdmin, self).queryset(request)
+        qs = super(ResultAdmin, self).get_queryset(request)
         return qs.select_subclasses()
 
 @admin.register(SimpleResult)

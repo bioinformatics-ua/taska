@@ -14,9 +14,9 @@ const DetailActionsMixin = {
 };
 
 const ListActionsMixin = {
-    'loadListSuccess': {},
-    'loadList': {asyncResult: true},
-    'loadListIfNecessary': {asyncResult: true},
+    'loadSimpleListSuccess': {},
+    'loadSimpleList': {asyncResult: true},
+    'loadSimpleListIfNecessary': {asyncResult: true},
     'unloadList': {}
 };
 

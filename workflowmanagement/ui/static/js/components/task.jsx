@@ -127,6 +127,8 @@ export default React.createClass({
             tmp.task = TaskStore.getDetail();
         }
 
+        console.log(tmp.answer);
+
         return tmp;
     },
     isMine(){
@@ -157,19 +159,34 @@ export default React.createClass({
         }
     },
     componentWillMount(){
-        ResultActions.calibrate(this.state.task);
+        let r;
+        try{
+            let detail = Object.keys(this.props.detail)[0];
+            r = this.props.detail[detail].result.hash;
+        } catch(ex){
+            r = undefined;
+        }
+
+        ResultActions.calibrate($.extend(this.state.task, {hash: r}));
     },
     componentWillUnmount(){
         ResultActions.unloadAnswer();
     },
     componentDidUpdate(){
-        if(this.state.submitted)
+        let detail = Object.keys(this.props.detail)[0];
+
+        if(this.state.submitted && !this.props.detail[detail].result)
             this.context.router.transitionTo('home');
     },
     update(status){
-        if(status == TaskStore.DETAIL){
+        console.log('UPDATE');
+
+        let detail = Object.keys(this.props.detail)[0];
+
+        if(this.props.detail[detail].result)
+            this.setState(this.__getState(true));
+        else
             this.setState(this.__getState());
-        }
     },
     setAnswer(prop, val){
         ResultActions.setAnswer(prop, val);
@@ -179,6 +196,7 @@ export default React.createClass({
             ResultActions.saveAnswer();
     },
     render() {
+        console.log('RENDER');
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;
@@ -231,7 +249,6 @@ export default React.createClass({
                   "displayName": "Requester"
                 }
             ];
-
         return (
             <div className="task-detail row">
                 <div className="col-md-12">

@@ -51,7 +51,7 @@ class FormTask extends SimpleTask {
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
                 console.log(FormActions);
-                FormActions.loadListIfNecessary.triggerPromise(200).then(
+                FormActions.loadSimpleListIfNecessary.triggerPromise(200).then(
                     (forms) => {
                         let map = forms.results.map(
                                     entry => {
@@ -314,7 +314,7 @@ class FormTaskRun extends FormTask{
             componentDidMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                UserActions.loadListIfNecessary.triggerPromise().then(
+                UserActions.loadSimpleListIfNecessary.triggerPromise().then(
                     (users) => {
                         let map = users.results.map(
                                     entry => {

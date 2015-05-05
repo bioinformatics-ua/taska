@@ -1129,13 +1129,13 @@ $.fn.clearFields = $.fn.clearInputs = function(includeHidden) {
         else if (tag == 'select') {
             this.selectedIndex = -1;
         }
-		else if (t == "file") {
-			if (/MSIE/.test(navigator.userAgent)) {
-				$(this).replaceWith($(this).clone(true));
-			} else {
-				$(this).val('');
-			}
-		}
+        else if (t == "file") {
+            if (/MSIE/.test(navigator.userAgent)) {
+                $(this).replaceWith($(this).clone(true));
+            } else {
+                $(this).val('');
+            }
+        }
         else if (includeHidden) {
             // includeHidden can be the value true, or it can be a selector string
             // indicating a special test; for example:
@@ -1217,178 +1217,178 @@ function log() {
 
 
 ;(function(win){
-	var store = {},
-		doc = win.document,
-		localStorageName = 'localStorage',
-		scriptTag = 'script',
-		storage
+    var store = {},
+        doc = win.document,
+        localStorageName = 'localStorage',
+        scriptTag = 'script',
+        storage
 
-	store.disabled = false
-	store.version = '1.3.17'
-	store.set = function(key, value) {}
-	store.get = function(key, defaultVal) {}
-	store.has = function(key) { return store.get(key) !== undefined }
-	store.remove = function(key) {}
-	store.clear = function() {}
-	store.transact = function(key, defaultVal, transactionFn) {
-		if (transactionFn == null) {
-			transactionFn = defaultVal
-			defaultVal = null
-		}
-		if (defaultVal == null) {
-			defaultVal = {}
-		}
-		var val = store.get(key, defaultVal)
-		transactionFn(val)
-		store.set(key, val)
-	}
-	store.getAll = function() {}
-	store.forEach = function() {}
+    store.disabled = false
+    store.version = '1.3.17'
+    store.set = function(key, value) {}
+    store.get = function(key, defaultVal) {}
+    store.has = function(key) { return store.get(key) !== undefined }
+    store.remove = function(key) {}
+    store.clear = function() {}
+    store.transact = function(key, defaultVal, transactionFn) {
+        if (transactionFn == null) {
+            transactionFn = defaultVal
+            defaultVal = null
+        }
+        if (defaultVal == null) {
+            defaultVal = {}
+        }
+        var val = store.get(key, defaultVal)
+        transactionFn(val)
+        store.set(key, val)
+    }
+    store.getAll = function() {}
+    store.forEach = function() {}
 
-	store.serialize = function(value) {
-		return JSON.stringify(value)
-	}
-	store.deserialize = function(value) {
-		if (typeof value != 'string') { return undefined }
-		try { return JSON.parse(value) }
-		catch(e) { return value || undefined }
-	}
+    store.serialize = function(value) {
+        return JSON.stringify(value)
+    }
+    store.deserialize = function(value) {
+        if (typeof value != 'string') { return undefined }
+        try { return JSON.parse(value) }
+        catch(e) { return value || undefined }
+    }
 
-	// Functions to encapsulate questionable FireFox 3.6.13 behavior
-	// when about.config::dom.storage.enabled === false
-	// See https://github.com/marcuswestin/store.js/issues#issue/13
-	function isLocalStorageNameSupported() {
-		try { return (localStorageName in win && win[localStorageName]) }
-		catch(err) { return false }
-	}
+    // Functions to encapsulate questionable FireFox 3.6.13 behavior
+    // when about.config::dom.storage.enabled === false
+    // See https://github.com/marcuswestin/store.js/issues#issue/13
+    function isLocalStorageNameSupported() {
+        try { return (localStorageName in win && win[localStorageName]) }
+        catch(err) { return false }
+    }
 
-	if (isLocalStorageNameSupported()) {
-		storage = win[localStorageName]
-		store.set = function(key, val) {
-			if (val === undefined) { return store.remove(key) }
-			storage.setItem(key, store.serialize(val))
-			return val
-		}
-		store.get = function(key, defaultVal) {
-			var val = store.deserialize(storage.getItem(key))
-			return (val === undefined ? defaultVal : val)
-		}
-		store.remove = function(key) { storage.removeItem(key) }
-		store.clear = function() { storage.clear() }
-		store.getAll = function() {
-			var ret = {}
-			store.forEach(function(key, val) {
-				ret[key] = val
-			})
-			return ret
-		}
-		store.forEach = function(callback) {
-			for (var i=0; i<storage.length; i++) {
-				var key = storage.key(i)
-				callback(key, store.get(key))
-			}
-		}
-	} else if (doc.documentElement.addBehavior) {
-		var storageOwner,
-			storageContainer
-		// Since #userData storage applies only to specific paths, we need to
-		// somehow link our data to a specific path.  We choose /favicon.ico
-		// as a pretty safe option, since all browsers already make a request to
-		// this URL anyway and being a 404 will not hurt us here.  We wrap an
-		// iframe pointing to the favicon in an ActiveXObject(htmlfile) object
-		// (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
-		// since the iframe access rules appear to allow direct access and
-		// manipulation of the document element, even for a 404 page.  This
-		// document can be used instead of the current document (which would
-		// have been limited to the current path) to perform #userData storage.
-		try {
-			storageContainer = new ActiveXObject('htmlfile')
-			storageContainer.open()
-			storageContainer.write('<'+scriptTag+'>document.w=window</'+scriptTag+'><iframe src="/favicon.ico"></iframe>')
-			storageContainer.close()
-			storageOwner = storageContainer.w.frames[0].document
-			storage = storageOwner.createElement('div')
-		} catch(e) {
-			// somehow ActiveXObject instantiation failed (perhaps some special
-			// security settings or otherwse), fall back to per-path storage
-			storage = doc.createElement('div')
-			storageOwner = doc.body
-		}
-		var withIEStorage = function(storeFunction) {
-			return function() {
-				var args = Array.prototype.slice.call(arguments, 0)
-				args.unshift(storage)
-				// See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
-				// and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
-				storageOwner.appendChild(storage)
-				storage.addBehavior('#default#userData')
-				storage.load(localStorageName)
-				var result = storeFunction.apply(store, args)
-				storageOwner.removeChild(storage)
-				return result
-			}
-		}
+    if (isLocalStorageNameSupported()) {
+        storage = win[localStorageName]
+        store.set = function(key, val) {
+            if (val === undefined) { return store.remove(key) }
+            storage.setItem(key, store.serialize(val))
+            return val
+        }
+        store.get = function(key, defaultVal) {
+            var val = store.deserialize(storage.getItem(key))
+            return (val === undefined ? defaultVal : val)
+        }
+        store.remove = function(key) { storage.removeItem(key) }
+        store.clear = function() { storage.clear() }
+        store.getAll = function() {
+            var ret = {}
+            store.forEach(function(key, val) {
+                ret[key] = val
+            })
+            return ret
+        }
+        store.forEach = function(callback) {
+            for (var i=0; i<storage.length; i++) {
+                var key = storage.key(i)
+                callback(key, store.get(key))
+            }
+        }
+    } else if (doc.documentElement.addBehavior) {
+        var storageOwner,
+            storageContainer
+        // Since #userData storage applies only to specific paths, we need to
+        // somehow link our data to a specific path.  We choose /favicon.ico
+        // as a pretty safe option, since all browsers already make a request to
+        // this URL anyway and being a 404 will not hurt us here.  We wrap an
+        // iframe pointing to the favicon in an ActiveXObject(htmlfile) object
+        // (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
+        // since the iframe access rules appear to allow direct access and
+        // manipulation of the document element, even for a 404 page.  This
+        // document can be used instead of the current document (which would
+        // have been limited to the current path) to perform #userData storage.
+        try {
+            storageContainer = new ActiveXObject('htmlfile')
+            storageContainer.open()
+            storageContainer.write('<'+scriptTag+'>document.w=window</'+scriptTag+'><iframe src="/favicon.ico"></iframe>')
+            storageContainer.close()
+            storageOwner = storageContainer.w.frames[0].document
+            storage = storageOwner.createElement('div')
+        } catch(e) {
+            // somehow ActiveXObject instantiation failed (perhaps some special
+            // security settings or otherwse), fall back to per-path storage
+            storage = doc.createElement('div')
+            storageOwner = doc.body
+        }
+        var withIEStorage = function(storeFunction) {
+            return function() {
+                var args = Array.prototype.slice.call(arguments, 0)
+                args.unshift(storage)
+                // See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
+                // and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
+                storageOwner.appendChild(storage)
+                storage.addBehavior('#default#userData')
+                storage.load(localStorageName)
+                var result = storeFunction.apply(store, args)
+                storageOwner.removeChild(storage)
+                return result
+            }
+        }
 
-		// In IE7, keys cannot start with a digit or contain certain chars.
-		// See https://github.com/marcuswestin/store.js/issues/40
-		// See https://github.com/marcuswestin/store.js/issues/83
-		var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g")
-		function ieKeyFix(key) {
-			return key.replace(/^d/, '___$&').replace(forbiddenCharsRegex, '___')
-		}
-		store.set = withIEStorage(function(storage, key, val) {
-			key = ieKeyFix(key)
-			if (val === undefined) { return store.remove(key) }
-			storage.setAttribute(key, store.serialize(val))
-			storage.save(localStorageName)
-			return val
-		})
-		store.get = withIEStorage(function(storage, key, defaultVal) {
-			key = ieKeyFix(key)
-			var val = store.deserialize(storage.getAttribute(key))
-			return (val === undefined ? defaultVal : val)
-		})
-		store.remove = withIEStorage(function(storage, key) {
-			key = ieKeyFix(key)
-			storage.removeAttribute(key)
-			storage.save(localStorageName)
-		})
-		store.clear = withIEStorage(function(storage) {
-			var attributes = storage.XMLDocument.documentElement.attributes
-			storage.load(localStorageName)
-			for (var i=0, attr; attr=attributes[i]; i++) {
-				storage.removeAttribute(attr.name)
-			}
-			storage.save(localStorageName)
-		})
-		store.getAll = function(storage) {
-			var ret = {}
-			store.forEach(function(key, val) {
-				ret[key] = val
-			})
-			return ret
-		}
-		store.forEach = withIEStorage(function(storage, callback) {
-			var attributes = storage.XMLDocument.documentElement.attributes
-			for (var i=0, attr; attr=attributes[i]; ++i) {
-				callback(attr.name, store.deserialize(storage.getAttribute(attr.name)))
-			}
-		})
-	}
+        // In IE7, keys cannot start with a digit or contain certain chars.
+        // See https://github.com/marcuswestin/store.js/issues/40
+        // See https://github.com/marcuswestin/store.js/issues/83
+        var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g")
+        function ieKeyFix(key) {
+            return key.replace(/^d/, '___$&').replace(forbiddenCharsRegex, '___')
+        }
+        store.set = withIEStorage(function(storage, key, val) {
+            key = ieKeyFix(key)
+            if (val === undefined) { return store.remove(key) }
+            storage.setAttribute(key, store.serialize(val))
+            storage.save(localStorageName)
+            return val
+        })
+        store.get = withIEStorage(function(storage, key, defaultVal) {
+            key = ieKeyFix(key)
+            var val = store.deserialize(storage.getAttribute(key))
+            return (val === undefined ? defaultVal : val)
+        })
+        store.remove = withIEStorage(function(storage, key) {
+            key = ieKeyFix(key)
+            storage.removeAttribute(key)
+            storage.save(localStorageName)
+        })
+        store.clear = withIEStorage(function(storage) {
+            var attributes = storage.XMLDocument.documentElement.attributes
+            storage.load(localStorageName)
+            for (var i=0, attr; attr=attributes[i]; i++) {
+                storage.removeAttribute(attr.name)
+            }
+            storage.save(localStorageName)
+        })
+        store.getAll = function(storage) {
+            var ret = {}
+            store.forEach(function(key, val) {
+                ret[key] = val
+            })
+            return ret
+        }
+        store.forEach = withIEStorage(function(storage, callback) {
+            var attributes = storage.XMLDocument.documentElement.attributes
+            for (var i=0, attr; attr=attributes[i]; ++i) {
+                callback(attr.name, store.deserialize(storage.getAttribute(attr.name)))
+            }
+        })
+    }
 
-	try {
-		var testKey = '__storejs__'
-		store.set(testKey, testKey)
-		if (store.get(testKey) != testKey) { store.disabled = true }
-		store.remove(testKey)
-	} catch(e) {
-		store.disabled = true
-	}
-	store.enabled = !store.disabled
+    try {
+        var testKey = '__storejs__'
+        store.set(testKey, testKey)
+        if (store.get(testKey) != testKey) { store.disabled = true }
+        store.remove(testKey)
+    } catch(e) {
+        store.disabled = true
+    }
+    store.enabled = !store.disabled
 
-	if (typeof module != 'undefined' && module.exports && this.module !== module) { module.exports = store }
-	else if (typeof define === 'function' && define.amd) { define(store) }
-	else { win.store = store }
+    if (typeof module != 'undefined' && module.exports && this.module !== module) { module.exports = store }
+    else if (typeof define === 'function' && define.amd) { define(store) }
+    else { win.store = store }
 
 })(Function('return this')());
 
@@ -2986,7 +2986,7 @@ function log() {
   var Model = Backbone.Model = function(attributes, options) {
     var attrs = attributes || {};
     options || (options = {});
-    this.cid = _.uniqueId('c');
+    this.cid = _.uniqueId('t');
     this.attributes = {};
     if (options.collection) this.collection = options.collection;
     if (options.parse) attrs = this.parse(attrs, options) || {};
@@ -3007,7 +3007,7 @@ function log() {
 
     // The default name for the JSON `id` attribute is `"id"`. MongoDB and
     // CouchDB users may want to set this to `"_id"`.
-    idAttribute: 'cid',
+    idAttribute: 'id',
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
@@ -6300,10 +6300,13 @@ var scripts;scripts={},window.requireOnce=function(a,b){return"undefined"==typeo
         model = new FormRenderer.Models["ResponseField" + (_.str.classify(rf.field_type))](rf, {
           form_renderer: this
         });
+        console.log(_.str.classify(rf.field_type));
+        console.log(model);
         if (model.input_field) {
           model.setExistingValue(this.options.response.responses[model.get('cid')]);
         }
         this.response_fields.add(model);
+        console.log(this.response_fields)
       }
       return this.listenTo(this.response_fields, 'change:value change:value.*', $.proxy(this._onChange, this));
     },
@@ -7181,14 +7184,17 @@ var scripts;scripts={},window.requireOnce=function(a,b){return"undefined"==typeo
   FormRenderer.Models.ResponseFieldCheckboxes = FormRenderer.Models.ResponseField.extend({
     field_type: 'checkboxes',
     setExistingValue: function(x) {
+      console.log(x);
       return this.set('value', _.tap({}, (function(_this) {
         return function(h) {
           var i, option, _i, _j, _len, _len1, _ref, _ref1, _results;
           if (!_.isEmpty(x)) {
             _ref = _this.getOptions();
+            console.log(_ref);
+            console.log(h);
             for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
               option = _ref[i];
-              h["" + i] = x[option.label];
+              h["" + i] = x[i];
             }
             if (x.Other) {
               h['other_checkbox'] = true;
@@ -7246,15 +7252,20 @@ var scripts;scripts={},window.requireOnce=function(a,b){return"undefined"==typeo
     field_type: 'radio',
     setExistingValue: function(x) {
       var defaultOption;
+      console.log(x);
+      if(x != null)
+        return this.set('value.selected', x);
+      /* well that below doesnt work at all for inputs from formbuilder
       if (x != null ? x.selected : void 0) {
         return this.set('value', x);
       } else if ((defaultOption = _.find(this.getOptions(), (function(option) {
+        console.log('DEFAULT');
         return _.toBoolean(option.checked);
       })))) {
         return this.set('value.selected', defaultOption.label);
       } else {
         return this.set('value', {});
-      }
+      }*/
     },
     getValue: function() {
       return _.tap({
@@ -8524,6 +8535,10 @@ window.JST["fields/email"] = function(__obj) {
 
       _print(this.getDomId());
 
+      _print(_safe('"\n       class="size_'));
+
+      _print(this.model.getSize());
+
       _print(_safe('"\n       data-rv-input=\'model.value\' />\n'));
 
     }).call(this);
@@ -8746,6 +8761,7 @@ window.JST["fields/number"] = function(__obj) {
       return _safe(result);
     };
     (function() {
+        console.log('PROCESS NUMBER')
       _print(_safe('<input type="text"\n       id="'));
 
       _print(this.getDomId());
@@ -8959,6 +8975,7 @@ window.JST["fields/radio"] = function(__obj) {
       var i, option, _i, _len, _ref;
 
       _ref = this.model.getOptions();
+
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         option = _ref[i];
         _print(_safe('\n  <label class=\'fr_option control\'>\n    <input type=\'radio\'\n           data-rv-checked=\'model.value.selected\'\n           id="'));
@@ -9320,6 +9337,10 @@ window.JST["fields/website"] = function(__obj) {
       _print(_safe('<input type="text" inputmode="url"\n       id="'));
 
       _print(this.getDomId());
+
+      _print(_safe('"\n       class="size_'));
+
+      _print(this.model.getSize());
 
       _print(_safe('"\n       data-rv-input=\'model.value\'\n       placeholder=\'http://\' />\n'));
 

@@ -28,6 +28,9 @@ class Form(models.Model):
         # else
         return tmp
 
+    def __unicode__(self):
+        return '%s (created on %s)' % (self.title, self.created_date.strftime("%Y-%m-%d %H:%M"))
+
 @receiver(models.signals.post_save, sender=Form)
 def __generate_form_hash(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an form.

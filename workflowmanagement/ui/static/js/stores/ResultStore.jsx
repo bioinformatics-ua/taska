@@ -37,11 +37,12 @@ export default Reflux.createStore({
         );
     },
     onCalibrate(data){
-        this.__detaildata = {
-            task: data.processtask.task,
-            process: data.processtask.process,
-            type: depmap[data.processtask.parent.type]
-        };
+            this.__detaildata = {
+                hash: data.hash || undefined,
+                task: data.processtask.task,
+                process: data.processtask.process,
+                type: depmap[data.processtask.parent.type]
+            };
     },
     getAnswer(){
         return this.__detaildata || {};
@@ -51,8 +52,9 @@ export default Reflux.createStore({
     },
     onSetAnswer(prop, val){
         this.__detaildata[prop] = val;
+        console.log(this.__detaildata);
 
-        //this.trigger(this.DETAIL);
+        //this.trigger();
     },
     answerSubmitted(){
         return this.__rfinished || false;
@@ -60,13 +62,22 @@ export default Reflux.createStore({
     onSaveAnswer(){
         StateActions.loadingStart();
 
-        ResultActions.addDetail.triggerPromise(this.__detaildata).then(
-            (answer) => {
-                StateActions.loadingEnd();
+        if(this.__detaildata.hash){
+            ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
+                    (answer) => {
+                        StateActions.loadingEnd();
+                        this.trigger();
+                    }
+            );
+        } else {
+            ResultActions.addDetail.triggerPromise(this.__detaildata).then(
+                (answer) => {
+                    StateActions.loadingEnd();
 
-                this.__rfinished = answer;
-                this.trigger();
-            }
-        )
+                    this.__rfinished = answer;
+                    this.trigger();
+                }
+            );
+        }
     }
 });

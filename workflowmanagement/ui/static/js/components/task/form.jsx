@@ -58,6 +58,7 @@ class FormTask extends Task{
     }
     saveCallback(responses){
         console.log(responses);
+        super.setAnswer('answer', responses);
     }
     validate(){
         return fr.validate();
@@ -68,34 +69,15 @@ class FormTask extends Task{
 
         return React.createClass({
             componentDidMount(){
+                console.log(context.state.answer.answer);
+                console.log(context.state.task.processtask.parent['form_repr'].schema);
                 let options = {
                     saveCallback: context.saveCallback,
                     project_id: 1,
-                    response_fields: [{
-                            "label": "Please enter your clearance number",
-                            "field_type": "text",
-                            "required": true,
-                            "field_options": {},
-                            "cid": "c6"
-                        }, {
-                            "label": "Security personnel #82?",
-                            "field_type": "radio",
-                            "required": true,
-                            "field_options": {
-                                "options": [{
-                                    "label": "Yes",
-                                    "checked": false
-                                }, {
-                                    "label": "No",
-                                    "checked": false
-                                }],
-                                "include_other_option": true
-                            },
-                            "cid": "c10"
-                    }],
+                    response_fields: context.state.task.processtask.parent['form_repr'].schema,
                     response: {
                         id: 'xxx',
-                        responses: {}
+                        responses: context.state.answer.answer || {}
                     }
                 };
                 fr = new FormRenderer(
@@ -109,7 +91,7 @@ class FormTask extends Task{
                         <div className="input-group">
                           <span className="input-group-addon"><strong>Commentaries</strong></span>
                           <textarea disabled={!editable} rows="4" placeholder="Leave a comment upon task resolution (optional)"
-                            value={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
+                            defaultValue={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
                         </div>
                     </div>
                     <h3>File outputs</h3>

@@ -62,10 +62,11 @@ class Result(models.Model):
     def get_serializer(self):
         serializer_name = '__%s'%(self.type())
         serializer = None
+
         if hasattr(Result, serializer_name):
             serializer = getattr(Result, serializer_name)
         else:
-            serializer = Result.init_serializer()
+            serializer = self.init_serializer()
             setattr(Result, serializer_name, serializer)
 
         return serializer
