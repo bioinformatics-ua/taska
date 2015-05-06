@@ -146,8 +146,6 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
 
                 except (ProcessTaskUser.DoesNotExist, KeyError):
                     ptu=user_serializer.create(user_data)
-                    History.new(event=History.ADD, actor=processtask.process.executioner, object=instance, authorized=[ptu.user])
-
 
 
         for attr, value in validated_data.items():
@@ -384,6 +382,8 @@ class ProcessViewSet(  mixins.CreateModelMixin,
             except ProcessTaskUser.DoesNotExist:
                 ptaskuser = ProcessTaskUser(user=user, processtask=ptask)
                 ptaskuser.save()
+
+                History.new(event=History.ADD, actor=ptask.process.executioner, object=ptask, authorized=[ptaskuser.user])
 
                 return Response(ProcessSerializer(process).data)
 

@@ -146,6 +146,14 @@ class ResultSerializer(serializers.ModelSerializer):
 
         result = self.Meta.model.objects.create(**validated_data)
 
+        users = []
+        auths = ptu.processtask.users().order_by('user').distinct('user')
+
+        for ptu in auths:
+            users.append(ptu.user)
+
+        History.new(event=History.ADD, actor=process.executioner, object=result, authorized=users)
+
         self.__create_resources(result, outputs)
 
         return result

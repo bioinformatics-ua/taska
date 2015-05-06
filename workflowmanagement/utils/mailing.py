@@ -60,3 +60,12 @@ class ProcessTaskAddTemplate(MailTemplate):
     template="mail/processtask_add.html"
 
 
+class ResultAddTemplate(MailTemplate):
+    subjecttemplate="mail/result_add_subject.html"
+    template="mail/result_add.html"
+
+class SimpleResultAddTemplate(ResultAddTemplate):
+    pass
+
+class FormResultAddTemplate(ResultAddTemplate):
+    pass

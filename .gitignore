@@ -3,4 +3,4 @@ documentation/build
 *.pyc
 /node_modules
 workflowmanagement/upload/file
-workflowmanagement/local_settings.py
+workflowmanagement/workflowmanagement/local_settings.py

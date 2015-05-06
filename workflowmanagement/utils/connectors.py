@@ -11,6 +11,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
         tcn+= dict(instance.__class__.EVENTS)[instance.event].title()+'Template'
 
         tcn = tcn.replace(' ', '')
+        print tcn
         try:
             tc = getattr(mailing, tcn)
             tci = tc(instance, instance.authorized.filter(profile__notification=True).values_list('email', flat=True))
