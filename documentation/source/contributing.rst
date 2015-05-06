@@ -22,6 +22,9 @@ Installing development environment under Ubuntu
 5. Activate virtual environment
     source <path_to_folder_to_hold_virtual_environment>/bin/activate
 
+5. Install RabbitMQ (used for message queueing)
+    sudo apt-get install rabbitmq-server
+
 5. Get project from github
     git clone https://github.com/bioinformatics-ua/workflow-management.git <path_to_folder_to_hold_project>
 
@@ -40,3 +43,7 @@ Installing development environment under Ubuntu
 
 6. To run server in development mode
     python manage.py runserver
+
+7. Run the celery worker (in production environments this should be done through a daemon like supervisord)
+
+    celery -A workflowmanagement worker -l info

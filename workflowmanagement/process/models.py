@@ -11,6 +11,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.db import transaction
 
+from history.models import History
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -72,6 +74,7 @@ class Process(models.Model):
                 ptask.status = ProcessTask.CANCELED
                 ptask.save()
 
+
         self.status = Process.CANCELED
         self.save()
 
@@ -101,16 +104,14 @@ class Process(models.Model):
         if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING)).count() == 0:
             self.status = Process.FINISHED
             self.end_date = timezone.now()
+
+            History.new(event=History.DONE, actor=self.executioner, object=self)
+
             self.save()
 
     def progress(self):
         all = ProcessTask.all(process=self).count()
         done = ProcessTask.all(process=self).filter(Q(status=ProcessTask.FINISHED) | Q(status=ProcessTask.CANCELED)).count()
-
-        print "ALL:"
-        print all
-        print "done"
-        print done
 
         try:
             return done*100 / all
@@ -177,6 +178,10 @@ class ProcessTask(models.Model):
 
     def __str__(self):
         return ('%s - %s' % (self.task, self.process)).encode('utf-8')
+
+    def rpr(self):
+        ts = Task.all().get_subclass(id=self.task.id)
+        return "%s/%s" % (ts.type(), self.hash)
 
     def users(self):
         return ProcessTaskUser.all(processtask=self)

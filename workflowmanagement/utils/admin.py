@@ -11,11 +11,13 @@ def reverse_link(obj, name=None):
     Kwargs:
         :name (str): Name to appear on the link, if left unfilled the obj textual representation will be used
     '''
+    try:
+        url = reverse('admin:%s_%s_change' % (obj._meta.app_label, obj._meta.module_name), args=(obj.id,))
+        if name == None:
+            name = obj
 
-    url = reverse('admin:%s_%s_change' % (obj._meta.app_label, obj._meta.module_name), args=(obj.id,))
-    if name == None:
-        name = obj
+        print type(name)
 
-    print type(name)
-
-    return '<a href="%s">%s</a>' % (url, name)
+        return '<a href="%s">%s</a>' % (url, name)
+    except:
+        return ''

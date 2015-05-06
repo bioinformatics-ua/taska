@@ -12,3 +12,4 @@ class Profile(models.Model):
         )
     user        = models.OneToOneField(User)
     detail_mode = models.PositiveSmallIntegerField(choices=DETAIL_MODES, default=POPUP)
+    notification= models.BooleanField(default=False)

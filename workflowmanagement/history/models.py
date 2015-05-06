@@ -1,12 +1,11 @@
 from django.db import models
-from process.models import ProcessTaskUser
 
 from django.contrib.auth.models import User
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
-
+import django.dispatch
 
 class History(models.Model):
     ''' Describes all actions executed over the system.
@@ -30,12 +29,16 @@ class History(models.Model):
     EDIT            = 2
     DELETE          = 3
     ACCESS          = 4
+    CANCEL          = 5
+    DONE            = 6
 
     EVENTS          = (
             (ADD,       'Add'),
             (EDIT,      'Edit'),
             (DELETE,    'Delete'),
-            (ACCESS,    'Access')
+            (ACCESS,    'Access'),
+            (CANCEL,    'Cancel'),
+            (DONE,      'Done'),
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
@@ -56,6 +59,14 @@ class History(models.Model):
     def obj_repr(self):
         return str(self.object)
 
+    def actor_repr(self):
+        tmp = self.actor.get_full_name()
+
+        if tmp != None:
+            return tmp
+
+        return self.actor.email
+
     @staticmethod
     def all(user=None):
         """
@@ -70,8 +81,8 @@ class History(models.Model):
         return history
 
 
-    @staticmethod
-    def new(event, actor, object, authorized=None):
+    @classmethod
+    def new(self, event, actor, object, authorized=None):
         """
         Generates a new generic history object
         """
@@ -83,6 +94,8 @@ class History(models.Model):
         if authorized != None:
             for elem in authorized:
                 action.authorized.add(elem)
+        print 'NEW HISTORY'
+        self.post_new.send(sender=self.__class__, instance=action)
 
         return action
 
@@ -107,3 +120,6 @@ class History(models.Model):
             pass
 
         return History.objects.none()
+
+    # Signals
+    post_new = django.dispatch.Signal(providing_args=["instance"])

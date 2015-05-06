@@ -1,0 +1,14 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object}} has been canceled
+{% endblock %}
+
+{% block body %}
+Hello dear user,<br /><br />
+
+This email is meant to inform you that the process {{object}}, that you were part of, has been canceled by {{history.actor.get_full_name}}. And will need no further collaboration.
+<br /><br />
+Best Regards,<br />
+EMIF Study Manager
+{% endblock %}

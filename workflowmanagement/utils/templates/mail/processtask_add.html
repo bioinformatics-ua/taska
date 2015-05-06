@@ -1,0 +1,14 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object}} has been assigned
+{% endblock %}
+
+{% block body %}
+Hello dear user,<br /><br />
+
+This email is meant to inform you that the task {{object}} has been assigned, and now requires your collaboration.
+<br /><br />
+Best Regards,<br />
+EMIF Study Manager
+{% endblock %}

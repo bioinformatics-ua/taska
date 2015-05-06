@@ -112,7 +112,16 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
                 user_data['processtask'] = processtask
                 serializer = ProcessTaskUserSerializer()
 
-                serializer.create(user_data)
+                ptu = serializer.create(user_data)
+
+        users = []
+        auths = processtask.users().order_by('user').distinct('user')
+
+        for ptu in auths:
+            users.append(ptu.user)
+
+        History.new(event=History.ADD, actor=processtask.process.executioner, object=processtask, authorized=users)
+
 
         return processtask
 
@@ -136,7 +145,9 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
                     user_serializer.update(t_instance, user_data)
 
                 except (ProcessTaskUser.DoesNotExist, KeyError):
-                    user_serializer.create(user_data)
+                    ptu=user_serializer.create(user_data)
+                    History.new(event=History.ADD, actor=processtask.process.executioner, object=instance, authorized=[ptu.user])
+
 
 
         for attr, value in validated_data.items():
@@ -341,6 +352,8 @@ class ProcessViewSet(  mixins.CreateModelMixin,
     def cancel(self, request, hash=None):
         process = self.get_object()
         process.cancel()
+
+        History.new(event=History.CANCEL, actor=request.user, object=process)
 
         return Response(ProcessSerializer(process).data)
 

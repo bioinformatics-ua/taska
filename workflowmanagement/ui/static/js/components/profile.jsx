@@ -11,6 +11,8 @@ import UserStore from '../stores/UserStore.jsx';
 
 import UserActions from '../actions/UserActions.jsx';
 
+import Toggle from 'react-toggle';
+
 export default React.createClass({
     displayName: "Profile",
     mixins: [Router.Navigation, Authentication,
@@ -42,11 +44,13 @@ export default React.createClass({
             n = '';
         UserActions.setProfileField('detail_mode', n);
     },
+    setNotification(e){
+        UserActions.setProfileField('notification', e.target.checked);
+    },
     save(e){
         UserActions.saveUser()
     },
     render: function () {
-        console.log(this.state.user.profile['detail_mode']);
         return (
             <span>
                 <div className="row">
@@ -84,6 +88,21 @@ export default React.createClass({
                                 <Select placeholder="Select a Detail Render Mode" onChange={this.setDetailMode}
                                     value={''+this.state.user.profile['detail_mode']} searchable={false}
                                     options={[{value: '0', label: 'Popup'},{value: '1', label: 'Below'}]} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>Email Notifications</strong>
+                                </span>
+                                <div className="form-control">
+                                    <span className="selectBox">
+                                        <Toggle key={`ptoggle_${this.state.user.profile.notification}`}
+                                            checked={this.state.user.profile.notification}
+                                            defaultChecked={this.state.user.profile.notification}
+                                            onChange={this.setNotification}/>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         {/*<div className="form-group">

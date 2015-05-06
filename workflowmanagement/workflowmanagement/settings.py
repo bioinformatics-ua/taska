@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+BASE_URL = "/"
+
 # swagger settings
 SWAGGER_SETTINGS = {
     "exclude_namespaces": ['index'], # List URL namespaces to ignore
@@ -61,6 +63,7 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'rest_framework',
     'rest_framework_swagger',
+    'utils',
     'material',
     'workflow',
     'tasks',
@@ -72,7 +75,9 @@ INSTALLED_APPS = (
     'ui',
 
     # Extra types of task/result
-    'form'
+    'form',
+
+    'django_premailer'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -180,9 +185,22 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 
 )
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'tasks/templates'), os.path.join(BASE_DIR, 'ui/templates')]
+TEMPLATE_DIRS = [
+    os.path.join(BASE_DIR, 'tasks/templates'),
+    os.path.join(BASE_DIR, 'ui/templates'),
+    os.path.join(BASE_DIR, 'utils/templates')
+]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
 
 # by default it never expires
 SESSION_COOKIE_AGE = 12*3600
+
+try:
+    from local_settings import *
+except:
+    pass
+
+DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+
+PREMAILER_OPTIONS = dict(base_url=BASE_URL, remove_classes=False)

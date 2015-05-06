@@ -20,11 +20,22 @@ var HistoryItem = React.createClass({
       const ty = entry.object_type;
       let link;
 
+      if(ty === 'ProcessTask'){
+        let dts = entry.object.split('/');
+        let ptlink = <Link to={dts[0]} params={{object: dts[1]}}>{entry.object_repr}</Link>;
+        var text;
+        switch(entry.event){
+          case 'Add':
+            text = `${entry.actor_repr} has assigned`;
+            return <span>{text} {ptlink}</span>;
+          default: return event;
+        }
+      }
+
       if(ty === 'NoneType')
         link = <span>{entry.object_repr}</span>;
       else
         link = <Link to={entry.object_type} params={entry}>{entry.object_repr}</Link>;
-
 
       var text;
       switch(entry.event){
@@ -39,6 +50,9 @@ var HistoryItem = React.createClass({
           return <span>{text} {link}</span>;
         case 'Delete':
           text = `${entry.actor_repr} has removed`;
+          return <span>{text} <strong>{entry.object_repr}</strong></span>;
+        case 'Cancel':
+          text = `${entry.actor_repr} has canceled`;
           return <span>{text} <strong>{entry.object_repr}</strong></span>;
         default: return event;
       }

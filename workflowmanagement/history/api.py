@@ -23,9 +23,15 @@ class GenericObjectField(serializers.RelatedField):
 
     def to_representation(self, value):
         """
-        Serialize bjects to a simple textual representation.
+        Serialize objects to a simple textual representation.
         """
-        return str(value.hash)
+        try:
+            return value.rpr()
+        except:
+            try:
+                return str(value.hash)
+            except:
+                return "DUMMY"
 
 # Serializers define the API representation.
 class HistorySerializer(serializers.ModelSerializer):
