@@ -201,6 +201,7 @@ export default React.createClass({
                     addNew={this.addNew}
                     cancelUser={this.cancelUser}
                     endDetail={ProcessResume}
+                    detailMode={this.state.user.profile['detail_mode']}
                     {...this.props}/>
             </span>
         );
