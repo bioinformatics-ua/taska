@@ -141,7 +141,7 @@ const Uploader = React.createClass({
             },
             multiple: true
         };
-        let zone = new FileDrop('fuploader', options);
+        window.zone = new FileDrop('fuploader', options);
         zone.event('send', function (files) {
           files.each(function (file) {
             self.changeupload({
@@ -164,6 +164,7 @@ const Uploader = React.createClass({
                 }
             })
             file.event('done', function (xhr) {
+                console.log('DONE!')
                 let entry = self.getupload(file.name);
                 if(entry){
                     let response = JSON.parse(xhr.response);
@@ -193,8 +194,37 @@ const Uploader = React.createClass({
         });
 
         // <iframe> uploads are special - handle them.
+        zone.event('iframeSetup', function (iframe) {
+            let files = $(iframe).find('.fd-file').prop('files');
+
+            for(var i=0;i<files.length;i++){
+                let file = files[i];
+
+                self.changeupload({
+                    filename: decodeURI(file.name),
+                    size: file.size,
+                    status: 'Waiting',
+                    progress: 0,
+                    manage: ''
+                });
+            }
+
+            $(iframe).append(`<input type="hidden" name="csrfmiddlewaretoken" value="${Django.csrf_token()}" />`);
+        });
         zone.event('iframeDone', function (xhr) {
-          alert('Done uploading via <iframe>, response:\n\n' + xhr.responseText);
+            console.log('IFRAME DONE');
+            let files = JSON.parse(xhr.response);
+            for(let file of files){
+                let entry = self.getupload(file.filename);
+                if(entry){
+                    entry.status = "Finished";
+                    entry.progress = 100;
+                    entry.hash = file.hash;
+
+                    self.changeupload(entry);
+                }
+            }
+
         });
     },
     componentWillMount(){

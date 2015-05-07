@@ -33,6 +33,8 @@ from django.core.urlresolvers import reverse, get_resolver
 
 import tempfile
 from django.core.files import File as DjangoFile
+from django.shortcuts import render
+import json
 
 class GenericResourceSerializer(serializers.ModelSerializer):
 
@@ -251,23 +253,47 @@ class FileUpload(generics.CreateAPIView):
     lookup_field = 'hash'
     parser_classes = (BinaryParser,)
 
-    def create(self, request, *args, **kwargs):
+    def __serializeFile(self, name, creator, this_file):
         data = {
-            'filename': request.META['HTTP_X_FILE_NAME'],
+            'filename': name,
             'type': 'material.File',
-            'creator': request.user.id
+            'creator': creator
         }
-
-
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
-        serializer.instance.file = request.data
+        serializer.instance.file = this_file
         serializer.instance.save()
 
-        headers = self.get_success_headers(serializer.data)
+        return serializer.data
 
-        return Response(serializer.data, status=200, headers=headers)
+    def create(self, request, *args, **kwargs):
+        print "file list:"
+        print request.FILES
+        print "--"
+
+        mform = request.FILES
+        if len(mform) > 0:
+            files = []
+            for fd_file in mform.getlist('fd-file'):
+                files.append(self.__serializeFile(fd_file.name, request.user.id, fd_file))
+
+            print "CALLBACK"
+            print json.dumps(files)
+            print "--"
+
+            # in case this is a iframe from filedrop with must respond in html with a js function that callsback through window
+            return render(request, 'iframe_response.html',
+                {
+                    "callback": request.POST['fd-callback'],
+                    "response": json.dumps(files).replace('"', '\\"')
+                },
+                content_type="text/html; charset=utf-8"
+            )
+
+        else:
+            bfile = self.__serializeFile(request.META['HTTP_X_FILE_NAME'], request.user.id, request.data)
+            return Response(bfile, status=200)
 

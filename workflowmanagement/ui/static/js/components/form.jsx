@@ -75,7 +75,6 @@ export default React.createClass({
         });
     },
     componentDidUpdate(){
-        console.log(this.state.form);
         if(this.state.addedform){
             this.context.router.transitionTo('Form', {object: this.state.addedform.hash})
         }

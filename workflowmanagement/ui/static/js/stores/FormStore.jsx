@@ -57,8 +57,27 @@ export default Reflux.createStore({
     },
     onSubmitForm(){
         let sForm = $.extend({}, this.__detaildata);
-        console.log(sForm);
-        if(sForm.title != ""){
+        let errors = false;
+
+        if(!(sForm.title && sForm.title != "")){
+            StateActions.alert(
+                {
+                    'title': 'Missing Field',
+                    'message': 'The form must have a title!'
+                });
+            errors=true;
+        }
+
+        if(!(sForm.schema && sForm.schema.length > 0)){
+            StateActions.alert(
+                {
+                    'title':'Missing Field',
+                    'message': 'The form must have a defined schema!'
+                });
+            errors=true;
+        }
+
+        if(!errors){
             StateActions.loadingStart();
 
             if(sForm.hash){
@@ -78,8 +97,6 @@ export default Reflux.createStore({
                 );
             }
 
-        } else {
-            alert('The form must have a title!');
         }
     }
 });

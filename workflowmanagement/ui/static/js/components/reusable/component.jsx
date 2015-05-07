@@ -31,6 +31,13 @@ const DjangoCSRFToken = React.createClass({
 });
 
 const Modal = React.createClass({
+  getDefaultProps(){
+    return {
+      title: 'Undefined Title',
+      message: 'Undefined Message',
+      showConfirm: true
+    }
+  },
   render(){
     return <div className="modal modalback show">
                     <div className="modal-dialog">
@@ -42,10 +49,12 @@ const Modal = React.createClass({
                         <div className="modal-body">
                           {this.props.message}
                         </div>
+                        {this.props.showConfirm?
                         <div className="modal-footer">
-                          <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                          <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                            <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
                         </div>
+                        :''}
                       </div>
                     </div>
                   </div>;

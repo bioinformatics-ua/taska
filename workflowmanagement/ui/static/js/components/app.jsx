@@ -15,6 +15,34 @@ import StateStore from '../stores/StateStore.jsx';
 
 import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 
+import {Modal} from './reusable/component.jsx';
+
+const AlertQueue = React.createClass({
+    mixins: [Reflux.listenTo(StateStore, 'update')],
+    __getState(){
+        return {
+            alert: StateStore.getAlert(),
+        }
+    },
+    getInitialState() {
+        return this.__getState();
+    },
+    update(status){
+        this.setState(this.__getState());
+    },
+    handleClose(e){
+        StateActions.dismissAlert();
+    },
+    render: function(){
+        let alert = this.state.alert;
+        if(!alert)
+            return <span></span>
+
+        return <Modal title={alert.title} message={alert.message} close={this.handleClose} showConfirm={false} />
+
+    }
+});
+
 const LoadingBar = React.createClass({
     mixins: [Reflux.listenTo(StateStore, 'update'),
     Reflux.listenTo(StateStore, 'update')    ],
@@ -95,6 +123,7 @@ export default React.createClass({
             </nav>
         </header>
         <div className="container">
+          <AlertQueue />
           <Breadcrumbs separator='' {...this.props} />
           <LoadingBar />
           <RouteHandler key={name} {...this.props} />

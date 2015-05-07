@@ -44,7 +44,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
 
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    });/*.catch(
+    }).catch(
         (ex) => {
             console.log(ex);
             if(ex.status === 404){
@@ -58,7 +58,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
                 StateActions.loadingEnd();
             }
         }
-    );*/
+    );
 });
 
 

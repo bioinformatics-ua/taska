@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <script type="text/javascript">
+            try{
+                window.top.{{callback}}("{{response|safe}}")
+            }catch(e){}
+        </script>
+    </body>
+</html>

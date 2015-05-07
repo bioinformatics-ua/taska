@@ -3,6 +3,8 @@ import UserStore from '../stores/UserStore.jsx';
 import {Login} from '../actions/api.jsx'
 import UserActions from '../actions/UserActions.jsx';
 
+import StateActions from '../actions/StateActions.jsx';
+
 const Authentication = {
     statics: {
         willTransitionTo: function (transition, params, query, callback) {
@@ -19,7 +21,10 @@ const Authentication = {
                 console.log(ex.status);
 
                 switch(ex.status){
-                    case 0: alert('Connection Failed, please try again, if the problem persists contact the administrator.'); break;
+                    case 0: StateActions.alert({
+                        'title': 'Connection Failed',
+                        'message': 'Connection Failed, please try again, if the problem persists contact the administrator.'
+                    }); break;
                     case 404: transition.redirect('/404',{},{}); break;
                     default: transition.redirect('/500',{},{}); break;
                 }
