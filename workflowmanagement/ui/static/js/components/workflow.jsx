@@ -203,6 +203,7 @@ export default React.createClass({
                             setFork={this.fork}
                             setPublic={this.setPublic}
                             setSearchable={this.setSearchable}
+                            setForkable={this.setForkable}
                             object={params.object}
                             runProcess={this.runProcess}
                             {...this.state.workflow.permissions} />

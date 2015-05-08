@@ -185,9 +185,11 @@ const PermissionsBar = React.createClass({
                     <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
                     {!this.props.editable && !this.props.runnable && this.props.showEdit ?
                       <span>
-                        <button style={{marginRight: '7px'}} onClick={this.setFork} className="btn btn-default">
-                          <i className="fa fa-code-fork"></i> &nbsp;Fork
-                        </button>
+                        {this.props.forkable ?
+                          <button style={{marginRight: '7px'}} onClick={this.setFork} className="btn btn-default">
+                            <i className="fa fa-code-fork"></i> &nbsp;Fork
+                          </button>
+                        :''}
                         <Link className="btn btn-warning" to={this.props.link}
                         params={{object: this.props.object, mode:'edit'}}>
                         <i className="fa fa-pencil"></i> &nbsp;Edit

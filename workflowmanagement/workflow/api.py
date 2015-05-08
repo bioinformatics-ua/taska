@@ -302,8 +302,11 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
     def fork(self, request, hash=None):
         workflow = self.get_object()
 
-        new_workflow = workflow.fork()
+        if workflow.permissions().forkable:
+            new_workflow = workflow.fork()
 
-        History.new(event=History.ADD, actor=request.user, object=new_workflow)
+            History.new(event=History.ADD, actor=request.user, object=new_workflow)
 
-        return Response(WorkflowSerializer(new_workflow).data)
+            return Response(WorkflowSerializer(new_workflow).data)
+
+        return Response({"error": "Workflow isn't forkable"}, 403)
