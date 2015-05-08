@@ -27,9 +27,14 @@ class MailTemplate:
 
     def send_mail(self):
 
-        print "---"
-        print self.instance
-        print "---"
+        if not self.subject:
+            raise Exception('No subject was specified for the email')
+
+        if not self.message:
+            raise Exception('No message was specified for the email')
+
+        if not self.destinies:
+            raise Exception('No destinies were specified for the email')
 
         if self.subject and self.message and self.destinies:
             msg = EmailMultiAlternatives(
