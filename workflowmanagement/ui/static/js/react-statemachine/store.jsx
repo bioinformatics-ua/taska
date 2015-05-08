@@ -137,6 +137,9 @@ const StateMachineStore = Reflux.createStore({
 
         let new_state = this.__sm.stateFactory(e.getLevel(), type.Class, $.extend({}, e.getData()));
         new_state.getData().name= new_state.getData().name+' (Copy)';
+        try {
+            delete new_state.getData().hash;
+        } catch(ex){};
 
         console.log(e);
         console.log(new_state);

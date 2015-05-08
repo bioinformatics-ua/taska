@@ -83,7 +83,6 @@ const WorkflowStore = Reflux.createStore({
 
         //this.trigger(WorkflowStore.DETAIL);
     },
-
     onSetWorkflow(data){
         let workflow = this.__detaildata;
 

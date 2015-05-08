@@ -107,7 +107,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
             for old in old_resources:
                 # mark the resource as removed
-                old.remove()
+                #old.remove()
                 task.resources.remove(old)
 
 
