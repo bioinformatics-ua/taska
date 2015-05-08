@@ -70,6 +70,14 @@
     right:0;
 }
 
+.state-options > .duplicate-state{
+    position:absolute;
+    z-index: 1040;
+    margin-right:-25px;
+    bottom:0;
+    right:0;
+}
+
 .state-options > .connect-state{
     position:absolute;
     bottom:-20px;
@@ -203,4 +211,8 @@
     .detail-dialog{
         width: 100%;
     }
+}
+
+.undoredobar{
+    position: absolute;
 }

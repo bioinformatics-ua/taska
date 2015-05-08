@@ -29,6 +29,15 @@ class Resource(models.Model):
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
 
+    def clone(self):
+        new_kwargs = dict([(fld.name, getattr(self, fld.name)) for fld in self._meta.fields if fld.name != self._meta.pk.name]);
+        try:
+            del new_kwargs['hash']
+        except:
+            pass
+
+        return self.__class__.objects.create(**new_kwargs)
+
     def remove(self):
         self.removed=True
         self.save()
@@ -114,6 +123,12 @@ class File(Resource):
     # we must have an indicator that they are already linked or not, so we can
     # periodically remove unlinked temporary files with a background task such as celery(TODO)
     linked   = models.BooleanField(default=False)
+
+    def clone(self):
+        f = File(filename=self.filename, file=self.file, linked=self.linked)
+        f.save()
+
+        return f
 
     def remove(self):
         self.linked=False

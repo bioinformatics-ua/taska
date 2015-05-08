@@ -263,6 +263,9 @@ let StateMachineComponent = React.createClass({
     deleteState(event){
         StateMachineActions.deleteState();
     },
+    duplicateState(event){
+        StateMachineActions.duplicateState();
+    },
     deleteConnection(dependant, dependency){
         StateMachineActions.deleteDependency(dependant, dependency);
     },
@@ -335,6 +338,11 @@ let StateMachineComponent = React.createClass({
                             onClick={this.deleteState} data-id={state.getIdentificator()}
                             className="btn btn-xs btn-danger destroy-state">
                                 <i className="fa fa-1x fa-times"/>
+                            </button>
+                            <button title="Click to duplicate this state"
+                            onClick={this.duplicateState} data-id={state.getIdentificator()}
+                            className="btn btn-xs btn-success duplicate-state">
+                                <i className="fa fa-1x fa-plus"/>
                             </button>
                                 <div data-id={state.getIdentificator()} title="Drag to create a dependency " className="connect-state">
                                 <i className="fa fa-1x fa-circle"/>
@@ -618,7 +626,7 @@ let StateMachineComponent = React.createClass({
                                 <div className="col-md-12">
                             {this.props.savebar?
                             <span>
-                                <div className="pull-left btn-group" role="group">
+                                <div className="undoredobar pull-left btn-group" role="group">
                                     <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
                                         <i title="Undo action" className="fa fa-undo"></i>
                                     </button>

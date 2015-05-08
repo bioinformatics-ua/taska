@@ -46,6 +46,23 @@ class Task(models.Model):
     def type(self):
         return self._meta.app_label + '.' +self.__class__.__name__
 
+    def clone(self, workflow):
+        new_kwargs = dict([(fld.name, getattr(self, fld.name)) for fld in self._meta.fields if fld.name != self._meta.pk.name]);
+        try:
+            del new_kwargs['hash']
+            del new_kwargs['id']
+        except:
+            pass
+
+        new_kwargs['workflow'] = workflow
+
+        task = self.__class__.objects.create(**new_kwargs)
+
+        for resource in self.resources.all():
+            task.resources.add(resource.clone())
+
+        return task
+
     def __str__(self):
         ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
         '''

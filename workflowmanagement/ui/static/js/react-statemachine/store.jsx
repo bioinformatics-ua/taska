@@ -129,6 +129,24 @@ const StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
+    onDuplicateState(){
+        console.log(`Duplicate state ${this.__selected}`);
+        let e = this.__sm.getState(Number.parseInt(this.__selected));
+
+        let type = this.__sm.getStateClass(e.getData().type);
+
+        let new_state = this.__sm.stateFactory(e.getLevel(), type.Class, $.extend({}, e.getData()));
+        new_state.getData().name= new_state.getData().name+' (Copy)';
+
+        console.log(e);
+        console.log(new_state);
+
+        this.addHistory();
+
+        this.__sm.addState(new_state);
+
+        this.trigger();
+    },
     onSetStateTitle(elem, new_title){
         let elem_obj = this.__sm.getState(elem);
         elem_obj.label(new_title);

@@ -58,6 +58,7 @@ export default React.createClass({
     __getState(){
         return {
             addedProcess: WorkflowStore.getProcessAddFinished(),
+            addedWorkflow: WorkflowStore.getWorkflowAddFinished(),
             ***REMOVED*** WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing(),
             user: UserStore.getUser()
@@ -71,7 +72,15 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.addedProcess){
-            this.context.router.transitionTo('Process', {object: this.state.addedProcess.hash})
+            this.context.router.transitionTo('Process', {object: this.state.addedProcess.hash});
+        }
+        if(this.state.addedWorkflow){
+            let mode = this.context.router.getCurrentParams().mode;
+            if(mode)
+                this.context.router.transitionTo('WorkflowEdit', {object: this.state.addedWorkflow.hash, mode: mode});
+            else
+                this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
+
         }
     },
     update(status){
@@ -137,7 +146,13 @@ export default React.createClass({
         WorkflowActions.setSearchable(e.target.checked);
     },
     setForkable(e){
+        // sets fork preferences
         WorkflowActions.setForkable(e.target.checked);
+    },
+    fork(e){
+        console.log('FORK');
+        // Effectively duplicates the workflow creating a fork
+        WorkflowActions.fork();
     },
     runProcess(data){
         WorkflowActions.runProcess(data);
@@ -182,11 +197,12 @@ export default React.createClass({
                     extra={
                         <PermissionsBar
                             link="WorkflowEdit"
+                            forkable={params.mode === 'forkable'}
                             editable={params.mode === 'edit'}
                             runnable={params.mode === 'run'}
+                            setFork={this.fork}
                             setPublic={this.setPublic}
                             setSearchable={this.setSearchable}
-                            setForkable={this.setForkable}
                             object={params.object}
                             runProcess={this.runProcess}
                             {...this.state.workflow.permissions} />

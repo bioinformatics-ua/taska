@@ -36,6 +36,7 @@ const WorkflowStore = Reflux.createStore({
     onCalibrate(){
         this.__missing=[];
         this.__pfinished=false;
+        this.__wfinished=false;
 
         this.trigger();
     },
@@ -44,6 +45,9 @@ const WorkflowStore = Reflux.createStore({
     },
     getProcessAddFinished(){
         return this.__pfinished || false;
+    },
+    getWorkflowAddFinished(){
+        return this.__wfinished || false;
     },
     resetDetail(){
         this.__detaildata = {
@@ -104,6 +108,7 @@ const WorkflowStore = Reflux.createStore({
               WorkflowActions.addDetail.triggerPromise(workflow).then(
                     (workflow) => {
                         StateActions.loadingEnd();
+                        this.__wfinished = workflow;
                         this.trigger();
                     }
             );
@@ -144,6 +149,21 @@ const WorkflowStore = Reflux.createStore({
         }
 
         this.trigger();
+
+    },
+    onFork(){
+        let workflow = this.__detaildata;
+
+        if(workflow.hash){
+            StateActions.loadingStart();
+            WorkflowActions.methodDetail.triggerPromise('fork', workflow.hash).then(
+                (workflow) => {
+                    StateActions.loadingEnd();
+                    this.__wfinished = workflow;
+                    this.trigger();
+                }
+            );
+        }
 
     }
 });

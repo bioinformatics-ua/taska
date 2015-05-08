@@ -297,3 +297,13 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         History.new(event=History.DELETE, actor=request.user, object=instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['get'])
+    def fork(self, request, hash=None):
+        workflow = self.get_object()
+
+        new_workflow = workflow.fork()
+
+        History.new(event=History.ADD, actor=request.user, object=new_workflow)
+
+        return Response(WorkflowSerializer(new_workflow).data)

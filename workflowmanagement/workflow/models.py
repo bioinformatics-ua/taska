@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
@@ -42,6 +42,40 @@ class Workflow(models.Model):
         val = Task.all(workflow=self)
 
         return val
+
+    def clone(self):
+        new_kwargs = dict([(fld.name, getattr(self, fld.name)) for fld in self._meta.fields if fld.name != self._meta.pk.name]);
+        try:
+            del new_kwargs['hash']
+        except:
+            pass
+        return self.__class__.objects.create(**new_kwargs)
+
+    @transaction.atomic
+    def fork(self):
+        fork = self.clone()
+        fork.permissions()
+
+        depmap = {}
+
+        # First pass we create the tasks (because we dont make assumptions on how dependencies are connected)
+        for task in self.tasks():
+            ntask = task.clone(fork)
+            depmap[task.id] = ntask
+
+        # Second pass we create the dependencies based on the depmap changes
+        for task in self.tasks():
+            deps = []
+            for dep in task.dependencies():
+                deps.append(depmap[dep.dependency.id])
+
+            depmap[task.id].replaceDependencies(deps)
+
+        fork.title = "%s (Fork)" % fork.title
+        fork.save()
+
+        return fork
+
 
     @staticmethod
     def all(user=None, workflow=None):
