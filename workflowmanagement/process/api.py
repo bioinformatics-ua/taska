@@ -69,10 +69,10 @@ class PTUWithResult(ProcessTaskUserSerializer):
     def get_result(self, obj):
         from result.api import GenericResultSerializer
 
-        result = obj.result()
+        result = obj.getResult()
 
         if result:
-            return GenericResultSerializer(obj.result()).data
+            return GenericResultSerializer(obj.getResult()).data
 
         return None
 

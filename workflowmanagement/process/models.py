@@ -251,7 +251,7 @@ class ProcessTaskUser(models.Model):
             | Q(processtaskuser__processtask=self.processtask, public=True)
             )
 
-    def result(self):
+    def getResult(self):
         from result.models import Result
         try:
             results = Result.all().filter(processtaskuser=self)

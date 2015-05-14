@@ -18,7 +18,7 @@ class Result(models.Model):
         :date (datetime): Timestamp of this result generation
         :comment (str): Other relevant comments from the executioner about this task.
     '''
-    processtaskuser = models.ForeignKey(ProcessTaskUser)
+    processtaskuser = models.OneToOneField(ProcessTaskUser)
     date            = models.DateTimeField(auto_now_add=True)
     comment         = models.TextField()
     hash            = models.CharField(max_length=50)

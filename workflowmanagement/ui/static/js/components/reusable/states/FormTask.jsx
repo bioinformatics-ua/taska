@@ -50,7 +50,6 @@ class FormTask extends SimpleTask {
             componentDidMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                console.log(FormActions);
                 FormActions.loadSimpleListIfNecessary.triggerPromise(200).then(
                     (forms) => {
                         let map = forms.results.map(
@@ -278,7 +277,20 @@ class FormTaskRun extends FormTask{
                         <table className="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th colSpan="2"><center><h4>Status of each assignee tasks</h4></center></th>
+                                    <th colSpan="2">
+
+                                    <center><h4 style={{position: 'absolute'}}>Status of each assignee tasks</h4></center>
+
+                                    <div className="pull-right btn-group">
+                                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <i className="fa fa-download"></i> <small>Download Results</small> <span className="caret"></span>
+                                      </button>
+                                      <ul className="dropdown-menu" role="menu">
+                                        <li><a href="#">As CSV</a></li>
+                                      </ul>
+                                    </div>
+
+                                    </th>
                                 </tr>
                                 <tr>
                                     <th style={{width: '40%'}}>User</th>

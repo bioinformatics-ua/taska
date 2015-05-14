@@ -17,4 +17,5 @@ router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
+    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.FormTaskResultExport.as_view())
 )
