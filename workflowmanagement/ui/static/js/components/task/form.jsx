@@ -83,7 +83,11 @@ class FormTask extends Task{
                 fr = new FormRenderer(
                     options
                 );
-
+                if(!editable){
+                    let inputs = $('.fr_form input, .fr_form select, .fr_form textarea');
+                    inputs.addClass('disabledFrenderer');
+                    inputs.prop('disabled', true);
+                }
             },
             render(){
                 return (<span>

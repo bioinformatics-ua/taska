@@ -83,6 +83,7 @@ const WorkflowTable = React.createClass({
                 <Link to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
+                  noDataMessage={<center>You have not created any studies yet, click on the plus icon above to create a new study.</center>}
                   {...this.commonTableSettings()}
                   columns={["title", "hash"]}
                   columnMetadata={columnMeta} />

@@ -72,7 +72,6 @@ class FormTask extends SimpleTask {
                 );
             },
             render(){
-                console.log(this.parent());
                 return (
                     <span>
                         <div key="state-form" className="form-group">

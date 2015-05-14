@@ -617,3 +617,13 @@ footer {
 .warnicon{
   vertical-align: super;
 }
+
+.panel-overflow .griddle-nodata{
+  padding-top: 55px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.disabledFrenderer{
+  background-color: #eee !important;
+}

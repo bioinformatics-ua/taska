@@ -122,7 +122,10 @@ const HistoryTable = React.createClass({
                     <h3 className="panel-title"> History</h3>
                   </center>
                 </div>
-                <Griddle {...this.commonTableSettings()} enableInfiniteScroll={true}
+                <Griddle
+                  noDataMessage={<center>You currently have no history related to yourself. Here will appear all events related with action on the system you are involved in.</center>}
+
+                 {...this.commonTableSettings()} enableInfiniteScroll={true}
                 showTableHeading={false} columns={["object", "event"]}
                 columnMetadata={columnMeta} />
               </div>;
