@@ -820,13 +820,17 @@ class ProcessTaskResultExport(APIView):
 
         ptask = get_object_or_404(ProcessTask, hash=hash)
 
+        if not (
+                request.user == ptask.process.executioner
+                or ptask.process.workflow.workflowpermission.public
+            ):
+            raise Http404
+
         try:
             # Type is generic, so we must get it (as we have no idea of type from processtask)
             task = Task.objects.get_subclass(id=ptask.task.id)
 
             exporter = task.get_exporter(mode, ptask)
-
-            print type(exporter)
 
             export = exporter.export()
 

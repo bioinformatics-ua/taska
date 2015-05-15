@@ -176,6 +176,13 @@ class ProcessTask(models.Model):
     hash            = models.CharField(max_length=50)
     removed         = models.BooleanField(default=False)
 
+    @staticmethod
+    def statusCode(code):
+        try:
+            return dict(ProcessTask.STATUS)[code]
+        except KeyError:
+            return "Unknown"
+
     def __str__(self):
         return ('%s - %s' % (self.task, self.process)).encode('utf-8')
 

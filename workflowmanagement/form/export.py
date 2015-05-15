@@ -23,18 +23,16 @@ class FormResultExporter(ResultExporter):
         schema  = self.getSchema()
         fields  = schema.getKeys()
 
-        rows = [ ['User / Question'] + schema.getLabels(encode=encode)]
+
+        rows = super(FormResultExporter, self).export(encode=encode)
+
+        i=6
+        rows[i].extend(schema.getLabels(encode=encode))
 
         for result in results:
+            i+=1
             answers = json.loads(result.answer)
-            user = result.processtaskuser.user
-
-            if user.get_full_name():
-                user = user.get_full_name()
-            else:
-                user = user.email
-
-            row = [user]
+            row = []
             for field in fields:
                 answer = schema.getAnswer(field, answers, encode=encode)
 
@@ -43,7 +41,7 @@ class FormResultExporter(ResultExporter):
                 else:
                     row.append(answer)
 
-            rows.append(row)
+            rows[i].extend(row)
 
         return rows
 

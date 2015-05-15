@@ -11,8 +11,6 @@ from process.models import ProcessTask
 from tasks.models import Task
 from result.models import Result
 
-
-
 class ResultExporter(object):
     class Meta:
         task_model = Task
@@ -45,8 +43,17 @@ class ResultExporter(object):
 
     def export(self, encode=False):
         results = self.getResults()
+        task = self.getTask()
 
-        rows = [['User / Field']]
+        rows = [
+            ['Task', task.title],
+            ['Number of Task Assignees', self.processtask.users().count()],
+            ['Number of Answers', results.count()],
+            ['Task Status', ProcessTask.statusCode(self.processtask.status)],
+            [''],
+            ['List of User responses'],
+            ['User / Field', 'Commentary upon conclusion', 'Date Conclusion']
+        ]
 
         for result in results:
             user = result.processtaskuser.user
@@ -56,7 +63,7 @@ class ResultExporter(object):
             else:
                 user = user.email
 
-            row = [user]
+            row = [user, result.comment, result.date.strftime("%Y-%m-%d %H:%M")]
 
             rows.append(row)
 
