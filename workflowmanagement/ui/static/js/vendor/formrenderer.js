@@ -7252,7 +7252,7 @@ var scripts;scripts={},window.requireOnce=function(a,b){return"undefined"==typeo
     field_type: 'radio',
     setExistingValue: function(x) {
       var defaultOption;
-      console.log(x);
+
       if(x != null)
         return this.set('value.selected', x);
       /* well that below doesnt work at all for inputs from formbuilder

@@ -1,6 +1,8 @@
 from process.models import ProcessTask
 from models import FormTask, FormResult
 
+from fields import Schema
+
 import json
 
 class FormResultExporter(object):
@@ -38,10 +40,11 @@ class FormResultExporterCSV(FormResultExporter):
         users = self.processtask.users().values_list('id', flat=True)
         results = FormResult.objects.filter(removed=False, processtaskuser__in=users)
 
-        schema = json.loads(task.form.schema)
-
-        print schema
+        schema = Schema(json.loads(task.form.schema))
 
         for result in results:
-            print result.answer
-            print type(result)
+            answers = json.loads(result.answer)
+            print "--"
+            for cid in answers.keys():
+                print schema.getAnswer(cid, answers)
+            print "--"

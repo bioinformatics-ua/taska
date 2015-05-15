@@ -23,15 +23,114 @@ class Text(Field):
     field_type = "text"
 
     def getAnswer(self, data):
-        return data
+        try:
+            return data[self.cid]
+        except KeyError:
+            return None
 
 class Paragraph(Text):
+    field_type = "paragraph"
+    pass
+
+class Radio(Field):
+    field_type = "radio"
+    def getAnswer(self, data):
+        try:
+            tmp = data[self.cid]
+
+            if tmp == 'Other':
+                try:
+                    tmp += ' (%s)' % data["%s_other" % self.cid]
+                except KeyError:
+                    pass
+
+            return tmp
+        except KeyError:
+            return None
+
+class Checkboxes(Field):
+    field_type = "checkboxes"
+    def getAnswer(self, data):
+        try:
+            answers = []
+            tmp = data[self.cid]
+
+            options = self.field_options["options"]
+
+            if isinstance(tmp, dict):
+                for index, state in tmp.items():
+                    if state == 'on' and index != 'other':
+                        if index == 'other_checkbox':
+                            try:
+                                answers.append("Other (%s)" % tmp['other'])
+                            except KeyError:
+                                answer.append('Other')
+                        else:
+                            answers.append(options[int(index)]['label'])
+
+            return answers
+        except KeyError:
+            pass
+
+        return None
+
+class Date(Field):
+    field_type = "date"
+    def getAnswer(self, data):
+        try:
+            tmp = data[self.cid]
+
+            if isinstance(tmp, dict):
+                return "%s/%s/%s" % (tmp['year'], tmp['month'], tmp['day'])
+
+        except KeyError:
+            pass
+        return None
+
+class Timestamp(Field):
+    field_type = "time"
+    def getAnswer(self, data):
+        try:
+            tmp = data[self.cid]
+
+            if isinstance(tmp, dict):
+                return "%s:%s:%s %s" % (tmp['hours'], tmp['minutes'], tmp['seconds'], tmp['am_pm'])
+
+        except KeyError:
+            pass
+        return None
+
+class Dropdown(Text):
+    field_type = "dropdown"
+    pass
+
+class NumberField(Text):
+    field_type = "number"
+    pass
+
+class WebsiteField(Text):
+    field_type = "website"
+    pass
+
+class EmailField(Text):
+    field_type = "email"
     pass
 
 class Schema(object):
     map = {
-        "text": Text
+        "section_break": SectionBreak,
+        "text": Text,
+        "paragraph": Paragraph,
+        "radio": Radio,
+        "checkboxes": Checkboxes,
+        "date": Date,
+        "time": Timestamp,
+        "dropdown": Dropdown,
+        "number": NumberField,
+        "website": WebsiteField,
+        "email": EmailField
     }
+
     def __init__(self, schema):
         self.fields = {}
         cerror = "schema must be a list of dictionaries containing a formbuilder compliant schema."
@@ -40,7 +139,8 @@ class Schema(object):
             raise NotCompliant(cerror)
 
         for member in schema:
-            if not (isinstance(member, dict) and member.cid and member.type):
+
+            if not (isinstance(member, dict) and member['cid'] and member['field_type']):
                 raise NotCompliant(cerror)
 
             self.set(Schema.translate(member))
@@ -52,136 +152,18 @@ class Schema(object):
             raise self.UnsupportedField("The schema object only supports valid Field objects")
 
     def getAnswer(self, cid, data):
-        return self.fields[cid].getAnswer(data)
+        if not 'other' in cid:
+            return self.fields[cid].getAnswer(data)
 
     @staticmethod
-    def translate(self, schema):
+    def translate(schema):
         try:
-            return Schema.map[schema.type]
+            return Schema.map[schema['field_type']](schema['cid'], schema['label'], schema['required'], schema['field_options'])
         except KeyError:
-            raise self.UnsupportedField("The schema type %s doesnt have a valid class translation" % schema.type)
+            raise Schema.UnsupportedField("The schema type %s doesnt have a valid class translation" % schema.type)
 
     class UnsupportedField(Exception):
         pass
 
     class NotCompliant(Exception):
         pass
-
-'''
-[
-                        {
-                            "field_type": "radio",
-                            "required": true,
-                            "label": "Será do Guaraná ?",
-                            "field_options": {
-                                "include_other_option": true,
-                                "options": [
-                                    {
-                                        "checked": false,
-                                        "label": "Opção 1"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "Opção 2"
-                                    }
-                                ],
-                                "description": "Da antartida !!"
-                            },
-                            "cid": "c32"
-                        },
-                        {
-                            "field_type": "checkboxes",
-                            "required": true,
-                            "label": "Coisas malaicas",
-                            "field_options": {
-                                "include_other_option": true,
-                                "options": [
-                                    {
-                                        "checked": false,
-                                        "label": "Coisa coisa coisa"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "Outra coisa"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "Munta coisa"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "Munta mais ainda"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "estes"
-                                    }
-                                ],
-                                "description": "Descrição de coisas malaicas !"
-                            },
-                            "cid": "c37"
-                        },
-                        {
-                            "field_type": "date",
-                            "required": true,
-                            "label": "Untitled",
-                            "field_options": {},
-                            "cid": "c24"
-                        },
-                        {
-                            "field_type": "dropdown",
-                            "required": true,
-                            "label": "Untitled",
-                            "field_options": {
-                                "options": [
-                                    {
-                                        "checked": false,
-                                        "label": "teste"
-                                    },
-                                    {
-                                        "checked": false,
-                                        "label": "teste"
-                                    }
-                                ],
-                                "include_blank_option": true
-                            },
-                            "cid": "c28"
-                        },
-                        {
-                            "field_type": "number",
-                            "required": false,
-                            "label": "number",
-                            "field_options": {
-                                "units": "teste",
-                                "integer_only": true
-                            },
-                            "cid": "c36"
-                        },
-                        {
-                            "field_type": "time",
-                            "required": false,
-                            "label": "Untitled",
-                            "field_options": {},
-                            "cid": "c32"
-                        },
-                        {
-                            "field_type": "website",
-                            "required": true,
-                            "label": "http",
-                            "field_options": {
-                                "size": "large"
-                            },
-                            "cid": "c40"
-                        },
-                        {
-                            "field_type": "email",
-                            "required": true,
-                            "label": "email",
-                            "field_options": {
-                                "size": "large"
-                            },
-                            "cid": "c44"
-                        }
-                    ],
-'''
-
