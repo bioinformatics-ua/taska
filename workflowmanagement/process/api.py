@@ -33,6 +33,10 @@ import json
 
 from django.shortcuts import get_object_or_404
 
+from tasks.export import ResultExporter
+
+from django.http import HttpResponse, StreamingHttpResponse
+
 @api_view(('GET',))
 def root(request, format=None):
     return Response({
@@ -806,3 +810,30 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         History.new(event=History.DELETE, actor=request.user, object=instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+### Handler for retrieving EXPORT Data from FormTasks
+class ProcessTaskResultExport(APIView):
+    def get(self, request, hash, mode):
+        if not mode:
+            mode = 'csv'
+
+        ptask = get_object_or_404(ProcessTask, hash=hash)
+
+        try:
+            # Type is generic, so we must get it (as we have no idea of type from processtask)
+            task = Task.objects.get_subclass(id=ptask.task.id)
+
+            exporter = task.get_exporter(mode, ptask)
+
+            print type(exporter)
+
+            export = exporter.export()
+
+            if isinstance(export, HttpResponse) or isinstance(export, StreamingHttpResponse):
+                return export
+
+        except ResultExporter.UnsupportedExport:
+            raise
+
+        return Response({'export': export}, 500)

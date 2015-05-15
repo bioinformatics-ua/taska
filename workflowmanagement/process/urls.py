@@ -21,4 +21,5 @@ urlpatterns = patterns('',
     url(r'^/my/tasks/', api.MyTasks.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', api.MyTaskDependencies.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/', api.MyTask.as_view()),
+    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view())
 )

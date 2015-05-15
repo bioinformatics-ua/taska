@@ -7,6 +7,7 @@ from tasks.models import Task
 from result.models import Result
 from utils.hashes import createHash
 
+
 class Form(models.Model):
     hash = models.CharField(max_length=50, default="ERROR")
     creator = models.ForeignKey(User)
@@ -53,6 +54,10 @@ class FormTask(Task):
         from .api import FormTaskSerializer
         return FormTaskSerializer(instance=instance, data=data, many=many, partial=partial)
     pass
+
+    def get_exporter(self, mode, processtask):
+        from export import FormResultExporter
+        return FormResultExporter.getInstance(mode, processtask)
 
 class FormResult(Result):
     '''Form-based concretization of a result for a ProcessTask.

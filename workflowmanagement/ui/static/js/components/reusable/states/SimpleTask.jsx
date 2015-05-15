@@ -298,7 +298,21 @@ class SimpleTaskRun extends SimpleTask{
                         <table className="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th colSpan="2"><center><h4>Status of each assignee tasks</h4></center></th>
+                                    <th colSpan="2">
+                                    <div className="pull-right btn-group">
+                                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <i className="fa fa-download"></i> <small>Download Results</small> <span className="caret"></span>
+                                      </button>
+                                      <ul className="dropdown-menu" role="menu">
+                                        <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/csv`}>
+                                            <i className="fa fa-file-text-o"></i> As CSV</a></li>
+                                        <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/json`}>
+                                            <i className="fa fa-file-code-o"></i> As JSON</a></li>
+                                        <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/xlsx`}>
+                                            <i className="fa fa-file-excel-o"></i> As XLSX</a></li>
+                                      </ul>
+                                    </div>
+                                    </th>
                                 </tr>
                                 <tr>
                                     <th style={{width: '40%'}}>User</th>

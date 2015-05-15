@@ -140,6 +140,10 @@ class Task(models.Model):
 
         return serializer
 
+    def get_exporter(self, mode, processtask):
+        from export import ResultExporter
+        return ResultExporter.getInstance(mode, processtask)
+
     def to_representation(self, instance):
         serializer = self.get_serializer()
 

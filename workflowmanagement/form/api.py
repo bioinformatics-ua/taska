@@ -32,9 +32,6 @@ from django.shortcuts import get_object_or_404
 from utils.api_related import create_serializer, AliasOrderingFilter
 
 from process.models import ProcessTask
-from export import FormResultExporter
-
-from django.http import HttpResponse, StreamingHttpResponse
 
 class JSONSerializerField(serializers.Field):
     def to_internal_value(self, data):
@@ -190,26 +187,3 @@ class FormViewSet(  mixins.CreateModelMixin,
         History.new(event=History.DELETE, actor=request.user, object=instance)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-### Handler for retrieving EXPORT Data from FormTasks
-
-class FormTaskResultExport(APIView):
-    def get(self, request, hash, mode):
-        if not mode:
-            mode = 'csv'
-
-        ptask = get_object_or_404(ProcessTask, hash=hash)
-
-        try:
-            exporter = FormResultExporter.getInstance(mode, ptask)
-
-            export = exporter.export()
-
-            if isinstance(export, HttpResponse) or isinstance(export, StreamingHttpResponse):
-                return export
-
-        except FormResultExporter.UnsupportedExport:
-            raise
-
-        return Response({'export': export}, 500)
