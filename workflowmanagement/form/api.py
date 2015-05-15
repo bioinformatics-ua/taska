@@ -34,6 +34,8 @@ from utils.api_related import create_serializer, AliasOrderingFilter
 from process.models import ProcessTask
 from export import FormResultExporter
 
+from django.http import HttpResponse, StreamingHttpResponse
+
 class JSONSerializerField(serializers.Field):
     def to_internal_value(self, data):
         try:
@@ -202,18 +204,12 @@ class FormTaskResultExport(APIView):
         try:
             exporter = FormResultExporter.getInstance(mode, ptask)
 
-            exporter.export()
+            export = exporter.export()
+
+            if isinstance(export, HttpResponse) or isinstance(export, StreamingHttpResponse):
+                return export
 
         except FormResultExporter.UnsupportedExport:
             raise
-        '''queryset = self.get_queryset()
-        filter = {
-            'processtask__hash': self.kwargs['hash'],
-            'user': self.request.user
-        }
 
-        obj = get_object_or_404(queryset, **filter)
-        self.check_object_permissions(self.request, obj)
-        return obj'''
-
-        return Response({}, 200)
+        return Response({'export': export}, 500)

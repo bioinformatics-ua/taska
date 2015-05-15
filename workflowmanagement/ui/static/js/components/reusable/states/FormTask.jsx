@@ -286,7 +286,12 @@ class FormTaskRun extends FormTask{
                                         <i className="fa fa-download"></i> <small>Download Results</small> <span className="caret"></span>
                                       </button>
                                       <ul className="dropdown-menu" role="menu">
-                                        <li><a href="#">As CSV</a></li>
+                                        <li><a href={`api/form/processtask/${this.parent().ptask.hash}/export/csv`}>
+                                            <i className="fa fa-file-text-o"></i> As CSV</a></li>
+                                        <li><a href={`api/form/processtask/${this.parent().ptask.hash}/export/json`}>
+                                            <i className="fa fa-file-code-o"></i> As JSON</a></li>
+                                        <li><a href={`api/form/processtask/${this.parent().ptask.hash}/export/xlsx`}>
+                                            <i className="fa fa-file-excel-o"></i> As XLSX</a></li>
                                       </ul>
                                     </div>
 

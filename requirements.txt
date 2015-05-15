@@ -14,3 +14,4 @@ django.js==0.8.1
 celery==3.1.18
 html2text==2015.4.14
 django-premailer==0.1.0
+openpyxl==2.2.2

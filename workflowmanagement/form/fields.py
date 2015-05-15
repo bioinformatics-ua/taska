@@ -7,26 +7,40 @@ class Field(object):
         self.required = required
         self.field_options = field_options
 
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         raise NotImplementedError("Field getAnswer() is abstract and must be implemented by children classes")
 
-    def getLabel(self):
+    def getLabel(self, encode=False):
+        if encode:
+            return self.label.encode('utf-8')
+
         return self.label
+
+    def getCid(self):
+        return self.cid
 
 class SectionBreak(Field):
     field_type = "section_break"
 
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         return ""
 
 class Text(Field):
     field_type = "text"
 
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         try:
-            return data[self.cid]
+            tmp = data[self.cid]
+
+            if isinstance(tmp, basestring):
+                if encode:
+                    tmp = tmp.encode('utf-8')
+                return tmp
+
         except KeyError:
-            return None
+            pass
+
+        return None
 
 class Paragraph(Text):
     field_type = "paragraph"
@@ -34,41 +48,95 @@ class Paragraph(Text):
 
 class Radio(Field):
     field_type = "radio"
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         try:
             tmp = data[self.cid]
 
-            if tmp == 'Other':
-                try:
-                    tmp += ' (%s)' % data["%s_other" % self.cid]
-                except KeyError:
-                    pass
+            if isinstance(tmp, basestring):
+                if tmp == 'Other':
+                    try:
+                        tmp += ' (%s)' % data["%s_other" % self.cid]
+                    except KeyError:
+                        pass
 
-            return tmp
+                if encode:
+                    tmp = tmp.encode('utf-8')
+
+                return tmp
         except KeyError:
-            return None
+            pass
+
+        return None
 
 class Checkboxes(Field):
     field_type = "checkboxes"
-    def getAnswer(self, data):
+
+    def getLabel(self, encode=False):
+        '''
+            Since checkboxes can be multiple, we dont have only a label but a list of getLabels
+            to make easy to chart through the exported content
+        '''
+        main = self.label
+        tmp = []
+
+        try:
+            options = self.field_options["options"]
+            has_other = self.field_options["include_other_option"]
+
+            for option in options:
+                if encode:
+                    tmp.append(('%s - %s' % (main, option['label'])).encode('utf-8'))
+                else:
+                    tmp.append('%s - %s' % (main, option['label']))
+
+            if has_other:
+                tmp.append('Other')
+
+            return tmp
+
+        except KeyError:
+            if encode:
+                return main.encode('utf-8')
+
+            return main
+
+    def getAnswer(self, data, encode=False):
         try:
             answers = []
             tmp = data[self.cid]
+            result = []
 
             options = self.field_options["options"]
-
+            has_other = self.field_options["include_other_option"]
+            other = None
             if isinstance(tmp, dict):
                 for index, state in tmp.items():
                     if state == 'on' and index != 'other':
                         if index == 'other_checkbox':
                             try:
-                                answers.append("Other (%s)" % tmp['other'])
+                                other ="%s" % tmp['other']
                             except KeyError:
-                                answer.append('Other')
+                                other = 'Other'
                         else:
                             answers.append(options[int(index)]['label'])
 
-            return answers
+
+                for option in options:
+                    if option['label'] in answers:
+                        result.append('1')
+                    else:
+                        result.append('0')
+
+                if has_other:
+                    if other:
+                        if encode:
+                            result.append(other.encode('utf-8'))
+                        else:
+                            result.append(other)
+                    else:
+                        result.append('0')
+
+            return result
         except KeyError:
             pass
 
@@ -76,12 +144,17 @@ class Checkboxes(Field):
 
 class Date(Field):
     field_type = "date"
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         try:
             tmp = data[self.cid]
 
             if isinstance(tmp, dict):
-                return "%s/%s/%s" % (tmp['year'], tmp['month'], tmp['day'])
+                tmp = "%s/%s/%s" % (tmp['year'], tmp['month'], tmp['day'])
+
+                if encode:
+                    tmp = tmp.encode('utf-8')
+
+                    return tmp
 
         except KeyError:
             pass
@@ -89,12 +162,17 @@ class Date(Field):
 
 class Timestamp(Field):
     field_type = "time"
-    def getAnswer(self, data):
+    def getAnswer(self, data, encode=False):
         try:
             tmp = data[self.cid]
 
             if isinstance(tmp, dict):
-                return "%s:%s:%s %s" % (tmp['hours'], tmp['minutes'], tmp['seconds'], tmp['am_pm'])
+                tmp = "%s:%s:%s %s" % (tmp['hours'], tmp['minutes'], tmp['seconds'], tmp['am_pm'])
+
+                if encode:
+                    tmp = tmp.encode('utf-8')
+
+                return tmp
 
         except KeyError:
             pass
@@ -151,9 +229,30 @@ class Schema(object):
         else:
             raise self.UnsupportedField("The schema object only supports valid Field objects")
 
-    def getAnswer(self, cid, data):
+    def getKeys(self):
+        return self.fields.keys()
+
+    def getFields(self):
+        return self.fields.values()
+
+
+    def getLabels(self, encode=False):
+        tmp = []
+
+        for field in self.getFields():
+            label = field.getLabel(encode=encode)
+
+            if isinstance(label, list):
+                tmp.extend(label)
+
+            else:
+                tmp.append(label)
+
+        return tmp
+
+    def getAnswer(self, cid, data, encode=False):
         if not 'other' in cid:
-            return self.fields[cid].getAnswer(data)
+            return self.fields[cid].getAnswer(data, encode=encode)
 
     @staticmethod
     def translate(schema):
