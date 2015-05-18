@@ -100,13 +100,13 @@ export default React.createClass({
                     <span className="icon-bar"></span>
                     <span className="icon-bar"></span>
                   </button>
-                  <Link className="navbar-brand" to="app">EMIF Study Manager</Link>
+                  <Link className="navbar-brand" to="app">Study Manager</Link>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-                <form className="col-md-6 navbar-form navbar-left" role="search">
+                {/*<form className="col-md-6 navbar-form navbar-left" role="search">
                             <div className="form-group">
                       <div className="input-group">
                         <input type="text" className="form-control" placeholder="Search for..."></input>
@@ -115,7 +115,7 @@ export default React.createClass({
                         </span>
                       </div>
                     </div>
-      </form>
+      </form>*/}
                   <UserDropdown url="api/account/me/" />
 
                 </div><!-- /.navbar-collapse -->

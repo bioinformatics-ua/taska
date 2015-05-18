@@ -386,10 +386,10 @@ function() {
         addButton: '<span class="symbol"><span class="fa fa-circle-o"></span></span> Multiple Choice',
         defaultAttributes: function(a) {
             return a.field_options.options = [{
-                label: "",
+                label: "Option 1",
                 checked: !1
             }, {
-                label: "",
+                label: "Option 2",
                 checked: !1
             }], a
         }

@@ -645,8 +645,7 @@ class RequestSerializer(serializers.ModelSerializer):
         if response:
             response['request'] = instance.id
 
-            make_public = response.pop('public', False)
-            print response
+            make_public = response.get('public', False)
 
             try:
                 rserializer = RequestResponseSerializer(
@@ -657,7 +656,7 @@ class RequestSerializer(serializers.ModelSerializer):
             except RequestResponse.DoesNotExist:
                 rserializer = RequestResponseSerializer(data=response)
 
-            rserializer.is_valid()
+            rserializer.is_valid(raise_exception=True)
 
             rserializer.save()
 
