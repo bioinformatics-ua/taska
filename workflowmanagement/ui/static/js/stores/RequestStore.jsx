@@ -28,7 +28,7 @@ export default Reflux.createStore({
         }, state);
     },
     onCalibrate(){
-        this.__response = this.__detaildata.response || {};
+        this.__response = this.__detaildata.response || {public: false};
         this.trigger();
     },
     resetDetail(params){

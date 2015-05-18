@@ -54,7 +54,7 @@ export default React.createClass({
     },
     __getState(){
         let detail = RequestStore.getDetail();
-        console.log(detail);
+
         return {
             request:detail ,
             user: UserStore.getUser(),
@@ -116,7 +116,9 @@ export default React.createClass({
         RequestActions.setReqMessage(e.target.value);
     },
     setPublic(e){
-        RequestActions.setPublic(e.target.checked);
+        let condition = e === 'true';
+        console.log(condition);
+        RequestActions.setPublic(condition);
     },
     render() {
         if(this.props.failed){
@@ -167,15 +169,16 @@ export default React.createClass({
                                         <div className="col-md-6">
                                                 <div className="form-group">
                                                     <div className="input-group">
-                                                      <span className="input-group-addon"><strong>Is Public?</strong></span>
-                                                        <div className="form-control">
-                                                        <span className="selectBox">
-                                                            <Toggle key={`ptoggle_${this.state.request.public}`}
-                                                                checked={this.state.request.public}
-                                                                defaultChecked={this.state.request.public}
-                                                                onChange={this.setPublic} disabled={!this.didWrite()} />
-                                                        </span>
-                                                        </div>
+                                                      <span className="input-group-addon"><strong>Visible</strong></span>
+
+                                            <Select disabled={!this.didWrite()} placeholder="Select Visibility"
+                                             onChange={this.setPublic}
+                                            value={''+this.state.request.public} searchable={false}
+                                            options={[
+                                                {value: "false", label: 'Only for requester'},
+                                                {value: "true", label: 'For all task executers'}
+                                            ]} />
+
                                                     </div>
                                                 </div>
                                         </div>
@@ -208,7 +211,7 @@ export default React.createClass({
                                         {this.isMe()?
                                             <div className="pull-right">
                                             <button onClick={this.setResponsePublic} className="btn btn-warning">
-                                                <i style={{marginTop: '3px'}} className="fa fa-floppy-o"></i> Reply & Make Public
+                                                <i style={{marginTop: '3px'}} className="fa fa-floppy-o"></i> Reply & Make Visible for all executers
                                             </button>&nbsp;
                                             <button onClick={this.setResponse} className="btn btn-primary">
                                                 <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Reply

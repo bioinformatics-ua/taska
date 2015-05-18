@@ -150,7 +150,6 @@ export default React.createClass({
         WorkflowActions.setForkable(e.target.checked);
     },
     fork(e){
-        console.log('FORK');
         // Effectively duplicates the workflow creating a fork
         WorkflowActions.fork();
     },

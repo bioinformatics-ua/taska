@@ -173,13 +173,13 @@ const PermissionsBar = React.createClass({
                                 onChange={this.setSearchable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Searchable</span>
                           </span>
-                          <span className="selectBox">
+                          {/*<span className="selectBox">
                               <Toggle id="public"
                                 checked={this.props.forkable}
                                 defaultChecked={this.props.forkable}
                                 onChange={this.setForkable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Forkable</span>
-                          </span>
+                          </span>*/}
                         </div>
                 </div>
                     <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
@@ -187,7 +187,7 @@ const PermissionsBar = React.createClass({
                       <span>
                         {this.props.forkable ?
                           <button style={{marginRight: '7px'}} onClick={this.setFork} className="btn btn-default">
-                            <i className="fa fa-code-fork"></i> &nbsp;Fork
+                            <i className="fa fa-code-fork"></i> &nbsp;Duplicate
                           </button>
                         :''}
                         <Link className="btn btn-warning" to={this.props.link}
