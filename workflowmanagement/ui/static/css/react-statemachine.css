@@ -216,3 +216,10 @@
 .undoredobar{
     position: absolute;
 }
+
+.state-dep-label {
+  display:inline-block;
+  /*padding-top:0;
+  padding-bottom:0;
+  line-height:1.5em;*/
+}

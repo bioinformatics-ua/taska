@@ -1,4 +1,7 @@
 'use strict';
+
+import React from 'react';
+
 import Reflux from 'reflux';
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import ProcessActions from '../actions/ProcessActions.jsx';
@@ -88,29 +91,57 @@ const WorkflowStore = Reflux.createStore({
 
         workflow.title = data.title;
 
+        if(!workflow.title){
+            StateActions.alert(
+                {
+                    'title':'Missing Title',
+                    'message': 'The workflow must have a title!'
+                }
+            );
+        }
+
         workflow.tasks = [];
+
+        let failed = [];
 
         let states = data.sm.getStates();
 
         for(let state of states){
+            if(!state.is_valid())
+                failed.push(state);
             workflow.tasks.push(state.serialize());
         }
-        StateActions.loadingStart();
-        if(workflow.hash)
-            WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
-                    (workflow) => {
-                        StateActions.loadingEnd();
-                        this.trigger();
-                    }
+
+        if(failed.length > 0){
+            StateActions.alert(
+                {
+                    'title':'Missing Fields',
+                    'message':(
+                        <span>
+                    The workflow is currently invalid, because it is missing mandatory parameters on the following states:<br />
+                    {failed.map((curr)=>{
+                        return <span>{curr.label()}<br /></span>;
+                    })}</span>)
+                }
             );
-        else
-              WorkflowActions.addDetail.triggerPromise(workflow).then(
-                    (workflow) => {
-                        StateActions.loadingEnd();
-                        this.__wfinished = workflow;
-                        this.trigger();
-                    }
-            );
+        } else {
+            StateActions.loadingStart();
+            if(workflow.hash)
+                WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
+                        (workflow) => {
+                            StateActions.loadingEnd();
+                            this.trigger();
+                        }
+                );
+            else
+                  WorkflowActions.addDetail.triggerPromise(workflow).then(
+                        (workflow) => {
+                            StateActions.loadingEnd();
+                            this.__wfinished = workflow;
+                            this.trigger();
+                        }
+                );
+        }
     },
 
     onRunProcess(data){
@@ -125,8 +156,7 @@ const WorkflowStore = Reflux.createStore({
         for(let state of states){
             let serialized = state.serialize();
 
-            console.log(serialized);
-            if(!serialized.deadline || serialized.users.length == 0){
+            if(!state.is_valid()){
                 missing.push(serialized);
             }
 

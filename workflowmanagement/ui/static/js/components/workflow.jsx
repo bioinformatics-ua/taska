@@ -35,7 +35,7 @@ export default React.createClass({
 
                 return new Promise(function (fulfill, reject){
                     WorkflowStore.resetDetail();
-                    fulfill({title: 'New study'});
+                    fulfill({});
                 });
             }
             return WorkflowActions.loadDetailIfNecessary.triggerPromise(params.object).then(
@@ -171,8 +171,6 @@ export default React.createClass({
             this.context.router.replaceWith('/404');
 
         let sm = this.load(params.mode === 'run');
-
-        console.log(this.state.missing);
 
         return (
             <span>

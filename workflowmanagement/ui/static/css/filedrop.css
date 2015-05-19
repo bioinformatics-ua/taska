@@ -51,7 +51,7 @@ fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
 }
 
 .statusRow{
-  width: 50px;
+  width: 40px;
   text-align: center;
 }
 
@@ -61,12 +61,19 @@ fieldset.fd-zone :last-child:not(img) { margin-bottom: 0; }
 
 
 .progressRow{
-  width: 170px;
+  width: 80px;
 }
 .sizeRow{
-  width: 80px;
+  width: 65px;
 }
 
 #fuploader{
   margin-bottom: 15px;
+}
+
+.progress {
+  margin-bottom: 0;
+  width: 40px;
+  display: inline-block;
+  vertical-align: sub;
 }

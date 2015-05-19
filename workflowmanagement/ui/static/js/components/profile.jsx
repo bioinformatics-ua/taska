@@ -87,7 +87,10 @@ export default React.createClass({
                                 </span>
                                 <Select placeholder="Select a Detail Render Mode" onChange={this.setDetailMode}
                                     value={''+this.state.user.profile['detail_mode']} searchable={false}
-                                    options={[{value: '0', label: 'Popup'},{value: '1', label: 'Below'}]} />
+                                    options={[  {value: '0', label: 'Appear in Popup (good for low resolutions in desktop)'},
+                                                {value: '1', label: 'Appear Below diagram (good for mobile platforms)'},
+                                                {value: '2', label: 'Appear on the Left Bar (good for high resolutions)'},
+                                                ]} />
                             </div>
                         </div>
                         <div className="form-group">

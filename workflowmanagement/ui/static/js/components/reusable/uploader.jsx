@@ -15,9 +15,9 @@ const FileTitle = React.createClass({
         let row = this.props.rowData;
 
         return  <small>
-                    <a style={{wordBreak: 'break-word'}} target="_blank"
+                    <a title={`${decodeURI(row.filename)}`} style={{wordBreak: 'break-word'}} target="_blank"
                         href={`api/resource/${row.hash}/download/`}>
-                        {row.filename}
+                        {decodeURI(row.filename)}
                     </a>
                 </small>;
     }
@@ -63,9 +63,9 @@ const FileManage = React.createClass({
         return <DeleteButton
               success={this.props.metadata.delete}
               identificator = {row.filename}
-              title={`Delete '${row.filename}'`}
+              title={`Delete '${decodeURI(row.filename)}'`}
               extraCss='btn-xs'
-              message={`Are you sure you want to delete '${row.filename} ?'`}  />
+              message={`Are you sure you want to delete '${decodeURI(row.filename)} ?'`}  />
     }
 });
 
@@ -73,7 +73,9 @@ const FileProgress = React.createClass({
     render(){
         let row = this.props.rowData;
 
-        return <center><div style={{marginBottom: 0}} className="progress">
+        return <center>
+              <FileStatus rowData={row} /> &nbsp;
+              <div className="progress">
               <div title={`${row.progress}% Complete`} className="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
                 aria-valuenow={row.progress} aria-valuemin="0"
                 aria-valuemax="100" style={{width: `${row.progress}%`}}>
@@ -120,6 +122,7 @@ const Uploader = React.createClass({
         } catch(err){
             console.log("Can't remove file");
         }
+        console.log('GOT HERE');
         this.setState({
             uploads: tmp
         });
@@ -339,7 +342,7 @@ const Uploader = React.createClass({
             <span>
             {this.props.editable ?
                 <fieldset id="fuploader">
-                    <p className="lead">Drop files here, or click to browse...</p>
+                    <p>Drop files here, or click to browse...</p>
                 </fieldset>
             :''}
             <Griddle
@@ -347,7 +350,7 @@ const Uploader = React.createClass({
                   results={this.flatUploads()}
                   columnMetadata={metadata}
                   columns={ this.props.editable ?
-                    ["name", "size", "status", "progress", "manage"]:
+                    ["name", "size", "progress", "manage"]:
                     ["name", "size", ...this.props.extraFields]
                   }/>
             </span>

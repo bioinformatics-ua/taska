@@ -8,6 +8,8 @@ import StateMachineActions from './actions.jsx';
 import hotkey from 'react-hotkey';
 hotkey.activate();
 
+import Tabs from 'react-simpletabs';
+
 import cline from '../vendor/jquery.domline';
 
     // preventing backspace to trigger going back in the browser
@@ -251,9 +253,20 @@ let StateMachineComponent = React.createClass({
     },
     componentWillUpdate(){
         this.killUI();
+
     },
     componentDidUpdate(){
         this.__initUI();
+
+        // if in below mode jump to it on selection
+        /*if(this.props.detailMode === 1){
+            console.log(this.state.selected);
+            if(this.state.selected){
+                $('html, body').animate({
+                    scrollTop: $("#detailview").offset().top-70
+                }, 1000);
+            }
+        }*/
     },
     saveWorkflow(){
         console.log('SAVED WORKFLOW');
@@ -591,21 +604,78 @@ let StateMachineComponent = React.createClass({
 
             return undefined;
         };
+        let makeDraggable = () =>{
+            $('.new-state').draggable(
+                {
+                  revert: "invalid",
+                  opacity: 0.7,
+                  helper: "clone"
+                }
+            );
+        };
+
+        let detailMode2 = () => {
+            if(this.props.editable){
+                return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                    <h4>&nbsp;</h4>
+                    <hr />
+                    <Tabs tabActive={this.state.selected? 2: 1}
+                        onAfterChange={makeDraggable}
+                    >
+                        <Tabs.Panel title={<span><i className="fa fa-plus"></i> Add Task</span>}>
+                            {state_list}
+                        </Tabs.Panel>
+                        {this.state.selected?
+                        <Tabs.Panel title={<span><i className="fa fa-pencil"></i> Edit Task</span>}>
+                            {state_detail(this.props.editable)}
+                        </Tabs.Panel>: ''}
+                    </Tabs>
+                    </div>);
+            } else {
+                if(this.state.selected){
+                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                                <span>{state_detail(this.props.editable)}</span>
+                            </div>);
+                }
+                return undefined;
+            }
+        };
+
+        let otherModes = () => {
+            if(this.props.editable)
+                return (<div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
+                        <span>
+                        <h3 className="task-type-title panel-title">Type of Tasks</h3>
+                        <hr />
+                        {state_list}
+                        </span>
+
+                    {this.props.detailMode === 2?
+                        <span>{state_detail(this.props.editable)}</span>: ''
+                    }
+
+                </div>);
+
+            return undefined;
+        };
+
+        let mainsize='col-md-10';
+
+        if(this.props.detailMode === 2)
+            mainsize = 'col-md-8';
 
         return (
           <div className="react-statemachine row">
           <div className="col-md-12 no-select">
                 <div style={{width: '100%'}} ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
-                        {this.props.editable ?
-                        <div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
-                            <h3 className="task-type-title panel-title">Type of Tasks</h3>
-                            <hr />
-                            {state_list}
+                    {this.props.detailMode === 2 ?
+                            detailMode2()
+                        :
+                            otherModes()
+                    }
 
-                        </div>
-                        :''}
-                        <div className={this.props.editable?"col-md-10 table-col no-select":"col-md-12 table-col no-select"}>
+                        <div className={this.props.editable? `${mainsize} table-col no-select`:"col-md-12 table-col no-select"}>
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="form-group">
@@ -649,7 +719,9 @@ let StateMachineComponent = React.createClass({
                               </div>
                             {this.props.detailMode === 0?
                                 <ModalDetail clearSelect={this.clearSelect} component={state_detail(this.props.editable)} />
-                            :   <span>{state_detail(this.props.editable)}</span>
+                            :''}
+                            {this.props.detailMode === 1?
+                                <span>{state_detail(this.props.editable)}</span>: ''
                             }
                         </div>
                     </div>

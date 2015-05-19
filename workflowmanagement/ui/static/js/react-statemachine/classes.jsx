@@ -54,7 +54,7 @@ class State{
             return true;
         }
         // else is a reading
-        let name = this.__data['name'] || 'Unnamed';
+        let name = this.__data['name'] || this.__container.nextFreeName();
 
         return name;
     }
@@ -169,7 +169,7 @@ class State{
             render(){
                 let dependencies = self.getDependencies().map((dependency) => {
                     return <span key={dependency.getIdentificator()}
-                    className="state-dep-label label label-default">
+                    className="state-dep-label label state-dep-label label-default">
                         {dependency.label()}
                         &nbsp;&nbsp;
                         {editable?
@@ -198,7 +198,7 @@ class State{
                     if(possibledropdown.length > 0)
                         dependencies.push(
                                 <div className="btn-group dropup">
-                                  <span type="button" className="point label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                  <span type="button" className="point label state-dep-label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     Add dependency <span className="caret"></span>
                                     <span className="sr-only">Toggle Dropdown</span>
                                   </span>
@@ -209,29 +209,22 @@ class State{
                                 </div>
                             );
                 }
+
                 return (
                 <span id="detailview">
                     <div key="state-name" className="form-group">
-                        <div className="input-group clearfix">
-                            <span className="input-group-addon" id="state-title">
-                                <strong>State Name</strong>
-                            </span>
-                            <input type="title" className="form-control"
-                                            aria-describedby="state-title"
-                                            placeholder="Enter the state name"
-                                            onChange={this.setTitle} value={this.state.name} disabled={!editable} />
-                        </div>
+                        <label for="state-title">Task Name <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                        <input type="title" className="form-control"
+                                        aria-describedby="state-title"
+                                        placeholder="Enter the state name"
+                                        onChange={this.setTitle} value={this.state.name} disabled={!editable} />
                     </div>
                     <div key="state-deps" className="form-group">
-                        <div className="input-group">
-                            <span className="input-group-addon" id="state-dependencies">
-                                <strong>Dependencies</strong>
-                            </span>
-                            <div className="form-control" aria-describedby="study-title">
+                        <label for="state-dependencies">Dependencies</label>
+                            <div id="state-dependencies" aria-describedby="study-deps">
                              {dependencies.length === 0?
-                                "There's no possible dependencies for this task.": dependencies}
+                                "There are no possible dependencies for this task.": dependencies}
                             </div>
-                        </div>
                     </div>
                     <ChildComponent dataChange={this.props.dataChange} main={this} />
                 </span>
@@ -274,6 +267,10 @@ class State{
             dependencies: deps
         }
     }
+    is_valid(){
+        let data = this.getData();
+        return data.name != undefined;
+    }
 }
 
 class SimpleState extends State {
@@ -296,7 +293,25 @@ class StateMachine{
         this.__nextLevel = 0;
         this.__stateclasses = [];
     }
+    nextFreeName(){
+        let base = name = 'Unnamed';
+        let i=0;
+        while(this.__nameExists(name)){
+            i++;
+            name = `${base} ${i}`;
+        }
 
+        return name;
+    }
+    __nameExists(name){
+        for(let state of this.__states){
+            if(state.label() === name){
+                return state;
+            }
+        }
+
+        return false;
+    }
     clone(){
         let sm = new StateMachine();
 

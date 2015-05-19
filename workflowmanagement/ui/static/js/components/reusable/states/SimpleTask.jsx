@@ -55,24 +55,21 @@ class SimpleTask extends SimpleState {
             render(){
                 return <span>
                     <div key="state-descr" className="form-group">
-                        <div className="input-group clearfix">
-                            <span className="input-group-addon" id="state-description">
-                                <strong>Task Description</strong>
-                            </span>
-                            <textarea rows="6" type="description" className="form-control"
+                        <label for="state-description">Task Description</label>
+                            <textarea style={{resize: "vertical"}} id="state-description" rows="6" type="description" className="form-control"
                                             aria-describedby="state-description"
                                             placeholder="Enter the state description here"  disabled={!editable}
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
-                        </div>
                     </div>
+                    <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
+
                         <span>
                         {(this.parent().resources && this.parent().resources.length > 0)?
-                            <h3>File Inputs</h3>
+                            <label>File Inputs</label>
                         :''}
                         <Uploader editable={editable} uploads={this.parent().resources} done={this.setResources} />
                         </span>
-                    <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
                 </span>
             }
         });
@@ -143,7 +140,16 @@ class SimpleTaskRun extends SimpleTask{
     constructor(options){
         super(options);
     }
+    is_valid(){
+        let data = this.getData();
+        console.log(data);
+        return (
+            data.deadline
+            && data.assignee
+            && data.assignee.split(',').length > 0
+        );
 
+    }
     serialize(){
         let users = [];
         let assignee = this.getData().assignee || '';
@@ -295,12 +301,14 @@ class SimpleTaskRun extends SimpleTask{
                 };
                 if(users.length > 0){
                     return (<span>
-                        <table className="table table-striped table-bordered">
+                        <table style={{backgroundColor: 'white'}} className="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th colSpan="2">
+                                    <label style={{position: 'absolute'}}>Assignees Status</label>
+
                                     <div className="pull-right btn-group">
-                                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                      <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         <i className="fa fa-download"></i> <small>Download Results</small> <span className="caret"></span>
                                       </button>
                                       <ul className="dropdown-menu" role="menu">
@@ -378,30 +386,21 @@ class SimpleTaskRun extends SimpleTask{
             render(){
                 return <span>
                     <div key="state-assignee" className="form-group">
-                        <div className="input-group">
-                            <span className="input-group-addon" id="state-assignee">
-                                <strong>Assignees</strong>
-                            </span>
+                        <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+
                             {this.state.users.length > 0?
                             <Select onChange={this.setAssignee}
                             value={this.parent().assignee} name="form-field-name"
                             multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
-                        </div>
-
                     </div>
                     <div key="state-deadline" className="form-group">
-                        <div className="input-group clearfix">
-                            <span className="input-group-addon" id="state-deadline">
-                                <strong>Deadline</strong>
-                            </span>
-
+                        <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
                             <input type="datetime-local" className="form-control"
                                             aria-describedby="state-deadline"
                                             placeholder="Deadline"
                                             onChange={this.setDeadline} disabled={this.parent().disabled}
                                             value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
-                        </div>
                     </div>
 
                     {this.results()}

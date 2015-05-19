@@ -74,17 +74,12 @@ class FormTask extends SimpleTask {
                 return (
                     <span>
                         <div key="state-form" className="form-group">
-                            <div className="input-group">
-                                <span className="input-group-addon" id="state-form">
-                                    <strong>Form schema</strong>
-                                </span>
+                            <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
                                 {this.state.forms.length > 0?
                                 <Select onChange={this.setform}
                                 value={this.parent().form} name="form-field-name"
                                 multi={false} options={this.state.forms} disabled={!editable} />
                                 :''}
-                            </div>
-
                         </div>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
 
@@ -114,6 +109,16 @@ class FormTask extends SimpleTask {
         tmp.form=this.getData().form;
 
         return tmp;
+    }
+
+    is_valid(){
+        if(super.is_valid()){
+            let data = this.getData();
+            console.log(data);
+            return data.form != undefined;
+        }
+
+        return false;
     }
 }
 
@@ -274,15 +279,15 @@ class FormTaskRun extends FormTask{
                 };
                 if(users.length > 0){
                     return (<span>
-                        <table className="table table-striped table-bordered">
+                        <table style={{backgroundColor: 'white'}} className="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th colSpan="2">
 
-                                    <center><h4 style={{position: 'absolute'}}>Status of each assignee tasks</h4></center>
+                                    <label style={{position: 'absolute'}}>Assignees Status</label>
 
                                     <div className="pull-right btn-group">
-                                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                      <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         <i className="fa fa-download"></i> <small>Download Results</small> <span className="caret"></span>
                                       </button>
                                       <ul className="dropdown-menu" role="menu">
@@ -361,30 +366,21 @@ class FormTaskRun extends FormTask{
             render(){
                 return <span>
                     <div key="state-assignee" className="form-group">
-                        <div className="input-group">
-                            <span className="input-group-addon" id="state-assignee">
-                                <strong>Assignees</strong>
-                            </span>
+                        <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+
                             {this.state.users.length > 0?
                             <Select onChange={this.setAssignee}
                             value={this.parent().assignee} name="form-field-name"
                             multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
-                        </div>
-
                     </div>
                     <div key="state-deadline" className="form-group">
-                        <div className="input-group clearfix">
-                            <span className="input-group-addon" id="state-deadline">
-                                <strong>Deadline</strong>
-                            </span>
-
+                        <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
                             <input type="datetime-local" className="form-control"
                                             aria-describedby="state-deadline"
                                             placeholder="Deadline"
                                             onChange={this.setDeadline} disabled={this.parent().disabled}
                                             value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
-                        </div>
                     </div>
 
                     {this.results()}

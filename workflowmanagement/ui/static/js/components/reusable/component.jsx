@@ -166,6 +166,7 @@ const PermissionsBar = React.createClass({
                                     onChange={this.setPublic} disabled={!this.props.editable} />
                                 <span className="selectLabel">&nbsp;Public</span>
                             </span>
+                          {/*
                           <span className="selectBox">
                               <Toggle id="searchable"
                                 checked={this.props.searchable}
@@ -173,7 +174,7 @@ const PermissionsBar = React.createClass({
                                 onChange={this.setSearchable} disabled={!this.props.editable} />
                               <span className="selectLabel">&nbsp;Searchable</span>
                           </span>
-                          {/*<span className="selectBox">
+                          <span className="selectBox">
                               <Toggle id="public"
                                 checked={this.props.forkable}
                                 defaultChecked={this.props.forkable}
