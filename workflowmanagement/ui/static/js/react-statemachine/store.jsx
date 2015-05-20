@@ -13,6 +13,7 @@ const StateMachineStore = Reflux.createStore({
         this.__initial = this.__sm.clone();
         this.__final = this.__sm.clone();
         this.__timemachine = -1;
+        this.__detailVisible = false;
     },
     addHistory(){
 
@@ -88,6 +89,9 @@ const StateMachineStore = Reflux.createStore({
     getSelected(){
         return this.__selected;
     },
+    getDetailVisible(){
+        return this.__detailVisible;
+    },
     // Action handlers
     onAddState(type, level){
         console.log(`Add new state of type ${type} into level ${level}`);
@@ -155,6 +159,12 @@ const StateMachineStore = Reflux.createStore({
         elem_obj.label(new_title);
 
         this.__selected = elem;
+
+        this.trigger();
+    },
+    onSetDetailVisible(visible, selected=this.__selected){
+        this.__detailVisible = visible;
+        this.__selected = selected;
 
         this.trigger();
     },

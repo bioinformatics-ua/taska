@@ -8,6 +8,8 @@ import StateMachineActions from './actions.jsx';
 import hotkey from 'react-hotkey';
 hotkey.activate();
 
+import {ContextMenu} from './contextmenu.jsx';
+
 import Tabs from 'react-simpletabs';
 
 import cline from '../vendor/jquery.domline';
@@ -44,7 +46,10 @@ const ModalDetail = React.createClass({
     this.props.clearSelect(event);
   },
   componentWillReceiveProps(next){
-    this.setState({visible: true});
+    if(next.visible || next.visible == undefined)
+        this.setState({visible: true});
+    else
+        this.setState({visible: false});
   },
   render(){
     if(!this.props.component || !this.state.visible)
@@ -74,7 +79,8 @@ let StateMachineComponent = React.createClass({
             selected: StateMachineStore.getSelected(),
             title: StateMachineStore.getTitle(),
             canUndo: StateMachineStore.canUndo(),
-            canRedo: StateMachineStore.canRedo()
+            canRedo: StateMachineStore.canRedo(),
+            detailVisible: StateMachineStore.getDetailVisible(),
         }
     },
     getInitialState(){
@@ -286,15 +292,15 @@ let StateMachineComponent = React.createClass({
         StateMachineActions.addDependency(elem1, elem2);
     },
     select(event){
-        event.stopPropagation();
+            event.stopPropagation();
 
-        let id = event.currentTarget.id;
-        if(id === 'state-start' && !this.props.startDetail)
-            return;
-        if(id === 'state-end' && !this.props.endDetail)
-            return;
+            let id = event.currentTarget.id;
+            if(id === 'state-start' && !this.props.startDetail)
+                return;
+            if(id === 'state-end' && !this.props.endDetail)
+                return;
 
-        StateMachineActions.select(event.currentTarget.id);
+            StateMachineActions.select(event.currentTarget.id);
     },
     editLabel(event){
         event.stopPropagation();
@@ -307,6 +313,16 @@ let StateMachineComponent = React.createClass({
         event.stopPropagation();
         console.log('CLEAR SELECT');
         StateMachineActions.clearSelect();
+    },
+    clearPopup(event){
+        event.stopPropagation();
+        console.log('CLEAR POPUP');
+
+        if(this.props.editable)
+            StateMachineActions.setDetailVisible(false);
+        else
+            StateMachineActions.clearSelect();
+
     },
     insertAbove(event){
         event.stopPropagation();
@@ -664,6 +680,7 @@ let StateMachineComponent = React.createClass({
         if(this.props.detailMode === 2)
             mainsize = 'col-md-8';
 
+        console.log(this.state.detailVisible);
         return (
           <div className="react-statemachine row">
           <div className="col-md-12 no-select">
@@ -718,7 +735,7 @@ let StateMachineComponent = React.createClass({
                                 </div>
                               </div>
                             {this.props.detailMode === 0?
-                                <ModalDetail clearSelect={this.clearSelect} component={state_detail(this.props.editable)} />
+                                <ModalDetail visible={this.props.editable?this.state.detailVisible:undefined} clearSelect={this.clearPopup} component={state_detail(this.props.editable)} />
                             :''}
                             {this.props.detailMode === 1?
                                 <span>{state_detail(this.props.editable)}</span>: ''
@@ -727,6 +744,23 @@ let StateMachineComponent = React.createClass({
                     </div>
                 </div>
           </div>
+            {this.props.editable?
+                <ContextMenu target={'.state-handler'}
+                    items = {[{
+                        onClick: (e)=>{
+                            let $e = $(e);
+                            let lid = $e.attr('id');
+                            if(lid == undefined){
+                                lid = $e.closest('.state-handler').attr('id');
+                            }
+                            console.log(e);
+                            StateMachineActions.setDetailVisible(true, lid);
+                        },
+                        name: <span><i className="fa fa-pencil"></i> Edit</span>
+                    }]}
+                    offset={'.react-statemachine'}
+                />
+            :''}
           </div>
         );
     }

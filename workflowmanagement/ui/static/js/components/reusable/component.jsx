@@ -35,29 +35,34 @@ const Modal = React.createClass({
     return {
       title: 'Undefined Title',
       message: 'Undefined Message',
-      showConfirm: true
+      showConfirm: true,
+      visible: true
     }
   },
   render(){
-    return <div className="modal modalback show">
-                    <div className="modal-dialog">
-                      <div className="modal-content">
-                        <div className="modal-header">
-                          <button type="button" onClick={this.props.close} className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 className="modal-title">{this.props.title}</h4>
+    console.log(this.props.visible);
+    if(this.props.visible)
+      return <div className="modal modalback show">
+                      <div className="modal-dialog">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <button type="button" onClick={this.props.close} className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 className="modal-title">{this.props.title}</h4>
+                          </div>
+                          <div className="modal-body">
+                            {this.props.message}
+                          </div>
+                          {this.props.showConfirm?
+                          <div className="modal-footer">
+                              <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                              <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                          </div>
+                          :''}
                         </div>
-                        <div className="modal-body">
-                          {this.props.message}
-                        </div>
-                        {this.props.showConfirm?
-                        <div className="modal-footer">
-                            <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
-                        </div>
-                        :''}
                       </div>
-                    </div>
-                  </div>;
+                    </div>;
+
+    return undefined;
   }
 });
 
