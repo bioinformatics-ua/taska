@@ -680,7 +680,6 @@ let StateMachineComponent = React.createClass({
         if(this.props.detailMode === 2)
             mainsize = 'col-md-8';
 
-        console.log(this.state.detailVisible);
         return (
           <div className="react-statemachine row">
           <div className="col-md-12 no-select">
@@ -753,7 +752,6 @@ let StateMachineComponent = React.createClass({
                             if(lid == undefined){
                                 lid = $e.closest('.state-handler').attr('id');
                             }
-                            console.log(e);
                             StateMachineActions.setDetailVisible(true, lid);
                         },
                         name: <span><i className="fa fa-pencil"></i> Edit</span>

@@ -6,9 +6,9 @@ Below, follows intruction on how to deploy code in a development environment, si
 Installing development environment under Ubuntu
 -----------------------
 
-1. Install pip package
+1. Install pip package, python-dev and libxml
 
-    sudo apt-get install python-pip
+    sudo apt-get install python-pip python-dev libxml2-dev libxslt-dev
 
 2. Install PostgreSQL
     a)  sudo apt-get install postgresql
@@ -46,4 +46,4 @@ Installing development environment under Ubuntu
 
 7. Run the celery worker (in production environments this should be done through a daemon like supervisord)
 
-    celery -A workflowmanagement worker -l info
+    fcelery -A workflowmanagement worker -l info

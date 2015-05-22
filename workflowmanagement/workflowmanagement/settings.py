@@ -60,7 +60,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'oauth2_provider',
+    #'oauth2_provider',
     'rest_framework',
     'rest_framework_swagger',
     'utils',
@@ -102,7 +102,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'workflow_dev', # Or path to database file if using sqlite3.
-        'USER': 'postgres', # Not used with sqlite3.
+        'USER': 'workflow_dev', # Not used with sqlite3.
         'PASSWORD': '12345', # Not used with sqlite3.
         'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
@@ -152,10 +152,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-OAUTH2_PROVIDER = {
+'''OAUTH2_PROVIDER = {
     # this is the list of available scopes
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
-}
+}'''
 
 # framework settings
 REST_FRAMEWORK = {
