@@ -79,7 +79,7 @@ class FormTask extends SimpleTask {
                                 <Select onChange={this.setform}
                                 value={this.parent().form} name="form-field-name"
                                 multi={false} options={this.state.forms} disabled={!editable} />
-                                :''}
+                                :"There's no forms yet, please add one first from the main dashboard."}
                         </div>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
 

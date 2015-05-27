@@ -36,7 +36,11 @@
       </div>
     </div>
 
+    {% if IS_DEBUG %}
     <script src="{% static "bundle.js" %}"></script>
+    {% else %}
+    <script src="{% static "bundle.min.js" %}"></script>
+    {% endif%}
     <script src='{% static "js/vendor/dobtco-formbuilder-vendor.js" %}'></script>
     <script src='{% static "js/vendor/formbuilder-min.js" %}'></script>
     <script src='{% static "js/vendor/formrenderer.js" %}'></script>

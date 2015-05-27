@@ -36,15 +36,20 @@
     "glob": "^5.0.3",
     "minifyify": "^6.3.2",
     "watchify": "~2.6.0",
+    "browserify": "~9.0.3",
+    "uglifyjs": "~2.4.10",
     "uglifycss": "~0.0.13",
     "catw": "~0.2.0"
   },
   "scripts": {
     "start": "npm run watchjs & npm run watchcss",
     "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
-    "prodjs": "browserify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] -p [ minifyify --map bundle.map.json --output workflowmanagement/ui/static/bundle.map.json] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
     "watchcss": "catw -c 'uglifycss' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
-    "uglifycss": "uglifycss ./workflowmanagement/ui/static/bundle.min.css ./workflowmanagement/ui/static/bundle.min.css",
+
+    "prod": "npm run prodjs && npm run prodcss",
+    "prodjs": "browserify -d -t babelify -g [ uglifyify --no-sourcemap --screw-ie8 --bare-returns] -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -o workflowmanagement/ui/static/bundle.js && uglifyjs workflowmanagement/ui/static/bundle.js > workflowmanagement/ui/static/bundle.min.js",
+    "prodcss": "uglifycss ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css > ./workflowmanagement/ui/static/bundle.min.css",
+
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -61,3 +66,4 @@
     "url": "https://github.com/bioinformatics-ua/workflow-management/issues"
   }
 }
+

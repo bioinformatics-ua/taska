@@ -149,6 +149,7 @@ STATICFILES_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     "django.core.context_processors.request",
+    'workflowmanagement.context_processors.debug',
 )
 
 '''OAUTH2_PROVIDER = {
