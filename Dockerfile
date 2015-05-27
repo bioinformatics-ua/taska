@@ -1,60 +1,45 @@
-# VERSION 0.1
+# VERSION 0.1 - Production
 # DOCKER-VERSION 1.6.2
 # To build:
 # 1. Install docker (http://docker.io)
 # 2. Checkout source: git@github.com:bioinformatics-ua/workflow-management.git
 # 3. Build container: make build
 # 4. Run container: make run
-FROM    ubuntu:14.04
+#FROM    ubuntu:14.04
+FROM    python:2.7
 
-ENV PG_VERSION 9.4
-ENV DEBIAN_FRONTEND noninteractive
+ENV     DEBIAN_FRONTEND noninteractive
 #################### INSTALL STUFF ############################################
+RUN     pip install -U pip
 
-# Add postgres to reps
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN apt-get update && apt-get -y -q install python-software-properties software-properties-common \
-    && apt-get -y -q install postgresql-9.3 postgresql-client-9.3 postgresql-contrib-9.3 postgresql-server-dev-9.3
+RUN     apt-get update && \
+        apt-get install -y -q rabbitmq-server python-dev nginx nodejs npm uwsgi-plugin-python nano && \
+        rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+#libxml2-dev libxslt1-dev uwsgi
 
-# Install Pip and configure a new virtual environment
-RUN     apt-get install -y python-pip
 
-RUN     apt-get install -y -q rabbitmq-server python-dev libxml2-dev libxslt1-dev
+# Add user to run celery as it should not be run as root
+RUN     adduser --disabled-password --gecos '' django-deploy
 
-USER    postgres
+RUN     pip install uwsgi
 
-RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER workflow_dev WITH SUPERUSER PASSWORD '12345';" &&\
-    createdb -O workflow_dev workflow_dev
+ADD     ./requirements.txt /requirements.txt
+RUN     pip install -r /requirements.txt
 
-# Adjust PostgreSQL configuration so that remote connections to the
-# database are possible.
-RUN     echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
-
-# And add ``listen_addresses`` to ``/etc/postgresql/9.3/main/postgresql.conf``
-RUN     echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
-
-USER    root
+ADD     ./bin/nginx-app.conf /etc/nginx/sites-available/default
+ADD     ./bin/uwsgi-prod.ini /etc/uwsgi/apps-enabled/workflow.ini
 
 ADD     .   /workflow-management
 
-RUN     pip install -r /workflow-management/requirements.txt
-
-RUN     adduser --disabled-password --gecos '' django-deploy
-
-###############################################################################
-
-#################### COPY STUFF ###############################################
-
-###############################################################################
+ADD     ./bin/local_settings.py /workflow-management/workflowmanagement/workflowmanagement/local_settings.py
 
 #################### EXPOSE STUFF #############################################
 
-EXPOSE 5432
-EXPOSE  8000
+VOLUME  /workflow-management/workflowmanagement/upload
 
-CMD     cd /workflow-management && make run
+EXPOSE  80
+#EXPOSE  8000
+CMD     cd /workflow-management/bin && sh run_docker.sh
 
 ###############################################################################
 

@@ -37,8 +37,7 @@ SWAGGER_SETTINGS = {
 # See https://docs.djangoproject.com/en/1.7/howto/developmentloyment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+g93fk44)x+s%7-$7hb23@saom=#+7@n6lstr8-p7x8z$3#_f9'
-
+SECRET_KEY = os.environ.get('DOCKER_SECRET', '+g93fk44)x+s%7-$7hb23@saom=#+7@n6lstr8-p7x8z$3#_f9')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -101,11 +100,11 @@ WSGI_APPLICATION = 'workflowmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'workflow_dev', # Or path to database file if using sqlite3.
-        'USER': 'workflow_dev', # Not used with sqlite3.
-        'PASSWORD': '12345', # Not used with sqlite3.
-        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'NAME': os.environ.get('DOCKER_POSTGRES_DB', 'workflow_dev'), # Or path to database file if using sqlite3.
+        'USER': os.environ.get('DOCKER_POSTGRES_USER', 'workflow_dev'), # Not used with sqlite3.
+        'PASSWORD': os.environ.get('DOCKER_POSTGRES_PASS', '12345'), # Not used with sqlite3.
+        'HOST': os.environ.get('DOCKER_POSTGRES_HOST', 'localhost'), # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': os.environ.get('DOCKER_POSTGRES_PORT', '5432'), # Set to empty string for default. Not used with sqlite3.
         #'AUTOCOMMIT': True,
         #'autocommit': True,
         #'OPTIONS': {
