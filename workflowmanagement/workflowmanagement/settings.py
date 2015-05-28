@@ -14,6 +14,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 BASE_URL = "/"
 
+import context_serializers
+
 # swagger settings
 SWAGGER_SETTINGS = {
     "exclude_namespaces": ['index'], # List URL namespaces to ignore
@@ -149,6 +151,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     "django.core.context_processors.request",
     'workflowmanagement.context_processors.debug',
+    'workflowmanagement.context_processors.base',
 )
 
 '''OAUTH2_PROVIDER = {

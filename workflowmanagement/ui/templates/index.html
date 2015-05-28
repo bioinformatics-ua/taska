@@ -1,4 +1,3 @@
-{% load js %}
 {% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +6,7 @@
   <title>Workflow Management for Biomedical exploration</title>
   <meta name="description" content="Workflow Management for Biomedical exploration">
   <meta name="author" content="Ricardo Ribeiro">
-  <base href="/" />
+  <base href="{{BASE_URL}}" />
   <!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
@@ -45,8 +44,18 @@
     <script src='{% static "js/vendor/formbuilder-min.js" %}'></script>
     <script src='{% static "js/vendor/formrenderer.js" %}'></script>
 
+    <script type="text/javascript" src="djangojs/init.js"></script>
 
-    {% django_js jquery=false %}
+    <script type="text/javascript" src="djangojs/translation"></script>
+
+    <script>
+        window.DJANGO_JS_CSRF = true;
+        window.DJANGO_JS_INIT = true;
+    </script>
+
+
+
+    <script type="text/javascript" src='{% static "js/djangojs/django.min.js" %}'></script>
 
 </body>
 </html>
