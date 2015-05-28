@@ -20,3 +20,5 @@ ALLOWED_HOSTS = [
     '.%s'%WEBPAGE_URL,  # Allow domain and subdomains
     '.%s.'%WEBPAGE_URL,  # Also allow FQDN and subdomains,
 ]
+
+BASE_URL = os.environ.get('BASE_DIR', '/')

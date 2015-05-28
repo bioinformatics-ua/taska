@@ -130,7 +130,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
-STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -200,6 +199,8 @@ try:
     from local_settings import *
 except:
     pass
+
+STATIC_URL = BASE_URL+'static/'
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
