@@ -14,8 +14,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 BASE_URL = "/"
 
-import context_serializers
-
 # swagger settings
 SWAGGER_SETTINGS = {
     "exclude_namespaces": ['index'], # List URL namespaces to ignore
