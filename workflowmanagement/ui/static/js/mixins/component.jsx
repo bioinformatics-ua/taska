@@ -13,7 +13,7 @@ const Authentication = {
             let promise = UserActions.loadDetailIfNecessary.triggerPromise('me').then(
                 (user_data) => {
                     if(user_data.email === undefined)
-                        transition.redirect('/login',{}, {'nextPath' : nextPath });
+                        transition.redirect('login',{}, {'nextPath' : nextPath });
 
                     callback();
                 }
@@ -25,8 +25,8 @@ const Authentication = {
                         'title': 'Connection Failed',
                         'message': 'Connection Failed, please try again, if the problem persists contact the administrator.'
                     }); break;
-                    case 404: transition.redirect('/404',{},{}); break;
-                    default: transition.redirect('/500',{},{}); break;
+                    case 404: transition.redirect('NotFound',{},{}); break;
+                    default: transition.redirect('InternalError',{},{}); break;
                 }
             });
         }
@@ -40,7 +40,7 @@ const CheckLog = {
             UserActions.loadDetailIfNecessary.triggerPromise('me').then(
                 (user_data) => {
                     if(user_data.email != undefined)
-                        transition.redirect('/');
+                        transition.redirect('app');
 
                     callback();
                 }
