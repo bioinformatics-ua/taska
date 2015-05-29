@@ -201,7 +201,11 @@ try:
 except:
     pass
 
-STATIC_URL = BASE_URL+'static/'
+STATIC_URL = None
+if BASE_URL.endswith('/'):
+    STATIC_URL = BASE_URL+'static/'
+else:
+    STATIC_URL = BASE_URL+'/static/'
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
