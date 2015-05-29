@@ -39,7 +39,7 @@ var UserDropdown = React.createClass({
     logout: function(){
       let self = this;
       UserActions.logout(function(){
-        self.context.router.replaceWith('/login');
+        self.context.router.replaceWith('login');
       });
     },
   render: function () {

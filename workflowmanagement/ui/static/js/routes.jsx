@@ -5,14 +5,17 @@ import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
 
 import {Label} from './components/reusable/component.jsx';
 
+// Base url must come from django to be dynamic (i realize this breaks the isolation a bit...)
+var baseurl = $('#baseurl').attr('href');
+
 module.exports = (
-    <Route name='app' path='/' handler={require('./components/app.jsx')}>
+    <Route name='app' path={baseurl} handler={require('./components/app.jsx')}>
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
         <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
 
-        <Route name="home" path="/" handler={require('./components/home.jsx')}/>
+        <Route name="home" path={baseurl} handler={require('./components/home.jsx')}/>
 
         <Route name="about" handler={require('./components/about.jsx')} />
 
@@ -50,6 +53,6 @@ module.exports = (
         <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>
         <Route name="InternalError" path="/500" handler={require('./components/500.jsx')}/>
 
-        <NotFoundRoute handler={require('./components/404.jsx')}/>
+        <NotFoundRoute name="NotFound" handler={require('./components/404.jsx')}/>
     </Route>
 );

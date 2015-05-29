@@ -41,7 +41,7 @@ export default React.createClass({
                 if (nextPath) {
                     self.context.router.transitionTo(nextPath);
                 } else {
-                    self.context.router.replaceWith('/');
+                    self.context.router.replaceWith('app');
                 }
           }
         });
