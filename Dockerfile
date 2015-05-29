@@ -26,7 +26,8 @@ RUN     pip install uwsgi
 ADD     ./requirements.txt /requirements.txt
 RUN     pip install -r /requirements.txt
 
-ADD     ./bin/nginx-app.conf /etc/nginx/sites-available/default
+ADD     ./bin/nginx-app.conf /nginx-app.conf.template
+#ADD     ./bin/nginx-app.conf /etc/nginx/sites-available/default
 ADD     ./bin/uwsgi-prod.ini /etc/uwsgi/apps-enabled/workflow.ini
 ADD     ./bin/gzip.conf /etc/nginx/conf.d/gzip.conf
 
