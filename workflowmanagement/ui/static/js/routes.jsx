@@ -8,11 +8,14 @@ import {Label} from './components/reusable/component.jsx';
 // Base url must come from django to be dynamic (i realize this breaks the isolation a bit...)
 var baseurl = $('#baseurl').attr('href');
 
-/*if(baseurl.length > 1 && baseurl[baseurl.length-1] == '/'){
+if(baseurl.length > 1 && baseurl[baseurl.length-1] == '/'){
     baseurl = baseurl.substring(0, baseurl.length - 1);
-}*/
+}
+console.log(baseurl);
+
 module.exports = (
     <Route name='app' path={baseurl} handler={require('./components/app.jsx')}>
+        <Route name="default" path='/' handler={require('./components/home.jsx')}/>
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
