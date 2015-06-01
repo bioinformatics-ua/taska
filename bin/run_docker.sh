@@ -5,7 +5,8 @@ ln -s /usr/bin/nodejs /usr/bin/node
 echo "------------------------------------------"
 echo "---- Initializing nginx and rabbitmq-server ------ "
 cp /nginx-app.conf.template /etc/nginx/sites-available/default
-sed -i -e "s:{BASE_DIR_PLACEHOLDER}:$BASE_DIR:g" /etc/nginx/sites-available/default
+sed -i -e "s:{BASE_DIR_PLACEHOLDER}:$BASE_DIR/:g" /etc/nginx/sites-available/default
+sed -i -e "s:{BASE_STRIPDIR_PLACEHOLDER}:$BASE_DIR:g" /etc/nginx/sites-available/default
 
 /etc/init.d/rabbitmq-server start
 service nginx start

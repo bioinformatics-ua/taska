@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
     '.%s.'%WEBPAGE_URL,  # Also allow FQDN and subdomains,
 ]
 
-BASE_URL = os.environ.get('BASE_DIR', '/')
+BASE_URL = os.environ.get('BASE_DIR', '')+'/'
 
 # I dont like this here very much but i cant make it work with nginx otherwise... on a subdirectory at least
-FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '/')
+FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '')+'/'
