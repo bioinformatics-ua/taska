@@ -2,6 +2,11 @@
 export TERM=xterm
 ln -s /usr/bin/nodejs /usr/bin/node
 
+echo "------------------------------------------"
+echo "---- Initializing nginx and rabbitmq-server ------ "
+cp /nginx-app.conf.template /etc/nginx/sites-available/default
+sed -i -e "s:{BASE_DIR_PLACEHOLDER}:$BASE_DIR:g" /etc/nginx/sites-available/default
+
 /etc/init.d/rabbitmq-server start
 service nginx start
 
@@ -42,6 +47,9 @@ check_up "postgres" db 5432
 
 cd /workflow-management
 
+echo "------------------------------------------"
+echo "---- Building js and css bundles ------ "
+
 # get node modules
 npm install
 # locking browserify and watchify versions, as I don't know if they will work properly otherwise
@@ -52,6 +60,15 @@ npm install uglifyjs@2.4.10 -g
 # generate small production js/css files (as development ones are really big)
 npm run prod
 
+# handle documentation generation
+echo "------------------------------------------"
+echo "---- Generating html documentation ------ "
+cd /workflow-management/documentation
+make html
+
+# running project itself
+echo "------------------------------------------"
+echo "---- Running project migrations ------ "
 cd /workflow-management/workflowmanagement
 
 python manage.py migrate --noinput
