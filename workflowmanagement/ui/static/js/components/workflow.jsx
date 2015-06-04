@@ -203,10 +203,12 @@ export default React.createClass({
                             setForkable={this.setForkable}
                             object={params.object}
                             runProcess={this.runProcess}
+                            listProcesses={this.state.workflow['assoc_processes']}
                             {...this.state.workflow.permissions} />
                     }
                     title={this.props.detail.Workflow.title}
                     editable={params.mode === 'edit'}
+                    blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
                     save={params.mode === 'run'? this.runProcess:this.save}
                     saveLabel={params.mode !== 'run'?
                     <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>

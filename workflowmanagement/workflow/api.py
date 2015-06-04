@@ -36,6 +36,10 @@ class WorkflowPermissionSerializer(serializers.ModelSerializer):
 class WorkflowSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
     tasks = GenericTaskSerializer(many=True, required=False)
+    assoc_processes = serializers.SerializerMethodField()
+
+    def get_assoc_processes(self, obj):
+        return obj.assocProcesses().values_list('hash', flat=True)
 
     class Meta:
         model = Workflow
@@ -120,6 +124,12 @@ class WorkflowDetailSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
     tasks = GenericTaskSerializer(many=True)
 
+    assoc_processes = serializers.SerializerMethodField()
+
+    def get_assoc_processes(self, obj):
+        return obj.assocProcesses().values_list('hash', flat=True)
+
+
     class Meta:
         model = Workflow
         exclude = ('id', 'removed')
@@ -176,6 +186,8 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         pstates = []
         old = copy.deepcopy(data)
 
+        assoc_count = len(workflow.assocProcesses())
+
         if data.get('tasks', False):
             for task in data['tasks']:
                 task.pop('dependencies', None)
@@ -192,6 +204,9 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
                     print task
                     ts = GenericTaskSerializer(t, data=task)
                 else:
+                    if assoc_count > 0:
+                        raise Exception("Can't update an workflow schema when there are processes that ran with it. Please fork the workflow to create a new version of the workflow schema.")
+
                     print "creating"
                     task['workflow'] = workflow.id
                     print task
@@ -217,6 +232,8 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
             deleted_tasks = workflow.tasks().exclude(hash__in=pstates)
 
             for task in deleted_tasks:
+                if assoc_count > 0:
+                    raise Exception("Can't update an workflow schema when there are processes that ran with it. Please fork the workflow to create a new version of the workflow schema.")
                 task.remove()
 
 

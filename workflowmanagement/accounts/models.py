@@ -17,7 +17,7 @@ class Profile(models.Model):
     detail_mode = models.PositiveSmallIntegerField(choices=DETAIL_MODES, default=LEFT)
     notification= models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return "User profile for %s" % self.user
 
 @receiver(models.signals.post_save, sender=User)

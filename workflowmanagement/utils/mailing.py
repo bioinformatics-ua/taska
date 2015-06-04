@@ -7,8 +7,6 @@ import html2text
 
 class MailTemplate:
     def __init__(self, instance, destinies):
-        print "INIT TEMPLATE"
-        print instance.object
         self.instance = instance
         self.destinies = destinies
 

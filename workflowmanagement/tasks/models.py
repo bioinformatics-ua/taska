@@ -63,11 +63,11 @@ class Task(models.Model):
 
         return task
 
-    def __str__(self):
+    def __unicode__(self):
         ''' Represents the task at hand, usually just shows the title (or Unnamed if there's no title for the task).
         '''
         if self.title:
-            return self.title.encode('utf-8')
+            return self.title
 
         return 'Unnamed'
 
@@ -192,7 +192,7 @@ class TaskDependency(models.Model):
     class Meta:
         verbose_name_plural = "Task dependencies"
 
-    def __str__(self):
+    def __unicode__(self):
         '''
         '''
         return "TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))

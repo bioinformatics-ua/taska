@@ -43,6 +43,11 @@ class Workflow(models.Model):
 
         return val
 
+    def assocProcesses(self):
+        from process.models import Process
+
+        return Process.all(workflow=self)
+
     def clone(self):
         new_kwargs = dict([(fld.name, getattr(self, fld.name)) for fld in self._meta.fields if fld.name != self._meta.pk.name]);
         try:
@@ -93,11 +98,11 @@ class Workflow(models.Model):
         # else
         return tmp.filter(workflowpermission__public=True)
 
-    def __str__(self):
+    def __unicode__(self):
         '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
         '''
         if self.title:
-            return self.title.encode('utf-8')
+            return self.title
 
         return 'Unnamed'
 
@@ -126,7 +131,7 @@ class WorkflowPermission(models.Model):
     searchable      = models.BooleanField(default=True)
     forkable        = models.BooleanField(default=True)
 
-    def __str__(self):
+    def __unicode__(self):
         '''Returns a certain workflow permissions on a string
         '''
 

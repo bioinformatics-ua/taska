@@ -57,8 +57,8 @@ class Process(models.Model):
 
         return "Unknown"
 
-    def __str__(self):
-        return ('%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())).encode('utf-8')
+    def __unicode__(self):
+        return ('%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name()))
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -183,8 +183,8 @@ class ProcessTask(models.Model):
         except KeyError:
             return "Unknown"
 
-    def __str__(self):
-        return ('%s - %s' % (self.task, self.process)).encode('utf-8')
+    def __unicode__(self):
+        return ('%s - %s' % (self.task, self.process))
 
     def rpr(self):
         ts = Task.all().get_subclass(id=self.task.id)
@@ -249,8 +249,8 @@ class ProcessTaskUser(models.Model):
     class Meta:
         ordering = ['-processtask__deadline']
 
-    def __str__(self):
-        return ('%s - %s' % (self.processtask, self.user)).encode('utf-8')
+    def __unicode__(self):
+        return ('%s - %s' % (self.processtask, self.user))
 
     def requests(self):
         return Request.objects.filter(
@@ -375,7 +375,7 @@ class Request(models.Model):
 
         return tmp
 
-    def __str__(self):
+    def __unicode__(self):
         ptask = self.processtaskuser.processtask
         return "Request for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
 

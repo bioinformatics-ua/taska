@@ -57,7 +57,7 @@ class History(models.Model):
         ordering = ["-id"]
 
     def obj_repr(self):
-        return str(self.object)
+        return self.object.__unicode__().decode('utf-8')
 
     def actor_repr(self):
         tmp = self.actor.get_full_name()
