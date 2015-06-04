@@ -39,6 +39,7 @@
     "browserify": "~9.0.3",
     "uglifyjs": "~2.4.10",
     "uglifycss": "~0.0.13",
+    "uglifyify": "~3.0.1",
     "catw": "~0.2.0"
   },
   "scripts": {
