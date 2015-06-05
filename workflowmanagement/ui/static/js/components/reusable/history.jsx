@@ -54,7 +54,7 @@ var HistoryItem = React.createClass({
         case 'Cancel':
           text = `${entry.actor_repr} has canceled`;
           return <span>{text} <strong>{entry.object_repr}</strong></span>;
-        default: return event;
+        default: return entry.event;
       }
     }
     return (
