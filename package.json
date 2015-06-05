@@ -43,8 +43,9 @@
     "catw": "~0.2.0"
   },
   "scripts": {
-    "start": "npm run watchjs & npm run watchcss",
+    "start": "npm run watchjs & npm run watchless & npm run watchcss",
     "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
+    "watchless": "catw -c 'lessc -' ./workflowmanagement/ui/static/less/variables.less ./workflowmanagement/ui/static/less/imports.less  -o ./workflowmanagement/ui/static/css/less_bundle.css -v",
     "watchcss": "catw -c 'uglifycss' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
 
     "prod": "npm run prodjs && npm run prodcss",
