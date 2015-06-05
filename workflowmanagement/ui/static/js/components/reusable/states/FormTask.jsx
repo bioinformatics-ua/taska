@@ -312,8 +312,8 @@ class FormTaskRun extends FormTask{
                                     (user, index) => {
                                             return (
                                                 <tr key={`ustatus_${index}`}>
-                                                    <td>{user['user_repr']}</td>
-                                                    <td>{renderStatus(user)}</td>
+                                                    <td><small>{user['user_repr']}</small></td>
+                                                    <td><small>{renderStatus(user)}</small></td>
                                                 </tr>
                                             );
                                     })
@@ -321,11 +321,20 @@ class FormTaskRun extends FormTask{
                             </tbody>
                         </table>
                         { stillOn ?<span className="clearfix">
-                        <button onClick={me.addNew} className="pull-right btn btn-success">Add new assignee</button>
-                        <Select placeholder="Search for assignee" className="pull-right col-md-5" onChange={this.newAssignee}
-                            value={this.state.new_assignee} name="form-field-name"
-                         options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
-                        } />
+                        <div className="row">
+
+                            <div className="col-md-12">
+                                <div className="input-group">
+                                        <Select placeholder="Search for assignee" onChange={this.newAssignee}
+                                            value={this.state.new_assignee} name="form-field-name"
+                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                        } />
+                                  <span className="input-group-btn">
+                                    <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
+                                  </span>
+                                </div>
+                            </div>
+                        </div><br />
                         </span>: ''}
                     </span>);
                 }

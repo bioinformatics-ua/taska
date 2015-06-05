@@ -100,7 +100,7 @@ export default React.createClass({
                     <span className="icon-bar"></span>
                     <span className="icon-bar"></span>
                   </button>
-                  <Link className="navbar-brand" to="app"><span className="navbar-prefix">Task</span><span className="navbar-suffix">a</span></Link>
+                  <Link className="navbar-brand boldit" to="app"><span className="navbar-prefix">Task</span><span className="navbar-suffix">a</span></Link>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->

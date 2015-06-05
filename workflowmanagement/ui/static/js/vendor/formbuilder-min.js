@@ -314,10 +314,10 @@ function() {
         addButton: '<span class="symbol"><span class="fa fa-square-o"></span></span> Checkboxes',
         defaultAttributes: function(a) {
             return a.field_options.options = [{
-                label: "",
+                label: "Option 1",
                 checked: !1
             }, {
-                label: "",
+                label: "Options 2",
                 checked: !1
             }], a
         }

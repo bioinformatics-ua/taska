@@ -45,9 +45,11 @@ class ResultExporter(object):
     def export(self, encode=False):
         results = self.getResults()
         task = self.getTask()
-
+        ttitle = task.title
+        if encode:
+            ttitle= ttitle.encode('utf-8')
         rows = [
-            ['Task', task.title],
+            ['Task', ttitle],
             ['Number of Task Assignees', self.processtask.users().count()],
             ['Number of Answers', results.count()],
             ['Task Status', ProcessTask.statusCode(self.processtask.status)],

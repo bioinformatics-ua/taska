@@ -38,7 +38,7 @@ class MailTemplate:
             msg = EmailMultiAlternatives(
                     self.subject,
                     html2text.html2text(self.message),
-                    'Study Manager <%s>' % settings.DEFAULT_FROM_EMAIL,
+                    'Taska <%s>' % settings.DEFAULT_FROM_EMAIL,
                     self.destinies
                 )
             msg.attach_alternative(self.message, "text/html")

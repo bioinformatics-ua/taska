@@ -8,9 +8,9 @@ export default React.createClass({
         return (
           <div>
             <h1>Version</h1>
-            Study Manager - v0.1alpha
-            <h1>About Study Manager</h1>
-            <p>The Study Manager is an on-going work for the creation of a modular and easily extendable workflow-oriented system designed to managing
+            Taska - v0.1alpha
+            <h1>About Taska</h1>
+            <p>Taska is an on-going work for the creation of a modular and easily extendable workflow-oriented system designed to managing
             processes of data extraction and data handling.</p>
             <p>The basis of the project is focused on a SaaS approach, to make it more versatile and easily integratable with other software. An default client browser-based implementation is made available through a state-of-the-art reactJS application.</p>
             <p>The platform allows several users to collaborate and interact in an easy manner, with resource to a easy-to-use interface for creating and managing repeatable workflows.</p>

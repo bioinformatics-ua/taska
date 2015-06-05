@@ -515,6 +515,7 @@ let StateMachineComponent = React.createClass({
                 {x:Math.round(offset2.left+width2), y:offset2.top+height2},
                 {
                     lineWidth: 5,
+                    lineColor: "#2C3E50",
                     className: `${conn} state_line ${selected}`,
                     title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
                     id: (exists)? `${conn}`: undefined,
@@ -538,7 +539,8 @@ let StateMachineComponent = React.createClass({
             {x:pos.left, y:pos.top},
             {
                 lineWidth: 5,
-                className: 'temp_line'
+                className: 'temp_line',
+                lineColor: '"2C3E50'
             });
     },
     renderLines(){

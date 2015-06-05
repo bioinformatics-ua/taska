@@ -17,7 +17,7 @@
 @brand-primary:         #2C3E50;
 @brand-success:         #19AB27;
 @brand-info:            #3498DB;
-@brand-warning:         #FFB800;
+@brand-warning:         #f39c12;
 @brand-danger:          #E74C3C;
 
 
@@ -48,7 +48,7 @@
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 @font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          15px;
+@font-size-base:          14px;
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
 
@@ -61,7 +61,7 @@
 
 //** Unit-less `line-height` for use in components like buttons.
 @line-height-base:        1.428571429; // 20/14
-//** Computed "line-height" (`font-size` * `line-height`) for use with `margin`, `padding`, etc.
+//** Computed "line-height" (`font-size` * `line-height`) for use with `marginf`, `padding`, etc.
 @line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
 
 //** By default, this inherits from the `<body>`.
@@ -135,7 +135,7 @@
 @table-bg-active:               @table-bg-hover;
 
 //** Border color for table and cell borders.
-@table-border-color:            @gray-lighter;
+@table-border-color:            darken(@gray-lighter, 10%);
 
 
 //== Buttons
@@ -146,7 +146,7 @@
 
 @btn-default-color:              #fff;
 @btn-default-bg:                 @gray;
-@btn-default-border:             @btn-default-bg;
+@btn-default-border:             lighten(@btn-default-bg, 100%);
 
 @btn-primary-color:              @btn-default-color;
 @btn-primary-bg:                 #337ab7;
@@ -195,7 +195,7 @@
 @input-border-radius-small:      @border-radius-small;
 
 //** Border color for inputs on focus
-@input-border-focus:             @brand-primary;
+@input-border-focus:             @btn-default-bg;
 
 //** Placeholder text color
 @input-color-placeholder:        #acb6c0;
@@ -490,19 +490,19 @@
 //
 //## Define colors for form feedback states and, by default, alerts.
 
-@state-success-text:             #fff;
+@state-success-text:             @brand-success;
 @state-success-bg:               @brand-success;
 @state-success-border:           @brand-success;
 
-@state-info-text:                #fff;
+@state-info-text:                @brand-info;
 @state-info-bg:                  @brand-info;
 @state-info-border:              @brand-info;
 
-@state-warning-text:             #fff;
+@state-warning-text:             @brand-warning;
 @state-warning-bg:               @brand-warning;
 @state-warning-border:           @brand-warning;
 
-@state-danger-text:              #fff;
+@state-danger-text:              @brand-danger;
 @state-danger-bg:                @brand-danger;
 @state-danger-border:            @brand-danger;
 
@@ -703,31 +703,31 @@
 @panel-border-radius:         @border-radius-base;
 
 //** Border color for elements within panels
-@panel-inner-border:          @gray-lighter;
+@panel-inner-border:          darken(@gray-lighter, 10%);
 @panel-footer-bg:             @gray-lighter;
 
 @panel-default-text:          @text-color;
-@panel-default-border:        @gray-lighter;
+@panel-default-border:        darken(@gray-lighter, 10%);
 @panel-default-heading-bg:    @gray-lighter;
 
 @panel-primary-text:          #fff;
-@panel-primary-border:        @brand-primary;
+@panel-primary-border:        darken(@brand-primary, 10%);
 @panel-primary-heading-bg:    @brand-primary;
 
 @panel-success-text:          @state-success-text;
-@panel-success-border:        @state-success-border;
+@panel-success-border:        darken(@state-success-border, 10%);
 @panel-success-heading-bg:    @state-success-bg;
 
 @panel-info-text:             @state-info-text;
-@panel-info-border:           @state-info-border;
+@panel-info-border:           darken(@state-info-border, 10%);
 @panel-info-heading-bg:       @state-info-bg;
 
 @panel-warning-text:          @state-warning-text;
-@panel-warning-border:        @state-warning-border;
+@panel-warning-border:        darken(@state-warning-border, 10%);
 @panel-warning-heading-bg:    @state-warning-bg;
 
 @panel-danger-text:           @state-danger-text;
-@panel-danger-border:         @state-danger-border;
+@panel-danger-border:         darken(@state-danger-border, 10%);
 @panel-danger-heading-bg:     @state-danger-bg;
 
 

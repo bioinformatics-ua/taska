@@ -27,7 +27,7 @@
     text-overflow: ellipsis;
 }
  .state-start{
-    color: black;
+    color: #2C3E50;
     display: inline-block;
     margin:20px;
     position: relative;
@@ -56,6 +56,11 @@
     border: 4px dotted #C7C7C7;
     background-color: white;
     min-width: 100px;
+}
+
+.btn-dotted:hover{
+    color: #2C3E50;
+    background-color: #ECF0F1;
 }
 .state-options, .line-options{
     display: none;
@@ -92,9 +97,9 @@
 }
 
 .state-handler-selected, .state_line_selected{
-  border-color: rgba(51, 122, 183, 0.61);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
-  outline: 0 none;
+/*  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
+  outline: 0 none;*/
+  background-color: #798d8f;
 }
 
 .line-options{
@@ -121,7 +126,7 @@
     font-family: fa;
 }
 .state_line::after{
-    color: black;
+    color: #2C3E50;
     content: '\f060';
     font-size: 20px;
     margin-left: -4px;
