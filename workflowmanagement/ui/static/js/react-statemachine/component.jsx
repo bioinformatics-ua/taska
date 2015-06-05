@@ -63,7 +63,7 @@ const ModalDetail = React.createClass({
                           <h4 className="modal-title">Detail View</h4>
                         </div>
                         <div className="modal-body">
-                          {this.props.component}
+                          { this.props.component }
                         </div>
                       </div>
                     </div>
