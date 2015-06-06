@@ -463,7 +463,7 @@ function() {
         var __t, __p = "";
         _.escape
     }
-    with(obj) __p += "<label>\n  <input type='checkbox' data-rv-checked='model." + (null == (__t = Formbuilder.options.mappings.REQUIRED) ? "" : __t) + "' />\n  Required\n</label>\n<label>\n  <input type='checkbox' data-rv-checked='model." + (null == (__t = Formbuilder.options.mappings.ADMIN_ONLY) ? "" : __t) + "' />\n  Admin only\n</label>";
+    with(obj) __p += "<label>\n  <input type='checkbox' data-rv-checked='model." + (null == (__t = Formbuilder.options.mappings.REQUIRED) ? "" : __t) + "' />\n  Required\n</label>\n<label>";
     return __p
 }, this.Formbuilder.templates["edit/common"] = function(obj) {
     obj || (obj = {}); {
@@ -491,14 +491,14 @@ function() {
         var __t, __p = "";
         _.escape
     }
-    with(obj) __p += '<div class=\'fb-edit-section-header\'>Minimum / Maximum</div>\n\nAbove\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MIN) ? "" : __t) + '" style="width: 30px" />\n\n&nbsp;&nbsp;\n\nBelow\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MAX) ? "" : __t) + '" style="width: 30px" />\n';
+    with(obj) __p += '<div class=\'fb-edit-section-header\'>Minimum / Maximum</div>\n\nAbove\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MIN) ? "" : __t) + '" style="width: 60px" />\n\n&nbsp;&nbsp;\n\nBelow\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MAX) ? "" : __t) + '" style="width: 60px" />\n';
     return __p
 }, this.Formbuilder.templates["edit/min_max_length"] = function(obj) {
     obj || (obj = {}); {
         var __t, __p = "";
         _.escape
     }
-    with(obj) __p += '<div class=\'fb-edit-section-header\'>Length Limit</div>\n\nMin\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MINLENGTH) ? "" : __t) + '" style="width: 30px" />\n\n&nbsp;&nbsp;\n\nMax\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MAXLENGTH) ? "" : __t) + '" style="width: 30px" />\n\n&nbsp;&nbsp;\n\n<select data-rv-value="model.' + (null == (__t = Formbuilder.options.mappings.LENGTH_UNITS) ? "" : __t) + '" style="width: auto;">\n  <option value="characters">characters</option>\n  <option value="words">words</option>\n</select>\n';
+    with(obj) __p += '<div class=\'fb-edit-section-header\'>Length Limit</div>\n\nMin\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MINLENGTH) ? "" : __t) + '" style="width: 60px" />\n\n&nbsp;&nbsp;\n\nMax\n<input type="text" data-rv-input="model.' + (null == (__t = Formbuilder.options.mappings.MAXLENGTH) ? "" : __t) + '" style="width: 60px" />\n\n&nbsp;&nbsp;\n\n<select data-rv-value="model.' + (null == (__t = Formbuilder.options.mappings.LENGTH_UNITS) ? "" : __t) + '" style="width: auto;">\n  <option value="characters">characters</option>\n  <option value="words">words</option>\n</select>\n';
     return __p
 }, this.Formbuilder.templates["edit/options"] = function(obj) {
     obj || (obj = {}); {
