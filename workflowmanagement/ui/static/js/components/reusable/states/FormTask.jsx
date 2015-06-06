@@ -15,6 +15,8 @@ import moment from 'moment';
 
 import {stateColor} from '../../../map.jsx';
 
+import DateTimePicker from 'react-widgets/lib/DateTimePicker';
+
 class FormTask extends SimpleTask {
     constructor(options){
         super(options);
@@ -199,7 +201,7 @@ class FormTaskRun extends FormTask{
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
             setDeadline(e){
-                let data = {deadline: e.target.value};
+                let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
@@ -385,11 +387,9 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            <input type="datetime-local" className="form-control"
-                                            aria-describedby="state-deadline"
-                                            placeholder="Deadline"
-                                            onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
+                        <DateTimePicker onChange={this.setDeadline} disabled={this.parent().disabled}
+                            defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+
                     </div>
 
                     {this.results()}

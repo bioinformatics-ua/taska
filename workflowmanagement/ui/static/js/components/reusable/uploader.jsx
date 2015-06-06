@@ -341,7 +341,7 @@ const Uploader = React.createClass({
             <span>
             {this.props.editable ?
                 <fieldset id="fuploader">
-                    <p>Drop files here, or click to browse...</p>
+                    <p><i className="fa fa-paperclip"></i> Drop files here, or click to browse...</p>
                 </fieldset>
             :''}
             <Griddle

@@ -17,6 +17,8 @@ import Uploader from '../uploader.jsx';
 
 import {stateColor} from '../../../map.jsx';
 
+import DateTimePicker from 'react-widgets/lib/DateTimePicker';
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -65,8 +67,8 @@ class SimpleTask extends SimpleState {
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
 
                         <span>
-                        {(this.parent().resources && this.parent().resources.length > 0)?
-                            <label>File Inputs</label>
+                        {(this.parent().resources && this.parent().resources.length > 0 || editable)?
+                            <label>Attachments</label>
                         :''}
                         <Uploader editable={editable} uploads={this.parent().resources} done={this.setResources} />
                         </span>
@@ -221,7 +223,7 @@ class SimpleTaskRun extends SimpleTask{
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
             setDeadline(e){
-                let data = {deadline: e.target.value};
+                let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
@@ -390,7 +392,6 @@ class SimpleTaskRun extends SimpleTask{
                             value: moment().add(10, 'days').format('YYYY-MM-DDTHH:mm')
                         }
                     });
-
             },
             render(){
                 return <span>
@@ -405,11 +406,16 @@ class SimpleTaskRun extends SimpleTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            <input type="datetime-local" className="form-control"
+                            {/*<input type="text" className="form-control"
                                             aria-describedby="state-deadline"
+                                            id="state-deadline"
                                             placeholder="Deadline"
                                             onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
+                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />*/}
+
+                            <DateTimePicker onChange={this.setDeadline} disabled={this.parent().disabled}
+                            defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+
                     </div>
 
                     {this.results()}
