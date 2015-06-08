@@ -33,6 +33,31 @@ footer {
     background-color: #ecf0f1;
 }
 
+.breadbar{
+  padding-top:10px;
+  margin-top:-10px;
+  background-color: white;
+  z-index:1030;
+  position: fixed;
+
+}
+
+.affixed:after{
+
+    height: 4px;
+    width: 100%;
+    position: absolute;
+    content: " ";
+    background: rgba(163,163,163,1);
+    background: -moz-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(163,163,163,1)), color-stop(100%, rgba(255,255,255,0)));
+    background: -webkit-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -o-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
+}
+
 table {
   background-color: white;
 }
