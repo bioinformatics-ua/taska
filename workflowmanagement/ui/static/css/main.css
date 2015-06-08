@@ -6,6 +6,9 @@ html {
 .navbar{
     min-width: 480px;
 }
+.dropdown-menu{
+  z-index: 1200 !important;
+}
 body {
     font-family: opensans;
     font-size: 140%;
@@ -37,14 +40,14 @@ footer {
   padding-top:10px;
   margin-top:-10px;
   background-color: white;
-  z-index:1030;
+  z-index:1020;
   position: fixed;
 
 }
 
 .affixed:after{
 
-    height: 4px;
+    height: 6px;
     width: 100%;
     position: absolute;
     content: " ";

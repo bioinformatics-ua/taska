@@ -51,10 +51,20 @@ export default React.createClass({
         router: React.PropTypes.func.isRequired
     },
     displayName: route => {
-        try {
-            return `Study - ${route.props.detail.Workflow.title}`;
+        try{
+            let detail = Object.keys(route.props.detail)[0];
+            return `Study - ${route.props.detail[detail].title}`;
         } catch(ex){
-            return "Study Not Found"
+            return 'Study Not Found';
+        }
+    },
+    getWorkflow(){
+        return this.props.detail
+        try{
+            let detail = Object.keys(this.props.detail)[0];
+            return `Study - ${route.props.detail[detail].title}`;
+        } catch(ex){
+            return 'Study Not Found';
         }
     },
     __getState(){
@@ -214,7 +224,7 @@ export default React.createClass({
                             listProcesses={this.state.workflow['assoc_processes']}
                             {...this.state.workflow.permissions} />
                     }
-                    title={this.props.detail.Workflow.title}
+                    title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
                     save={params.mode === 'run'? this.runProcess:this.save}

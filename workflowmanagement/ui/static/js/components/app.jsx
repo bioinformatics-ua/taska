@@ -71,8 +71,46 @@ const LoadingBar = React.createClass({
     getInitialState() {
       return this.__getState();
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     update(status){
       this.setState(this.__getState());
+    },
+    componentDidUpdate(){
+      // react-breadcrumbs are automatic, so i have to force the url status as i see fit
+      let ba = $('.breadcrumbs a.active');
+
+      let self = this;
+      let handler = function(e){
+        e.preventDefault();
+        let goFunc = ()=>{
+            self.context.router.transitionTo(
+                $(this).attr('href')
+            );
+        };
+
+        if(StateStore.isUnsaved()){
+            StateActions.alert(
+            {
+                'title':'Unsaved Data',
+                'message': 'There is unsaved data. Are you sure you want to leave ? Unsaved data will be lost.',
+                onConfirm: (context)=>{
+                    // User confirmed he wants to lose data
+                    StateActions.save(false);
+                    StateActions.dismissAlert(false);
+
+                    //window.location.replace(nextPath);
+                    goFunc();
+                }
+            });
+        } else {
+            goFunc();
+        }
+      };
+
+      ba.unbind('click');
+      ba.bind('click', handler);
     },
     render(){
       return (

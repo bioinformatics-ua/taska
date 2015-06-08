@@ -572,7 +572,7 @@ let StateMachineComponent = React.createClass({
             {
                 lineWidth: 5,
                 className: 'temp_line',
-                lineColor: '"2C3E50'
+                lineColor: '#2C3E50'
             });
     },
     renderLines(){
