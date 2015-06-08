@@ -326,7 +326,7 @@ let Affix = React.createClass({
 
     return (
       <span>
-      <div data-clamp="#bs-example-navbar-collapse-1" className={joinClasses(className, affix)}>
+      <div data-clamp=".widthreference" className={joinClasses(className, affix)}>
         {this.props.children}
       </div>
       <div style={{height: offset}}>&nbsp;</div>

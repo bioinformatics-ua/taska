@@ -168,6 +168,12 @@ export default React.createClass({
             </Affix>
             <RouteHandler key={name} {...this.props} />
           </div>
+          <div className="container">
+            <div className="row">
+              <div className="widthreference col-md-12">
+              </div>
+            </div>
+          </div>
           <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
         </div>
     );
