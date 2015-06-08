@@ -49,6 +49,11 @@ table {
     right: 20px;
     top: 4px;
 }
+.loadingbar{
+  padding-top: 8px;
+  text-align: right;
+}
+
 .breadcrumbs {
     padding: 8px 15px;
     padding-left:0;

@@ -11,10 +11,12 @@ import {Authentication} from '../mixins/component.jsx';
 import {Modal, PermissionsBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
+import StateActions from '../actions/StateActions.jsx';
 
 import WorkflowStore from '../stores/WorkflowStore.jsx';
 
 import UserStore from '../stores/UserStore.jsx';
+import StateStore from '../stores/StateStore.jsx';
 
 import {StateMachineComponent} from '../react-statemachine/component.jsx';
 
@@ -159,6 +161,12 @@ export default React.createClass({
     closePopup(){
         WorkflowActions.calibrate();
     },
+    unsaved(){
+        let params = this.context.router.getCurrentParams();
+
+        if(params.mode === 'edit')
+            StateActions.waitSave();
+    },
     render() {
         if(this.props.failed){
             let Failed = this.props.failed;
@@ -210,6 +218,7 @@ export default React.createClass({
                     editable={params.mode === 'edit'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
                     save={params.mode === 'run'? this.runProcess:this.save}
+                    onUpdate={this.unsaved}
                     saveLabel={params.mode !== 'run'?
                     <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
                     : <span><i className="fa fa-play"></i> Run</span>}

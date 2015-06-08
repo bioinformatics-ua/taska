@@ -4,11 +4,31 @@ import {Login} from '../actions/api.jsx'
 import UserActions from '../actions/UserActions.jsx';
 
 import StateActions from '../actions/StateActions.jsx';
+import StateStore from '../stores/StateStore.jsx';
 
 const Authentication = {
     statics: {
         willTransitionTo: function (transition, params, query, callback) {
             var nextPath = transition.path;
+            // Must clear on all pages!
+            if(StateStore.isUnsaved()){
+                console.log('THERE ARE UNSAVED DATA');
+                transition.abort();
+                StateActions.alert(
+                {
+                    'title':'Unsaved Data',
+                    'message': 'There is unsaved data. Are you sure you want to leave ? Unsaved data will be lost.',
+                    onConfirm: (context)=>{
+                        // User confirmed he wants to lose data
+                        StateActions.save(false);
+                        StateActions.dismissAlert(false);
+
+                        // Hell, i can't seem to be able to do it with a transition here... have some kind of race condition
+                        // so i use a hard redirect, better than nothing...
+                        window.location.replace(nextPath);
+                    }
+                });
+            }
 
             let promise = UserActions.loadDetailIfNecessary.triggerPromise('me').then(
                 (user_data) => {
@@ -22,8 +42,8 @@ const Authentication = {
 
                 switch(ex.status){
                     case 0: StateActions.alert({
-                        'title': 'Connection Failed',
-                        'message': 'Connection Failed, please try again, if the problem persists contact the administrator.'
+                        title: 'Connection Failed',
+                        message: 'Connection Failed, please try again, if the problem persists contact the administrator.'
                     }); break;
                     case 404: transition.redirect('NotFound',{},{}); break;
                     default: transition.redirect('InternalError',{},{}); break;

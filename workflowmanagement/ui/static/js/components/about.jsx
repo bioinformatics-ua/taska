@@ -2,9 +2,12 @@
 
 import React from 'react';
 
+import {Authentication} from '../mixins/component.jsx';
+
 export default React.createClass({
     displayName: "About",
-      render() {
+    mixins: [Authentication],
+    render() {
         return (
           <div>
             <h1>Version</h1>

@@ -21,9 +21,10 @@ const AlertQueue = React.createClass({
     mixins: [Reflux.listenTo(StateStore, 'update')],
     __getState(){
         return {
-            alert: StateStore.getAlert(),
+            alert: StateStore.getAlert()
         }
     },
+
     getInitialState() {
         return this.__getState();
     },
@@ -33,10 +34,25 @@ const AlertQueue = React.createClass({
     handleClose(e){
         StateActions.dismissAlert();
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
+    askLoss(alert){
+
+        let alert = this.state.alert;
+
+        if(alert.onConfirm)
+            alert.onConfirm(this.context.router);
+    },
     render: function(){
         let alert = this.state.alert;
         if(!alert)
             return <span></span>
+
+        if(alert.onConfirm){
+            return <Modal title={alert.title} message={alert.message}
+                        close={this.handleClose} showConfirm={true} success={this.askLoss} />
+        }
 
         return <Modal title={alert.title} message={alert.message} close={this.handleClose} showConfirm={false} />
 
@@ -49,6 +65,7 @@ const LoadingBar = React.createClass({
     __getState(){
       return {
         loading: StateStore.isLoading(),
+        unsaved: StateStore.isUnsaved()
       }
     },
     getInitialState() {
@@ -57,11 +74,23 @@ const LoadingBar = React.createClass({
     update(status){
       this.setState(this.__getState());
     },
+    confirmExit(){
+
+    },
+
+    componentDidUpdate(){
+        if(this.state.unsaved)
+            window.onbeforeunload = this.confirmExit;
+
+        window.onbeforeunload = undefined;
+    },
     render(){
       return (
-        <span>
-        {(this.state.loading)?<div className="loading"><i className="fa fa-2x fa-cog fa-spin"></i></div>:''}
-        </span>
+        <div className="col-md-2 pull-right loadingbar">
+        {(this.state.loading)?<div className="pull-right">&nbsp;&nbsp;<i className="fa fa-2x fa-cog fa-spin"></i></div>:''}
+        {(this.state.unsaved)?<div className="pull-right"><i className="fa fa-exclamation-triangle"></i> Not saved</div>:''}
+
+        </div>
       );
     }
   });
@@ -78,6 +107,7 @@ export default React.createClass({
         failed: UserStore.getDetailFailed()
       }
     },
+
     getInitialState() {
       return this.__getState();
     },
@@ -124,8 +154,12 @@ export default React.createClass({
         </header>
         <div className="container">
           <AlertQueue />
-          <Breadcrumbs separator='' {...this.props} />
-          <LoadingBar />
+            <div className="row">
+                <div className="col-md-10 pull-left">
+                    <Breadcrumbs separator='' {...this.props} />
+                </div>
+                <LoadingBar />
+            </div>
           <RouteHandler key={name} {...this.props} />
         </div>
         <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
