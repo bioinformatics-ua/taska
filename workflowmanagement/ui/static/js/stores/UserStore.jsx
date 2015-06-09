@@ -81,8 +81,6 @@ export default Reflux.createStore({
             self.__loginfail = false;
             UserActions.unloadDetail();
 
-            console.log(data);
-
             UserActions.logoutSuccess(data);
             if(callback)
                 callback();

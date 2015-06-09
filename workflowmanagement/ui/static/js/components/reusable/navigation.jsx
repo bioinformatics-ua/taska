@@ -39,6 +39,7 @@ var UserDropdown = React.createClass({
     },
     logout: function(){
       let self = this;
+      console.log('LOGGING OUT');
       UserActions.logout(function(){
         self.context.router.replaceWith('login');
       });
@@ -69,7 +70,7 @@ var UserDropdown = React.createClass({
                           <Link to="profile"><i className="fa fa-pencil-square-o"></i> Edit Profile</Link>
                         </li>
                         <li className="divider"></li>
-                        <li><a href="#" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
+                        <li><a href="javascript:void(0)" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
                       </ul>
                     </li>
 
