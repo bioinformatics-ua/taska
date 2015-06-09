@@ -18,6 +18,11 @@ module.exports = (
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
+        <Route name="register" path="register" handler={require('./components/register.jsx')}/>
+
+        <Route name="activate" path="activate/:email" handler={require('./components/activate.jsx')}/>
+
+
         <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
 
         <Route name="home" path={baseurl} handler={require('./components/home.jsx')}/>

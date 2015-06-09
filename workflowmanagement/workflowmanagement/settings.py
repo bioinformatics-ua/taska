@@ -196,6 +196,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
 # by default it never expires
 SESSION_COOKIE_AGE = 12*3600
 
+EMAIL_URL  = "http://localhost:8000"
+
+# api default
+#API_ACTIVATE_URL = "api/account/activate/?email="
+API_ACTIVATE_URL = "activate/"
+
+
 try:
     from local_settings import *
 except:
@@ -205,4 +212,5 @@ STATIC_URL = BASE_URL+'static/'
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
-PREMAILER_OPTIONS = dict(base_url=BASE_URL, remove_classes=False)
+PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
+

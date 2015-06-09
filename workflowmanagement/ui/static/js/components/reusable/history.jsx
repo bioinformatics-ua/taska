@@ -32,6 +32,19 @@ var HistoryItem = React.createClass({
         }
       }
 
+      if(ty === 'User'){
+        var text;
+        switch(entry.event){
+          case 'Add':
+            text = `${entry.actor_repr} has registered.`;
+            return <span>{text}</span>;
+          case 'Approve':
+            text = `${entry.actor_repr} has approved ${entry.object_repr}.`;
+            return <span>{text}</span>;
+          default: return event;
+        }
+      }
+
       if(ty === 'NoneType')
         link = <span>{entry.object_repr}</span>;
       else
@@ -75,6 +88,7 @@ var EventIcon = React.createClass({
         case 'Add': return <i className="fa fa-plus thumb"></i>;
         case 'Edit': return <i className="fa fa-pencil thumb"></i>;
         case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
+        case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
         default: return event;
       }
     }

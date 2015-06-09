@@ -19,9 +19,15 @@ class MailTemplate:
 
         self.subject = render_to_string(self.subjecttemplate, {
                             'object': self.instance.object,
-                            'history': self.instance
+                            'history': self.instance,
+                            'settings': settings
                         }).replace('\n', '')
-        self.message = render_to_string(self.template, {'object': self.instance.object, 'history': self.instance})
+        self.message = render_to_string(self.template,
+            {
+                'object': self.instance.object,
+                'history': self.instance,
+                'settings': settings
+            })
 
     def send_mail(self):
 
@@ -72,3 +78,11 @@ class SimpleResultAddTemplate(ResultAddTemplate):
 
 class FormResultAddTemplate(ResultAddTemplate):
     pass
+
+class UserAddTemplate(MailTemplate):
+    subjecttemplate="mail/user_add_subject.html"
+    template="mail/user_add.html"
+
+class UserApproveTemplate(MailTemplate):
+    subjecttemplate="mail/user_approve_subject.html"
+    template="mail/user_approve.html"

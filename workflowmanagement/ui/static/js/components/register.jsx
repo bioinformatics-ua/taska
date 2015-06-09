@@ -3,23 +3,31 @@ import Router from 'react-router';
 import React from 'react/addons';
 import Reflux from 'reflux';
 
-import {Authentication} from '../mixins/component.jsx';
-
 import Select from 'react-select';
 
 import UserStore from '../stores/UserStore.jsx';
 
 import UserActions from '../actions/UserActions.jsx';
+import StateActions from '../actions/StateActions.jsx';
 
 import Toggle from 'react-toggle';
 
 export default React.createClass({
-    displayName: "Profile",
-    mixins: [Router.Navigation, Authentication,
+    displayName: "Register",
+    mixins: [Router.Navigation,
                 Reflux.listenTo(UserStore, 'update')],
+    statics: {
+        fetch(params) {
+            return new Promise(function (fulfill, reject){
+                UserStore.init();
+                fulfill({});
+            });
+        }
+    },
     getState(){
         return {
             user: UserStore.getUser(),
+            registered: UserStore.hasRegistered()
         }
     },
     getInitialState(){
@@ -30,6 +38,9 @@ export default React.createClass({
     },
     contextTypes: {
         router: React.PropTypes.func.isRequired
+    },
+    setEmail(e){
+        UserActions.setField('email', e.target.value);
     },
     setFirst(e){
         UserActions.setField('first_name', e.target.value);
@@ -53,21 +64,32 @@ export default React.createClass({
     setNotification(e){
         UserActions.setProfileField('notification', e.target.checked);
     },
-    save(e){
-        UserActions.saveUser()
+    register(e){
+        UserActions.registerUser()
+    },
+    componentDidUpdate(){
+        if(this.state.registered==true){
+            this.context.router.transitionTo('default');
+            StateActions.alert({
+                'title': 'User registered with success',
+                'message': 'The user has been registered successfully, and the decision about approval will be briefly communicated by email by the administrators.'
+            })
+        }
     },
     render: function () {
         return (
             <span>
                 <div className="row">
                     <div className="profileform col-md-8 col-md-offset-2">
-                        <h3>Edit Profile</h3>
+                        <h3>Register Account</h3>
+                        <p>To register, please apply with the form below.</p>
+                        <p>At this time, registry is manually approved by the administrator. You will receive an email with the veredict of your approval status.</p>
                         <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Email</strong>
                                 </span>
-                                <input className="form-control" disabled value={this.state.user.email} />
+                                <input className="form-control" onChange={this.setEmail} value={this.state.user.email} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -89,9 +111,9 @@ export default React.createClass({
                         <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
-                                    <strong>New Password</strong>
+                                    <strong>Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="Only fill when changing password" type="password" onChange={this.setPassword} value={this.state.user['password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setPassword} value={this.state.user['password']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -99,7 +121,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Confirm Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="Only fill when changing password" type="password" onChange={this.setConfirmPassword} value={this.state.user['confirm_password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} value={this.state.user['confirm_password']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -140,8 +162,8 @@ export default React.createClass({
                                  options={[]} />
                             </div>
                         </div>*/}
-                        <button onClick={this.save} className="pull-right btn btn-primary">
-                            <i className="fa fa-floppy-o"></i> &nbsp;Save
+                        <button onClick={this.register} className="pull-right btn btn-primary">
+                            <i className="fa fa-floppy-o"></i> &nbsp;Register
                         </button>
                     </div>
                 </div>

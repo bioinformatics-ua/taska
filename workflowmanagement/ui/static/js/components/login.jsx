@@ -76,7 +76,7 @@ export default React.createClass({
                         <!--a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span-->
                         </form>
                     </div>
-                    <!--a href="#" className="text-center new-account">Create an account </a-->
+                    <Link to="register" className="text-center new-account">Create an account </Link>
                 </div>
             </div>
         </div>);
