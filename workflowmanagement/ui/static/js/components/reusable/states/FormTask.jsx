@@ -367,11 +367,7 @@ class FormTaskRun extends FormTask{
                 );
 
                 if(!this.parent().deadline)
-                    this.setDeadline({
-                        target: {
-                            value: moment().add(10, 'days').format('YYYY-MM-DDTHH:mm')
-                        }
-                    });
+                    this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
 
             },
             render(){
@@ -387,7 +383,7 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        <DateTimePicker onChange={this.setDeadline} disabled={this.parent().disabled}
+                        <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 
                     </div>
