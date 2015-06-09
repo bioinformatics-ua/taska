@@ -73,10 +73,10 @@ export default Reflux.createStore({
             ResultActions.addDetail.triggerPromise(this.__detaildata).then(
                 (answer) => {
                     StateActions.loadingEnd();
-                    StateActions.save()
-
-                    this.__rfinished = answer;
-                    this.trigger();
+                    StateActions.save(true, ()=>{
+                        this.__rfinished = answer;
+                        this.trigger();
+                    });
                 }
             );
         }
