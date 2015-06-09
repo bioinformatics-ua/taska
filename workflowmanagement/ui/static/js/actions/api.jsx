@@ -67,7 +67,7 @@ class SimpleListLoader extends Loader{
         this.model = options.model;
     }
     load(){
-        return super.load(`api/${this.model}/`);
+        return super.load(`api/${this.model}/?page_size=1000`);
     }
 }
 
