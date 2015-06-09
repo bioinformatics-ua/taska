@@ -409,8 +409,8 @@ let StateMachineComponent = React.createClass({
                 ):'';
               return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
                         <div title={state.label()} style={state.stateStyle()} onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
-                            <label onClick={this.cancel}>{state.label()}</label>
-                            <input type="text" className="clickedit form-control" defaultValue={state.label()} />
+                            <label key={state.label()+'_label'} onClick={this.cancel}>{state.label()}</label>
+                            <input key={state.label()+'_input'} type="text" className="clickedit form-control" defaultValue={state.label()} />
                             <div>
                                 <div className="pull-right">
                                     <small>{state.type()}</small>
