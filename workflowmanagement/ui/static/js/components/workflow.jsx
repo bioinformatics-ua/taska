@@ -59,13 +59,8 @@ export default React.createClass({
         }
     },
     getWorkflow(){
-        return this.props.detail
-        try{
-            let detail = Object.keys(this.props.detail)[0];
-            return `Study - ${route.props.detail[detail].title}`;
-        } catch(ex){
-            return 'Study Not Found';
-        }
+        let detail = Object.keys(this.props.detail)[0];
+        return this.props.detail[detail];
     },
     __getState(){
         return {

@@ -130,7 +130,7 @@ const WorkflowStore = Reflux.createStore({
                 WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
-                            StateActions.save()
+                            StateActions.save();
                             this.trigger();
                         }
                 );
@@ -138,9 +138,11 @@ const WorkflowStore = Reflux.createStore({
                   WorkflowActions.addDetail.triggerPromise(workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
-                            StateActions.save()
-                            this.__wfinished = workflow;
-                            this.trigger();
+                            StateActions.save(true, ()=>{
+                                this.__wfinished = workflow;
+                                this.trigger();
+                            });
+
                         }
                 );
         }
