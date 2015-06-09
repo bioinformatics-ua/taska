@@ -90,6 +90,11 @@ class DetailLoader extends Loader{
     method(method, hash, type='GET', data={}){
       if(typeof data !== 'string')
         data = JSON.stringify(data);
+
+      if(hash==undefined)
+        return super.load(`api/${this.model}/${method}/`, null, null, type, data);
+
+      //else
       return super.load(`api/${this.model}/${hash}/${method}/`, null, null, type, data);
     }
 }

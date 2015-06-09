@@ -10,6 +10,7 @@ import UserStore from '../stores/UserStore.jsx';
 
 import {CheckLog} from '../mixins/component.jsx';
 
+
 export default React.createClass({
     displayName: "Login",
     mixins: [Reflux.listenTo(UserStore, 'update'), CheckLog],
@@ -75,7 +76,7 @@ export default React.createClass({
                         <!--a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span-->
                         </form>
                     </div>
-                    <!--a href="#" className="text-center new-account">Create an account </a-->
+                    <Link to="register" className="text-center new-account">Create an account </Link>
                 </div>
             </div>
         </div>);

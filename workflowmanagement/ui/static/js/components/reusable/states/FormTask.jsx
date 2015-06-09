@@ -15,6 +15,8 @@ import moment from 'moment';
 
 import {stateColor} from '../../../map.jsx';
 
+import DateTimePicker from 'react-widgets/lib/DateTimePicker';
+
 class FormTask extends SimpleTask {
     constructor(options){
         super(options);
@@ -199,7 +201,7 @@ class FormTaskRun extends FormTask{
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
             setDeadline(e){
-                let data = {deadline: e.target.value};
+                let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
@@ -312,8 +314,8 @@ class FormTaskRun extends FormTask{
                                     (user, index) => {
                                             return (
                                                 <tr key={`ustatus_${index}`}>
-                                                    <td>{user['user_repr']}</td>
-                                                    <td>{renderStatus(user)}</td>
+                                                    <td><small>{user['user_repr']}</small></td>
+                                                    <td><small>{renderStatus(user)}</small></td>
                                                 </tr>
                                             );
                                     })
@@ -321,11 +323,20 @@ class FormTaskRun extends FormTask{
                             </tbody>
                         </table>
                         { stillOn ?<span className="clearfix">
-                        <button onClick={me.addNew} className="pull-right btn btn-success">Add new assignee</button>
-                        <Select placeholder="Search for assignee" className="pull-right col-md-5" onChange={this.newAssignee}
-                            value={this.state.new_assignee} name="form-field-name"
-                         options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
-                        } />
+                        <div className="row">
+
+                            <div className="col-md-12">
+                                <div className="input-group">
+                                        <Select placeholder="Search for assignee" onChange={this.newAssignee}
+                                            value={this.state.new_assignee} name="form-field-name"
+                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                        } />
+                                  <span className="input-group-btn">
+                                    <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
+                                  </span>
+                                </div>
+                            </div>
+                        </div><br />
                         </span>: ''}
                     </span>);
                 }
@@ -376,11 +387,9 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            <input type="datetime-local" className="form-control"
-                                            aria-describedby="state-deadline"
-                                            placeholder="Deadline"
-                                            onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />
+                        <DateTimePicker onChange={this.setDeadline} disabled={this.parent().disabled}
+                            defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+
                     </div>
 
                     {this.results()}

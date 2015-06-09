@@ -12,6 +12,7 @@ var Tab = React.createClass({
   },
   render() {
     var isActive = this.context.router.isActive(this.props.to, this.props.params, this.props.query);
+
     var className = isActive ? 'active' : '';
     var link = (
       <Link {...this.props} />
@@ -38,6 +39,7 @@ var UserDropdown = React.createClass({
     },
     logout: function(){
       let self = this;
+      console.log('LOGGING OUT');
       UserActions.logout(function(){
         self.context.router.replaceWith('login');
       });
@@ -48,7 +50,10 @@ var UserDropdown = React.createClass({
     }
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
                     <li>
-                        <Tab to='about'><i className="fa fa-info-circle"></i> About</Tab>
+                        <Tab to='default' className="boldit"><i className="fa fa-home"></i> HOME</Tab>
+                    </li>
+                    <li>
+                        <Tab to='about' className="boldit"><i className="fa fa-info-circle"></i> ABOUT</Tab>
                     </li>
                     <li className="dropdown">
                       <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -65,7 +70,7 @@ var UserDropdown = React.createClass({
                           <Link to="profile"><i className="fa fa-pencil-square-o"></i> Edit Profile</Link>
                         </li>
                         <li className="divider"></li>
-                        <li><a href="#" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
+                        <li><a href="javascript:void(0)" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>
                       </ul>
                     </li>
 

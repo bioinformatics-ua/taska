@@ -73,17 +73,17 @@ const WorkflowStore = Reflux.createStore({
     },
     onSetPublic(status){
         this.__detaildata.permissions.public = status;
-
+        StateActions.waitSave();
         //this.trigger(WorkflowStore.DETAIL);
     },
     onSetSearchable(status){
         this.__detaildata.permissions.searchable = status;
-
+        StateActions.waitSave();
         //this.trigger(WorkflowStore.DETAIL);
     },
     onSetForkable(status){
         this.__detaildata.permissions.forkable = status;
-
+        StateActions.waitSave();
         //this.trigger(WorkflowStore.DETAIL);
     },
     onSetWorkflow(data){
@@ -130,6 +130,7 @@ const WorkflowStore = Reflux.createStore({
                 WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
+                            StateActions.save()
                             this.trigger();
                         }
                 );
@@ -137,6 +138,7 @@ const WorkflowStore = Reflux.createStore({
                   WorkflowActions.addDetail.triggerPromise(workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
+                            StateActions.save()
                             this.__wfinished = workflow;
                             this.trigger();
                         }

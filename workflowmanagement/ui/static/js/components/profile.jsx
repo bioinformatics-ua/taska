@@ -37,6 +37,12 @@ export default React.createClass({
     setLast(e){
         UserActions.setField('last_name', e.target.value);
     },
+    setPassword(e){
+        UserActions.setField('password', e.target.value);
+    },
+    setConfirmPassword(e){
+        UserActions.setField('confirm_password', e.target.value);
+    },
     setDetailMode(e){
         let n = Number.parseInt(e)
 
@@ -78,6 +84,22 @@ export default React.createClass({
                                     <strong>Last Name</strong>
                                 </span>
                                 <input className="form-control" onChange={this.setLast} value={this.state.user['last_name']} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>New Password</strong>
+                                </span>
+                                <input className="form-control" placeholder="Only fill when changing password" type="password" onChange={this.setPassword} value={this.state.user['password']} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>Confirm Password</strong>
+                                </span>
+                                <input className="form-control" placeholder="Only fill when changing password" type="password" onChange={this.setConfirmPassword} value={this.state.user['confirm_password']} />
                             </div>
                         </div>
                         <div className="form-group">

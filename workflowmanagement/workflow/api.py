@@ -129,7 +129,6 @@ class WorkflowDetailSerializer(serializers.ModelSerializer):
     def get_assoc_processes(self, obj):
         return obj.assocProcesses().values_list('hash', flat=True)
 
-
     class Meta:
         model = Workflow
         exclude = ('id', 'removed')

@@ -1,6 +1,8 @@
 from django.dispatch import receiver
 from history.models import History
 
+from django.contrib.auth.models import User
+
 from utils import mailing
 from tasks import sendEmail
 
@@ -14,7 +16,13 @@ def newHistoryNotifications(sender, instance, **kwargs):
         print tcn
         try:
             tc = getattr(mailing, tcn)
-            tci = tc(instance, instance.authorized.filter(profile__notification=True).values_list('email', flat=True))
+            tci = None
+
+            if isinstance(instance.object, User):
+                # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
+                tci = tc(instance, instance.authorized.values_list('email', flat=True))
+            else:
+                tci = tc(instance, instance.authorized.filter(profile__notification=True).values_list('email', flat=True))
 
             sendEmail.apply_async([tci])
 

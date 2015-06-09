@@ -15,7 +15,9 @@ const UserActions = Reflux.createActions($.extend({
     'loadUsers': {},
     'saveUser': {},
     'setField': {},
-    'setProfileField': {}
+    'setProfileField': {},
+    'registerUser': {},
+    'approve': {}
 }, DetailActionsMixin, ListActionsMixin));
 
 export default UserActions;

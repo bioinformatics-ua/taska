@@ -19,7 +19,8 @@ module.exports = function (b, opts) {
     }
 
     b.on('package', function (pkg) {
-        if (pkg.style) {
+        // I want to build bootstrap.css myself so i can change the less files
+        if (pkg.style && pkg.style.indexOf('bootstrap.css') == -1) {
             pending ++;
             glob(pkg.style, { cwd: pkg.__dirname }, function (err, files) {
                 pending --;

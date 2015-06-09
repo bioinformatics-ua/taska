@@ -57,6 +57,7 @@ npm install
 npm install browserify@9.0.3 -g
 npm install watchify@2.6.0 -g
 npm install uglifyjs@2.4.10 -g
+npm install less@2.5.1 -g
 
 # generate small production js/css files (as development ones are really big)
 npm run prod

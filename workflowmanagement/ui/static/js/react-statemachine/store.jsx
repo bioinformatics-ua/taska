@@ -45,7 +45,6 @@ const StateMachineStore = Reflux.createStore({
         }
     },
     setTime(){
-        console.log('SET TIME TO '+ this.__timemachine);
         if(this.__timemachine === this.__actionstack.length)
             this.__sm = this.__initial;
 
@@ -54,7 +53,7 @@ const StateMachineStore = Reflux.createStore({
         else
             this.__sm = this.__actionstack[this.__timemachine];
 
-        this.trigger();
+        this.trigger(true);
     },
     canUndo(){
         return this.__timemachine < this.__actionstack.length-1;
@@ -99,13 +98,11 @@ const StateMachineStore = Reflux.createStore({
 
         let new_state = this.__sm.stateFactory(level, type.Class, {type: type.id, name: this.__sm.nextFreeName()});
 
-        console.log(new_state);
-
         this.addHistory();
 
         this.__sm.addState(new_state);
 
-        this.trigger();
+        this.trigger(true);
     },
     onMoveState(identificator, level){
         console.log(`Drop ${identificator} into level ${level}`);
@@ -120,7 +117,7 @@ const StateMachineStore = Reflux.createStore({
             this.__sm.moveState(e, level);
         }
 
-        this.trigger();
+        this.trigger(true);
     },
     onDeleteState(){
         console.log(`Delete state ${this.__selected}`);
@@ -131,7 +128,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__selected = undefined;
 
-        this.trigger();
+        this.trigger(true);
     },
     onDuplicateState(){
         console.log(`Duplicate state ${this.__selected}`);
@@ -145,14 +142,11 @@ const StateMachineStore = Reflux.createStore({
             delete new_state.getData().hash;
         } catch(ex){};
 
-        console.log(e);
-        console.log(new_state);
-
         this.addHistory();
 
         this.__sm.addState(new_state);
 
-        this.trigger();
+        this.trigger(true);
     },
     onSetStateTitle(elem, new_title){
         let elem_obj = this.__sm.getState(elem);
@@ -160,7 +154,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__selected = elem;
 
-        this.trigger();
+        this.trigger(true);
     },
     onSetDetailVisible(visible, selected=this.__selected){
         this.__detailVisible = visible;
@@ -175,7 +169,7 @@ const StateMachineStore = Reflux.createStore({
         this.__sm.dataChange(elem, field_dict);
 
         if(refresh)
-            this.trigger();
+            this.trigger(true);
     },
     onDeleteDependency(dependant, dependency){
         console.log(`Delete ${dependency} from ${dependant}`);
@@ -183,7 +177,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__sm.deleteDependency(dependant, dependency);
 
-        this.trigger();
+        this.trigger(true);
     },
     onAddDependency(elem1, elem2){
 
@@ -201,7 +195,7 @@ const StateMachineStore = Reflux.createStore({
         }
 
         this.__sm.debug();
-        this.trigger();
+        this.trigger(true);
     },
     onSelect(selected){
         this.__selected = selected;
@@ -215,7 +209,7 @@ const StateMachineStore = Reflux.createStore({
     onSetTitle(title){
         this.__title=title;
 
-        this.trigger();
+        this.trigger(true);
     },
     onInsertAbove(level){
         console.log(`Insert above ${level}`);
@@ -224,7 +218,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__sm.insertAbove(level);
 
-        this.trigger();
+        this.trigger(true);
     },
     onRemoveRow(){
 
@@ -232,7 +226,7 @@ const StateMachineStore = Reflux.createStore({
 
         this.__sm.removeDiscontinuities();
 
-        this.trigger();
+        this.trigger(true);
     }
 });
 

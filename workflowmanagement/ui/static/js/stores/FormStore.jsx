@@ -42,10 +42,12 @@ export default Reflux.createStore({
     },
     onSetTitle(title){
         this.__detaildata.title=title;
+        StateActions.waitSave();
         this.trigger();
     },
     onSetSchema(schema){
         this.__detaildata.schema=JSON.parse(schema).fields;
+        StateActions.waitSave();
         this.trigger();
     },
     onDeleteForm(hash){
@@ -84,6 +86,8 @@ export default Reflux.createStore({
                 FormActions.postDetail.triggerPromise(sForm.hash, sForm).then(
                         (form) => {
                             StateActions.loadingEnd();
+                            StateActions.save();
+
                             this.trigger();
                         }
                 );
@@ -92,6 +96,7 @@ export default Reflux.createStore({
                         (form) => {
                             StateActions.loadingEnd();
                             this.__rfinished = form;
+                            StateActions.save();
                             this.trigger();
                         }
                 );

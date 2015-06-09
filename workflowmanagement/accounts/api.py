@@ -8,12 +8,15 @@ from rest_framework import permissions
 
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from django.contrib.auth import authenticate, login, logout
 
 from models import Profile
+
+from history.models import History
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -80,7 +83,13 @@ class UserSerializer(serializers.ModelSerializer):
 
         # create profile data
         if profile_data:
-            Profile.objects.create(user=user, **profile_data)
+            try:
+                p_instance = user.profile
+                serializer = ProfileSerializer(p_instance, partial=True)
+                serializer.update(p_instance, profile_data)
+
+            except Profile.DoesNotExist:
+                Profile.objects.create(user=user, **profile_data)
 
         return user
 
@@ -167,12 +176,124 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(instance = request.user, context={'request': request})
 
             if request.method == 'PATCH':
+                password = request.data.pop('password', None)
+
                 serializer.update(request.user, request.data)
-                print serializer.data
+                if password:
+                    request.user.set_password(password)
+                    request.user.save()
 
             return Response(serializer.data)
         else:
             return Response({'authenticated': False})
+
+    @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
+    def check_email(self, request):
+        email = request.data.get('email')
+
+        if email != None:
+            try:
+                usr = User.objects.get(email=email)
+
+                return Response({
+                    'email': email,
+                    'available': False
+                })
+            except User.DoesNotExist:
+                return Response({
+                    'email': email,
+                    'available': True
+                })
+
+        return Response({
+            'error': "Email is mandatory field to check if email is free"
+        })
+
+    @list_route(methods=['get', 'post'])
+    def activate(self, request):
+
+        email = None
+
+        if request.method == 'GET':
+            email = request.GET.get('email', None)
+
+        else:
+            email = request.data.get('email', None)
+
+        if request.user.is_staff and email != None:
+            try:
+                usr = User.objects.get(email=email)
+
+                if not usr.is_active:
+                    usr.is_active = True
+                    usr.save()
+
+                    users = [usr]
+                    staff = User.objects.filter(is_staff=True)
+                    for user in staff:
+                        users.append(user)
+
+                    History.new(event=History.APPROVE, actor=request.user,
+                        object=usr, authorized=users)
+
+                    return Response({
+                        'success': True
+                    })
+
+                return Response({
+                    'error': 'User already activated'
+                })
+
+            except User.DoesNotExist:
+                return Response({
+                    'error': "Can't activate user, %s it doesn't exist" % email
+                })
+
+        return Response({
+            'error': "Invalid or not authorized request"
+        })
+
+    @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
+    def register(self, request):
+        if request.user.is_authenticated():
+            return Response({
+                    'error': "An already registered user can't register new users!"
+                })
+        password = request.data.pop('password', None)
+        email = request.data.get('email', None)
+
+        if email != None and password != None:
+            try:
+                usr = User.objects.get(email=email)
+
+                return Response({
+                    'error': "An user with this email already exists"
+                })
+            except User.DoesNotExist:
+                request.data['username']=email
+                serializer = UserSerializer(data=request.data, context={'request': request})
+
+                valid = serializer.is_valid(raise_exception=True)
+
+                if valid:
+                    new_user = serializer.save()
+
+                    new_user.set_password(password)
+                    new_user.is_active=False
+                    new_user.save()
+
+                    History.new(event=History.ADD, actor=new_user,
+                        object=new_user, authorized=User.objects.filter(is_staff=True))
+
+                    return Response(serializer.data)
+
+                return Response({
+                    'error': "User details invalid"
+                })
+
+        return Response({
+            'error': "Email and password are mandatory fields on registering a new user"
+        })
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def login(self, request):
@@ -189,12 +310,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
             user = authenticate(username=username, password=password)
             if user is not None:
+                print user
+                print user.is_active
                 if user.is_active:
                     login(request, user)
                 else:
                     return Response({
                             'authenticated': False,
-                            'error': 'This account is disabled, please contact an administrator'
+                            'error': 'This account is disabled. This may be because of you are waiting approval.If this is not the case, please contact the administrator'
                         })
             else:
                 return Response({

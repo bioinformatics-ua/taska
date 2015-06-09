@@ -63,7 +63,7 @@ const ModalDetail = React.createClass({
                           <h4 className="modal-title">Detail View</h4>
                         </div>
                         <div className="modal-body">
-                          {this.props.component}
+                          { this.props.component }
                         </div>
                       </div>
                     </div>
@@ -96,11 +96,18 @@ let StateMachineComponent = React.createClass({
         return {
             editable: true,
             detailMode: 0,
-            blockSchema: false
+            blockSchema: false,
+            onUpdate: undefined,
+            onUnsavedExit: undefined
         };
     },
     update(data){
         this.setState(this.getState());
+
+        /*if(data){
+            if(this.props.onUpdate)
+                this.props.onUpdate();
+        }*/
     },
     handleHotkey(e) {
         if(this.props.editable && !this.props.blockSchema){
@@ -174,10 +181,14 @@ let StateMachineComponent = React.createClass({
           drop: function( event, ui ) {
             let level = $(event.target).data('level');
 
-            if(ui.draggable.hasClass('new-state'))
+            if(ui.draggable.hasClass('new-state')){
                 StateMachineActions.addState(ui.draggable.data('type'), level);
-            else
+                self.onUpdate();
+            }
+            else{
                 StateMachineActions.moveState(ui.draggable.attr('id'), level);
+                self.onUpdate();
+            }
 
           }
         });
@@ -257,6 +268,9 @@ let StateMachineComponent = React.createClass({
     componentWillUnmount(){
         console.log('UNMOUNT');
         this.killUI();
+        if(this.props.onUnsavedExit){
+            this.props.onUnsavedExit(this.getState());
+        }
     },
     componentWillUpdate(){
         this.killUI();
@@ -275,6 +289,10 @@ let StateMachineComponent = React.createClass({
             }
         }*/
     },
+    onUpdate(){
+        if(this.props.onUpdate)
+            this.props.onUpdate();
+    },
     saveWorkflow(){
         console.log('SAVED WORKFLOW');
         if(this.props.save)
@@ -282,15 +300,19 @@ let StateMachineComponent = React.createClass({
     },
     deleteState(event){
         StateMachineActions.deleteState();
+        this.onUpdate();
     },
     duplicateState(event){
         StateMachineActions.duplicateState();
+        this.onUpdate();
     },
     deleteConnection(dependant, dependency){
         StateMachineActions.deleteDependency(dependant, dependency);
+        this.onUpdate();
     },
     addDependency(elem1, elem2){
         StateMachineActions.addDependency(elem1, elem2);
+        this.onUpdate();
     },
     select(event){
             event.stopPropagation();
@@ -329,11 +351,13 @@ let StateMachineComponent = React.createClass({
         event.stopPropagation();
         let level = $(event.target).parent().data('level');
         StateMachineActions.insertAbove(Number.parseInt(level));
+        this.onUpdate();
     },
     removeRow(event){
         event.stopPropagation();
 
         StateMachineActions.removeRow();
+        this.onUpdate();
     },
     setStateTitle(e){
         let input = $(e.target),
@@ -346,9 +370,13 @@ let StateMachineComponent = React.createClass({
         input.css('visibility', 'hidden');
         label.css('visibility', 'visible');
         StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
+        this.onUpdate();
     },
     dataChange(state, field_dict, refresh=true){
         StateMachineActions.dataChange(state, field_dict, refresh);
+        if(this.props.onUpdate){
+            this.props.onUpdate();
+        }
     },
     getLevels(){
         let getLevel = (level => {
@@ -403,7 +431,11 @@ let StateMachineComponent = React.createClass({
             let state_list = this.state.sm.getStateClasses().map(
                 (stclass) => {
                     return  <li key={stclass.id}>
-                                <a onClick={(event) => StateMachineActions.addState(stclass.id, prop)}>
+                                <a onClick={(event) => {
+                                        StateMachineActions.addState(stclass.id, prop)
+                                        this.onUpdate();
+                                    }
+                                }>
                                     {stclass.Class.typeIcon()} {stclass.Class.repr()}
                                 </a>
                             </li>;
@@ -515,6 +547,7 @@ let StateMachineComponent = React.createClass({
                 {x:Math.round(offset2.left+width2), y:offset2.top+height2},
                 {
                     lineWidth: 5,
+                    lineColor: "#2C3E50",
                     className: `${conn} state_line ${selected}`,
                     title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
                     id: (exists)? `${conn}`: undefined,
@@ -538,7 +571,8 @@ let StateMachineComponent = React.createClass({
             {x:pos.left, y:pos.top},
             {
                 lineWidth: 5,
-                className: 'temp_line'
+                className: 'temp_line',
+                lineColor: '#2C3E50'
             });
     },
     renderLines(){
@@ -579,12 +613,15 @@ let StateMachineComponent = React.createClass({
     },
     setTitle(event){
         StateMachineActions.setTitle(event.target.value);
+        this.onUpdate();
     },
     undo(e){
         StateMachineActions.undo();
+        this.onUpdate();
     },
     redo(e){
         StateMachineActions.redo();
+        this.onUpdate();
     },
     render(){
         let chart = this.getRepresentation();

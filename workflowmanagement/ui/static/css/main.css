@@ -6,6 +6,9 @@ html {
 .navbar{
     min-width: 480px;
 }
+.dropdown-menu{
+  z-index: 1200 !important;
+}
 body {
     font-family: opensans;
     font-size: 140%;
@@ -14,6 +17,9 @@ body {
 }
 h1, h2, h3, h4, h5, h6, h7{
     font-family: opensansbold;
+}
+.boldit {
+  font-family: opensansbold;
 }
 strong{
     font-family: opensansbold;
@@ -27,7 +33,40 @@ footer {
     border: 1px solid #e7e7e7;
     padding: 15px 0px;
     text-align: center;
-    background-color: #f8f8f8;
+    background-color: #ecf0f1;
+}
+
+.breadbar{
+  padding-top:10px;
+  margin-top:-10px;
+  background-color: white;
+  z-index:1020;
+  position: fixed;
+
+}
+
+.affixed:after{
+
+    height: 6px;
+    width: 100%;
+    position: absolute;
+    content: " ";
+    background: rgba(163,163,163,1);
+    background: -moz-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(163,163,163,1)), color-stop(100%, rgba(255,255,255,0)));
+    background: -webkit-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -o-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
+}
+
+table {
+  background-color: white;
+}
+.modal-body {
+  max-height: calc(90vh - 60px);
+  overflow-y: auto
 }
 .container {
     position: relative;
@@ -38,11 +77,15 @@ footer {
     right: 20px;
     top: 4px;
 }
+.loadingbar{
+  padding-top: 8px;
+  text-align: right;
+}
+
 .breadcrumbs {
     padding: 8px 15px;
-    margin-bottom: 20px;
+    padding-left:0;
     list-style: none;
-    background-color: #f5f5f5;
     border-radius: 4px;
 }
 
@@ -85,7 +128,7 @@ footer {
 }
 
 .thumb {
-    font-size: 40px;
+    font-size: 35px;
 }
 
 .panel-overflow{
@@ -211,7 +254,7 @@ footer {
   position: absolute;
   width: 100%;
   bottom: 0;
-  background-color: #F5F5F5;
+  background-color: #ecf0f1;
   border-top: 2px solid rgb(221, 221, 221);
 }
 
@@ -219,6 +262,9 @@ footer {
   padding-bottom: 45px;
 }
 
+.progress{
+    margin-bottom: 0 !important;
+}
 .progressbar-process{
     width: 50px;
     display: inline-block;
@@ -276,7 +322,7 @@ footer {
 }
 
 .taskbar{
-    background-color: whitesmoke;
+    background-color: #ecf0f1;
     border-right: 1px solid rgb(205, 205, 205);
     height: 100%;
     margin-bottom: 20px;
@@ -406,11 +452,24 @@ footer {
 .is-searchable.is-open > .Select-control {
   cursor: text;
 }
+
+.is-searchable.is-open > .Select-control {
+  cursor: text;
+}
+
+.Select.is-disabled .Select-control{
+  background-color: #ecf0f1 !important;
+}
+
+.Select .Select-control{
+  border: 2px solid #dce4ec;
+}
+
 .is-open > .Select-control {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
   background: white;
-  border-color: #b3b3b3 #cccccc #d9d9d9;
+  border-color: #95a5a6;
 }
 .is-open > .Select-control > .Select-arrow {
   border-color: transparent transparent #999999;
@@ -556,7 +615,7 @@ footer {
   padding: 3px 0;
 }
 .Select-item {
-  background-color: #777777;
+  background-color: #95A5A6;
   border-radius: 2px;
   color: white;
   display: inline-block;
@@ -587,7 +646,7 @@ footer {
 }
 .Select-item-icon:hover,
 .Select-item-icon:focus {
-  background-color: #444444;
+  background-color: #95A5A6;
   color: white;
 }
 .Select-item-icon:active {
@@ -612,7 +671,7 @@ footer {
 }
 
 .task-warning{
-  color: #D38F2E;
+  color: #F39C12;
 }
 .warnicon{
   vertical-align: super;

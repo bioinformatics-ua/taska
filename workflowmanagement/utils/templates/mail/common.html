@@ -244,15 +244,20 @@ ul.sidebar li a h1,ul.sidebar li a h2,ul.sidebar li a h3,ul.sidebar li a h4,ul.s
 <body bgcolor="#FFFFFF">
 
 <!-- HEADER -->
-<table class="head-wrap" bgcolor="#F8F8F8">
+<table class="head-wrap" bgcolor="#2c3e50">
     <tr>
         <td></td>
         <td class="header container">
 
                 <div class="content">
-                    <table bgcolor="#F8F8F8">
+                    <table bgcolor="#2c3e50">
                     <tr>
-                        <td style="color: #777;">Study Manager</td>
+                        <td style="color: white; line-height: 1; text-transform: uppercase; font-weight: bold;">
+                            <a style="text-decoration: none;" href="{{settings.EMAIL_URL}}">
+                                <span style="color: white; text-decoration: overline;float: left;">Task</span>
+                                <span style="color: #00b2ff; text-decoration: none; float: left;">a</span>
+                            </a>
+                        </td>
                     </tr>
                 </table>
                 </div>
@@ -288,7 +293,7 @@ ul.sidebar li a h1,ul.sidebar li a h2,ul.sidebar li a h3,ul.sidebar li a h4,ul.s
 </table><!-- /BODY -->
 
 <!-- FOOTER -->
-<table class="footer-wrap">
+<table style="background-color: #ecf0f1;"  class="footer-wrap">
     <tr>
         <td></td>
         <td class="container">
@@ -299,7 +304,7 @@ ul.sidebar li a h1,ul.sidebar li a h2,ul.sidebar li a h3,ul.sidebar li a h4,ul.s
                 <tr>
                     <td align="center">
                         <p>
-                            {% block copyright %}&copy; Study Manager 2015{% endblock %}
+                            {% block copyright %}&copy; Taska 2015{% endblock %}
                         </p>
                         <small>You received this notification because you have Email Notifications on in your user profile. To disable notifications, please change your profile <a href="/profile">here</a>.</small>
                     </td>

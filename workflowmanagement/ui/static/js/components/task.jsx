@@ -190,6 +190,8 @@ export default React.createClass({
     },
     setAnswer(prop, val){
         ResultActions.setAnswer(prop, val);
+
+
     },
     saveAnswer(e){
         if(this.validate())
