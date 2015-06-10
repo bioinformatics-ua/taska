@@ -308,7 +308,7 @@ export default React.createClass({
                                             object: 'add',
                                             process: this.state.task.processtask.process,
                                             task: this.state.task.processtask.task,
-                                            default: 1
+                                            default: 2
                                         }} className="btn btn-default">
                                             <i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification
                                         </Link>

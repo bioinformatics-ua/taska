@@ -125,7 +125,6 @@ export default React.createClass({
             let Failed = this.props.failed;
             return <Failed />;
         }
-
         return (
             <div className="request-detail row">
                 <div className="col-md-12">
