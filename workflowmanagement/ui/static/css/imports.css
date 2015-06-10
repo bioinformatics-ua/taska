@@ -14,3 +14,8 @@
     font-family: fa;
     src: url("font-awesome/fonts/FontAwesome.otf");
 }
+
+@font-face {
+    font-family: RwWidgets;
+    src: url("react-widgets/dist/fonts/rw-widgets.ttf");
+}

@@ -63,7 +63,7 @@ const ModalDetail = React.createClass({
                           <h4 className="modal-title">Detail View</h4>
                         </div>
                         <div className="modal-body">
-                          {this.props.component}
+                          { this.props.component }
                         </div>
                       </div>
                     </div>
@@ -95,14 +95,22 @@ let StateMachineComponent = React.createClass({
     getDefaultProps() {
         return {
             editable: true,
-            detailMode: 0
+            detailMode: 0,
+            blockSchema: false,
+            onUpdate: undefined,
+            onUnsavedExit: undefined
         };
     },
     update(data){
         this.setState(this.getState());
+
+        /*if(data){
+            if(this.props.onUpdate)
+                this.props.onUpdate();
+        }*/
     },
     handleHotkey(e) {
-        if(this.props.editable){
+        if(this.props.editable && !this.props.blockSchema){
             e.stopPropagation();
             e.preventDefault();
             // receives a React Keyboard Event
@@ -128,7 +136,7 @@ let StateMachineComponent = React.createClass({
     __initUI(){
         let self = this;
 
-        if(this.props.editable){
+        if(this.props.editable && ! this.props.blockSchema){
 
         $('.new-state').draggable(
             {
@@ -173,10 +181,14 @@ let StateMachineComponent = React.createClass({
           drop: function( event, ui ) {
             let level = $(event.target).data('level');
 
-            if(ui.draggable.hasClass('new-state'))
+            if(ui.draggable.hasClass('new-state')){
                 StateMachineActions.addState(ui.draggable.data('type'), level);
-            else
+                self.onUpdate();
+            }
+            else{
                 StateMachineActions.moveState(ui.draggable.attr('id'), level);
+                self.onUpdate();
+            }
 
           }
         });
@@ -256,6 +268,9 @@ let StateMachineComponent = React.createClass({
     componentWillUnmount(){
         console.log('UNMOUNT');
         this.killUI();
+        if(this.props.onUnsavedExit){
+            this.props.onUnsavedExit(this.getState());
+        }
     },
     componentWillUpdate(){
         this.killUI();
@@ -274,6 +289,10 @@ let StateMachineComponent = React.createClass({
             }
         }*/
     },
+    onUpdate(){
+        if(this.props.onUpdate)
+            this.props.onUpdate();
+    },
     saveWorkflow(){
         console.log('SAVED WORKFLOW');
         if(this.props.save)
@@ -281,15 +300,19 @@ let StateMachineComponent = React.createClass({
     },
     deleteState(event){
         StateMachineActions.deleteState();
+        this.onUpdate();
     },
     duplicateState(event){
         StateMachineActions.duplicateState();
+        this.onUpdate();
     },
     deleteConnection(dependant, dependency){
         StateMachineActions.deleteDependency(dependant, dependency);
+        this.onUpdate();
     },
     addDependency(elem1, elem2){
         StateMachineActions.addDependency(elem1, elem2);
+        this.onUpdate();
     },
     select(event){
             event.stopPropagation();
@@ -328,11 +351,13 @@ let StateMachineComponent = React.createClass({
         event.stopPropagation();
         let level = $(event.target).parent().data('level');
         StateMachineActions.insertAbove(Number.parseInt(level));
+        this.onUpdate();
     },
     removeRow(event){
         event.stopPropagation();
 
         StateMachineActions.removeRow();
+        this.onUpdate();
     },
     setStateTitle(e){
         let input = $(e.target),
@@ -345,9 +370,13 @@ let StateMachineComponent = React.createClass({
         input.css('visibility', 'hidden');
         label.css('visibility', 'visible');
         StateMachineActions.setStateTitle(Number.parseInt(e.target.parentNode.id), new_title);
+        this.onUpdate();
     },
     dataChange(state, field_dict, refresh=true){
         StateMachineActions.dataChange(state, field_dict, refresh);
+        if(this.props.onUpdate){
+            this.props.onUpdate();
+        }
     },
     getLevels(){
         let getLevel = (level => {
@@ -361,7 +390,7 @@ let StateMachineComponent = React.createClass({
                     state_handler_class = `${state_handler_class} state-handler-selected`;
                 }
 
-                let stateOptions = this.props.editable? (
+                let stateOptions = this.props.editable && !this.props.blockSchema ? (
                         <div className="state-options">
                             <button title="Click to delete this state"
                             onClick={this.deleteState} data-id={state.getIdentificator()}
@@ -380,8 +409,8 @@ let StateMachineComponent = React.createClass({
                 ):'';
               return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
                         <div title={state.label()} style={state.stateStyle()} onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
-                            <label onClick={this.cancel}>{state.label()}</label>
-                            <input type="text" className="clickedit form-control" defaultValue={state.label()} ></input>
+                            <label key={state.label()+'_label'} onClick={this.cancel}>{state.label()}</label>
+                            <input key={state.label()+'_input'} type="text" className="clickedit form-control" defaultValue={state.label()} />
                             <div>
                                 <div className="pull-right">
                                     <small>{state.type()}</small>
@@ -402,14 +431,18 @@ let StateMachineComponent = React.createClass({
             let state_list = this.state.sm.getStateClasses().map(
                 (stclass) => {
                     return  <li key={stclass.id}>
-                                <a onClick={(event) => StateMachineActions.addState(stclass.id, prop)}>
+                                <a onClick={(event) => {
+                                        StateMachineActions.addState(stclass.id, prop)
+                                        this.onUpdate();
+                                    }
+                                }>
                                     {stclass.Class.typeIcon()} {stclass.Class.repr()}
                                 </a>
                             </li>;
                 }
             );
 
-            return this.props.editable? (
+            return this.props.editable && !this.props.blockSchema ? (
 
                 <div className="btn-group taskaddgroup">
                     <div title="Drop tasks to add/move them here." data-level={`${prop}`}
@@ -437,7 +470,7 @@ let StateMachineComponent = React.createClass({
         });
 
         let insertAbove = prop => {
-            return this.props.editable ? (
+            return this.props.editable && ! this.props.blockSchema ? (
                 <div onClick={this.insertAbove} data-level={prop} className="level-separator-container">
                     <div className="level-separator"></div>
                     <small className="level-label">Click line to add row here.</small>
@@ -490,40 +523,43 @@ let StateMachineComponent = React.createClass({
         let height1 = elem1.outerHeight()/2;
         let height2 = elem2.outerHeight()/2;
 
-        let maximum_referential = ($('#state_machine_chart').width()/2);
-        //console.log(`Maximum Referential ${maximum_referential}`);
-        let referential_zero = offset1.left+width1;
-        //console.log(`Referential zero ${referential_zero}`);
-        let relative_ref = Math.round((offset2.left+width2)-referential_zero);
-        //console.log(`Relative referencial ${relative_ref}`);
-        let horizontal_variation = width1+((relative_ref * (width1)) / maximum_referential);
-        //console.log(`Horizontal_variation ${horizontal_variation}`);
+        if(offset1 && offset2){
+            let maximum_referential = ($('#state_machine_chart').width()/2);
+            //console.log(`Maximum Referential ${maximum_referential}`);
+            let referential_zero = offset1.left+width1;
+            //console.log(`Referential zero ${referential_zero}`);
+            let relative_ref = Math.round((offset2.left+width2)-referential_zero);
+            //console.log(`Relative referencial ${relative_ref}`);
+            let horizontal_variation = width1+((relative_ref * (width1)) / maximum_referential);
+            //console.log(`Horizontal_variation ${horizontal_variation}`);
 
-        let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
+            let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
 
-        let selected = (this.state.selected == conn)? 'state_line_selected': '';
+            let selected = (this.state.selected == conn)? 'state_line_selected': '';
 
-        // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
-        let exists = (elem2.attr('id') != 'undefined' && elem1.attr('id') != undefined)
-        && (elem2.attr('id') != 'state-start' && elem1.attr('id') != 'state-start')
-        && (elem2.attr('id') != 'state-end' && elem1.attr('id') != 'state-end');
+            // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
+            let exists = (elem2.attr('id') != 'undefined' && elem1.attr('id') != undefined)
+            && (elem2.attr('id') != 'state-start' && elem1.attr('id') != 'state-start')
+            && (elem2.attr('id') != 'state-end' && elem1.attr('id') != 'state-end');
 
-        $.line(
-            {x:Math.round(offset1.left+horizontal_variation), y:offset1.top-4},
-            {x:Math.round(offset2.left+width2), y:offset2.top+height2},
-            {
-                lineWidth: 5,
-                className: `${conn} state_line ${selected}`,
-                title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
-                id: (exists)? `${conn}`: undefined,
-                extraHtml: (exists && this.props.editable)? `
-                    <div class="line-options">
-                        <button title="Click to delete this line" data-id="${conn}" class="btn btn-xs btn-danger destroy-connection">
-                                <i class="fa fa-1x fa-times"></i>
-                        </button>
-                    </div>
-                `: undefined
-            });
+            $.line(
+                {x:Math.round(offset1.left+horizontal_variation), y:offset1.top-4},
+                {x:Math.round(offset2.left+width2), y:offset2.top+height2},
+                {
+                    lineWidth: 5,
+                    lineColor: "#2C3E50",
+                    className: `${conn} state_line ${selected}`,
+                    title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
+                    id: (exists)? `${conn}`: undefined,
+                    extraHtml: (exists && this.props.editable && !this.props.blockSchema )? `
+                        <div class="line-options">
+                            <button title="Click to delete this line" data-id="${conn}" class="btn btn-xs btn-danger destroy-connection">
+                                    <i class="fa fa-1x fa-times"></i>
+                            </button>
+                        </div>
+                    `: undefined
+                });
+        }
     },
     __tempLine(pos, elem){
         let offset = elem.offset();
@@ -535,7 +571,8 @@ let StateMachineComponent = React.createClass({
             {x:pos.left, y:pos.top},
             {
                 lineWidth: 5,
-                className: 'temp_line'
+                className: 'temp_line',
+                lineColor: '#2C3E50'
             });
     },
     renderLines(){
@@ -576,12 +613,15 @@ let StateMachineComponent = React.createClass({
     },
     setTitle(event){
         StateMachineActions.setTitle(event.target.value);
+        this.onUpdate();
     },
     undo(e){
         StateMachineActions.undo();
+        this.onUpdate();
     },
     redo(e){
         StateMachineActions.redo();
+        this.onUpdate();
     },
     render(){
         let chart = this.getRepresentation();
@@ -632,14 +672,21 @@ let StateMachineComponent = React.createClass({
 
         let detailMode2 = () => {
             if(this.props.editable){
-                return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
                     <h4>&nbsp;</h4>
                     <hr />
                     <Tabs tabActive={this.state.selected? 2: 1}
                         onAfterChange={makeDraggable}
                     >
                         <Tabs.Panel title={<span><i className="fa fa-plus"></i> Add Task</span>}>
-                            {state_list}
+                            {this.props.blockSchema ?
+                                    (<div style={{textAlign: 'justify'}}>
+                                        <h3 className="task-type-title panel-title"> <i className="fa fa-2x fa-exclamation-triangle"></i> Attention</h3>
+                                        <p>You won't be able to add/remove states on this workflow, because there are processes associated with it.</p>
+                                        <p>You only will be able to edit detail information on the states.</p>
+                                        <p>To modify and existing workflow with running processes, please duplicate the schema.</p>
+                                    </div>)
+                            :{state_list}}
                         </Tabs.Panel>
                         {this.state.selected?
                         <Tabs.Panel title={<span><i className="fa fa-pencil"></i> Edit Task</span>}>
@@ -658,7 +705,7 @@ let StateMachineComponent = React.createClass({
         };
 
         let otherModes = () => {
-            if(this.props.editable)
+            if(this.props.editable && ! this.props.blockSchema)
                 return (<div ref="taskbar" className="clearfix taskbar col-md-2 table-col">
                         <span>
                         <h3 className="task-type-title panel-title">Type of Tasks</h3>
@@ -690,7 +737,6 @@ let StateMachineComponent = React.createClass({
                         :
                             otherModes()
                     }
-
                         <div className={this.props.editable? `${mainsize} table-col no-select`:"col-md-12 table-col no-select"}>
                                 <div className="row">
                               <div className="col-md-12">

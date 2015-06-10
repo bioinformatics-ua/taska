@@ -151,5 +151,5 @@ class File(Resource):
         return FileSerializer(instance=instance, data=data, many=many, partial=partial)
     pass
 
-    def __str__(self):
+    def __unicode__(self):
         return self.file.name

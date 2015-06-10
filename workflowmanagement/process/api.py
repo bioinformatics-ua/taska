@@ -622,8 +622,6 @@ class RequestSerializer(serializers.ModelSerializer):
 
             make_public = response.pop('public', False)
 
-            print response
-
             rserializer = RequestResponseSerializer(data=response)
 
             rserializer.is_valid()
@@ -653,13 +651,18 @@ class RequestSerializer(serializers.ModelSerializer):
         response = validated_data.pop('response', None)
         rserializer = None
         if response:
-            response['request'] = instance.id
+            rep = None
+            try:
+                rep = instance.response
+            except RequestResponse.DoesNotExist:
+                rep = RequestResponse(request=instance)
+                rep.save()
 
             make_public = response.get('public', False)
 
             try:
                 rserializer = RequestResponseSerializer(
-                    instance=instance.response,
+                    instance=rep,
                     data=response,
                     partial=True
                 )

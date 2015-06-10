@@ -24,9 +24,21 @@ export default Reflux.createStore({
     ],
     init(){
         this.__loginfail = false;
+        this.__success_register = false;
     },
     getUser(){
-        return this.__detaildata;
+
+        if($.isEmptyObject(this.__detaildata) ||
+            (this.__detaildata.authenticated == false && Object.keys(this.__detaildata).length == 1)){
+            this.__detaildata = {
+                profile:{
+                    detail_mode: 2
+                },
+                authenticated: false
+            };
+        }
+
+        return this.__detaildata
     },
     loggedIn: function(){
         return this.__detaildata.email != undefined;
@@ -69,8 +81,6 @@ export default Reflux.createStore({
             self.__loginfail = false;
             UserActions.unloadDetail();
 
-            console.log(data);
-
             UserActions.logoutSuccess(data);
             if(callback)
                 callback();
@@ -91,17 +101,100 @@ export default Reflux.createStore({
         );
     },
     onSaveUser(){
-        StateActions.loadingStart();
-        console.log(this.__detaildata);
-        UserActions.postDetail.triggerPromise('me', {
-            'first_name': this.__detaildata['first_name'],
-            'last_name': this.__detaildata['last_name'],
-            'profile': this.__detaildata['profile']
-        }).then(
+        let pass = this.__detaildata['password'];
+        if(pass && pass.trim() != ''
+            && pass != this.__detaildata['confirm_password'].trim()){
+            StateActions.alert({
+                'title':"Password doesn't match",
+                'message': "The password and the confirmation of password entered don't match."
+            });
+        } else {
+            let data = {
+                'first_name': this.__detaildata['first_name'],
+                'last_name': this.__detaildata['last_name'],
+                'profile': this.__detaildata['profile']
+            };
+            if(pass)
+                data.password = pass.trim();
+
+            StateActions.loadingStart();
+            UserActions.postDetail.triggerPromise('me', data).then(
+                    (user) => {
+                        StateActions.loadingEnd();
+                        this.trigger();
+                    }
+            );
+        }
+    },
+    isEmail(email){
+            return /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/.test( email );
+    },
+    onRegisterUser(){
+
+        let email = this.__detaildata.email;
+        let password = this.__detaildata.password;
+
+        try{
+            delete this.__detaildata['authenticated'];
+        }catch(err){};
+
+        if(!password || password.trim() == ''
+            || password != this.__detaildata['confirm_password'].trim()){
+            StateActions.alert({
+                'title':"Password doesn't match or empty",
+                'message': "The password and the confirmation of password entered don't match or are empty."
+            });
+        }
+        else if(!(email && this.isEmail(email))){
+            StateActions.alert({
+                'title':"Email must be a valid email",
+                'message': "The email must follow a pattern like <user>@<domain>"
+            });
+        }
+        else {
+            UserActions.methodDetail.triggerPromise('register', undefined, 'POST', this.__detaildata).then(
                 (user) => {
                     StateActions.loadingEnd();
+
+                    if(user.error){
+                        StateActions.alert({
+                            'title':"Error Registering User",
+                            'message': user.error
+                        });
+                    } else {
+                        this.__detaildata={};
+                        this.__success_register=true;
+                    }
+
                     this.trigger();
                 }
+            );
+        }
+    },
+    hasRegistered(){
+        return this.__success_register;
+    },
+    onApprove(email){
+        UserActions.methodDetail.triggerPromise('activate', undefined, 'POST', {
+            'email': email
+        }).then(
+            (response) => {
+                StateActions.loadingEnd();
+
+                if(response.error){
+                    StateActions.alert({
+                        'title':"Error Approving User",
+                        'message': response.error
+                    });
+                } else {
+                    StateActions.alert({
+                        'title':"User approved Successfully",
+                        'message': "The user has been approved successfully, and notified of your decision."
+                    });
+                }
+
+                this.trigger();
+            }
         );
     },
     onSetField(field, value){

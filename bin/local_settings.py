@@ -12,7 +12,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'password_here')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
 
 WEBPAGE_URL = os.environ.get('PUBLIC_IP', 'example.com')
-
+EMAIL_URL = os.environ.get('EMAIL_URL', WEBPAGE_URL)
 ALLOWED_HOSTS = [
     '.127.0.0.1',  # Allow domain and subdomains
     '.127.0.0.1.',  # Also allow FQDN and subdomains,

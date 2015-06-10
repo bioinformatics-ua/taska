@@ -31,6 +31,7 @@ class History(models.Model):
     ACCESS          = 4
     CANCEL          = 5
     DONE            = 6
+    APPROVE         = 7
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -39,6 +40,7 @@ class History(models.Model):
             (ACCESS,    'Access'),
             (CANCEL,    'Cancel'),
             (DONE,      'Done'),
+            (APPROVE,   'Approve')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
@@ -57,7 +59,7 @@ class History(models.Model):
         ordering = ["-id"]
 
     def obj_repr(self):
-        return str(self.object)
+        return self.object.__unicode__()
 
     def actor_repr(self):
         tmp = self.actor.get_full_name()

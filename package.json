@@ -25,6 +25,7 @@
     "react-select": "^0.4.4",
     "react-simpletabs": "^0.6.1",
     "react-toggle": "~0.1.1",
+    "react-widgets": "^2.6.2",
     "reflux": "~0.2.5",
     "rivets": "^0.8.1",
     "underscore": "^1.8.3"
@@ -39,17 +40,18 @@
     "browserify": "~9.0.3",
     "uglifyjs": "~2.4.10",
     "uglifycss": "~0.0.13",
+    "uglifyify": "~3.0.1",
     "catw": "~0.2.0"
   },
   "scripts": {
-    "start": "npm run watchjs & npm run watchcss",
+    "start": "npm run watchjs & npm run watchless & npm run watchcss",
     "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
+    "watchless": "catw -c 'lessc -' ./workflowmanagement/ui/static/less/variables.less ./workflowmanagement/ui/static/less/imports.less  -o ./workflowmanagement/ui/static/css/less_bundle.css -v",
     "watchcss": "catw -c 'uglifycss' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
-
-    "prod": "npm run prodjs && npm run prodcss",
+    "prod": "npm run prodjs && npm run prodless &&npm run prodcss",
     "prodjs": "browserify -d -t babelify -g [ uglifyify --no-sourcemap --screw-ie8 --bare-returns] -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -o workflowmanagement/ui/static/bundle.js && uglifyjs workflowmanagement/ui/static/bundle.js > workflowmanagement/ui/static/bundle.min.js",
+    "prodless": "lessc ./workflowmanagement/ui/static/less/imports.less ./workflowmanagement/ui/static/css/less_bundle.css",
     "prodcss": "uglifycss ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css > ./workflowmanagement/ui/static/bundle.min.css",
-
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -66,4 +68,3 @@
     "url": "https://github.com/bioinformatics-ua/workflow-management/issues"
   }
 }
-

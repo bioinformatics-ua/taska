@@ -136,7 +136,7 @@ const Uploader = React.createClass({
     __initUploader(){
         const self=this;
 
-        const destiny = 'api/resource/my/upload/';
+        const destiny = 'api/resource/my/upload/?format=json';
 
         let options = {
             iframe: {
@@ -167,7 +167,6 @@ const Uploader = React.createClass({
                 }
             })
             file.event('done', function (xhr) {
-                console.log('DONE!')
                 let entry = self.getupload(file.name);
                 if(entry){
                     let response = JSON.parse(xhr.response);
@@ -342,7 +341,7 @@ const Uploader = React.createClass({
             <span>
             {this.props.editable ?
                 <fieldset id="fuploader">
-                    <p>Drop files here, or click to browse...</p>
+                    <p><i className="fa fa-paperclip"></i> Drop files here, or click to browse...</p>
                 </fieldset>
             :''}
             <Griddle

@@ -67,7 +67,7 @@ class SimpleListLoader extends Loader{
         this.model = options.model;
     }
     load(){
-        return super.load(`api/${this.model}/`);
+        return super.load(`api/${this.model}/?page_size=1000`);
     }
 }
 
@@ -90,6 +90,11 @@ class DetailLoader extends Loader{
     method(method, hash, type='GET', data={}){
       if(typeof data !== 'string')
         data = JSON.stringify(data);
+
+      if(hash==undefined)
+        return super.load(`api/${this.model}/${method}/`, null, null, type, data);
+
+      //else
       return super.load(`api/${this.model}/${hash}/${method}/`, null, null, type, data);
     }
 }

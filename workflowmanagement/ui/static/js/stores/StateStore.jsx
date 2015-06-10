@@ -10,12 +10,31 @@ export default Reflux.createStore({
     init: function () {
         this.__loading = false;
         this.__alert_queue = new Queue();
+        this.__unsaved = false;
     },
 
     isLoading: function(){
         return this.__loading;
     },
+    isUnsaved: function(){
+        return this.__unsaved;
+    },
+    onWaitSave: function(){
+        if(!this.__unsaved){
+            this.__unsaved = true;
+            this.trigger();
+        }
+    },
+    onSave: function(trigger=true, callback){
+        this.__unsaved = false;
 
+        if(callback){
+            callback();
+        }
+
+        if(trigger)
+            this.trigger();
+    },
     // Action handlers
     onLoadingStart: function(){
         this.__loading = true;
@@ -30,10 +49,12 @@ export default Reflux.createStore({
         this.__alert_queue.push(options);
         this.trigger();
     },
-    onDismissAlert(){
+    onDismissAlert(trigger=true){
         if(this.__alert_queue.length > 0){
             this.__alert_queue.shift();
-            this.trigger();
+
+            if(trigger)
+                this.trigger();
         }
     },
     getAlert(){

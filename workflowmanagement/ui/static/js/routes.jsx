@@ -11,13 +11,17 @@ var baseurl = $('#baseurl').attr('href');
 if(baseurl.length > 1 && baseurl[baseurl.length-1] == '/'){
     baseurl = baseurl.substring(0, baseurl.length - 1);
 }
-console.log(baseurl);
 
 module.exports = (
     <Route name='app' path={baseurl} handler={require('./components/app.jsx')}>
         <Route name="default" path='/' handler={require('./components/home.jsx')}/>
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
+
+        <Route name="register" path="register" handler={require('./components/register.jsx')}/>
+
+        <Route name="activate" path="activate/:email" handler={require('./components/activate.jsx')}/>
+
 
         <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
 

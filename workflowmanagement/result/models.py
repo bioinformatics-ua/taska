@@ -81,7 +81,7 @@ class Result(models.Model):
 
         return serializer.to_internal_value(instance)
 
-    def __str__(self):
+    def __unicode__(self):
         ptask = self.processtaskuser.processtask
         return "Result for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
 

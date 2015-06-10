@@ -7,7 +7,9 @@ const StateActions = Reflux.createActions([
     'loadingStart',
     'loadingEnd',
     'alert',
-    'dismissAlert'
+    'dismissAlert',
+    'waitSave',
+    'save'
 ]);
 
 export default StateActions;

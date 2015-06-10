@@ -20,7 +20,7 @@ class ResultExporter(object):
     class UnsupportedExport(Exception):
         def __init__(self, value):
             self.value = value
-        def __str__(self):
+        def __unicode__(self):
             return repr(self.value)
 
     def __init__(self, processtask):
@@ -45,9 +45,11 @@ class ResultExporter(object):
     def export(self, encode=False):
         results = self.getResults()
         task = self.getTask()
-
+        ttitle = task.title
+        if encode:
+            ttitle= ttitle.encode('utf-8')
         rows = [
-            ['Task', task.title],
+            ['Task', ttitle],
             ['Number of Task Assignees', self.processtask.users().count()],
             ['Number of Answers', results.count()],
             ['Task Status', ProcessTask.statusCode(self.processtask.status)],

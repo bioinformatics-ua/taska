@@ -52,8 +52,7 @@ export default Reflux.createStore({
     },
     onSetAnswer(prop, val){
         this.__detaildata[prop] = val;
-        console.log(this.__detaildata);
-
+        StateActions.waitSave()
         //this.trigger();
     },
     answerSubmitted(){
@@ -66,6 +65,7 @@ export default Reflux.createStore({
             ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
                     (answer) => {
                         StateActions.loadingEnd();
+                        StateActions.save()
                         this.trigger();
                     }
             );
@@ -73,9 +73,10 @@ export default Reflux.createStore({
             ResultActions.addDetail.triggerPromise(this.__detaildata).then(
                 (answer) => {
                     StateActions.loadingEnd();
-
-                    this.__rfinished = answer;
-                    this.trigger();
+                    StateActions.save(true, ()=>{
+                        this.__rfinished = answer;
+                        this.trigger();
+                    });
                 }
             );
         }
