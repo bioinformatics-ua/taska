@@ -10,6 +10,7 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'admin@example.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'password_here')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', "admin@example.com")
 
 WEBPAGE_URL = os.environ.get('PUBLIC_IP', 'example.com')
 EMAIL_URL = os.environ.get('EMAIL_URL', WEBPAGE_URL)
