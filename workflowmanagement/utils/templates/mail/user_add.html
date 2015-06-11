@@ -1,13 +1,13 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{{object}} waiting approval
+{{object.email}} waiting approval
 {% endblock %}
 
 {% block body %}
 Hello dear user,<br /><br />
 
-This email is meant to inform you that the user {{object}} has just registered and is waiting approval from one of the administrators.
+This email is meant to inform you that the user {{object.email}} has just registered and is waiting approval from one of the administrators.
 <br /><br />
 
 To approve this user please click <a href="/{{settings.API_ACTIVATE_URL}}{{object.email}}">here</a>.

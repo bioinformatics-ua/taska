@@ -93,7 +93,6 @@ ROOT_URLCONF = 'workflowmanagement.urls'
 
 WSGI_APPLICATION = 'workflowmanagement.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -202,6 +201,7 @@ EMAIL_URL  = "http://localhost:8000"
 #API_ACTIVATE_URL = "api/account/activate/?email="
 API_ACTIVATE_URL = "activate/"
 
+DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
 try:
     from local_settings import *
@@ -210,7 +210,6 @@ except:
 
 STATIC_URL = BASE_URL+'static/'
 
-DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
 PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
 
