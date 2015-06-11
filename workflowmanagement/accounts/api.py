@@ -270,7 +270,7 @@ class UserViewSet(viewsets.ModelViewSet):
                     'error': "An user with this email already exists"
                 })
             except User.DoesNotExist:
-                request.data['username']=email
+                request.data['username']=email[:30]
                 serializer = UserSerializer(data=request.data, context={'request': request})
 
                 valid = serializer.is_valid(raise_exception=True)
@@ -308,10 +308,16 @@ class UserViewSet(viewsets.ModelViewSet):
                 request.session.set_expiry(1296000) # if set to remember, keep for 2 weeks
 
 
+            if '@' in username:
+                try:
+                    user = User.objects.get(email=username)
+                    username = user.username
+                except:
+                    pass
+
             user = authenticate(username=username, password=password)
             if user is not None:
-                print user
-                print user.is_active
+
                 if user.is_active:
                     login(request, user)
                 else:

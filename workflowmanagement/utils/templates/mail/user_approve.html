@@ -1,13 +1,13 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{{object}} waiting approval
+{{object.email}} approved
 {% endblock %}
 
 {% block body %}
 Hello dear user,<br /><br />
 
-This email is meant to inform you that the user {{object}} has just been approved by {%if history.actor.first_name %}{{history.actor.get_full_name}}{% else %}{{history.actor}}{%endif%}.
+This email is meant to inform you that the user {{object.email}} has just been approved by {%if history.actor.first_name %}{{history.actor.get_full_name}}{% else %}{{history.actor.email}}{%endif%}.
 <br /><br />
 
 Best Regards,<br />
