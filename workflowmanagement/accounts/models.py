@@ -18,7 +18,7 @@ class Profile(models.Model):
     notification= models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "User profile for %s" % self.user
+        return u"User profile for %s" % self.user
 
 @receiver(models.signals.post_save, sender=User)
 def __generate_profile(sender, instance, created, *args, **kwargs):

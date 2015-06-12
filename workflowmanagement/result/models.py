@@ -83,7 +83,7 @@ class Result(models.Model):
 
     def __unicode__(self):
         ptask = self.processtaskuser.processtask
-        return "Result for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
+        return u"Result for Task %s in Process %s" % (ptask.task, ptask.process)
 
 @receiver(models.signals.post_save)
 def __generate_result_hash(sender, instance, created, *args, **kwargs):

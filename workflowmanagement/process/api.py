@@ -181,7 +181,7 @@ class ProcessSerializer(serializers.ModelSerializer):
         return obj.start_date.strftime("%Y-%m-%d %H:%M")
 
     def get_object_repr(self, obj):
-        return (obj.workflow)
+        return unicode(obj.workflow)
 
     def get_status_repr(self, obj):
         return Process.statusCode(obj.status)
@@ -427,10 +427,10 @@ class MyProcessTaskSerializer(serializers.ModelSerializer):
         return Task.objects.get_subclass(id=obj.task.id).type()
 
     def get_process(self, obj):
-        return unicode(obj.process.hash)
+        return obj.process.hash
 
     def get_process_repr(self, obj):
-        return unicode(obj.process)
+        return obj.process.__unicode__()
 
     def get_parent(self, obj):
         return GenericTaskSerializer(Task.objects.get_subclass(id=obj.task.id)).data
