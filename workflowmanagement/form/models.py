@@ -30,7 +30,7 @@ class Form(models.Model):
         return tmp
 
     def __unicode__(self):
-        return '%s (created on %s)' % (self.title, self.created_date.strftime("%Y-%m-%d %H:%M"))
+        return u'%s (created on %s)' % (self.title, self.created_date.strftime("%Y-%m-%d %H:%M"))
 
 @receiver(models.signals.post_save, sender=Form)
 def __generate_form_hash(sender, instance, created, *args, **kwargs):

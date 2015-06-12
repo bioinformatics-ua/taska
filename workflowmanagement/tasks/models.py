@@ -195,7 +195,7 @@ class TaskDependency(models.Model):
     def __unicode__(self):
         '''
         '''
-        return "TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))
+        return u"TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))
 
 class SimpleTask(Task):
     '''Basic concretization of a generic task.

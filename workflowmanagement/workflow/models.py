@@ -135,5 +135,5 @@ class WorkflowPermission(models.Model):
         '''Returns a certain workflow permissions on a string
         '''
 
-        return str(self.workflow)+' Permissions[ Public='+str(self.public)+', Searchable='+str(self.searchable)+', Forkable='+str(self.forkable)+']'
+        return unicode(self.workflow)+' Permissions[ Public='+unicode(self.public)+', Searchable='+unicode(self.searchable)+', Forkable='+unicode(self.forkable)+']'
 

@@ -58,7 +58,7 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return ('%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name()))
+        return u'%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -184,7 +184,7 @@ class ProcessTask(models.Model):
             return "Unknown"
 
     def __unicode__(self):
-        return ('%s - %s' % (self.task, self.process))
+        return u'%s - %s' % (self.task, self.process)
 
     def rpr(self):
         ts = Task.all().get_subclass(id=self.task.id)
@@ -250,7 +250,7 @@ class ProcessTaskUser(models.Model):
         ordering = ['-processtask__deadline']
 
     def __unicode__(self):
-        return ('%s - %s' % (self.processtask, self.user))
+        return u'%s - %s' % (self.processtask, self.user)
 
     def requests(self):
         return Request.objects.filter(
@@ -377,7 +377,7 @@ class Request(models.Model):
 
     def __unicode__(self):
         ptask = self.processtaskuser.processtask
-        return "Request for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
+        return u"Request for Task %s in Process %s" % (ptask.task, ptask.process)
 
 
 @receiver(models.signals.post_save, sender=Request)
