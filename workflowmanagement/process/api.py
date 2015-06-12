@@ -60,7 +60,7 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         exclude = ('id', 'processtask')
 
     def get_user_repr(self, obj):
-        tmp = obj.user.get_full_name()
+        tmp = unicode(obj.user.get_full_name())
 
         if not tmp:
             tmp = obj.user.email
@@ -181,7 +181,7 @@ class ProcessSerializer(serializers.ModelSerializer):
         return obj.start_date.strftime("%Y-%m-%d %H:%M")
 
     def get_object_repr(self, obj):
-        return str(obj.workflow)
+        return (obj.workflow)
 
     def get_status_repr(self, obj):
         return Process.statusCode(obj.status)
@@ -427,10 +427,10 @@ class MyProcessTaskSerializer(serializers.ModelSerializer):
         return Task.objects.get_subclass(id=obj.task.id).type()
 
     def get_process(self, obj):
-        return str(obj.process.hash)
+        return unicode(obj.process.hash)
 
     def get_process_repr(self, obj):
-        return str(obj.process)
+        return unicode(obj.process)
 
     def get_parent(self, obj):
         return GenericTaskSerializer(Task.objects.get_subclass(id=obj.task.id)).data

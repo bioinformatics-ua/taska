@@ -121,7 +121,7 @@ export default Reflux.createStore({
             UserActions.postDetail.triggerPromise('me', data).then(
                     (user) => {
                         StateActions.loadingEnd();
-                        this.trigger();
+                        this.trigger(pass);
                     }
             );
         }
@@ -200,7 +200,7 @@ export default Reflux.createStore({
     onSetField(field, value){
         this.__detaildata[field] = value;
 
-        this.trigger();
+        //this.trigger();
     },
     onSetProfileField(field, value){
         if(!this.__detaildata.profile)
@@ -208,7 +208,7 @@ export default Reflux.createStore({
 
         this.__detaildata.profile[field] = value;
 
-        this.trigger();
+        //this.trigger();
     },
     getUsers(){
         return this.__list;

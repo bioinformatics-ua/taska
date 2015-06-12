@@ -89,7 +89,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Email</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setEmail} value={this.state.user.email} />
+                                <input className="form-control" onChange={this.setEmail} defaultValue={this.state.user.email} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -97,7 +97,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>First Name</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setFirst} value={this.state.user['first_name']} />
+                                <input className="form-control" onChange={this.setFirst} defaultValue={this.state.user['first_name']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -105,7 +105,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Last Name</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setLast} value={this.state.user['last_name']} />
+                                <input className="form-control" onChange={this.setLast} defaultValue={this.state.user['last_name']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -113,7 +113,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="" type="password" onChange={this.setPassword} value={this.state.user['password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setPassword} defaultValue={this.state.user['password']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -121,7 +121,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Confirm Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} value={this.state.user['confirm_password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} defaultValue={this.state.user['confirm_password']} />
                             </div>
                         </div>
                         <div className="form-group">
