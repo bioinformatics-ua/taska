@@ -14,10 +14,10 @@ const ProcessResume = React.createClass({
     },
     translateResources(users){
         let files = [];
-
         for(let user of users){
             if(user.result){
                 let resources = user.result.outputs;
+
                 for(let resource of resources){
                     if(resource.type === 'material.File')
                         files.push({
@@ -47,10 +47,14 @@ const ProcessResume = React.createClass({
 
         //return tasks.map(task => this.__renderTask(task));
         let resources = tasks.reduce(
-            (array, task) =>
-                $.extend(array, this.__renderTask(task))
+            (array, task) =>{
+                let mergeresult =  $.merge(array, this.__renderTask(task));
+                return mergeresult;
+            }
             ,[]
         );
+
+        console.log(resources);
 
         return <Uploader
                 editable={false}

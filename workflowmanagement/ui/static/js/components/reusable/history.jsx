@@ -67,6 +67,10 @@ var HistoryItem = React.createClass({
         case 'Cancel':
           text = `${entry.actor_repr} has canceled`;
           return <span>{text} <strong>{entry.object_repr}</strong></span>;
+        case 'Done':
+          text = `${entry.actor_repr} has finished`;
+          return <span>{text} {link}</span>;
+
         default: return entry.event;
       }
     }
@@ -89,6 +93,7 @@ var EventIcon = React.createClass({
         case 'Edit': return <i className="fa fa-pencil thumb"></i>;
         case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
         case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
+        case 'Done': return <i className="fa fa-check thumb"></i>;
         default: return event;
       }
     }
