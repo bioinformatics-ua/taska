@@ -40,7 +40,6 @@ const Modal = React.createClass({
     }
   },
   render(){
-    console.log(this.props.visible);
     if(this.props.visible)
       return <div className="modal modalback show">
                       <div className="modal-dialog">

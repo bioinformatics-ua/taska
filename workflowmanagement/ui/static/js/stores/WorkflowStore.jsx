@@ -189,7 +189,7 @@ const WorkflowStore = Reflux.createStore({
 
         if(workflow.hash){
             StateActions.loadingStart();
-            WorkflowActions.methodDetail.triggerPromise('fork', workflow.hash).then(
+            this.onMethodDetail('fork', workflow.hash).then(
                 (workflow) => {
                     StateActions.loadingEnd();
                     this.__wfinished = workflow;

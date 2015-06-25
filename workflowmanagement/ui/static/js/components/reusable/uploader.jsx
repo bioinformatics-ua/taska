@@ -2,13 +2,101 @@
 
 import Router from 'react-router';
 import React from 'react';
+
+import Reflux from 'reflux';
+
 import {RouteHandler, Link} from 'react-router';
-import {DeleteButton} from './component.jsx'
+import {DeleteButton, Modal} from './component.jsx'
+import {LayeredComponentMixin} from '../../mixins/component.jsx';
+
+import ResourceStore from '../../stores/ResourceStore.jsx';
+
+import ResourceActions from '../../actions/ResourceActions.jsx';
 
 import Griddle from 'griddle-react';
 
 require('filedrop');
 import checksum from 'json-checksum';
+import moment from 'moment';
+
+const CommentsModal = React.createClass({
+  mixins: [LayeredComponentMixin, Reflux.listenTo(ResourceStore, 'update')],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    __getState(){
+        return {
+            comments: ResourceStore.getComments(this.props.row.hash)
+        };
+    },
+    update(){
+        this.setState(this.__getState());
+    },
+    componentWillMount(){
+        ResourceActions.loadComments(this.props.row.hash);
+    },
+    render: function() {
+        return (
+            <span>&nbsp;<button onClick={this.handleClick} style={{padding:0}} className="btn btn-link pull-right">
+              <i className="fa fa-comments"></i>
+            </button></span>
+          );
+    },
+    setComment(e){
+        ResourceActions.setNewComment(e.target.value);
+    },
+    postComment(){
+        ResourceActions.sendNewComment(this.props.row.hash);
+    },
+    renderLayer: function() {
+        if (this.state.clicked) {
+            return <Modal title={`Comments on ${this.props.row.filename}`} message={
+                <span>
+                    <div className="form-group">
+                        <textarea style={{resize: "vertical"}} rows="4" type="description" className="form-control"
+                                            placeholder="Please introduce your comment here."
+                                            onChange={this.setComment} defaultValue={''}>
+                        </textarea>
+                    </div>
+                    <div className="form-group clearfix">
+                        <button className="btn btn-info pull-right" onClick={this.postComment}>Comment</button>
+                    </div>
+                    {this.state.comments?
+                        this.state.comments.map(
+                        (comment) =>{
+                            return (
+                                <span key={comment['create_date']}>
+                                    <div className="panel panel-default">
+                                        <div className="panel-heading">
+                                        <strong>{comment['user_repr']} </strong>
+                                        <span className="text-muted"> commented {moment(comment.create_date).fromNow()}</span>
+                                        </div>
+                                        <div className="panel-body">
+                                            {comment.comment}
+                                        </div>
+                                    </div>
+                                </span>
+                            );
+                        }
+                    ):'No comments on this file yet.'}
+
+                </span>
+            }
+            success={this.success} close={this.handleClose} showConfirm={false} />
+        } else {
+            return <span />;
+        }
+    },
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return $.extend({ clicked: false }, this.__getState());
+  }
+});
 
 const FileTitle = React.createClass({
     render(){
@@ -19,6 +107,7 @@ const FileTitle = React.createClass({
                         href={`api/resource/${row.hash}/download/`}>
                         {decodeURI(row.filename)}
                     </a>
+                    <CommentsModal key={row.hash} row={row} />
                 </small>;
     }
 });
@@ -60,12 +149,14 @@ const FileManage = React.createClass({
     render(){
         let row = this.props.rowData;
 
-        return <DeleteButton
+        return <span>
+            <DeleteButton
               success={this.props.metadata.delete}
               identificator = {row.filename}
               title={`Delete '${decodeURI(row.filename)}'`}
               extraCss='btn-xs'
               message={`Are you sure you want to delete '${decodeURI(row.filename)} ?'`}  />
+              </span>;
     }
 });
 
@@ -106,7 +197,6 @@ const Uploader = React.createClass({
         this.setState({
             uploads: tmp
         });
-        console.log('CHANGE UPLOAD ?'+this.props.done)
         if(this.props.done)
             this.props.done(this.flatUploads().filter(
                     value => value.hash != undefined
@@ -122,7 +212,6 @@ const Uploader = React.createClass({
         } catch(err){
             console.log("Can't remove file");
         }
-        console.log('GOT HERE');
         this.setState({
             uploads: tmp
         });
