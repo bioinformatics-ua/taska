@@ -71,12 +71,11 @@ class PTUWithResult(ProcessTaskUserSerializer):
     result = serializers.SerializerMethodField()
 
     def get_result(self, obj):
-        from result.api import GenericResultSerializer
-
         result = obj.getResult()
-
         if result:
-            return GenericResultSerializer(obj.getResult()).data
+            serializer = result.get_serializer()
+
+            return serializer.to_representation(result)
 
         return None
 
@@ -518,8 +517,7 @@ class MyTask(generics.RetrieveAPIView):
     def get_object(self):
         queryset = self.get_queryset()
         filter = {
-            'processtask__hash': self.kwargs['hash'],
-            'user': self.request.user
+            'hash': self.kwargs['hash']
         }
 
         obj = get_object_or_404(queryset, **filter)

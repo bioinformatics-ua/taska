@@ -74,7 +74,7 @@ class ResultSerializer(serializers.ModelSerializer):
     user_repr = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
     outputswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
-    processtaskuser = MyProcessTaskUserDetailSerializer()
+    processtaskuser = serializers.SlugRelatedField(slug_field='hash', queryset=ProcessTaskUser.objects)
     process_owner = serializers.SerializerMethodField()
 
     def get_outputs(self, obj):

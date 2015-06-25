@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.db.models import Q
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
@@ -91,7 +92,7 @@ class Workflow(models.Model):
         tmp = Workflow.objects.filter(removed=False)
 
         if user != None:
-            tmp=tmp.filter(owner=user)
+            tmp=tmp.filter(Q(owner=user) | Q(workflowpermission__public=True))
 
         if workflow != None:
             tmp=tmp.filter(workflow=workflow)

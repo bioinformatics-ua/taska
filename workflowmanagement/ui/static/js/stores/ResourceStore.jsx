@@ -52,11 +52,13 @@ export default Reflux.createStore({
             }).then(
                 (result) => {
                     if(this.__comments[hash].length == 0){
-                        this.__comments[hash] = result.comments;
+                        this.__comments[hash] = [result.comment];
                     }
                     else {
                         this.__comments[hash].unshift(result.comment);
                     }
+                    console.log(hash);
+                    console.log(result);
                     console.log(this.__comments);
                     this.trigger();
                 }

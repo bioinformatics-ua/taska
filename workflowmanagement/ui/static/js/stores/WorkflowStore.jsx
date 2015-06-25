@@ -98,6 +98,8 @@ const WorkflowStore = Reflux.createStore({
                     'message': 'The workflow must have a title!'
                 }
             );
+
+            return;
         }
 
         workflow.tasks = [];

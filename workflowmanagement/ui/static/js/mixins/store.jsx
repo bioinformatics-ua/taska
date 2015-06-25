@@ -156,8 +156,6 @@ class DetailStoreMixin{
                 return new Promise(function (fulfill, reject){
                     loader.method(method, hash, type, data).then(
                         data => {
-                            console.log(hash);
-                            console.log(data);
                             fulfill(data);
                         }
                     ).catch(ex=>reject(ex));

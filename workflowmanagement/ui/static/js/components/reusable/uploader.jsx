@@ -25,8 +25,13 @@ const CommentsModal = React.createClass({
       this.props.success(this.props.identificator);
     },
     __getState(){
+        if(this.props.row.hash && this.props.row.hash.trim() != '')
+            return {
+                comments: ResourceStore.getComments(this.props.row.hash)
+            };
+
         return {
-            comments: ResourceStore.getComments(this.props.row.hash)
+            comments: []
         };
     },
     update(){
@@ -59,22 +64,26 @@ const CommentsModal = React.createClass({
                         </textarea>
                     </div>
                     <div className="form-group clearfix">
-                        <button className="btn btn-info pull-right" onClick={this.postComment}>Comment</button>
+                        <button className="btn btn-primary pull-right" onClick={this.postComment}>
+                        <i className="fa fa-comment"></i> Comment
+                        </button>
                     </div>
-                    {this.state.comments?
+                    {(this.state.comments && this.state.comments.length > 0)?
                         this.state.comments.map(
                         (comment) =>{
                             return (
                                 <span key={comment['create_date']}>
-                                    <div className="panel panel-default">
-                                        <div className="panel-heading">
-                                        <strong>{comment['user_repr']} </strong>
-                                        <span className="text-muted"> commented {moment(comment.create_date).fromNow()}</span>
+                                    <div>
+                                        <div>
+                                            <strong>{comment['user_repr']} </strong>
+                                            <span> commented {moment(comment.create_date).fromNow()}:</span>
                                         </div>
-                                        <div className="panel-body">
+                                        <div>
                                             {comment.comment}
                                         </div>
                                     </div>
+                                    <hr />
+
                                 </span>
                             );
                         }
@@ -107,7 +116,9 @@ const FileTitle = React.createClass({
                         href={`api/resource/${row.hash}/download/`}>
                         {decodeURI(row.filename)}
                     </a>
-                    <CommentsModal key={row.hash} row={row} />
+                    {row.hash && row.hash.trim() != ''?
+                        <CommentsModal key={row.hash} row={row}></CommentsModal>
+                    :''}
                 </small>;
     }
 });

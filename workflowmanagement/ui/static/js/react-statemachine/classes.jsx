@@ -290,7 +290,7 @@ class StateMachine{
         this.__internal_counter = 0;
         this.__states = [];
         this.__level = {};
-        this.__nextLevel = 0;
+        this.__nextLevel = 1;
         this.__stateclasses = [];
     }
     nextFreeName(){

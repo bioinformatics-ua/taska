@@ -9,6 +9,8 @@ from rest_framework.decorators import detail_route, list_route
 
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
+
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from .models import *

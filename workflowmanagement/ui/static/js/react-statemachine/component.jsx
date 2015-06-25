@@ -493,7 +493,6 @@ let StateMachineComponent = React.createClass({
                 </div>
             );
         }
-        if(this.state.sm.getNextLevel() > 1){
             let classes = "state-end";
 
             if(this.state.selected === 'state-end')
@@ -511,7 +510,7 @@ let StateMachineComponent = React.createClass({
                     {drop(this.state.sm.getNextLevel())}
                 </div>
             );
-        }
+
         return list;
     },
     __renderLine(elem1, elem2, variate=true){

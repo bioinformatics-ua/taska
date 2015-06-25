@@ -245,6 +245,7 @@ class ProcessTaskUser(models.Model):
     reassigned      = models.BooleanField(default=False)
     reassign_date   = models.DateTimeField(null=True, blank=True)
     finished        = models.BooleanField(default=False)
+    hash            = models.CharField(max_length=50)
 
     class Meta:
         ordering = ['-processtask__deadline']
@@ -261,10 +262,7 @@ class ProcessTaskUser(models.Model):
     def getResult(self):
         from result.models import Result
         try:
-            results = Result.all().filter(processtaskuser=self)
-
-            if len(results) > 0:
-                return results[0]
+            return Result.all(processtaskuser=self)
 
         except Result.DoesNotExist, IndexError:
             pass
@@ -312,6 +310,14 @@ class ProcessTaskUser(models.Model):
             tmp = tmp.filter(processtask=processtask)
 
         return tmp
+
+@receiver(models.signals.post_save, sender=ProcessTaskUser)
+def __generate_ptu_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an process task user.
+    '''
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class Request(models.Model):
     '''Represents a request made over a ProcessTask assignment.

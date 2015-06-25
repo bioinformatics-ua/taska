@@ -12,9 +12,10 @@ const ProcessResume = React.createClass({
     process(){
         return this.props.context.props.detail.Process.process;
     },
-    translateResources(users){
+
+    translateResources(task){
         let files = [];
-        for(let user of users){
+        for(let user of task.users){
             if(user.result){
                 let resources = user.result.outputs;
 
@@ -25,7 +26,7 @@ const ProcessResume = React.createClass({
                             filename: resource.filename,
                             size: resource.size,
                             creator: resource['creator_repr'],
-                            task: user.result.processtaskuser.processtask.parent.title,
+                            task: task['task_repr'],
                             date: moment(resource['create_date']).fromNow(),
                             status: 'Finished',
                             progress: 100,
@@ -40,7 +41,7 @@ const ProcessResume = React.createClass({
 
     },
     __renderTask(task){
-        return this.translateResources(task.users);
+        return this.translateResources(task);
     },
     renderTasks(){
         let tasks = this.process().tasks;

@@ -56,7 +56,7 @@ class HistorySerializer(serializers.ModelSerializer):
         return obj.object.__class__.__name__
 
     def get_actor_repr(self, obj):
-        return obj.actor.get_full_name()
+        return obj.actor.get_full_name() or obj.actor.email
 
 # ViewSets define the view behavior.
 class HistoryViewSet(   mixins.ListModelMixin,
