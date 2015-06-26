@@ -10,6 +10,7 @@ const TableStoreMixin = {
         this.__current={};
     },
     onLoadSuccess: function (data) {
+        console.log(data);
         if(this.merge)
             this.__list = $.merge(this.__list, data.results);
         else

@@ -3,12 +3,18 @@ from rest_framework import renderers, serializers, viewsets, permissions, mixins
 from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import status
+from rest_framework import status, filters, generics
 
+
+from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from history.models import *
+from django.apps import apps
+from utils.api_related import create_serializer, AliasOrderingFilter
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -80,7 +86,7 @@ class HistoryViewSet(   mixins.ListModelMixin,
         """
         return super(HistoryViewSet, self).list(request, args, kwargs)
 
-    @detail_route(methods=['get'])
+    '''@detail_route(methods=['get'])
     def request(self, request, pk=None):
         """
         Return a list of history for a given request object by hash
@@ -124,10 +130,41 @@ class HistoryViewSet(   mixins.ListModelMixin,
         from result.models import Result
 
         return self.__filterHistory(Result, pk)
-
+    '''
     def __filterHistory(self, Model, pk):
 
         serializer = HistorySerializer(many=True, instance=History.type(Model, pk))
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class FilteredHistory(generics.ListAPIView):
+    queryset = History.objects.none()
+    serializer_class = HistorySerializer
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('event', 'date', 'actor')
+    ordering_map = {
+    }
+    type_map = {
+        'process': 'process.Process',
+        'request': 'process.Request',
+        'workflow': 'workflow.Workflow',
+        'task': 'task.Task',
+        'result': 'result.Result'
+    }
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+        kwargs = self.request.parser_context['kwargs']
+
+        mdl = kwargs['model']
+        pk = kwargs['pk']
+
+        try:
+            ObjModel = apps.get_model(self.type_map[mdl])
+
+            return History.type(ObjModel, pk).exclude(event=History.ACCESS)
+
+        except KeyError:
+            return Response({'error': 'No type of object %s' %mdl})

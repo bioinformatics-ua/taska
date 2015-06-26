@@ -8,6 +8,11 @@ import moment from 'moment';
 
 import {stateColor} from '../map.jsx';
 
+import Tabs from 'react-simpletabs';
+import Griddle from 'griddle-react';
+
+import {DetailHistoryTable} from './reusable/history.jsx';
+
 const ProcessResume = React.createClass({
     process(){
         return this.props.context.props.detail.Process.process;
@@ -54,9 +59,6 @@ const ProcessResume = React.createClass({
             }
             ,[]
         );
-
-        console.log(resources);
-
         return <Uploader
                 editable={false}
                 extraFields={['date', 'creator', 'task']}
@@ -68,8 +70,14 @@ const ProcessResume = React.createClass({
 
         return (
         <span>
-            <h3>Study Outputs by Task</h3>
-            {this.renderTasks()}
+            <Tabs tabActive={1}>
+                <Tabs.Panel title={<span><i className="fa fa-file-o"></i> Outputs by Task</span>}>
+                    {this.renderTasks()}
+                </Tabs.Panel>
+                <Tabs.Panel title={<span><i className="fa fa-list-alt"></i> Log</span>}>
+                    <DetailHistoryTable hash={`process/${this.process().hash}`} />
+                </Tabs.Panel>
+            </Tabs>
         </span>
         );
     }

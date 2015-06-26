@@ -58,6 +58,7 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         model = ProcessTaskUser
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         exclude = ('id', 'processtask')
+        extra_kwargs = {'hash': {'required': False}}
 
     def get_user_repr(self, obj):
         tmp = unicode(obj.user.get_full_name())

@@ -165,8 +165,13 @@ export default React.createClass({
         } catch(ex){
             r = undefined;
         }
+        if(this.state.task.hash){
+            delete this.state.task.hash;
+        }
 
-        ResultActions.calibrate($.extend(this.state.task, {hash: r}));
+        ResultActions.calibrate(
+            $.extend(this.state.task, {hash: r})
+        );
     },
     componentWillUnmount(){
         ResultActions.unloadAnswer();
@@ -262,7 +267,7 @@ export default React.createClass({
                                       </div>
                                       <div className="form-group">
                                         <div className="input-group">
-                                          <span className="input-group-addon"><strong>Process</strong></span>
+                                          <span className="input-group-addon"><strong>Study</strong></span>
                                           <span disabled className="form-control">{this.state.task.processtask['process_repr']}</span>
                                         </div>
                                       </div>

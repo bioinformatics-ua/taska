@@ -146,13 +146,14 @@ export default React.createClass({
                                 editable={params.mode === 'edit'}
                                 showEdit={false}
                                 runnable={params.mode === 'run'}
-                                extra={
+                                extra={this.state.process.status === 1 || this.state.process.status === 3?
                                     <DeleteButton
                                       success={this.cancel}
                                       identificator = {false}
                                       deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
                                       title={`Cancel ${this.state.process['object_repr']}`}
                                       message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
+                                      : ''
                                 }
                                 showRun={false}
                                 object={params.object}

@@ -75,7 +75,9 @@ const TableComponentMixin = {
         this.setPage(0);
     },
     getState: function(){
+        console.log(this.props.hash);
       return {
+            hash: this.props.hash || undefined,
             entries: this.tableStore.getList(),
             currentPage: this.tableStore.getPage(),
             maxPages: this.tableStore.getMaxPage(),
@@ -90,7 +92,7 @@ const TableComponentMixin = {
     //what page is currently viewed
     setPage: function(index){
       console.log(`Set page ${index}`);
-      this.tableAction($.extend(this.getState(), {currentPage: index}));
+      this.tableAction($.extend(this.getState(), {currentPage: index}), this.state.hash);
     },
     //this will handle how the data is sorted
     sortData: function(sort, sortAscending, data){
