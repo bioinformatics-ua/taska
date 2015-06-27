@@ -126,14 +126,15 @@ const HistoryTable = React.createClass({
                 "customComponent": EventIcon,
                 "cssClassName": "event-td"
                 }
-            ]
+            ],
+            enableInfiniteScroll: true
         }
     },
     render(){
       return  <span><Griddle
                   noDataMessage={<center>No history to show.</center>}
 
-                 {...this.props.commonTableSettings} enableInfiniteScroll={true}
+                 {...this.props.commonTableSettings} enableInfiniteScroll={this.props.enableInfiniteScroll}
                 showTableHeading={false} columns={["object", "event"]}
                 columnMetadata={this.props.columns} />
               </span>;
@@ -186,7 +187,7 @@ const DetailHistoryTable = React.createClass({
     },
     render: function () {
       return  <div>
-                <HistoryTable commonTableSettings={this.commonTableSettings()} />
+                <HistoryTable commonTableSettings={this.commonTableSettings()} enableInfiniteScroll={false} />
               </div>;
   }
 });

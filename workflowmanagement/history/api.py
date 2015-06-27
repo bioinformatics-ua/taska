@@ -164,7 +164,7 @@ class FilteredHistory(generics.ListAPIView):
         try:
             ObjModel = apps.get_model(self.type_map[mdl])
 
-            return History.type(ObjModel, pk).exclude(event=History.ACCESS)
+            return History.type(ObjModel, pk, related=True).exclude(event=History.ACCESS)
 
         except KeyError:
             return Response({'error': 'No type of object %s' %mdl})

@@ -8,7 +8,7 @@ import {ListLoader} from '../actions/api.jsx'
 let dloader;
 
 const DetailHistoryStore = Reflux.createStore({
-    merge: true,
+    merge: false,
     mixins: [TableStoreMixin],
     listenables: [DetailHistoryActions],
     load: function (state, hash) {
@@ -16,7 +16,7 @@ const DetailHistoryStore = Reflux.createStore({
         console.log(hash);
         if(hash !== undefined){
             let self = this;
-            dloader = new ListLoader({model: `history/${hash}`, dontrepeat: true});
+            dloader = new ListLoader({model: `history/${hash}`, dontrepeat: false});
 
             dloader.load(function(data){
                 self.updatePaginator(state);

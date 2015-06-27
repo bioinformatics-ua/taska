@@ -124,7 +124,7 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
         for ptu in auths:
             users.append(ptu.user)
 
-        History.new(event=History.ADD, actor=processtask.process.executioner, object=processtask, authorized=users)
+        History.new(event=History.ADD, actor=processtask.process.executioner, object=processtask, authorized=users, related=[processtask.process])
 
 
         return processtask
@@ -387,7 +387,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
                 ptaskuser = ProcessTaskUser(user=user, processtask=ptask)
                 ptaskuser.save()
 
-                History.new(event=History.ADD, actor=ptask.process.executioner, object=ptask, authorized=[ptaskuser.user])
+                History.new(event=History.ADD, actor=ptask.process.executioner, object=ptask, authorized=[ptaskuser.user], related=[ptask.process])
 
                 return Response(ProcessSerializer(process).data)
 
@@ -568,6 +568,7 @@ class RequestResponseSerializer(serializers.ModelSerializer):
 class RequestSerializer(serializers.ModelSerializer):
     processtaskuser = ProcessTaskUserSerializer(read_only=True)
     process = serializers.CharField(max_length=50)
+    process_repr = serializers.SerializerMethodField()
     process_owner = serializers.SerializerMethodField()
     task = serializers.CharField(max_length=50)
     user = serializers.IntegerField(write_only=True)
@@ -583,6 +584,9 @@ class RequestSerializer(serializers.ModelSerializer):
 
     def get_process_owner(self, obj):
         return obj.processtaskuser.processtask.process.executioner.id
+
+    def get_process_repr(self, obj):
+        return str(obj.processtaskuser.processtask.process)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -771,10 +775,10 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         request.data[u'user'] = request.user.id
 
         serializer, headers = create_serializer(self, request)
+        process = serializer.instance.processtaskuser.processtask.process
+        process_owner = process.executioner
 
-        process_owner = serializer.instance.processtaskuser.processtask.process.executioner
-
-        History.new(event=History.ADD, actor=request.user, object=serializer.instance, authorized=[process_owner])
+        History.new(event=History.ADD, actor=request.user, object=serializer.instance, authorized=[process_owner], related=[process])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -794,7 +798,10 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         serializer = RequestSerializer(instance=instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        History.new(event=History.EDIT, actor=request.user, object=instance)
+        process = serializer.instance.processtaskuser.processtask.process
+        process_owner = process.executioner
+
+        History.new(event=History.EDIT, actor=request.user, object=instance, authorized=[process_owner], related=[process])
 
         return Response(serializer.data)
 
@@ -804,7 +811,11 @@ class RequestsViewSet(  mixins.CreateModelMixin,
 
         """
         instance = self.get_object()
-        History.new(event=History.ACCESS, actor=request.user, object=instance)
+
+        process = instance.processtaskuser.processtask.process
+        process_owner = process.executioner
+
+        History.new(event=History.ACCESS, actor=request.user, object=instance, authorized=[process_owner], related=[process])
 
         return Response(RequestSerializer(instance).data)
 
@@ -818,7 +829,10 @@ class RequestsViewSet(  mixins.CreateModelMixin,
         instance.removed = True
         instance.save()
 
-        History.new(event=History.DELETE, actor=request.user, object=instance)
+        process = instance.processtaskuser.processtask.process
+        process_owner = process.executioner
+
+        History.new(event=History.DELETE, actor=request.user, object=instance, authorized=[process_owner], related=[process])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

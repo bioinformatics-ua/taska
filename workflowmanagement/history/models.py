@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 from django.contrib.auth.models import User
 
@@ -6,6 +7,12 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 import django.dispatch
+
+class HistoryRelated(models.Model):
+    # related object reference
+    object_type     = models.ForeignKey(ContentType)
+    object_id       = models.PositiveIntegerField()
+    object          = GenericForeignKey('object_type', 'object_id')
 
 class History(models.Model):
     ''' Describes all actions executed over the system.
@@ -54,6 +61,8 @@ class History(models.Model):
 
     authorized      = models.ManyToManyField(User, related_name='authorized')
 
+    related         = models.ManyToManyField(HistoryRelated, related_name='related')
+
     class Meta:
         verbose_name_plural = "Historic"
         ordering = ["-id"]
@@ -84,7 +93,7 @@ class History(models.Model):
 
 
     @classmethod
-    def new(self, event, actor, object, authorized=None):
+    def new(self, event, actor, object, authorized=None, related=None):
         """
         Generates a new generic history object
         """
@@ -96,13 +105,21 @@ class History(models.Model):
         if authorized != None:
             for elem in authorized:
                 action.authorized.add(elem)
+
+        if related != None:
+            for relation in related:
+                hr = HistoryRelated(object=relation)
+                hr.save()
+
+                action.related.add(hr)
+
         print 'NEW HISTORY'
         self.post_new.send(sender=self.__class__, instance=action)
 
         return action
 
     @staticmethod
-    def type(Model, pk):
+    def type(Model, pk, related=False):
         """
         Retrieves all history objects for a given Model
         """
@@ -116,6 +133,9 @@ class History(models.Model):
                 req = Model.objects.get(hash=pk)
 
             type = ContentType.objects.get_for_model(req)
+
+            if related:
+                return History.objects.filter(Q(object_type=type, object_id=req.id) | Q(related__object_type=type, related__object_id=req.id))
 
             return History.objects.filter(object_type=type, object_id=req.id)
         except Model.DoesNotExist:
