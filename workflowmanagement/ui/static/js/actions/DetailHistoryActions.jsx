@@ -5,7 +5,8 @@ import Reflux from 'reflux';
 // Thus the flow is: User interaction -> component calls action -> store reacts and triggers -> components update
 const DetailHistoryActions = Reflux.createActions([
     'loadSuccess',
-    'load'
+    'load',
+    'calibrate'
 ]);
 
 export default DetailHistoryActions;

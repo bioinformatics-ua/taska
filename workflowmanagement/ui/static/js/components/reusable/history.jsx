@@ -175,7 +175,9 @@ const DetailHistoryTable = React.createClass({
     tableAction: DetailHistoryActions.load,
     tableStore: DetailHistoryStore,
     mixins: [Reflux.listenTo(DetailHistoryStore, 'update'), TableComponentMixin],
-
+    componentWillMount(){
+        DetailHistoryActions.calibrate();
+    },
     getInitialState: function() {
         return {};
     },

@@ -23,6 +23,16 @@ const DetailHistoryStore = Reflux.createStore({
                 DetailHistoryActions.loadSuccess(data);
             }, state);
        }
+    },
+    onCalibrate(){
+        this.__list = [];
+        this.__page = 0;
+        this.__page_size = 5;
+        this.__max_page = 0;
+        this.__count = 0;
+        this.__sortcolumn = null;
+        this.__sortascending = true;
+        this.__current={};
     }
 });
 
