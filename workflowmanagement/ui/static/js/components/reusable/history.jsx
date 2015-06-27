@@ -75,6 +75,10 @@ var HistoryItem = React.createClass({
           text = `${entry.actor_repr} has finished`;
           return <span>{text} {link}</span>;
 
+        case 'Comment':
+          text = `${entry.actor_repr} has made comments on`;
+          return <span>{text} {entry.object_repr}</span>;
+
         default: return entry.event;
       }
     }
@@ -98,6 +102,8 @@ var EventIcon = React.createClass({
         case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
         case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
         case 'Done': return <i className="fa fa-check thumb"></i>;
+        case 'Comment': return <i className="fa fa-comment thumb"></i>;
+
         default: return event;
       }
     }

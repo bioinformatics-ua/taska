@@ -245,6 +245,9 @@ class ResourceViewSet(
 
                 if rcs.is_valid(raise_exception=True):
                     rcs.save()
+
+                    History.new(event=History.COMMENT, actor=request.user, object=servefile)
+
                     return Response({
                         'comment': rcs.data
                         })

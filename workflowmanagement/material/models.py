@@ -170,4 +170,4 @@ class File(Resource):
     pass
 
     def __unicode__(self):
-        return self.file.name
+        return self.filename

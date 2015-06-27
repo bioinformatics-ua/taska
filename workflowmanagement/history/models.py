@@ -39,6 +39,7 @@ class History(models.Model):
     CANCEL          = 5
     DONE            = 6
     APPROVE         = 7
+    COMMENT         = 8
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -47,7 +48,8 @@ class History(models.Model):
             (ACCESS,    'Access'),
             (CANCEL,    'Cancel'),
             (DONE,      'Done'),
-            (APPROVE,   'Approve')
+            (APPROVE,   'Approve'),
+            (COMMENT,   'Comment')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
