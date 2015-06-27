@@ -152,7 +152,7 @@ export default Reflux.createStore({
             });
         }
         else {
-            UserActions.methodDetail.triggerPromise('register', undefined, 'POST', this.__detaildata).then(
+            this.onMethodDetail('register', undefined, 'POST', this.__detaildata).then(
                 (user) => {
                     StateActions.loadingEnd();
 
@@ -175,7 +175,7 @@ export default Reflux.createStore({
         return this.__success_register;
     },
     onApprove(email){
-        UserActions.methodDetail.triggerPromise('activate', undefined, 'POST', {
+        this.onMethodDetail('activate', undefined, 'POST', {
             'email': email
         }).then(
             (response) => {

@@ -8,13 +8,19 @@ import moment from 'moment';
 
 import {stateColor} from '../map.jsx';
 
+import Tabs from 'react-simpletabs';
+import Griddle from 'griddle-react';
+
+import {DetailHistoryTable} from './reusable/history.jsx';
+
 const ProcessResume = React.createClass({
     process(){
         return this.props.context.props.detail.Process.process;
     },
-    translateResources(users){
+
+    translateResources(task){
         let files = [];
-        for(let user of users){
+        for(let user of task.users){
             if(user.result){
                 let resources = user.result.outputs;
 
@@ -25,7 +31,7 @@ const ProcessResume = React.createClass({
                             filename: resource.filename,
                             size: resource.size,
                             creator: resource['creator_repr'],
-                            task: user.result.processtaskuser.processtask.parent.title,
+                            task: task['task_repr'],
                             date: moment(resource['create_date']).fromNow(),
                             status: 'Finished',
                             progress: 100,
@@ -40,7 +46,7 @@ const ProcessResume = React.createClass({
 
     },
     __renderTask(task){
-        return this.translateResources(task.users);
+        return this.translateResources(task);
     },
     renderTasks(){
         let tasks = this.process().tasks;
@@ -53,9 +59,6 @@ const ProcessResume = React.createClass({
             }
             ,[]
         );
-
-        console.log(resources);
-
         return <Uploader
                 editable={false}
                 extraFields={['date', 'creator', 'task']}
@@ -67,8 +70,14 @@ const ProcessResume = React.createClass({
 
         return (
         <span>
-            <h3>Study Outputs by Task</h3>
-            {this.renderTasks()}
+            <Tabs tabActive={1}>
+                <Tabs.Panel title={<span><i className="fa fa-file-o"></i> Outputs by Task</span>}>
+                    {this.renderTasks()}
+                </Tabs.Panel>
+                <Tabs.Panel title={<span><i className="fa fa-list-alt"></i> Log</span>}>
+                    <DetailHistoryTable hash={`process/${this.process().hash}`} />
+                </Tabs.Panel>
+            </Tabs>
         </span>
         );
     }

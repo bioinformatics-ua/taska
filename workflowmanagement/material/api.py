@@ -68,17 +68,30 @@ class GenericResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
 
+class ResourceCommentSerializer(serializers.ModelSerializer):
+    user_repr = serializers.SerializerMethodField()
+
+    def get_user_repr(self, obj):
+        return obj.user.get_full_name() or obj.user.email
+
+    class Meta:
+        model = ResourceComment
+        exclude = ('id', 'removed')
 
 # Serializers define the API representation.
 class ResourceSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     creator_repr = serializers.SerializerMethodField()
+    #comments = serializers.SerializerMethodField()
 
     def get_type(self, obj):
         return obj.type()
 
     def get_creator_repr(self, obj):
         return obj.creator.get_full_name()
+
+    #def get_comments(self, obj):
+    #    return ResourceCommentSerializer(obj.resourcecomment_set, many=True).data
 
     @transaction.atomic
     def create (self, data):
@@ -213,6 +226,36 @@ class ResourceViewSet(
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @detail_route(methods=['get', 'post'])
+    def comment(self, request, hash):
+        # get the file
+        servefile = Resource.all().get(hash=hash)
+
+        if request.method == 'POST':
+            content = request.data.get('comment', None)
+
+            if content:
+                comm = {
+                    'comment': content,
+                    'user': request.user.id,
+                    'resource': servefile.id
+                }
+                #rc = ResourceComment(resource=servefile, user=request.user, comment=content)
+                rcs = ResourceCommentSerializer(data=comm)
+
+                if rcs.is_valid(raise_exception=True):
+                    rcs.save()
+
+                    History.new(event=History.COMMENT, actor=request.user, object=servefile)
+
+                    return Response({
+                        'comment': rcs.data
+                        })
+
+            return Response({'error': 'Request must contain a comment'})
+
+        # else if get
+        return Response({'comments': ResourceCommentSerializer(servefile.resourcecomment_set, many=True).data})
 
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):
@@ -239,7 +282,6 @@ class BinaryParser(BaseParser):
         """
             Returns a django file object from a stream-like binary object
         """
-        print "PARSE BINARY"
         tmp = tempfile.NamedTemporaryFile()
 
         for chunk in iter((lambda:stream.read(2048)),''):
@@ -270,19 +312,12 @@ class FileUpload(generics.CreateAPIView):
         return serializer.data
 
     def create(self, request, *args, **kwargs):
-        print "file list:"
-        print request.FILES
-        print "--"
 
         mform = request.FILES
         if len(mform) > 0:
             files = []
             for fd_file in mform.getlist('fd-file'):
                 files.append(self.__serializeFile(fd_file.name, request.user.id, fd_file))
-
-            print "CALLBACK"
-            print json.dumps(files)
-            print "--"
 
             # in case this is a iframe from filedrop with must respond in html with a js function that callsback through window
             return render(request, 'iframe_response.html',

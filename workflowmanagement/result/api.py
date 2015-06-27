@@ -74,7 +74,7 @@ class ResultSerializer(serializers.ModelSerializer):
     user_repr = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
     outputswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
-    processtaskuser = MyProcessTaskUserDetailSerializer()
+    processtaskuser = serializers.SlugRelatedField(slug_field='hash', queryset=ProcessTaskUser.objects)
     process_owner = serializers.SerializerMethodField()
 
     def get_outputs(self, obj):
@@ -156,7 +156,7 @@ class ResultSerializer(serializers.ModelSerializer):
 
         users.append(process.executioner)
 
-        History.new(event=History.ADD, actor=this_ptu.user, object=result, authorized=users)
+        History.new(event=History.ADD, actor=this_ptu.user, object=result, authorized=users, related=[process])
 
         self.__create_resources(result, outputs)
 
@@ -265,7 +265,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
 
         """
         instance = self.get_object()
-        History.new(event=History.ACCESS, actor=request.user, object=instance)
+        History.new(event=History.ACCESS, actor=request.user, object=instance, related=[instance.processtaskuser.processtask.process])
 
         return super(ResultViewSet, self).retrieve(request, args, kwargs)
 
@@ -279,7 +279,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
         instance.removed = True
         instance.save()
 
-        History.new(event=History.DELETE, actor=request.user, object=instance)
+        History.new(event=History.DELETE, actor=request.user, object=instance, related=[instance.processtaskuser.processtask.process])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -69,8 +69,8 @@ class FormTask extends Task{
 
         return React.createClass({
             componentDidMount(){
-                console.log(context.state.answer.answer);
-                console.log(context.state.task.processtask.parent['form_repr'].schema);
+                            console.log(context.state);
+
                 let options = {
                     saveCallback: context.saveCallback,
                     project_id: 1,

@@ -4,7 +4,11 @@ import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
 import HistoryActions from '../../actions/HistoryActions.jsx';
+import DetailHistoryActions from '../../actions/DetailHistoryActions.jsx';
+
 import HistoryStore from '../../stores/HistoryStore.jsx';
+
+import DetailHistoryStore from '../../stores/DetailHistoryStore.jsx';
 
 import Griddle from 'griddle-react';
 
@@ -71,6 +75,10 @@ var HistoryItem = React.createClass({
           text = `${entry.actor_repr} has finished`;
           return <span>{text} {link}</span>;
 
+        case 'Comment':
+          text = `${entry.actor_repr} has made comments on`;
+          return <span>{text} {entry.object_repr}</span>;
+
         default: return entry.event;
       }
     }
@@ -94,6 +102,8 @@ var EventIcon = React.createClass({
         case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
         case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
         case 'Done': return <i className="fa fa-check thumb"></i>;
+        case 'Comment': return <i className="fa fa-comment thumb"></i>;
+
         default: return event;
       }
     }
@@ -102,7 +112,43 @@ var EventIcon = React.createClass({
             </span>;
   }
 });
+
 const HistoryTable = React.createClass({
+    getDefaultProps(){
+        return {
+            columns: [
+                {
+                "columnName": "object",
+                "order": 1,
+                "locked": false,
+                "visible": true,
+                "customComponent": HistoryItem
+                },
+                {
+                "columnName": "event",
+                "order": 2,
+                "locked": false,
+                "visible": true,
+                "customComponent": EventIcon,
+                "cssClassName": "event-td"
+                }
+            ],
+            enableInfiniteScroll: true
+        }
+    },
+    render(){
+      return  <span><Griddle
+                  noDataMessage={<center>No history to show.</center>}
+
+                 {...this.props.commonTableSettings} enableInfiniteScroll={this.props.enableInfiniteScroll}
+                showTableHeading={false} columns={["object", "event"]}
+                columnMetadata={this.props.columns} />
+              </span>;
+    }
+});
+
+
+const GeneralHistoryTable = React.createClass({
     // This is requires by the mixin, to know where to throw the action on events, i realize
     // the best case scenario for a mixin is be independently detachable, but I couldnt find a way to guess
     // the action destiny without explicitly identifying it
@@ -117,23 +163,6 @@ const HistoryTable = React.createClass({
         this.setState(this.getState());
     },
     render: function () {
-      const columnMeta = [
-        {
-        "columnName": "object",
-        "order": 1,
-        "locked": false,
-        "visible": true,
-        "customComponent": HistoryItem
-        },
-        {
-        "columnName": "event",
-        "order": 2,
-        "locked": false,
-        "visible": true,
-        "customComponent": EventIcon,
-        "cssClassName": "event-td"
-        }
-      ];
       return  <div className="panel panel-default panel-overflow">
                 <div className="panel-heading">
                   <center>
@@ -141,14 +170,32 @@ const HistoryTable = React.createClass({
                     <h3 className="panel-title"> History</h3>
                   </center>
                 </div>
-                <Griddle
-                  noDataMessage={<center>You currently have no history related to yourself. Here will appear all events related with action on the system you are involved in.</center>}
-
-                 {...this.commonTableSettings()} enableInfiniteScroll={true}
-                showTableHeading={false} columns={["object", "event"]}
-                columnMetadata={columnMeta} />
+                <HistoryTable commonTableSettings={this.commonTableSettings()} />
               </div>;
   }
 });
 
-export {HistoryTable}
+const DetailHistoryTable = React.createClass({
+    // This is requires by the mixin, to know where to throw the action on events, i realize
+    // the best case scenario for a mixin is be independently detachable, but I couldnt find a way to guess
+    // the action destiny without explicitly identifying it
+    tableAction: DetailHistoryActions.load,
+    tableStore: DetailHistoryStore,
+    mixins: [Reflux.listenTo(DetailHistoryStore, 'update'), TableComponentMixin],
+    componentWillMount(){
+        DetailHistoryActions.calibrate();
+    },
+    getInitialState: function() {
+        return {};
+    },
+    update: function(data){
+        this.setState(this.getState());
+    },
+    render: function () {
+      return  <div>
+                <HistoryTable commonTableSettings={this.commonTableSettings()} enableInfiniteScroll={false} />
+              </div>;
+  }
+});
+
+export default {HistoryTable, GeneralHistoryTable, DetailHistoryTable};

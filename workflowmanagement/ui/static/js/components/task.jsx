@@ -85,9 +85,16 @@ export default React.createClass({
 
                 ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                     (result) => {
+
+                        return TaskActions.loadDetailIfNecessary.triggerPromise(result.processtaskuser).then(
+                            (task) => {
                                 fulfill({
                                     result: result,
+                                    task: task
                                 });
+                            }
+                        );
+
                     }
                 ).catch(ex=> reject(ex));
                 });
@@ -118,17 +125,9 @@ export default React.createClass({
         let tmp = {
             answer: ResultStore.getAnswer(),
             submitted: ResultStore.answerSubmitted(),
-            user: UserStore.getUser()
+            user: UserStore.getUser(),
+            task: TaskStore.getDetail()
         };
-
-        if(result || (this.state && this.state.isResult)){
-            tmp.task = tmp.answer.processtaskuser;
-        } else {
-            tmp.task = TaskStore.getDetail();
-        }
-
-        console.log(tmp.answer);
-
         return tmp;
     },
     isMine(){
@@ -166,8 +165,13 @@ export default React.createClass({
         } catch(ex){
             r = undefined;
         }
+        if(this.state.task.hash){
+            delete this.state.task.hash;
+        }
 
-        ResultActions.calibrate($.extend(this.state.task, {hash: r}));
+        ResultActions.calibrate(
+            $.extend(this.state.task, {hash: r})
+        );
     },
     componentWillUnmount(){
         ResultActions.unloadAnswer();
@@ -179,8 +183,6 @@ export default React.createClass({
             this.context.router.transitionTo('home');
     },
     update(status){
-        console.log('UPDATE');
-
         let detail = Object.keys(this.props.detail)[0];
 
         if(this.props.detail[detail].result)
@@ -198,7 +200,6 @@ export default React.createClass({
             ResultActions.saveAnswer();
     },
     render() {
-        console.log('RENDER');
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;
@@ -266,7 +267,7 @@ export default React.createClass({
                                       </div>
                                       <div className="form-group">
                                         <div className="input-group">
-                                          <span className="input-group-addon"><strong>Process</strong></span>
+                                          <span className="input-group-addon"><strong>Study</strong></span>
                                           <span disabled className="form-control">{this.state.task.processtask['process_repr']}</span>
                                         </div>
                                       </div>

@@ -3,7 +3,7 @@ import Router from 'react-router';
 import React from 'react/addons';
 import Reflux from 'reflux';
 
-import {HistoryTable} from './reusable/history.jsx';
+import {GeneralHistoryTable} from './reusable/history.jsx';
 import {WorkflowTable} from './reusable/workflow.jsx';
 import {ProcessTable} from './reusable/process.jsx';
 import {RequestTable} from './reusable/request.jsx';
@@ -46,7 +46,7 @@ const LoggedInHome = React.createClass({
                 <FormTable />
               </div>
               <div className="col-md-6 flex-container flex-row">
-                <HistoryTable />
+                <GeneralHistoryTable />
               </div>
           </div>
       </span>);
