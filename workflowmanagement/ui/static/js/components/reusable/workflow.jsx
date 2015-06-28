@@ -79,11 +79,11 @@ const WorkflowTable = React.createClass({
     return  <div className="panel panel-default panel-overflow griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-sitemap pull-left"></i>
-                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Studies</h3>
+                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Protocols</h3>
                 <Link to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
-                  noDataMessage={<center>You have not created any studies yet, click on the plus icon above to create a new study.</center>}
+                  noDataMessage={<center>You have not created any protocols yet, click on the plus icon above to create a new protocol.</center>}
                   {...this.commonTableSettings()}
                   columns={["title", "hash"]}
                   columnMetadata={columnMeta} />

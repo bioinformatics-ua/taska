@@ -53,9 +53,9 @@ export default React.createClass({
     displayName: route => {
         try{
             let detail = Object.keys(route.props.detail)[0];
-            return `Study - ${route.props.detail[detail].title}`;
+            return `Protocol - ${route.props.detail[detail].title}`;
         } catch(ex){
-            return 'Study Not Found';
+            return 'Protocol Not Found';
         }
     },
     getWorkflow(){
@@ -225,7 +225,7 @@ export default React.createClass({
                     save={params.mode === 'run'? this.runProcess:this.save}
                     onUpdate={this.unsaved}
                     saveLabel={params.mode !== 'run'?
-                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Protocol</span>
                     : <span><i className="fa fa-play"></i> Run</span>}
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}

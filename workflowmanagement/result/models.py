@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.dispatch import receiver
 
 from process.models import ProcessTaskUser
@@ -45,12 +46,15 @@ class Result(models.Model):
         return self._meta.app_label + '.' +self.__class__.__name__
 
     @staticmethod
-    def all(owner=None):
+    def all(owner=None, processtaskuser=None):
 
         tmp = Result.objects.filter(removed=False)
 
         if owner != None:
             tmp=tmp.filter(processtaskuser__processtask__process__executioner=owner)
+
+        if processtaskuser != None:
+            return tmp.get_subclass(processtaskuser=processtaskuser)
 
         return tmp.select_subclasses()
 

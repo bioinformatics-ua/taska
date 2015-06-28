@@ -130,6 +130,26 @@ export default React.createClass({
                 <div className="col-md-12">
                     <div className="panel panel-default">
                         <div className="panel-body">
+                            {this.state.request['process_repr']?
+                                <div className="row">
+                                    <div className="col-md-7">
+                                          <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Study</strong></span>
+                                              <input disabled={true} className="form-control" value={this.state.request['process_repr']}/>
+                                            </div>
+                                          </div>
+                                    </div>
+                                    <div className="col-md-5">
+                                        <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Requester</strong></span>
+                                              <input disabled={true} className="form-control" value={this.state.request.processtaskuser['user_repr']}/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            :''}
                             <div className="row">
                                 <div className="col-md-7">
                                       <div className="form-group">

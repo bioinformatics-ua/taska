@@ -40,7 +40,6 @@ const Modal = React.createClass({
     }
   },
   render(){
-    console.log(this.props.visible);
     if(this.props.visible)
       return <div className="modal modalback show">
                       <div className="modal-dialog">
@@ -238,7 +237,7 @@ const ProcessStatus = React.createClass({
         extra+=' circle-success'; label='Finished'; break;
       case 3:
         extra+=' circle-grey'; label='Canceled'; break;
-      case 3:
+      case 4:
         extra+=' circle-warning'; label='Overdue'; break;
     }
     return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label> </span>;

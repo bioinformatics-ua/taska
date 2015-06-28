@@ -113,7 +113,7 @@ const TaskTable = React.createClass({
                 <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Tasks</h3>
               </div>
               <Griddle
-                  noDataMessage={<center>You currently have no tasks assigned to you at this moment. This tasks are assigned through the running of processes.</center>}
+                  noDataMessage={<center>You currently have no tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                   {...this.commonTableSettings()}
                   columns={["type", "task_repr", "deadline"]}
                   columnMetadata={columnMeta} />

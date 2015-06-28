@@ -61,7 +61,7 @@ export default Reflux.createStore({
         this.trigger();
     },
     onCancel(ptask, user){
-        ProcessActions.methodDetail.triggerPromise('cancel', this.__detaildata.hash).then(
+        this.onMethodDetail('cancel', this.__detaildata.hash).then(
             (data) => {
                 this.__detaildata = data;
                 this.__v++;
@@ -71,8 +71,7 @@ export default Reflux.createStore({
         );
     },
     onCancelUser(ptask, user, val){
-        ProcessActions.methodDetail
-            .triggerPromise('canceluser',
+        this.onMethodDetail('canceluser',
                             this.__detaildata.hash,
                             'POST', {
                                 ptask: ptask,
@@ -81,7 +80,6 @@ export default Reflux.createStore({
                             })
             .then(
             (data) => {
-                console.log(data);
                 this.__detaildata = data;
                 this.__v++;
 

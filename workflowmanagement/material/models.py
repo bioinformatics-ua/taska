@@ -106,6 +106,24 @@ def __generate_resource_hash(sender, instance, created, *args, **kwargs):
         instance.ttype = instance.type()
         instance.save()
 
+### Resource comments
+class ResourceComment(models.Model):
+    '''Represents a resource comment, given by a certain user
+
+    Attributes:
+        :id (int): Private sequential identificator
+        :start_date (datetime): Creation date of comment
+        :latest_update (datetime): Date of latest update on comment
+        :removed (boolean): Logical indicator of removal status of this resource comment
+
+    '''
+    resource        = models.ForeignKey(Resource)
+    user            = models.ForeignKey(User)
+    create_date     = models.DateTimeField(auto_now_add=True)
+    latest_update   = models.DateTimeField(auto_now=True)
+    comment         = models.CharField(max_length=2000)
+    removed         = models.BooleanField(default=False)
+
 ### File resource
 
 def fileHash(instance, filename):
@@ -152,4 +170,4 @@ class File(Resource):
     pass
 
     def __unicode__(self):
-        return self.file.name
+        return self.filename

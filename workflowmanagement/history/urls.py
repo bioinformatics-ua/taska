@@ -16,4 +16,5 @@ router_tricks = router.urls # + [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
+    url(r'(?P<model>[^/.]+)/(?P<pk>[a-zA-Z0-9]+)/', api.FilteredHistory.as_view()),
 )
