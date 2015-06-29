@@ -24,7 +24,7 @@
     "react-router": "~0.13.2",
     "react-select": "^0.4.4",
     "react-simpletabs": "^0.6.1",
-    "react-toggle": "~0.1.1",
+    "react-toggle": "0.1.1",
     "react-widgets": "^2.6.2",
     "reflux": "~0.2.5",
     "rivets": "^0.8.1",
