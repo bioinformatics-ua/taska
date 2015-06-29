@@ -75,7 +75,6 @@ const TableComponentMixin = {
         this.setPage(0);
     },
     getState: function(){
-        console.log(this.props.hash);
       return {
             hash: this.props.hash || undefined,
             entries: this.tableStore.getList(),
