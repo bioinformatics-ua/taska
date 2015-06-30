@@ -212,7 +212,8 @@ export default React.createClass({
               </div>
             </div>
           </div>
-          <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
+          <footer> <a href="http://www.ua.pt"><img src="static/images/logo-ua2.png" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a href="http://bioinformatics.ua.pt"><img src="static/images/bioinformatics.png" /></a></footer>
         </div>
     );
   }
