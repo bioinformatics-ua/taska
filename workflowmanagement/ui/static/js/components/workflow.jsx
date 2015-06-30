@@ -172,6 +172,15 @@ export default React.createClass({
         if(params.mode === 'edit')
             StateActions.waitSave();
     },
+    didWrite(){
+        if(!this.state.workflow.owner)
+            return true;
+
+        if(this.state.user.id === this.state.workflow.owner)
+            return true;
+
+        return false;
+    },
     render() {
         if(this.props.failed){
             let Failed = this.props.failed;
@@ -210,6 +219,7 @@ export default React.createClass({
                             forkable={params.mode === 'forkable'}
                             editable={params.mode === 'edit'}
                             runnable={params.mode === 'run'}
+                            showEdit={this.didWrite()}
                             setFork={this.fork}
                             setPublic={this.setPublic}
                             setSearchable={this.setSearchable}

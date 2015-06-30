@@ -95,9 +95,9 @@ class Workflow(models.Model):
             tmp=tmp.filter(Q(owner=user) | Q(workflowpermission__public=True))
 
         if workflow != None:
-            tmp=tmp.filter(workflow=workflow)
+            tmp=tmp.filter(Q(workflow=workflow) | Q(workflowpermission__public=True))
         # else
-        return tmp.filter(workflowpermission__public=True)
+        return tmp
 
     def __unicode__(self):
         '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
