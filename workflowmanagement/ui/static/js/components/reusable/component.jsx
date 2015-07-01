@@ -30,6 +30,104 @@ const DjangoCSRFToken = React.createClass({
   }
 });
 
+
+/** Affix react component from: https://gist.github.com/julianocomg/296469e414db1202fc86
+ * @author Juliano Castilho <julianocomg@gmail.com>
+ */
+
+import joinClasses from 'react/lib/joinClasses';
+
+let Affix = React.createClass({
+  /**
+   * @type {Object}
+   */
+  propTypes: {
+    offset: React.PropTypes.number
+  },
+
+  /**
+   * @return {Object}
+   */
+  getDefaultProps() {
+    return {
+      offset: 0,
+      clamp: '.widthreference',
+      fill: true
+    };
+  },
+
+  /**
+   * @return {Object}
+   */
+  getInitialState() {
+    return {
+      affix: false
+    };
+  },
+
+  /**
+   * @return {void}
+   */
+  handleScroll() {
+    var affix = this.state.affix;
+    var offset = this.props.offset;
+    var scrollTop = document.body.scrollTop;
+
+    if (!affix && scrollTop >= offset) {
+      this.setState({
+        affix: true
+      });
+    }
+
+    if (affix && scrollTop < offset) {
+      this.setState({
+        affix: false
+      });
+    }
+  },
+
+  /**
+   * @return {void}
+   */
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+
+  /**
+   * @return {void}
+   */
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
+
+  render() {
+    var affix = this.state.affix ? 'affixed' : '';
+    var offset = this.props.offset;
+    var className = this.props.className;
+
+    var clamp_str= isNaN(this.props.clamp);
+
+    return (
+      <span>
+      {clamp_str ?
+      <div data-clamp={this.props.clamp} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+        :
+      <div style={{width: this.props.clamp+'px'}} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+      }
+
+      {this.props.fill ?
+        <div style={{height: offset}}>&nbsp;</div>
+      :''}
+      </span>
+    );
+  }
+
+});
+
 const Modal = React.createClass({
   getDefaultProps(){
     return {
@@ -192,7 +290,7 @@ const PermissionsBar = React.createClass({
                             <small><strong>Associated Processes: </strong> {this.props.listProcesses.length}</small>
                         </div>
                     :''}
-                    <div  style={{zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
+                    <div  style={{width: '100%', textAlign: 'right', zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
                     {!this.props.editable && !this.props.runnable && this.props.showEdit ?
                       <span>
 
@@ -249,90 +347,6 @@ const ProcessStatus = React.createClass({
             {this.translateStatus(row.status)}
            </center>;
   }
-});
-
-/** Affix react component from: https://gist.github.com/julianocomg/296469e414db1202fc86
- * @author Juliano Castilho <julianocomg@gmail.com>
- */
-
-import joinClasses from 'react/lib/joinClasses';
-
-let Affix = React.createClass({
-  /**
-   * @type {Object}
-   */
-  propTypes: {
-    offset: React.PropTypes.number
-  },
-
-  /**
-   * @return {Object}
-   */
-  getDefaultProps() {
-    return {
-      offset: 0
-    };
-  },
-
-  /**
-   * @return {Object}
-   */
-  getInitialState() {
-    return {
-      affix: false
-    };
-  },
-
-  /**
-   * @return {void}
-   */
-  handleScroll() {
-    var affix = this.state.affix;
-    var offset = this.props.offset;
-    var scrollTop = document.body.scrollTop;
-
-    if (!affix && scrollTop >= offset) {
-      this.setState({
-        affix: true
-      });
-    }
-
-    if (affix && scrollTop < offset) {
-      this.setState({
-        affix: false
-      });
-    }
-  },
-
-  /**
-   * @return {void}
-   */
-  componentDidMount() {
-    window.addEventListener('scroll', this.handleScroll);
-  },
-
-  /**
-   * @return {void}
-   */
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-  },
-
-  render() {
-    var affix = this.state.affix ? 'affixed' : '';
-    var offset = this.props.offset;
-    var className = this.props.className;
-
-    return (
-      <span>
-      <div data-clamp=".widthreference" className={joinClasses(className, affix)}>
-        {this.props.children}
-      </div>
-      <div style={{height: offset}}>&nbsp;</div>
-      </span>
-    );
-  }
-
 });
 
 export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar, ProcessStatus, Affix}
