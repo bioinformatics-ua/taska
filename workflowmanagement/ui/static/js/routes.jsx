@@ -28,6 +28,8 @@ module.exports = (
 
         <Route name="home" path={baseurl} handler={require('./components/home.jsx')}/>
 
+        <Route name="help" handler={require('./components/help.jsx')} />
+
         <Route name="about" handler={require('./components/about.jsx')} />
 
         <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} >
