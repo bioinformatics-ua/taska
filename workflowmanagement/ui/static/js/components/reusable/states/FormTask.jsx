@@ -78,7 +78,7 @@ class FormTask extends SimpleTask {
                         <div key="state-form" className="form-group">
                             <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
                                 {this.state.forms.length > 0?
-                                <Select onChange={this.setform}
+                                <Select placeholder="Search for form" onChange={this.setform}
                                 value={this.parent().form} name="form-field-name"
                                 multi={false} options={this.state.forms} disabled={!editable} />
                                 :<span><br/>There's no form yet, please add one first from the main dashboard.</span>}
@@ -376,7 +376,7 @@ class FormTaskRun extends FormTask{
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
 
                             {this.state.users.length > 0?
-                            <Select onChange={this.setAssignee}
+                            <Select onChange={this.setAssignee} placeholder="Search for assignees"
                             value={this.parent().assignee} name="form-field-name"
                             multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}

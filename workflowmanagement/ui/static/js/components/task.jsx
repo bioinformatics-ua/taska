@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
 
 import TaskActions from '../actions/TaskActions.jsx';
 
@@ -294,7 +294,7 @@ export default React.createClass({
                                       </div>
 
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-3 reassignments">
                                     {this.didWrite()?
                                     (<div className="btn-group-vertical btn-block" role="group">
                                         <Link to="RequestAdd" params={{
@@ -364,9 +364,11 @@ export default React.createClass({
                                                 <div className="col-md-9"></div>
                                                 <div className="col-md-3">
                                                         {this.didWrite() ?
-                                                        <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
-                                                        </button>
+                                                        <Affix key={'savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+                                                            <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
+                                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
+                                                            </button>
+                                                        </Affix>
                                                         : ''}
                                                 </div>
                                             </div>

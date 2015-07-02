@@ -35,6 +35,104 @@ import cline from '../vendor/jquery.domline';
             e.preventDefault();
     });
 
+/** Affix react component from: https://gist.github.com/julianocomg/296469e414db1202fc86
+ * @author Juliano Castilho <julianocomg@gmail.com>
+ */
+
+import joinClasses from 'react/lib/joinClasses';
+
+let Affix = React.createClass({
+  /**
+   * @type {Object}
+   */
+  propTypes: {
+    offset: React.PropTypes.number
+  },
+
+  /**
+   * @return {Object}
+   */
+  getDefaultProps() {
+    return {
+      offset: 0,
+      clamp: '.widthreference',
+      fill: true
+    };
+  },
+
+  /**
+   * @return {Object}
+   */
+  getInitialState() {
+    return {
+      affix: false
+    };
+  },
+
+  /**
+   * @return {void}
+   */
+  handleScroll() {
+    var affix = this.state.affix;
+    var offset = this.props.offset;
+    var scrollTop = document.body.scrollTop;
+
+    if (!affix && scrollTop >= offset) {
+      this.setState({
+        affix: true
+      });
+    }
+
+    if (affix && scrollTop < offset) {
+      this.setState({
+        affix: false
+      });
+    }
+  },
+
+  /**
+   * @return {void}
+   */
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+
+  /**
+   * @return {void}
+   */
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
+
+  render() {
+    var affix = this.state.affix ? 'affixed' : '';
+    var offset = this.props.offset;
+    var className = this.props.className;
+
+    var clamp_str= isNaN(this.props.clamp);
+
+    return (
+      <span>
+      {clamp_str ?
+      <div data-clamp={this.props.clamp} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+        :
+      <div style={{width: this.props.clamp+'px'}} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+      }
+
+      {this.props.fill ?
+        <div style={{height: offset}}>&nbsp;</div>
+      :''}
+      </span>
+    );
+  }
+
+});
+
+
 const ModalDetail = React.createClass({
   getInitialState(){
     return {
@@ -276,8 +374,23 @@ let StateMachineComponent = React.createClass({
         this.killUI();
 
     },
+    clamp(){
+        $('[data-clamp]').each(function () {
+            var elem = $(this);
+            var parentPanel = elem.data('clamp');
+
+            var resizeFn = function () {
+                var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+                elem.css('width', sideBarNavWidth);
+            };
+
+            resizeFn();
+            $(window).resize(resizeFn);
+        });
+    },
     componentDidUpdate(){
         this.__initUI();
+        this.clamp();
 
         // if in below mode jump to it on selection
         /*if(this.props.detailMode === 1){
@@ -753,30 +866,37 @@ let StateMachineComponent = React.createClass({
                                     <hr />
                                 </div>
                               </div>
-                              <div className="row">
-                                <div className="col-md-12">
                             {this.props.savebar?
-                            <span>
-                                <div className="undoredobar pull-left btn-group" role="group">
-                                    <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
-                                        <i title="Undo action" className="fa fa-undo"></i>
-                                    </button>
-                                    <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
-                                        <i title="Redo action" className="fa fa-repeat"></i>
-                                    </button>
-                                </div>
+                            <Affix key={'savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
+                              <div className="row">
+                                    <div className="col-md-12">
+                                            <span>
+                                                <div className="undoredobar pull-left btn-group" role="group">
+                                                    <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
+                                                        <i title="Undo action" className="fa fa-undo"></i>
+                                                    </button>
+                                                    <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
+                                                        <i title="Redo action" className="fa fa-repeat"></i>
+                                                    </button>
+                                                </div>
 
-                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                    {this.props.saveLabel}
-                                </button>
-                                </span>
+                                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                                    {this.props.saveLabel}
+                                                </button>
+                                            </span>
+                                    </div>
+                                    </div>
+                            </Affix>
                             :''}
-                                    <div ref="chart" id="state_machine_chart">
-                                        <div ref="movable">
-                                            {chart}
+
+                            <div className="row">
+                                    <div className="col-md-12">
+                                        <div ref="chart" id="state_machine_chart">
+                                            <div ref="movable">
+                                                {chart}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                               </div>
                             {this.props.detailMode === 0?
                                 <ModalDetail visible={this.props.editable?this.state.detailVisible:undefined} clearSelect={this.clearPopup} component={state_detail(this.props.editable)} />

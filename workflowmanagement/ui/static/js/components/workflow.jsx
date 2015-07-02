@@ -214,20 +214,20 @@ export default React.createClass({
                 :''}
                 <StateMachineComponent key={'workflow'+params.mode}
                     extra={
-                        <PermissionsBar
-                            link="WorkflowEdit"
-                            forkable={params.mode === 'forkable'}
-                            editable={params.mode === 'edit'}
-                            runnable={params.mode === 'run'}
-                            showEdit={this.didWrite()}
-                            setFork={this.fork}
-                            setPublic={this.setPublic}
-                            setSearchable={this.setSearchable}
-                            setForkable={this.setForkable}
-                            object={params.object}
-                            runProcess={this.runProcess}
-                            listProcesses={this.state.workflow['assoc_processes']}
-                            {...this.state.workflow.permissions} />
+                            <PermissionsBar
+                                link="WorkflowEdit"
+                                forkable={params.mode === 'forkable'}
+                                editable={params.mode === 'edit'}
+                                runnable={params.mode === 'run'}
+                                showEdit={this.didWrite()}
+                                setFork={this.fork}
+                                setPublic={this.setPublic}
+                                setSearchable={this.setSearchable}
+                                setForkable={this.setForkable}
+                                object={params.object}
+                                runProcess={this.runProcess}
+                                listProcesses={this.state.workflow['assoc_processes']}
+                                {...this.state.workflow.permissions} />
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}

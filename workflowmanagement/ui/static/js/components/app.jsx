@@ -139,7 +139,7 @@ export default React.createClass({
     getInitialState() {
       return this.__getState();
     },
-    componentDidMount(){
+    clamp(){
         $('[data-clamp]').each(function () {
             var elem = $(this);
             var parentPanel = elem.data('clamp');
@@ -152,6 +152,12 @@ export default React.createClass({
             resizeFn();
             $(window).resize(resizeFn);
         });
+    },
+    componentDidMount(){
+      this.clamp();
+    },
+    componentDidUpdate(){
+      this.clamp();
     },
     update(data){
         this.setState(this.__getState());

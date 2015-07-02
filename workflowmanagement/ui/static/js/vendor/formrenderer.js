@@ -9867,6 +9867,10 @@ window.JST["partials/response_field"] = function(__obj) {
 
       _print(_safe('\n'));
 
+      _print(_safe(JST["partials/description"](this)));
+
+      _print(_safe('\n'));
+
       _print(_safe(JST["fields/" + this.field_type](this)));
 
       _print(_safe('\n\n<div class=\'fr_clear\' />\n\n'));
@@ -9880,10 +9884,6 @@ window.JST["partials/response_field"] = function(__obj) {
       _print(_safe('\n'));
 
       _print(_safe(JST["partials/error"](this)));
-
-      _print(_safe('\n'));
-
-      _print(_safe(JST["partials/description"](this)));
 
       _print(_safe('\n'));
 

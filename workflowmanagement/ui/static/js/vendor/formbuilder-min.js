@@ -574,9 +574,9 @@ function() {
     }
     with(obj) __p += "<div class='subtemplate-wrapper'>\n  <div class='cover'></div>\n  " + (null == (__t = Formbuilder.templates["view/label"]({
         rf: rf
-    })) ? "" : __t) + "\n\n  " + (null == (__t = Formbuilder.fields[rf.get(Formbuilder.options.mappings.FIELD_TYPE)].view({
-        rf: rf
     })) ? "" : __t) + "\n\n  " + (null == (__t = Formbuilder.templates["view/description"]({
+        rf: rf
+    })) ? "" : __t) + "\n\n  " + (null == (__t = Formbuilder.fields[rf.get(Formbuilder.options.mappings.FIELD_TYPE)].view({
         rf: rf
     })) ? "" : __t) + "\n  " + (null == (__t = Formbuilder.templates["view/duplicate_remove"]({
         rf: rf
