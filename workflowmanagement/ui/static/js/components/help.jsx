@@ -68,7 +68,7 @@ export default React.createClass({
 
             <p>In this section, user's protocols and public protocols are shown. User's protocols can be edited through a rich visual editor and public protocols can be duplicated (to be modified), or simply used as they are.</p>
 
-            <p>This area can be used to create, modify and delete protocols, but also to run protocols as studies, through the run feature.</p>
+            <p>This area can be used to create, modify and delete protocols, but also to run protocols as studies, through the run feature. When we want to create a study from a protocol, we must click run and choose the deadlines and assignee's.</p>
 
             <h2>My Studies</h2>
 

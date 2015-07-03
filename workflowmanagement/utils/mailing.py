@@ -9,51 +9,62 @@ class MailTemplate:
     def __init__(self, instance, destinies):
         self.instance = instance
         self.destinies = destinies
+        self.working=False
 
-    def render(self):
+    def is_valid(self):
         if not self.template:
             raise TemplateDoesNotExist("The template for %s is not defined. 'template' variable must be defined on child class.")
 
         if not self.subjecttemplate:
             raise TemplateDoesNotExist("The template for %s is not defined. 'subjecttemplate' variable must be defined on child class.")
 
-        self.subject = render_to_string(self.subjecttemplate, {
+        self.working=True
+
+    def render(self, interested):
+        self.is_valid()
+
+        subject = render_to_string(self.subjecttemplate, {
                             'object': self.instance.object,
                             'history': self.instance,
-                            'settings': settings
+                            'settings': settings,
+                            'user': interested
                         }).replace('\n', '')
-        self.message = render_to_string(self.template,
+        message = render_to_string(self.template,
             {
                 'object': self.instance.object,
                 'history': self.instance,
-                'settings': settings
+                'settings': settings,
+                'user': interested
             })
+
+        return (subject, message)
 
     def send_mail(self):
 
-        if not self.subject:
-            raise Exception('No subject was specified for the email')
-
-        if not self.message:
-            raise Exception('No message was specified for the email')
+        if not self.working:
+            raise Exception('Must call is_valid() method, before sending mail')
 
         if not self.destinies:
             raise Exception('No destinies were specified for the email')
 
-        if self.subject and self.message and self.destinies:
+        print self.destinies
+
+        for interested in self.destinies:
+            print interested
+            print interested.is_staff
+            (subject, message) = self.render(interested)
+
             msg = EmailMultiAlternatives(
-                    self.subject,
-                    html2text.html2text(self.message),
+                    subject,
+                    html2text.html2text(message),
                     'Taska <%s>' % settings.DEFAULT_FROM_EMAIL,
-                    self.destinies
+                    [interested.email]
                 )
-            msg.attach_alternative(self.message, "text/html")
+            msg.attach_alternative(message, "text/html")
 
             msg.send()
 
-            return True
-        else:
-            raise Exception('Error. Make sure you called render() first!')
+        return True
 
 
 class ProcessCancelTemplate(MailTemplate):

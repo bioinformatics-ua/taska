@@ -198,7 +198,7 @@ export default React.createClass({
             <span>
                 {this.state.missing.length > 0?
                     <Modal title="Missing information"
-                        message={<span>You have to specify deadlines and assignee's for all tasks.<br />
+                        message={<span>You have to specify deadlines and assignee's for all tasks. This can be specified by clicking on the tasks and changing the values on the bottom of their detail view.<br />
                             <br />
                             The following tasks don't have deadlines or assignee's:
                             <ul>
