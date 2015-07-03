@@ -147,7 +147,7 @@ export default React.createClass({
                                 editable={params.mode === 'edit'}
                                 showEdit={false}
                                 runnable={params.mode === 'run'}
-                                extra={this.state.process.status === 1 || this.state.process.status === 3?
+                                extra={this.state.process.status === 1 || this.state.process.status === 4?
                                     <DeleteButton
                                       success={this.cancel}
                                       identificator = {false}
