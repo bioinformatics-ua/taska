@@ -12,8 +12,8 @@ export default React.createClass({
           <div>
             <h1>Getting Started</h1>
             <p>
-                TASKA is a extendable task manager with structured workflow-oriented features.
-                In this page we will have a quick explanation of all main concepts of the system and how they interconnect.
+                TASKA is an extensible task manager with structured workflow-oriented features.
+                This page contains a brief explanation of the system's main concepts and how they are interconnected.
             </p>
             <h2>Task</h2>
 
@@ -24,57 +24,61 @@ export default React.createClass({
             <h2>Protocol</h2>
 
             <p>A protocol is a composition of dependency related tasks, structured in a ordered way, to accomplish objectives or results.</p>
-            <p>The purpose of protocols is specifying a followable structure, that mixes tasks with the workflow of the tasks.</p>
-            <p>Protocols can be public or private. Public protocols will be made available for everyone on the system.</p>
+            <p>The purpose of protocols is specifying a straightforward structure, that mixes the tasks with a flow that guides them.</p>
+            <p>Protocols can be public or private. Public protocols are available for all registered users.</p>
 
             <p>A protocol works as a template for the study.</p>
 
             <h2>Study</h2>
 
-            <p>A study is a instanciation of a protocol, with a specified group of users and deadlines for each of the tasks that compose the protocol.</p>
-            <p>The main concept behind separating protocols from the protocol instanciations, is easily allowing repeatability of tasks, across time and intervenients.</p>
+            <p>A study is a protocol's instance, with a specified group of users and deadlines for each of the tasks that composes the protocol.</p>
+            <p>The main concept behind separating protocols from the instances is to easily allow repeatability of tasks across time and intervenients.</p>
 
             <h2>Request</h2>
 
-            <p>A request is a communication vehicle for the user completing a task, to interact with a study overseer. </p>
-            <p>Asking for reassignment, clarification or any other type of feedback can be asked through requests.</p>
+            <p>A request is a communication vehicle that allows the user who is completing a task to interact with a study overseer. </p>
+            <p>Asking for reassignment, clarification or any other type of feedback can be made through requests.</p>
 
             <h2>Form</h2>
 
-            <p>Forms are questionnaires with several types of questions, such as Select dropdowns, multiple choice or checkboxes.</p>
-            <p>Forms are created to be used on Form Tasks, so study overseers can collect information in an uniformized template.</p>
-            <p>The reason they are separated from the task itself, is allowing reusability of the same form in different tasks.</p>
+            <p>Forms are questionnaires with several types of questions such as Select dropdowns, multiple choice or checkboxes.</p>
+            <p>Forms are created to be used on Form Tasks, so study overseers can collect information in a uniformed template.</p>
+            <p>The reason they are separated from the task itself, is to allow the reusability of the same form in different tasks.</p>
 
             <h2>History</h2>
 
-            <p>History relates with actions made through the usage of the system. Whenever there is an action the ocurrs on the system, it is logged on history, so users can in a feed-like approximation, look at what happened and who made what.</p>
+            <p>History is a detailed list of all performed actions in the system. It can be used to backtrack users activities.</p>
 
             <h2>Usage Profiles</h2>
 
-            <p>There are essential two types of user roles on the system, which each user can play.</p>
-
-            <p>The user can be a study overseer, which is overseeing the study flows, analysing outcomes and all other tasks related with study management.</p>
-            <p>The user can be a study responder, which is replying to study overseer tasks, without needing to care about other users work.</p>
+            <p>This system has two types of user roles: </p>
+            <ul>
+                <li>Study overseer - oversee study flows, analyse outcomes and perform all related study management tasks</li>
+                <li>Study responder - reply the overseer's tasks</li>
+            </ul>
 
             <hr />
             <h1>The Main Dashboard</h1>
-            <p>When a user logs in, he is presented with a dashboard that reflects his private view of the system. This dashboard is divided in six areas, that try to reflect all functionality available on the system, combining the two user profiles into one single interface.</p>
+
+            <p>Private and complete view of the system after login.</p>
+
+            <p>This dashboard is divided into six areas evidencing all the system's available features and combines the two different user profiles into one single interface.</p>
 
             <h2>My Protocols</h2>
 
-            <p>In this section, we can see owned protocols, or public protocols. Owned protocols can be edited through a rich visual editor, and public protocols can be duplicated (to be modified), or simply used as they are.</p>
+            <p>In this section, user's protocols and public protocols are shown. User's protocols can be edited through a rich visual editor and public protocols can be duplicated (to be modified), or simply used as they are.</p>
 
-            <p>We can use this area to create, modify, and delete protocols, but also to run protocols as studies, through the run functionality.</p>
+            <p>This area can be used to create, modify and delete protocols, but also to run protocols as studies, through the run feature.</p>
 
             <h2>My Studies</h2>
 
-            <p>In this section users can see studies they ran, or are still running. It allows to manage and oversee the studies with a overview, but also analyse and obtain the results from the studies.</p>
+            <p>In this section users have access to finished or ongoing (still running) studies. It allows to manage and oversee the studies with an overview, but also analyse and obtain the results from the studies.</p>
 
             <p>Only the user running the study has access to this view.</p>
 
             <h2>My Tasks</h2>
 
-            <p>In this section users can see and answer to tasks attributed to themselves by study overseers. They are ordered by default based on deadline, so users can prioritize tasks.</p>
+            <p>In this section users can see and answer to tasks assigned to them by study overseers. They are ordered by default based on deadline, so users can prioritize tasks.</p>
 
             <h2>Received Requests</h2>
 
@@ -86,7 +90,7 @@ export default React.createClass({
 
             <h2>History</h2>
 
-            <p>In this section, users can see user-related history. This can range from all actions on the system made by himself, or by other in his studies.</p>
+            <p>In this section, users can see user-related history. This can range from all actions on the system, or by others in his studies.</p>
 
           </div>
         );

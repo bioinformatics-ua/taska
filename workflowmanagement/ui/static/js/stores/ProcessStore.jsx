@@ -88,8 +88,7 @@ export default Reflux.createStore({
         );
     },
     onAddUser(ptask, user){
-        ProcessActions.methodDetail
-            .triggerPromise('adduser',
+        this.onMethodDetail('adduser',
                             this.__detaildata.hash,
                             'POST', {
                                 ptask: ptask,
