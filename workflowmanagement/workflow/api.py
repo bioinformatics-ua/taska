@@ -42,6 +42,11 @@ class WorkflowSerializer(serializers.ModelSerializer):
     tasks = GenericTaskSerializer(many=True, required=False)
     assoc_processes = serializers.SerializerMethodField()
 
+    owner_repr = serializers.SerializerMethodField()
+
+    def get_owner_repr(self, obj):
+        return obj.owner.get_full_name() or obj.owner.email
+
     def get_assoc_processes(self, obj):
         return obj.assocProcesses().values_list('hash', flat=True)
 
@@ -130,6 +135,11 @@ class WorkflowDetailSerializer(serializers.ModelSerializer):
 
     assoc_processes = serializers.SerializerMethodField()
 
+    owner_repr = serializers.SerializerMethodField()
+
+    def get_owner_repr(self, obj):
+        return obj.owner.get_full_name() or obj.owner.email
+
     def get_assoc_processes(self, obj):
         return obj.assocProcesses().values_list('hash', flat=True)
 
@@ -170,7 +180,8 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
     ordering_map = {
         'public': 'workflowpermission__public',
         'searchable': 'workflowpermission__searchable',
-        'forkable': 'workflowpermission__forkable'
+        'forkable': 'workflowpermission__forkable',
+        'owner_repr': 'owner__id'
     }
     # we must override queryset to filter by authenticated user
     def get_queryset(self):

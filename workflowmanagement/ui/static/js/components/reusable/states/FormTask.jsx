@@ -49,11 +49,25 @@ class FormTask extends SimpleTask {
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
-            componentDidMount(){
-                // For some reason i was getting a refresh loop, when getting the action result from the store...
-                // so exceptionally, i decided to do it directly, the result is still cached anyway
-                FormActions.loadSimpleListIfNecessary.triggerPromise(200).then(
+            openPopup(){
+                let add_form = window.open("form/add/headless", "Add forms", "width=800;height=300;");
+
+                add_form.onunload = () => {
+                    let hash = add_form.formHash;
+
+                    if(hash){
+                        console.log(hash);
+                        this.props.dataChange(self.getIdentificator(), {form: hash}, false);
+                        this.refreshForm();
+                    }
+                };
+            },
+            refreshForm(){
+                console.log('refreshing form');
+                FormActions.loadSimpleList.triggerPromise(200).then(
                     (forms) => {
+                        console.log('updated forms list');
+
                         let map = forms.results.map(
                                     entry => {
                                         return {
@@ -63,6 +77,7 @@ class FormTask extends SimpleTask {
                                     }
                         );
                         if(this.isMounted()){
+                            console.log('SETTING STATE');
                             this.setState(
                                 {
                                     forms: map
@@ -72,16 +87,27 @@ class FormTask extends SimpleTask {
                     }
                 );
             },
+            componentDidMount(){
+                // For some reason i was getting a refresh loop, when getting the action result from the store...
+                // so exceptionally, i decided to do it directly, the result is still cached anyway
+                this.refreshForm();
+            },
             render(){
                 return (
                     <span>
                         <div key="state-form" className="form-group">
-                            <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                            <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" />
+                            </label>
+                                                            {editable ?
+                                <button className="pull-right btn btn-xs btn-success" onClick={this.openPopup}>
+                                    <i title="Add new form" className="fa fa-plus" /> Add new Form
+                                </button>
+                                :''}
                                 {this.state.forms.length > 0?
                                 <Select placeholder="Search for form" onChange={this.setform}
                                 value={this.parent().form} name="form-field-name"
                                 multi={false} options={this.state.forms} disabled={!editable} />
-                                :<span><br/>There's no form yet, please add one first from the main dashboard.</span>}
+                                :<span><br/>There's no form yet, please add one first.</span>}
                         </div>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
 
