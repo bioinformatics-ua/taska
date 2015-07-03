@@ -65,6 +65,8 @@ export default React.createClass({
         UserActions.setProfileField('notification', e.target.checked);
     },
     register(e){
+        e.preventDefault();
+
         UserActions.registerUser()
     },
     componentDidUpdate(){
@@ -79,6 +81,7 @@ export default React.createClass({
     render: function () {
         return (
             <span>
+                <form onSubmit={this.register}>
                 <div className="row">
                     <div className="profileform col-md-8 col-md-offset-2">
                         <h3>Register Account</h3>
@@ -124,7 +127,7 @@ export default React.createClass({
                                 <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} defaultValue={this.state.user['confirm_password']} />
                             </div>
                         </div>
-                        <div className="form-group">
+                        {/*<div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="detailmode">
                                     <strong>Detail Render</strong>
@@ -136,7 +139,7 @@ export default React.createClass({
                                                 {value: '2', label: 'Appear on the Left Bar (good for high resolutions)'},
                                                 ]} />
                             </div>
-                        </div>
+                        </div>*/}
                         <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
@@ -162,11 +165,12 @@ export default React.createClass({
                                  options={[]} />
                             </div>
                         </div>*/}
-                        <button onClick={this.register} className="pull-right btn btn-primary">
+                        <button type="submit" className="pull-right btn btn-primary">
                             <i className="fa fa-floppy-o"></i> &nbsp;Register
                         </button>
                     </div>
                 </div>
+                </form>
             </span>);
     }
 });

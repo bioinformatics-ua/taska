@@ -22,9 +22,9 @@ const WorkflowManage = React.createClass({
     const object2 = {object: row.hash, mode: 'run'};
     return <div className="btn-group" role="group" aria-label="...">
 
-            <Link className="btn btn-primary" to="WorkflowEdit"
+            <Link className="btn btn-sm btn-primary" to="WorkflowEdit"
               params={object2}><i className="fa fa-play"></i></Link>
-            <Link className="btn btn-warning" to="WorkflowEdit"
+            <Link className="btn btn-sm btn-warning" to="WorkflowEdit"
             params={object}><i className="fa fa-pencil"></i></Link>
             <DeleteButton
               success={this.delete}

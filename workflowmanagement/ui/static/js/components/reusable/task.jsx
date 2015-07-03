@@ -38,7 +38,7 @@ const TaskDate = React.createClass({
 
 const TaskLink = React.createClass({
   render: function(){
-    const row = this.props.rowData.processtask;
+    const row = this.props.rowData;
     const object = {object: row.hash}
     return <small title={row.process}>
             <Link id={`task_${row.hash}`}

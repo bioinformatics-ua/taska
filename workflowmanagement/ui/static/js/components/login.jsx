@@ -28,25 +28,26 @@ export default React.createClass({
     update: function(data){
         this.setState(this.__getState());
     },
-    __login: function(){
-      if(this.refs.usr != "" && this.refs.pwd != ""){
+    __login: function(e){
+        e.preventDefault();
+        if(this.refs.usr != "" && this.refs.pwd != ""){
 
-        var nextPath = this.context.router.getCurrentQuery().nextPath;
-        let self = this;
-        UserActions.login({
-          username: this.refs.usr.getDOMNode().value.trim(),
-          password: this.refs.pwd.getDOMNode().value.trim(),
-          remember: this.refs.rmb.getDOMNode().checked,
-          callback: function(){
-                console.log('LOGIN CALLBACK');
-                if (nextPath) {
-                    self.context.router.transitionTo(nextPath);
-                } else {
-                    self.context.router.replaceWith('app');
-                }
-          }
-        });
-      }
+            var nextPath = this.context.router.getCurrentQuery().nextPath;
+            let self = this;
+            UserActions.login({
+              username: this.refs.usr.getDOMNode().value.trim(),
+              password: this.refs.pwd.getDOMNode().value.trim(),
+              remember: this.refs.rmb.getDOMNode().checked,
+              callback: function(){
+                    console.log('LOGIN CALLBACK');
+                    if (nextPath) {
+                        self.context.router.transitionTo(nextPath);
+                    } else {
+                        self.context.router.replaceWith('app');
+                    }
+              }
+            });
+        }
     },
     render: function() {
       return (
@@ -56,7 +57,7 @@ export default React.createClass({
                     <div className="account-wall">
                         <h1 className="text-center login-title">Please login</h1>
                         <i className="fa fa-user profile-img"></i>
-                        <form className="form-signin">
+                        <form className="form-signin" onSubmit={this.__login}>
 
                         <input name="username" ref="usr" /*value={this.state.username}*/
                         /*onChange={this.setUsername}*/ type="text" className="form-control" placeholder="&#61664;&nbsp; Email" required autofocus />
@@ -65,15 +66,15 @@ export default React.createClass({
 
                         {this.state.failed ? (<div className="alert alert-danger" role="alert">Login failed</div>) : ''}
 
-                        <button onClick={this.__login}
+                        <button
                         className="btn btn-lg btn-primary btn-block"
-                        type="button"><i className="fa fa-sign-in"></i> &nbsp;Sign in</button>
+                        type="submit"><i className="fa fa-sign-in"></i> &nbsp;Sign in</button>
                         <label className="checkbox pull-left">
                             <input defaultChecked="true" ref="rmb"
                         /*onChange={this.setRememberMe}*/ name="remember_me" type="checkbox" value="remember-me" />
                             Remember me
                         </label>
-                        <!--a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span-->
+                        {/*<a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span>*/}
                         </form>
                     </div>
                     <Link to="register" className="text-center new-account">Create an account </Link>

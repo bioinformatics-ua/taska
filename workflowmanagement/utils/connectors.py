@@ -20,9 +20,9 @@ def newHistoryNotifications(sender, instance, **kwargs):
 
             if isinstance(instance.object, User):
                 # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
-                tci = tc(instance, instance.authorized.values_list('email', flat=True))
+                tci = tc(instance, instance.authorized.all())
             else:
-                tci = tc(instance, instance.authorized.filter(profile__notification=True).values_list('email', flat=True))
+                tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
             sendEmail.apply_async([tci])
 
