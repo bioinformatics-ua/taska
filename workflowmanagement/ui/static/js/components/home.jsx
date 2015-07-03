@@ -10,6 +10,7 @@ import {RequestTable} from './reusable/request.jsx';
 import {TaskTable} from './reusable/task.jsx';
 import {FormTable} from './reusable/form.jsx';
 
+import UserStore from '../stores/UserStore.jsx';
 
 import {Authentication} from '../mixins/component.jsx';
 
@@ -22,12 +23,19 @@ export default React.createClass({
 });
 
 const LoggedInHome = React.createClass({
-
+  __getState(){
+    return {
+        user: UserStore.getUser()
+    }
+  },
+  getInitialState(){
+    return this.__getState();
+  },
   render: function(){
     return (<span>
           <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
-                <WorkflowTable />
+                <WorkflowTable user={this.state.user} />
               </div>
               <div className="col-md-6 flex-container flex-row">
                 <ProcessTable />

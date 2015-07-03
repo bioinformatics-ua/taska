@@ -66,6 +66,8 @@ export default React.createClass({
         FormActions.calibrate();
     },
     componentDidMount(){
+        window.formHash = this.state.form.hash;
+
         let fb = new Formbuilder({
             selector: '#form_manager',
             bootstrapData: this.state.form.schema
@@ -76,7 +78,7 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.addedform){
-            this.context.router.transitionTo('Form', {object: this.state.addedform.hash})
+            this.context.router.transitionTo('Form', {object: this.state.addedform.hash, headless: this.props.headless})
         }
     },
     update(status){

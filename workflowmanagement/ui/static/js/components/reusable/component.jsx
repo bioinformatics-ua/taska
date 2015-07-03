@@ -253,9 +253,8 @@ const PermissionsBar = React.createClass({
       console.log('FORK PERM')
       this.props.setFork();
     },
-    render(){
-        return (<span>
-                <div className="form-group">
+    renderPermissions(){
+        return (<div className="form-group">
                   <div className="input-group">
                         <span className="input-group-addon" id="permissions">
                             <strong>Permissions</strong>
@@ -284,7 +283,31 @@ const PermissionsBar = React.createClass({
                               <span className="selectLabel">&nbsp;Forkable</span>
                           </span>*/}
                         </div>
+
                 </div>
+
+                </div>);
+    },
+    render(){
+        return (<span>
+                {this.props.owner ?
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="study-title"><strong>Creator</strong></span>
+                                <input type="text" className="form-control" defaultValue={this.props.owner} disabled={true} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-6">
+                        {this.renderPermissions()}
+                    </div>
+                </div>
+                :
+                this.renderPermissions()
+                }
+
                     {!this.props.editable && !this.props.runnable && this.props.showEdit ?
                         <div style={{zIndex: 200, position: 'absolute', left: '15px', bottom: '-40px'}}>
                             <small><strong>Associated Processes: </strong> {this.props.listProcesses.length}</small>
@@ -314,8 +337,6 @@ const PermissionsBar = React.createClass({
                         </Link>
                     :''}
                     </div>
-                </div>
-
                 </span>
         );
     }

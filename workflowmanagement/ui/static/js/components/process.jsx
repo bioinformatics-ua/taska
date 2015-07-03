@@ -143,6 +143,7 @@ export default React.createClass({
                         <span>
                             <PermissionsBar
                                 link="ProcessEdit"
+                                owner={this.state.workflow['owner_repr']}
                                 editable={params.mode === 'edit'}
                                 showEdit={false}
                                 runnable={params.mode === 'run'}

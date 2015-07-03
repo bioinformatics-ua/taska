@@ -216,6 +216,7 @@ export default React.createClass({
                     extra={
                             <PermissionsBar
                                 link="WorkflowEdit"
+                                owner={this.state.workflow['owner_repr']}
                                 forkable={params.mode === 'forkable'}
                                 editable={params.mode === 'edit'}
                                 runnable={params.mode === 'run'}

@@ -186,6 +186,9 @@ table {
 .manage-td{
     width: 110px;
 }
+.owner-td{
+    width: 160px;
+}
 .type-td{
   width: 60px;
 }

@@ -17,20 +17,27 @@ const WorkflowManage = React.createClass({
     WorkflowActions.deleteWorkflow(row.hash);
   },
   render: function(){
+    const user = this.props.metadata.user;
     const row = this.props.rowData;
     const object = {object: row.hash, mode: 'edit'};
     const object2 = {object: row.hash, mode: 'run'};
-    return <div className="btn-group" role="group" aria-label="...">
+    return <div className="btn-group pull-right" role="group" aria-label="...">
 
             <Link className="btn btn-sm btn-primary" to="WorkflowEdit"
               params={object2}><i className="fa fa-play"></i></Link>
-            <Link className="btn btn-sm btn-warning" to="WorkflowEdit"
-            params={object}><i className="fa fa-pencil"></i></Link>
+
+            {user && user.id === row.owner ?
+              <Link className="btn btn-sm btn-warning" to="WorkflowEdit"
+              params={object}><i className="fa fa-pencil"></i></Link>
+            :''} {user && user.id === row.owner ?
             <DeleteButton
               success={this.delete}
               identificator = {row}
               title={`Delete '${row.title}'`}
               message={`Are you sure you want to delete  '${row.title} ?'`}  />
+
+            :''}
+
            </div>;
   }
 });
@@ -45,6 +52,14 @@ const WorkflowLink = React.createClass({
   }
 });
 
+const WorkflowOwner = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    return <small>
+            {row['owner_repr']}
+           </small>;
+  }
+});
 
 const WorkflowTable = React.createClass({
     tableAction: WorkflowActions.load,
@@ -67,13 +82,23 @@ const WorkflowTable = React.createClass({
       "displayName": "Title"
       },
       {
-      "columnName": "hash",
+      "columnName": "owner_repr",
       "order": 2,
+      "locked": true,
+      "visible": true,
+      "displayName": "Creator",
+      "customComponent": WorkflowOwner,
+      "cssClassName": "owner-td"
+      },
+      {
+      "columnName": "hash",
+      "order": 3,
       "locked": true,
       "visible": true,
       "customComponent": WorkflowManage,
       "cssClassName": "manage-td",
-      "displayName": " "
+      "displayName": " ",
+      "user": this.props.user
       }
     ];
     return  <div className="panel panel-default panel-overflow griddle-pad">
@@ -85,7 +110,7 @@ const WorkflowTable = React.createClass({
               <Griddle
                   noDataMessage={<center>You have not created any protocols yet, click on the plus icon above to create a new protocol.</center>}
                   {...this.commonTableSettings()}
-                  columns={["title", "hash"]}
+                  columns={["title", "owner_repr", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }
