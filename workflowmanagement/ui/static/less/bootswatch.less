@@ -44,6 +44,19 @@
 
 .btn {
   border-width: 1px;
+
+}
+
+.btn-default{
+      &:hover,
+      &:focus,
+      &.focus,
+      &:active,
+      &.active {
+        color: white;
+        background-color: darken(@btn-default-bg, 30%);
+            border-color: darken(@btn-default-border, 22%);
+      }
 }
 
 .btn:active {

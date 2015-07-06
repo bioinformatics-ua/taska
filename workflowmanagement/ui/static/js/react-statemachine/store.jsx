@@ -212,7 +212,6 @@ const StateMachineStore = Reflux.createStore({
         this.trigger(true);
     },
     onInsertAbove(level){
-        console.log(`Insert above ${level}`);
 
         this.addHistory();
 
