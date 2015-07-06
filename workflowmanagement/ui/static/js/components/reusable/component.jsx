@@ -170,9 +170,13 @@ const Label = React.createClass({
             },
             displayName: route => {
                 let params = route.context.router.getCurrentParams();
+
                 let label = params['mode'] || 'Label';
 
                 try{
+                  if(params['object'] === 'add')
+                    return 'Add';
+                  // else
                   return params['mode'][0].toUpperCase() + params['mode'].slice(1);
                 } catch(err){
                   return 'Add';

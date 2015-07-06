@@ -31,6 +31,31 @@ export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
                 Reflux.listenTo(WorkflowStore, 'update')],
+    helpMapBlueprint: {
+        view: {
+        },
+        edit: {
+            detail: 'Drag and drop task types from below on the plus areas on the right, or click the plus areas to add new tasks.',
+            global: 'You can drag-and-drop existing tasks to move them between levels, by dragging to other levels plus areas.'
+        },
+        run: {
+            detail: 'Please fulfill assignee and deadlines before running the protocol as a study.',
+            global: 'Click tasks to add assignees and deadlines, ready tasks will change color'
+        }
+    },
+    helpMap(mode){
+        let result;
+        try{
+            result = this.helpMapBlueprint[mode];
+        }
+        catch(err){
+            // nothing
+        }
+        if(result === undefined)
+            return {};
+
+        return result;
+    },
     statics: {
         fetch(params) {
             if(params.object == 'add'){
@@ -89,6 +114,8 @@ export default React.createClass({
                 this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
 
         }
+        // hotfix to breadcrumbs on add
+        $('a[href$="/workflow/add"]').hide();
     },
     update(status){
         if(status == WorkflowStore.DETAIL){
@@ -241,6 +268,9 @@ export default React.createClass({
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
                     detailMode={this.state.user.profile['detail_mode']}
+                    detailHelp={this.helpMap(params.mode).detail}
+                    globalHelp={this.helpMap(params.mode).global}
+                    identifier={`workflow_${params.mode}page`}
                     {...this.props}/>
             </span>
         );
