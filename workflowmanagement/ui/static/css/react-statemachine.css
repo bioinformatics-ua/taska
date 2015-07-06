@@ -1,3 +1,6 @@
+.task-type {
+    max-width: 250px;
+}
 .task-type .task-type-icon{
   vertical-align: middle;
 }

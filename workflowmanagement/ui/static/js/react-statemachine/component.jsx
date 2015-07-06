@@ -763,7 +763,7 @@ let StateMachineComponent = React.createClass({
         let state_list = this.state.sm.getStateClasses().map(
             (stclass) => {
                 return  <div key={stclass.id} data-type={stclass.id}
-                className="task-type col-md-12 col-xs-4 btn btn-default btn-block new-state">
+                className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             {stclass.Class.typeIcon()} {stclass.Class.repr()}
                         </div>;
             }
