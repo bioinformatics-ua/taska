@@ -27,6 +27,9 @@ class FormTask extends SimpleTask {
     static repr(){
         return 'Form Task';
     }
+    static title(){
+        return "Do you know what is a form tasks? Basically you can do a questionnaire or survey for the users and know the answers. You will be able to export the answers to your statistic application. ";
+    }
 
     detailRender(editable=true, ChildComponent=dummy){
         let self = this;

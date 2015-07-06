@@ -35,8 +35,8 @@ export default React.createClass({
         view: {
         },
         edit: {
-            detail: 'Drag and drop task types from below on the plus areas on the right, or click the plus areas to add new tasks.',
-            global: 'You can drag-and-drop existing tasks to move them between levels, by dragging to other levels plus areas.'
+            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your protocol, is to click in the "plus” areas on the right and add the tasks that you want.',
+            global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of other level.'
         },
         run: {
             detail: 'Please fulfill assignee and deadlines before running the protocol as a study.',

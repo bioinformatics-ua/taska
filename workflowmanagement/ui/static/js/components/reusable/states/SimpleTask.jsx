@@ -31,6 +31,9 @@ class SimpleTask extends SimpleState {
     static repr(){
         return 'Simple Task';
     }
+    static title(){
+        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
+    }
 
     detailRender(editable=true, ChildComponent=dummy){
         let self = this;

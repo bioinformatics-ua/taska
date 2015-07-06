@@ -240,10 +240,12 @@ class State{
     static typeIcon(){
         return <i></i>;
     }
+    static title(){
+        return 'Title';
+    }
     static repr(){
         return 'Task';
     }
-
     static deserializeOptions(data){
         if(data.name === undefined)
             throw `data object must have at least a name property to be possible to deserialize it,
@@ -282,6 +284,9 @@ class SimpleState extends State {
     }
     static repr(){
         return 'Simple State';
+    }
+    static title(){
+        return 'Simple unit';
     }
 }
 

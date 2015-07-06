@@ -199,7 +199,8 @@ let StateMachineComponent = React.createClass({
             onUnsavedExit: undefined,
             detailHelp: "",
             globalHelp: "",
-            identifier: 'statemachine_editor'
+            identifier: 'statemachine_editor',
+            undoredo: false
         };
     },
     update(data){
@@ -546,7 +547,7 @@ let StateMachineComponent = React.createClass({
 
             let state_list = this.state.sm.getStateClasses().map(
                 (stclass) => {
-                    return  <li key={stclass.id}>
+                    return  <li title={stclass.Class.title()} key={stclass.id}>
                                 <a onClick={(event) => {
                                         StateMachineActions.addState(stclass.id, prop)
                                         this.onUpdate();
@@ -762,7 +763,8 @@ let StateMachineComponent = React.createClass({
 
         let state_list = this.state.sm.getStateClasses().map(
             (stclass) => {
-                return  <div key={stclass.id} data-type={stclass.id}
+                console.log(stclass.Class.prototype);
+                return  <div title={stclass.Class.title()} key={stclass.id} data-type={stclass.id}
                 className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             {stclass.Class.typeIcon()} {stclass.Class.repr()}
                         </div>;
@@ -917,6 +919,7 @@ let StateMachineComponent = React.createClass({
                               <div className="row">
                                     <div className="col-md-12">
                                             <span>
+                                                {this.props.undoredo ?
                                                 <div className="undoredobar pull-left btn-group" role="group">
                                                     <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
                                                         <i title="Undo action" className="fa fa-undo"></i>
@@ -925,6 +928,7 @@ let StateMachineComponent = React.createClass({
                                                         <i title="Redo action" className="fa fa-repeat"></i>
                                                     </button>
                                                 </div>
+                                                 :''}
 
                                                 <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
                                                     {this.props.saveLabel}
