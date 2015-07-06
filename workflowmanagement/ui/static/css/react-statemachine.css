@@ -222,6 +222,7 @@
 
 .undoredobar{
     position: absolute;
+    z-index: 1000;
 }
 
 .state-dep-label {
