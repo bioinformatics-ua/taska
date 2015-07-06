@@ -224,7 +224,7 @@ export default React.createClass({
             <Affix className={'breadbar'} offset={36}>
               <div className="row">
                   <div className="col-md-10 pull-left">
-                      <Breadcrumbs separator='' {...this.props} />
+                     <Breadcrumbs separator='' {...this.props} />
                   </div>
                   <LoadingBar />
               </div>
