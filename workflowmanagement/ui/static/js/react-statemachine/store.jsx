@@ -202,6 +202,13 @@ const StateMachineStore = Reflux.createStore({
 
         this.trigger();
     },
+    onSelectFirst(){
+        let first = this.__sm.selectFirst();
+        if(first)
+            this.__selected = first.getIdentificator();
+
+        this.trigger();
+    },
     onClearSelect(selected){
         this.__selected = undefined;
         this.trigger();

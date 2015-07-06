@@ -12,6 +12,7 @@ const StateMachineActions = Reflux.createActions([
     'addDependency',
     'deleteDependency',
     'select',
+    'selectFirst',
     'clearSelect',
     'setTitle',
     'insertAbove',

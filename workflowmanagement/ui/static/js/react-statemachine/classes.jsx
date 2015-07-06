@@ -298,6 +298,19 @@ class StateMachine{
         this.__nextLevel = 1;
         this.__stateclasses = [];
     }
+
+
+    selectFirst(){
+        console.log(this.__level);
+        try {
+            return this.__level[1][0];
+        } catch(err){
+            // noething
+        }
+        return undefined;
+
+    }
+
     nextFreeName(){
         let base = name = 'Unnamed';
         let i=0;

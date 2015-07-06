@@ -204,6 +204,9 @@ export default React.createClass({
                     cancelUser={this.cancelUser}
                     endDetail={ProcessResume}
                     detailMode={this.state.user.profile['detail_mode']}
+
+                    selectFirst={true}
+
                     {...this.props}/>
             </span>
         );

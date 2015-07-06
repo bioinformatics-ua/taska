@@ -200,7 +200,8 @@ let StateMachineComponent = React.createClass({
             detailHelp: "",
             globalHelp: "",
             identifier: 'statemachine_editor',
-            undoredo: false
+            undoredo: false,
+            selectFirst: false
         };
     },
     update(data){
@@ -366,6 +367,10 @@ let StateMachineComponent = React.createClass({
     },
     componentDidMount(){
         this.__initUI();
+
+        if(this.props.selectFirst){
+            StateMachineActions.selectFirst();
+        }
     },
     componentWillUnmount(){
         console.log('UNMOUNT');

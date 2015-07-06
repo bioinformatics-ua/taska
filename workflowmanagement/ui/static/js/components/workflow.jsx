@@ -271,6 +271,11 @@ export default React.createClass({
                     detailHelp={this.helpMap(params.mode).detail}
                     globalHelp={this.helpMap(params.mode).global}
                     identifier={`workflow_${params.mode}page`}
+
+                    savebar={!params.mode || params.mode === 'view'? false: true}
+
+                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run'? true: false}
+
                     {...this.props}/>
             </span>
         );
