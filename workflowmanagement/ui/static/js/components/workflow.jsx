@@ -89,6 +89,8 @@ export default React.createClass({
                 this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
 
         }
+        // hotfix to breadcrumbs on add
+        $('a[href="/workflow/add"]').hide();
     },
     update(status){
         if(status == WorkflowStore.DETAIL){
