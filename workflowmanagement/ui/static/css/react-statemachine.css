@@ -153,20 +153,20 @@
     position: absolute;
     width: 100%;
     margin-top: -20px;
-    background-color: rgb(199, 199, 199);
+    background-color: #95A5A6;
 }
 .level-separator:hover{
-    background-color: rgb(199, 199, 199);
+    background-color: #95A5A6;
 }
 .level-label{
     position: absolute;
     right:0;
     margin-top: -15px;
-    color: rgb(199, 199, 199);
+    color: #95A5A6;
     cursor: pointer;
 }
 .level-separator-container{
-    opacity: 0.2;
+    opacity: 0.7;
     position:relative;
 }
 

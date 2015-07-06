@@ -510,6 +510,8 @@ class StateMachine{
     }
 
     deleteState(remove_identificator){
+        this.removeDiscontinuities();
+
         let st_index = __getArrayPos(this.__states, remove_identificator);
         let removed_state = this.__states.splice(st_index,1);
 
