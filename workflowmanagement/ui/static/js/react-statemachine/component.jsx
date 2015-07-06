@@ -196,7 +196,10 @@ let StateMachineComponent = React.createClass({
             detailMode: 0,
             blockSchema: false,
             onUpdate: undefined,
-            onUnsavedExit: undefined
+            onUnsavedExit: undefined,
+            detailHelp: "",
+            globalHelp: "",
+            identifier: 'statemachine_editor'
         };
     },
     update(data){
@@ -735,6 +738,25 @@ let StateMachineComponent = React.createClass({
         StateMachineActions.redo();
         this.onUpdate();
     },
+    supportsLocal() {
+      try {
+        return 'localStorage' in window && window['localStorage'] !== null;
+      } catch (e) {
+        return false;
+      }
+    },
+    markGlbSeen() {
+        if(this.supportsLocal()){
+            localStorage.setItem(`${this.props.identifier}_glbhelp`, true)
+        }
+        this.forceUpdate();
+    },
+    markDtlSeen() {
+        if(this.supportsLocal()){
+            localStorage.setItem(`${this.props.identifier}_dtlhelp`, true)
+        }
+        this.forceUpdate();
+    },
     render(){
         let chart = this.getRepresentation();
 
@@ -782,15 +804,26 @@ let StateMachineComponent = React.createClass({
             );
         };
 
+        let detail_seen, global_seen;
+        if(this.supportsLocal()){
+            detail_seen = localStorage.getItem(`${this.props.identifier}_dtlhelp`);
+            global_seen = localStorage.getItem(`${this.props.identifier}_glbhelp`);
+        }
         let detailMode2 = () => {
             if(this.props.editable){
                     return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
                     <h4>&nbsp;</h4>
                     <hr />
+                    {this.props.detailHelp && !detail_seen ?
+                            <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
+                                <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                <strong>Help: </strong> {this.props.detailHelp}
+                            </div>
+                        :''}
                     <Tabs tabActive={this.state.selected? 2: 1}
                         onAfterChange={makeDraggable}
                     >
-                        <Tabs.Panel title={<span><i className="fa fa-plus"></i> Add Task</span>}>
+                        <Tabs.Panel title="Add Task">
                             {this.props.blockSchema ?
                                     (<div style={{textAlign: 'justify'}}>
                                         <h3 className="task-type-title panel-title"> <i className="fa fa-2x fa-exclamation-triangle"></i> Attention</h3>
@@ -801,7 +834,7 @@ let StateMachineComponent = React.createClass({
                             :{state_list}}
                         </Tabs.Panel>
                         {this.state.selected?
-                        <Tabs.Panel title={<span><i className="fa fa-pencil"></i> Edit Task</span>}>
+                        <Tabs.Panel title="Edit Task">
                             {state_detail(this.props.editable)}
                         </Tabs.Panel>: ''}
                     </Tabs>
@@ -809,6 +842,12 @@ let StateMachineComponent = React.createClass({
             } else {
                 if(this.state.selected){
                     return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                                {this.props.detailHelp && !detail_seen ?
+                                    <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
+                                        <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        <strong>Help: </strong> {this.props.detailHelp}
+                                    </div>
+                                :''}
                                 <span>{state_detail(this.props.editable)}</span>
                             </div>);
                 }
@@ -842,6 +881,7 @@ let StateMachineComponent = React.createClass({
         return (
           <div className="react-statemachine row">
           <div className="col-md-12 no-select">
+
                 <div style={{width: '100%'}} ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
                     {this.props.detailMode === 2 ?
@@ -866,6 +906,12 @@ let StateMachineComponent = React.createClass({
                                     <hr />
                                 </div>
                               </div>
+                            {this.props.globalHelp && !global_seen ?
+                                <div className="alert alert-warning alert-dismissible fade in" role="alert">
+                                    <button style={{zIndex: 1001}} type="button" onClick={this.markGlbSeen} className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    <strong>Help: </strong> {this.props.globalHelp}
+                                </div>
+                            :''}
                             {this.props.savebar?
                             <Affix key={'savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
                               <div className="row">

@@ -227,6 +227,9 @@ const StateMachineStore = Reflux.createStore({
         this.__sm.removeDiscontinuities();
 
         this.trigger(true);
+    },
+    onForceUpdate(){
+        this.trigger();
     }
 });
 

@@ -231,3 +231,7 @@
   padding-bottom:0;
   line-height:1.5em;*/
 }
+
+.smalert {
+    z-index: 1001;
+}

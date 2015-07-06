@@ -20,7 +20,8 @@ const StateMachineActions = Reflux.createActions([
     'setDetailVisible',
     'dataChange',
     'undo',
-    'redo'
+    'redo',
+    'forceUpdate'
 ]);
 
 export default StateMachineActions;

@@ -701,3 +701,7 @@ table {
 .disabledFrenderer{
   background-color: #eee !important;
 }
+
+li.is-active > a {
+  cursor: default;
+}
