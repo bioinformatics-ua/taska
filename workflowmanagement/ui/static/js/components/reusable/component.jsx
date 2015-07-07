@@ -266,7 +266,6 @@ const PermissionsBar = React.createClass({
                         <div className="form-control">
                             <span className="selectBox">
                                 <Toggle id="public"
-                                    checked={this.props.public}
                                     defaultChecked={this.props.public}
                                     onChange={this.setPublic} disabled={!this.props.editable} />
                                 <span className="selectLabel">&nbsp;Public</span>

@@ -139,7 +139,7 @@ export default React.createClass({
                                                 {value: '2', label: 'Appear on the Left Bar (good for high resolutions)'},
                                                 ]} />
                             </div>
-                        </div>*/}
+                        </div>
                         <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
@@ -155,7 +155,8 @@ export default React.createClass({
                                 </div>
                             </div>
                         </div>
-                        {/*<div className="form-group">
+
+                        <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Country</strong>

@@ -15,7 +15,7 @@ class Profile(models.Model):
         )
     user        = models.OneToOneField(User)
     detail_mode = models.PositiveSmallIntegerField(choices=DETAIL_MODES, default=LEFT)
-    notification= models.BooleanField(default=False)
+    notification= models.BooleanField(default=True)
 
     def __unicode__(self):
         return u"User profile for %s" % self.user
