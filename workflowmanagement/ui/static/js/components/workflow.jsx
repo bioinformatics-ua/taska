@@ -253,6 +253,7 @@ export default React.createClass({
                                 setSearchable={this.setSearchable}
                                 setForkable={this.setForkable}
                                 object={params.object}
+                                title={this.getWorkflow().title}
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />

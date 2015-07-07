@@ -301,7 +301,6 @@ class StateMachine{
 
 
     selectFirst(){
-        console.log(this.__level);
         try {
             return this.__level[1][0];
         } catch(err){

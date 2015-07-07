@@ -21,9 +21,15 @@ const WorkflowManage = React.createClass({
     const row = this.props.rowData;
     const object = {object: row.hash, mode: 'edit'};
     const object2 = {object: row.hash, mode: 'run'};
-    return <div className="btn-group pull-right" role="group" aria-label="...">
+    return <div className="pull-right" role="group" aria-label="...">
 
-            <Link className="btn btn-sm btn-primary" to="WorkflowEdit"
+
+            <div className="user-owned">{user && user.id === row.owner ?
+                <i title="You are the creator of this protocol, and are authorized to edit it." className="fa fa-2x fa-user"></i>
+            :''}</div>
+            <Link className="btn btn-sm btn-default" to="Workflow"
+              params={object2}><i className="fa fa-search"></i></Link>
+            {/*<Link className="btn btn-sm btn-primary" to="WorkflowEdit"
               params={object2}><i className="fa fa-play"></i></Link>
 
             {user && user.id === row.owner ?
@@ -34,9 +40,9 @@ const WorkflowManage = React.createClass({
               success={this.delete}
               identificator = {row}
               title={`Delete '${row.title}'`}
-              message={`Are you sure you want to delete  '${row.title} ?'`}  />
+              message={`Are you sure you want to delete  '${row.title} ?'`}  />:''}*/}
 
-            :''}
+
 
            </div>;
   }

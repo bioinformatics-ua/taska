@@ -8,6 +8,8 @@ import {LayeredComponentMixin} from '../../mixins/component.jsx';
 
 import Toggle from 'react-toggle';
 
+import WorkflowActions from '../../actions/WorkflowActions.jsx';
+
 const Loading = React.createClass({
   render: function(){
     return (
@@ -241,6 +243,9 @@ const PermissionsBar = React.createClass({
             forkable: this.props.forkable
         }
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     setPublic(e){
         this.setState({public: e.target.checked});
         this.props.setPublic(e);
@@ -291,7 +296,13 @@ const PermissionsBar = React.createClass({
 
                 </div>);
     },
+    delete(object){
+      WorkflowActions.deleteWorkflow(object);
+
+      this.context.router.transitionTo('home');
+    },
     render(){
+        let canedit = !this.props.editable && !this.props.runnable && this.props.showEdit;
         return (<span>
                 {this.props.owner ?
                 <div className="row">
@@ -317,28 +328,34 @@ const PermissionsBar = React.createClass({
                         </div>
                     :''}
                     <div  style={{width: '100%', textAlign: 'right', zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
-                    {!this.props.editable && !this.props.runnable && this.props.showEdit ?
-                      <span>
-
-                        {this.props.forkable ?
-                          <button style={{marginRight: '7px'}} onClick={this.setFork} className="btn btn-default">
-                            <i className="fa fa-code-fork"></i> &nbsp;Duplicate
-                          </button>
-                        :''}
-                        <Link className="btn btn-warning" to={this.props.link}
-                        params={{object: this.props.object, mode:'edit'}}>
-                        <i className="fa fa-pencil"></i> &nbsp;Edit
-                        </Link>
-                        </span>
-                    :''}
+                    <div className="btn btn-group">
+                      {!this.props.runnable && !this.props.editable && this.props.showRun && this.props.forkable ?
+                            <button style={{border: '1px solid #95a5a6'}} onClick={this.setFork} className="btn btn-sm btn-default">
+                              <i className="fa fa-code-fork"></i> &nbsp;Duplicate
+                            </button>
+                      :''}
+                      {!this.props.runnable && !this.props.editable && this.props.showRun?
+                          <Link title="Configure protocol as a study" className="btn btn-sm btn-primary" to={this.props.link}
+                          params={{object: this.props.object, mode:'run'}}>
+                          <i className="fa fa-play"></i>
+                          </Link>
+                      :''}
+                      {canedit ?
+                          <Link title="Edit this protocol" className="btn btn-sm btn-warning" to={this.props.link}
+                          params={{object: this.props.object, mode:'edit'}}>
+                          <i className="fa fa-pencil"></i>
+                          </Link>
+                      :''}
+                      {canedit ?
+                          <DeleteButton title="Delete this protocol"
+                            success={this.delete}
+                            identificator = {this.props.object}
+                            deleteLabel={<span><i className="fa fa-times"></i></span>}
+                            title={`Delete '${this.props.title}'`}
+                            message={`Are you sure you want to delete '${this.props.title} ?'`}></DeleteButton>
+                      :''}
+                    </div>
                      &nbsp;{this.props.extra}
-
-                    &nbsp;{!this.props.runnable && !this.props.editable && this.props.showRun?
-                        <Link className="btn btn-primary" to={this.props.link}
-                        params={{object: this.props.object, mode:'run'}}>
-                        <i className="fa fa-play"></i> &nbsp;Run
-                        </Link>
-                    :''}
                     </div>
                 </span>
         );

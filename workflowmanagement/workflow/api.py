@@ -337,7 +337,7 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
         workflow = self.get_object()
 
         if workflow.permissions().forkable:
-            new_workflow = workflow.fork()
+            new_workflow = workflow.fork(owner=request.user)
 
             History.new(event=History.ADD, actor=request.user, object=new_workflow)
 

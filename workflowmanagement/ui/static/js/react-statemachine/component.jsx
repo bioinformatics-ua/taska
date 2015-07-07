@@ -768,7 +768,6 @@ let StateMachineComponent = React.createClass({
 
         let state_list = this.state.sm.getStateClasses().map(
             (stclass) => {
-                console.log(stclass.Class.prototype);
                 return  <div title={stclass.Class.title()} key={stclass.id} data-type={stclass.id}
                 className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             {stclass.Class.typeIcon()} {stclass.Class.repr()}

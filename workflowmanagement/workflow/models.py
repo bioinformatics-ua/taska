@@ -58,7 +58,7 @@ class Workflow(models.Model):
         return self.__class__.objects.create(**new_kwargs)
 
     @transaction.atomic
-    def fork(self):
+    def fork(self, owner=None):
         fork = self.clone()
         fork.permissions()
 
@@ -78,6 +78,10 @@ class Workflow(models.Model):
             depmap[task.id].replaceDependencies(deps)
 
         fork.title = "%s (Fork)" % fork.title
+
+        if owner != None:
+            fork.owner = owner
+
         fork.save()
 
         return fork
