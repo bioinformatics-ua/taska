@@ -2,20 +2,27 @@
 @import url("font-awesome/css/font-awesome.min.css");
 
 @font-face {
-    font-family: opensans;
-    src: url("fonts/OpenSans-Regular.ttf");
+    font-family: 'opensans';
+    src:    url("fonts/OpenSans-Regular.woff2"),
+            url("fonts/OpenSans-Regular.woff"),
+            url("fonts/OpenSans-Regular.ttf");
 }
 @font-face {
-    font-family: opensansbold;
-    src: url("fonts/OpenSans-Bold.ttf");
+    font-family: 'opensansbold';
+    src:    url("fonts/OpenSans-Bold.woff2"),
+            url("fonts/OpenSans-Bold.woff"),
+            url("fonts/OpenSans-Bold.ttf");
 }
 
 @font-face {
-    font-family: fa;
-    src: url("font-awesome/fonts/FontAwesome.otf");
+    font-family: 'fa';
+    src:    url("font-awesome/fonts/fontawesome-webfont.woff2"),
+            url("font-awesome/fonts/fontawesome-webfont.woff"),
+            url("font-awesome/fonts/fontawesome-webfont.ttf");
 }
 
 @font-face {
-    font-family: RwWidgets;
-    src: url("react-widgets/dist/fonts/rw-widgets.ttf");
+    font-family: 'RwWidgets';
+    src:    url("react-widgets/dist/fonts/rw-widgets.woff"),
+            url("react-widgets/dist/fonts/rw-widgets.ttf");
 }
