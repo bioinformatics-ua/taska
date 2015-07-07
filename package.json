@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "backbone": "1.1.2",
+    "backbone-deep-model": "0.10.4",
     "baobab": "0.4.2",
     "bootstrap": "3.3.2",
     "envify": "3.2.0",
@@ -27,7 +28,7 @@
     "react-toggle": "1.2.0",
     "react-widgets": "2.6.2",
     "reflux": "0.2.5",
-    "rivets": "0.8.1",
+    "rivets": "0.6.0",
     "underscore": "1.8.3"
   },
   "style": "workflowmanagement/ui/css/main.css",
@@ -44,14 +45,16 @@
     "catw": "0.2.0"
   },
   "scripts": {
-    "start": "npm run watchjs & npm run watchless & npm run watchcss",
+    "start": "npm run watchjs & npm run watchvendor & npm run watchless & npm run watchcss",
     "watchjs": "watchify -d -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -t babelify -o workflowmanagement/ui/static/bundle.js",
+    "watchvendor": "catw -c 'cat'  ./workflowmanagement/ui/static/js/vendor/dobtco-formbuilder-vendor.js ./workflowmanagement/ui/static/js/vendor/formbuilder-min.js ./workflowmanagement/ui/static/js/vendor/formrenderer.js -o ./workflowmanagement/ui/static/bundle_vendor.js",
     "watchless": "catw -c 'lessc -' ./workflowmanagement/ui/static/less/variables.less ./workflowmanagement/ui/static/less/imports.less  -o ./workflowmanagement/ui/static/css/less_bundle.css -v",
     "watchcss": "catw -c 'uglifycss' ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css -o ./workflowmanagement/ui/static/bundle.min.css -v",
-    "prod": "npm run prodjs && npm run prodless &&npm run prodcss",
+    "prod": "npm run prodjs &&npm run prodvendor && npm run prodless && npm run prodcss",
     "prodjs": "browserify -d -t babelify -g [ uglifyify --no-sourcemap --screw-ie8 --bare-returns] -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -o workflowmanagement/ui/static/bundle.js && uglifyjs workflowmanagement/ui/static/bundle.js > workflowmanagement/ui/static/bundle.min.js",
     "prodless": "lessc ./workflowmanagement/ui/static/less/imports.less ./workflowmanagement/ui/static/css/less_bundle.css",
     "prodcss": "uglifycss ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css > ./workflowmanagement/ui/static/bundle.min.css",
+    "prodvendor": "uglifyjs ./workflowmanagement/ui/static/js/vendor/dobtco-formbuilder-vendor.js ./workflowmanagement/ui/static/js/vendor/formbuilder-min.js > ./workflowmanagement/ui/static/bundle_vendor.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

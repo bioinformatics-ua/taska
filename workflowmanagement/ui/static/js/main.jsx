@@ -1,5 +1,14 @@
 'use strict';
+
 window.$ = window.jQuery = require('jquery');
+
+window._ = window.underscore = require('underscore');
+
+window.Backbone = require('backbone');
+
+window.Backbone.DeepModel = require('backbone-deep-model');
+
+window.Backbone.$ = window.$;
 
 window.rivets = require('rivets');
 
@@ -24,6 +33,10 @@ import Http500 from './components/500.jsx';
 import Http0 from './components/0.jsx';
 
 const content = document.getElementById('playground');
+
+/*require('./vendor/dobtco-formbuilder-vendor');
+window.FormBuilder = require('./vendor/formbuilder-min');
+window.FormRenderer = require('./vendor/formrenderer');*/
 
 // For each route, if the route specifies a fetch function, treat it as an async-data needy route
 function fetch(routes, params) {

@@ -40,9 +40,11 @@
     {% else %}
     <script src="{% static "bundle.min.js" %}"></script>
     {% endif%}
-    <script src='{% static "js/vendor/dobtco-formbuilder-vendor.js" %}'></script>
-    <script src='{% static "js/vendor/formbuilder-min.js" %}'></script>
-    <script src='{% static "js/vendor/formrenderer.js" %}'></script>
+    {% if IS_DEBUG %}
+    <script src="{% static "bundle_vendor.js" %}"></script>
+    {% else %}
+    <script src="{% static "bundle_vendor.min.js" %}"></script>
+    {% endif%}
 
     <script type="text/javascript" src="djangojs/init.js"></script>
 

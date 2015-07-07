@@ -351,7 +351,6 @@ const PermissionsBar = React.createClass({
                             success={this.delete}
                             identificator = {this.props.object}
                             deleteLabel={<span><i className="fa fa-times"></i></span>}
-                            title={`Delete '${this.props.title}'`}
                             message={`Are you sure you want to delete '${this.props.title} ?'`}></DeleteButton>
                       :''}
                     </div>

@@ -267,7 +267,6 @@ export default React.createClass({
                     <span><i className="fa fa-floppy-o"></i> &nbsp;Save Protocol</span>
                     : <span><i className="fa fa-play"></i> Run</span>}
                     initialSm={sm}
-                    savebar={!params.mode || params.mode === 'view'? false: true}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}
                     globalHelp={this.helpMap(params.mode).global}

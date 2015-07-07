@@ -919,7 +919,7 @@ let StateMachineComponent = React.createClass({
                                 </div>
                             :''}
                             {this.props.savebar?
-                            <Affix key={'savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
+                            <Affix key={'component_savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
                               <div className="row">
                                     <div className="col-md-12">
                                             <span>

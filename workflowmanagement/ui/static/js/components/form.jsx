@@ -122,7 +122,7 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3 save_container">
                                         {this.didWrite()?
-                                            <Affix key={'savebar'} className={'savebar'} clamp={'.save_container'} fill={false} offset={40}>
+                                            <Affix key={'form_savebar'} className={'savebar'} clamp={'.save_container'} fill={false} offset={40}>
                                                 <button onClick={this.setForm} className="btn btn-primary btn-block btn-default">
                                                     <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Form
                                                 </button>
