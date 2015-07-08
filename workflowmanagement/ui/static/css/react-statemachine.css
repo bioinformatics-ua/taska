@@ -246,3 +246,9 @@
     border-color: black;
     cursor: cell;
 }
+
+.state-filled .state-handler {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid rgb(149, 165, 166);
+}

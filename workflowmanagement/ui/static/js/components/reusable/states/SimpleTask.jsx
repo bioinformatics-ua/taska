@@ -147,7 +147,7 @@ class SimpleTaskRun extends SimpleTask{
     }
     is_valid(){
         let data = this.getData();
-        console.log(data);
+
         return (
             data.deadline
             && data.assignee
@@ -155,6 +155,15 @@ class SimpleTaskRun extends SimpleTask{
         );
 
     }
+
+    status(){
+        if(this.is_valid()){
+            return 'state-filled';
+        }
+
+        return '';
+    }
+
     serialize(){
         let users = [];
         let assignee = this.getData().assignee || '';

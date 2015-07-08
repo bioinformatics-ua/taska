@@ -145,7 +145,6 @@ class FormTask extends SimpleTask {
     is_valid(){
         if(super.is_valid()){
             let data = this.getData();
-            console.log(data);
             return data.form != undefined;
         }
 
@@ -157,6 +156,25 @@ class FormTask extends SimpleTask {
 class FormTaskRun extends FormTask{
     constructor(options){
         super(options);
+    }
+
+    is_valid(){
+        let data = this.getData();
+
+        return (
+            data.deadline
+            && data.assignee
+            && data.assignee.split(',').length > 0
+        );
+
+    }
+
+    status(){
+        if(this.is_valid()){
+            return 'state-filled';
+        }
+
+        return '';
     }
 
     serialize(){

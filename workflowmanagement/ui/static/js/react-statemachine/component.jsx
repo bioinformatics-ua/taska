@@ -201,7 +201,8 @@ let StateMachineComponent = React.createClass({
             globalHelp: "",
             identifier: 'statemachine_editor',
             undoredo: false,
-            selectFirst: false
+            selectFirst: false,
+            validate: false
         };
     },
     update(data){
@@ -504,7 +505,11 @@ let StateMachineComponent = React.createClass({
         let getLevel = (level => {
             return level.map(state => {
                 let state_handler_class = "state-handler btn btn-default form-group";
-                let state_class = "state";
+                let state_class = 'state ';
+
+                if(this.props.validate){
+                    state_class += state.status();
+                }
 
                 if (this.state.selected == state.getIdentificator()){
                     state_class = `${state_class} state-selected`;
@@ -763,6 +768,16 @@ let StateMachineComponent = React.createClass({
         }
         this.forceUpdate();
     },
+    valid(){
+        let states = this.state.sm.getStates();
+
+        for(let state of states){
+            if(!state.is_valid())
+                return false;
+        }
+
+        return true;
+    },
     render(){
         let chart = this.getRepresentation();
 
@@ -790,10 +805,21 @@ let StateMachineComponent = React.createClass({
                 } else{
                     let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
 
-                    return <span><DRender
-                    deleteConnection={this.deleteConnection}
-                    addDependency={this.addDependency}
-                    dataChange={this.dataChange} {...this.props}/></span>;
+                    return <span>
+                        <DRender
+                        deleteConnection={this.deleteConnection}
+                        addDependency={this.addDependency}
+                        dataChange={this.dataChange} {...this.props}/>
+                        <br />
+                        <center>
+                            <button disabled={!StateMachineStore.hasPrevious()} onClick={StateMachineStore.getPrevious} className="btn btn-default">
+                                <i className="fa fa-chevron-left"></i> Previous
+                            </button>
+                            <button disabled={!StateMachineStore.hasNext()} onClick={StateMachineStore.getNext} className="btn btn-default">
+                                <i className="fa fa-chevron-right"></i> Next
+                            </button>
+                        </center>
+                    </span>;
                 }
 
             }
@@ -934,9 +960,11 @@ let StateMachineComponent = React.createClass({
                                                 </div>
                                                  :''}
 
-                                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                                    {this.props.saveLabel}
-                                                </button>
+                                                 {!this.props.validate || this.valid()?
+                                                    <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                                        {this.props.saveLabel}
+                                                    </button>
+                                                :''}
                                             </span>
                                     </div>
                                     </div>

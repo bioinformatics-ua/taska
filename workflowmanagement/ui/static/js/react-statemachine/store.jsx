@@ -91,6 +91,56 @@ const StateMachineStore = Reflux.createStore({
     getDetailVisible(){
         return this.__detailVisible;
     },
+    hasNext(){
+        if(this.__selected){
+            let selected = Number.parseInt(this.__selected);
+
+            if(selected && !isNaN(selected)){
+                let state = this.__sm.getState(selected);
+
+                return this.__sm.getNext(state) != undefined;
+            }
+
+        }
+    },
+    hasPrevious(){
+        if(this.__selected){
+            let selected = Number.parseInt(this.__selected);
+
+            if(selected && !isNaN(selected)){
+                let state = this.__sm.getState(selected);
+                return this.__sm.getPrevious(state) != undefined;
+            }
+
+        }
+    },
+    getNext(){
+        if(this.__selected){
+            let selected = Number.parseInt(this.__selected);
+
+            if(selected && !isNaN(selected)){
+                let state = this.__sm.getState(selected);
+
+                this.__selected=''+this.__sm.getNext(state).getIdentificator();
+
+                this.trigger();
+            }
+
+        }
+    },
+    getPrevious(){
+        if(this.__selected){
+            let selected = Number.parseInt(this.__selected);
+            console.log(selected);
+            if(selected && !isNaN(selected)){
+                let state = this.__sm.getState(selected);
+
+                this.__selected=''+this.__sm.getPrevious(state).getIdentificator();
+                this.trigger();
+            }
+
+        }
+    },
     // Action handlers
     onAddState(type, level){
         console.log(`Add new state of type ${type} into level ${level}`);

@@ -273,6 +273,9 @@ class State{
         let data = this.getData();
         return data.name != undefined;
     }
+    status(){
+        return '';
+    }
 }
 
 class SimpleState extends State {
@@ -299,7 +302,68 @@ class StateMachine{
         this.__stateclasses = [];
     }
 
+    getPrevious(selected_state){
+        let this_level = this.__level[selected_state.getLevel()];
+        let level_index = Number.parseInt(selected_state.getLevel());
 
+        let i = __getArrayPos(this_level, selected_state.getIdentificator());
+
+        // Impossible exception situation shouldnt happen never
+        if(i === -1)
+            return undefined;
+
+        // The selected state is the first on his level, so we move to the level above
+        else if(i === 0){
+            // If we are already at the top, we cant upper than this
+            try{
+                let prev_level = this.__level[''+(level_index-1)];
+
+                // Account for possible temporary discontinuities
+                if(prev_level.length > 0){
+                    // Return the last state of previous line
+                    return prev_level[prev_level.length-1];
+                }
+
+            } catch(err){
+                // If we are already at the bottom, we cant down more than this
+            };
+        } else {
+            // If we are in the middle just return the previous one, on the same level
+            return this_level[i-1];
+        }
+
+        return undefined;
+    }
+    getNext(selected_state){
+        let this_level = this.__level[selected_state.getLevel()];
+        let level_index = Number.parseInt(selected_state.getLevel());
+
+        let i = __getArrayPos(this_level, selected_state.getIdentificator());
+
+        // Impossible exception situation shouldnt happen never
+        if(i === -1)
+            return undefined;
+
+        // The selected state is the last on his level, so we move to the level below
+        else if(i === this_level.length-1){
+            try{
+                let next_level = this.__level[''+(level_index+1)]
+
+                // Account for possible temporary discontinuities
+                if(next_level.length > 0){
+                    return next_level[0];
+                }
+
+            } catch(err){
+                // If we are already at the bottom, we cant down more than this
+            };
+        } else {
+            // If we are in the middle just return the next one, on the same level
+            return this_level[i+1];
+        }
+
+        return undefined;
+    }
     selectFirst(){
         try {
             return this.__level[1][0];

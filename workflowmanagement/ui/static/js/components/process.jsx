@@ -45,7 +45,7 @@ const ProcessLabel = React.createClass({
                     </tr>
                 </table>
     }
-})
+});
 var i = 0;
 export default React.createClass({
     mixins: [   Router.Navigation,
