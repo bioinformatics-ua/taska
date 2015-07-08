@@ -22,6 +22,7 @@ class SimpleTask extends Task{
     getTypeRepr(){
         return <span><i className='fa fa-check'></i> Simple Task</span>;
     }
+
     changeComment(e){
         super.setAnswer('comment', e.target.value);
     }

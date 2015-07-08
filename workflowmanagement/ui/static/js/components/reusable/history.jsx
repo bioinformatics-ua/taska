@@ -42,6 +42,9 @@ var HistoryItem = React.createClass({
           case 'Add':
             text = `${entry.actor_repr} has registered.`;
             return <span>{text}</span>;
+          case 'Edit':
+            text = `${entry.actor_repr} has updated his preferences.`;
+            return <span>{text}</span>;
           case 'Approve':
             text = `${entry.actor_repr} has approved ${entry.object_repr}.`;
             return <span>{text}</span>;
@@ -75,6 +78,10 @@ var HistoryItem = React.createClass({
           text = `${entry.actor_repr} has finished`;
           return <span>{text} {link}</span>;
 
+        case 'Recover':
+          text = `${entry.actor_repr} has tried to recover his password.`;
+          return <span>{text}</span>;
+
         case 'Comment':
           text = `${entry.actor_repr} has made comments on`;
           return <span>{text} {entry.object_repr}</span>;
@@ -103,6 +110,7 @@ var EventIcon = React.createClass({
         case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
         case 'Done': return <i className="fa fa-check thumb"></i>;
         case 'Comment': return <i className="fa fa-comment thumb"></i>;
+        case 'Recover': return <i className="fa fa-medkit thumb"></i>;
 
         default: return event;
       }

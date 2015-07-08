@@ -23,6 +23,9 @@ module.exports = (
 
         <Route name="activate" path="activate/:email" handler={require('./components/activate.jsx')}/>
 
+        <Route name="forgotten" path="forgotten" handler={require('./components/forgotten.jsx')}/>
+
+        <Route name="changepassword" path="changepassword/:hash" handler={require('./components/setpassword.jsx')}/>
 
         <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
 

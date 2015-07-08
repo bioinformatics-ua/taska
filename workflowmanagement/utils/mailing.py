@@ -97,3 +97,7 @@ class UserAddTemplate(MailTemplate):
 class UserApproveTemplate(MailTemplate):
     subjecttemplate="mail/user_approve_subject.html"
     template="mail/user_approve.html"
+
+class UserRecoveryRecoverTemplate(MailTemplate):
+    subjecttemplate="mail/userrecovery_recover_subject.html"
+    template="mail/userrecovery_recover.html"

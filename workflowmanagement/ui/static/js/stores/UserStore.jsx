@@ -25,6 +25,7 @@ export default Reflux.createStore({
     init(){
         this.__loginfail = false;
         this.__success_register = false;
+        this.__success_recover = false;
     },
     getUser(){
 
@@ -171,8 +172,58 @@ export default Reflux.createStore({
             );
         }
     },
+    onRecoverPassword(email){
+        if(!(email && this.isEmail(email))){
+            StateActions.alert({
+                'title':"Email must be a valid email",
+                'message': "The email must follow a pattern like <user>@<domain>"
+            });
+        }
+        else {
+            this.onMethodDetail('recover', undefined, 'POST', {email: email}).then(
+                (user) => {
+                    StateActions.loadingEnd();
+
+                    if(user.error){
+                        StateActions.alert({
+                            'title':"Error recovering password.",
+                            'message': user.error
+                        });
+                    } else {
+                        this.__success_recover=true;
+                    }
+
+                    this.trigger();
+                }
+            );
+        }
+    },
+    onChangePassword(hash, password){
+        this.onMethodDetail('changepassword', undefined, 'POST', {
+            hash: hash,
+            password: password
+        }).then(
+            (user) => {
+                StateActions.loadingEnd();
+
+                if(user.error){
+                    StateActions.alert({
+                        'title':"Error changing password.",
+                        'message': user.error
+                    });
+                } else {
+                    this.__success_recover=true;
+                }
+
+                this.trigger();
+            }
+        );
+    },
     hasRegistered(){
         return this.__success_register;
+    },
+    hasRecovered(){
+        return this.__success_recover;
     },
     onApprove(email){
         this.onMethodDetail('activate', undefined, 'POST', {

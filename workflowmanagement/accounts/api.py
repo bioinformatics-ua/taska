@@ -14,9 +14,11 @@ from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasS
 
 from django.contrib.auth import authenticate, login, logout
 
-from models import Profile
+from models import Profile, UserRecovery
 
 from history.models import History
+
+from django.utils import timezone
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -293,6 +295,67 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return Response({
             'error': "Email and password are mandatory fields on registering a new user"
+        })
+
+    @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
+    def recover(self, request):
+        if request.user.is_authenticated():
+            return Response({
+                    'error': "An already logged in user can't recover a password!"
+                })
+        email = request.data.get('email', None)
+
+        if email != None:
+            try:
+                usr = User.objects.get(email=email)
+
+                ur = UserRecovery(user=usr)
+
+                ur.save()
+
+                History.new(event=History.RECOVER, actor=usr,
+                        object=ur, authorized=[usr])
+
+                return Response({'success': True})
+
+            except User.DoesNotExist:
+                pass
+
+            return Response({
+                'error': "An user with this email does not exist."
+            })
+
+    @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
+    def changepassword(self, request):
+        if request.user.is_authenticated():
+            return Response({
+                    'error': "An already logged in user can't recover a password!"
+                })
+
+        hash    = request.data.get('hash', None)
+        new_pass= request.data.get('password', None)
+
+        if hash != None and new_pass != None:
+            try:
+                ur = UserRecovery.objects.get(hash=hash, used=False, validity__gt=timezone.now())
+
+                ur.user.set_password(new_pass)
+                ur.user.save()
+
+                ur.used=True
+                ur.save()
+
+                History.new(event=History.EDIT, actor=ur.user,
+                    object=ur.user, authorized=[ur.user])
+
+                return Response({'success': True})
+            except UserRecovery.DoesNotExist:
+                return Response({
+                    'error': "Either the request does not exist, or it has expired."
+                })
+
+        return Response({
+            'error': "This request is not valid."
         })
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])

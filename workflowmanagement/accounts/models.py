@@ -3,6 +3,9 @@ from django.dispatch import receiver
 
 from django.contrib.auth.models import User
 
+from utils.hashes import createUUID
+from utils.time import nextMonth
+
 class Profile(models.Model):
     POPUP       = 0
     BELOW       = 1
@@ -31,3 +34,12 @@ def __generate_profile(sender, instance, created, *args, **kwargs):
         except Profile.DoesNotExist:
             p = Profile(user=instance)
             p.save()
+
+class UserRecovery(models.Model):
+    user    = models.ForeignKey(User)
+    validity= models.DateTimeField(default=nextMonth)
+    hash    = models.CharField(max_length=50, default=createUUID)
+    used    = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u"Password Recovery for %s" % self.user
