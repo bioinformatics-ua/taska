@@ -26,7 +26,7 @@ class SimpleTask extends SimpleState {
         super(options);
     }
     static typeIcon(){
-        return <i className="fa fa-check"></i>;
+        return <i className="fa fa-cube"></i>;
     }
     static repr(){
         return 'Simple Task';

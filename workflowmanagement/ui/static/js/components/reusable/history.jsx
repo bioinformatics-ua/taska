@@ -108,7 +108,7 @@ var EventIcon = React.createClass({
         case 'Edit': return <i className="fa fa-pencil thumb"></i>;
         case 'Delete': return <i className="fa fa-trash-o thumb"></i>;
         case 'Approve': return <i className="fa fa-thumbs-o-up thumb"></i>;
-        case 'Done': return <i className="fa fa-check thumb"></i>;
+        case 'Done': return <i className="fa fa-cube thumb"></i>;
         case 'Comment': return <i className="fa fa-comment thumb"></i>;
         case 'Recover': return <i className="fa fa-medkit thumb"></i>;
 

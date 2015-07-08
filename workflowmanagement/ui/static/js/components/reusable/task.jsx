@@ -53,7 +53,7 @@ const TaskType = React.createClass({
   getIcon(type){
     switch(type){
       case 'tasks.SimpleTask':
-        return 'fa-check';
+        return 'fa-cube';
       case 'form.FormTask':
         return 'fa-list-ul';
     }
