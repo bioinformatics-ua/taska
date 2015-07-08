@@ -194,6 +194,7 @@ class UserViewSet(viewsets.ModelViewSet):
         email = request.data.get('email')
 
         if email != None:
+            email = email.lower()
             try:
                 usr = User.objects.get(email=email)
 
@@ -223,6 +224,7 @@ class UserViewSet(viewsets.ModelViewSet):
             email = request.data.get('email', None)
 
         if request.user.is_staff and email != None:
+            email = email.lower()
             try:
                 usr = User.objects.get(email=email)
 
@@ -265,6 +267,8 @@ class UserViewSet(viewsets.ModelViewSet):
         email = request.data.get('email', None)
 
         if email != None and password != None:
+            email = email.lower()
+
             try:
                 usr = User.objects.get(email=email)
 
@@ -273,6 +277,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 })
             except User.DoesNotExist:
                 request.data['username']=email[:30]
+                request.data['email']=email
                 serializer = UserSerializer(data=request.data, context={'request': request})
 
                 valid = serializer.is_valid(raise_exception=True)
@@ -306,6 +311,7 @@ class UserViewSet(viewsets.ModelViewSet):
         email = request.data.get('email', None)
 
         if email != None:
+            email = email.lower()
             try:
                 usr = User.objects.get(email=email)
 
@@ -370,6 +376,8 @@ class UserViewSet(viewsets.ModelViewSet):
             if request.data.get('remember', False):
                 request.session.set_expiry(1296000) # if set to remember, keep for 2 weeks
 
+            if username != None:
+                username = username.lower()
 
             if '@' in username:
                 try:
