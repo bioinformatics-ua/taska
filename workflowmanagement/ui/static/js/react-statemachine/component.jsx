@@ -778,6 +778,21 @@ let StateMachineComponent = React.createClass({
 
         return true;
     },
+    percentage(){
+        let states = this.state.sm.getStates();
+        let i = 0;
+
+        for(let state of states){
+            if(state.is_valid())
+                i++;
+        }
+
+        try{
+            return Math.round((i*100)/states.length);
+        } catch(err){
+            return 0;
+        }
+    },
     render(){
         let chart = this.getRepresentation();
 
@@ -942,6 +957,14 @@ let StateMachineComponent = React.createClass({
                                 <div className="alert alert-warning alert-dismissible fade in" role="alert">
                                     <button style={{zIndex: 1001}} type="button" onClick={this.markGlbSeen} className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                                     <strong>Help: </strong> {this.props.globalHelp}
+                                </div>
+                            :''}
+                            {this.props.validate ?
+                                <div className="form-group">
+                                <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                                    <div title={`${this.percentage()}% ready`} style={{backgroundColor: '#19AB27', width: `${this.percentage()}%`, height: '10px'}}></div>
+                                    &nbsp;
+                                </div>
                                 </div>
                             :''}
                             {this.props.savebar?

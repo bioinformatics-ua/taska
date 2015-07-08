@@ -270,7 +270,8 @@ export default React.createClass({
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
-                            {params.mode === 'run' ? <RunLabel />:''}
+                            {params.mode === 'run' ?
+                                    <RunLabel />:''}
                             </span>
                     }
                     title={this.getWorkflow().title}
