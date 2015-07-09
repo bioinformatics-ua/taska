@@ -14,6 +14,7 @@ const StateMachineStore = Reflux.createStore({
         this.__final = this.__sm.clone();
         this.__timemachine = -1;
         this.__detailVisible = false;
+        this.__detailExtended = false;
     },
     addHistory(){
 
@@ -90,6 +91,9 @@ const StateMachineStore = Reflux.createStore({
     },
     getDetailVisible(){
         return this.__detailVisible;
+    },
+    getDetailExtended(){
+        return this.__detailExtended;
     },
     hasNext(){
         if(this.__selected){
@@ -209,6 +213,11 @@ const StateMachineStore = Reflux.createStore({
     onSetDetailVisible(visible, selected=this.__selected){
         this.__detailVisible = visible;
         this.__selected = selected;
+
+        this.trigger();
+    },
+    onSetDetailExtended(extended){
+        this.__detailExtended = extended;
 
         this.trigger();
     },

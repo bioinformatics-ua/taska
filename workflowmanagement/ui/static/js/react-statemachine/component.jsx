@@ -179,6 +179,7 @@ let StateMachineComponent = React.createClass({
             canUndo: StateMachineStore.canUndo(),
             canRedo: StateMachineStore.canRedo(),
             detailVisible: StateMachineStore.getDetailVisible(),
+            detailExtended: StateMachineStore.getDetailExtended()
         }
     },
     getInitialState(){
@@ -469,6 +470,10 @@ let StateMachineComponent = React.createClass({
         else
             StateMachineActions.clearSelect();
 
+    },
+    extend(event){
+      event.stopPropagation();
+      StateMachineActions.setDetailExtended(!this.state.detailExtended);
     },
     insertAbove(event){
         event.stopPropagation();
@@ -856,9 +861,19 @@ let StateMachineComponent = React.createClass({
             detail_seen = localStorage.getItem(`${this.props.identifier}_dtlhelp`);
             global_seen = localStorage.getItem(`${this.props.identifier}_glbhelp`);
         }
+
+        let tasklen = (this.state.detailExtended? 'col-md-12':'col-md-4');
+        let navigator = (
+          <div className="form-group">
+            <button title="Click to expand or retract this area" onClick={this.extend} className="btn btn-default pull-right">
+              {this.state.detailExtended ?<i className="fa fa-times"></i>:<i className="fa fa-expand"></i>}
+            </button>
+          </div>
+        );
         let detailMode2 = () => {
             if(this.props.editable){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
                     <h4>&nbsp;</h4>
                     <hr />
                     {this.props.detailHelp && !detail_seen ?
@@ -867,6 +882,7 @@ let StateMachineComponent = React.createClass({
                                 <strong>Help: </strong> {this.props.detailHelp}
                             </div>
                         :''}
+                    {navigator}
                     <Tabs tabActive={this.state.selected? 2: 1}
                         onAfterChange={makeDraggable}
                     >
@@ -888,7 +904,8 @@ let StateMachineComponent = React.createClass({
                     </div>);
             } else {
                 if(this.state.selected){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
+                                {navigator}
                                 {this.props.detailHelp && !detail_seen ?
                                     <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
                                         <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -921,9 +938,13 @@ let StateMachineComponent = React.createClass({
         };
 
         let mainsize='col-md-10';
+        let mainsize2='col-md-12';
 
-        if(this.props.detailMode === 2)
-            mainsize = 'col-md-8';
+        if(this.props.detailMode === 2){
+            mainsize = (this.state.detailExtended? 'hide':'col-md-8');
+            mainsize2= (this.state.detailExtended? 'hide':'col-md-12');
+
+        }
 
         return (
           <div className="react-statemachine row">
@@ -936,7 +957,7 @@ let StateMachineComponent = React.createClass({
                         :
                             otherModes()
                     }
-                        <div className={this.props.editable? `${mainsize} table-col no-select`:"col-md-12 table-col no-select"}>
+                        <div className={this.props.editable? `${mainsize} table-col no-select`:`${mainsize2} table-col no-select`}>
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="form-group">
