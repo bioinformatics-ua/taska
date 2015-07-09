@@ -78,7 +78,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Password</strong>
                                 </span>
-                                <input ref="password" className="form-control" placeholder="Please introduce new password" defaultValue={''} />
+                                <input ref="password" type="password" className="form-control" placeholder="Please introduce new password" defaultValue={''} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -86,7 +86,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Repeat Password</strong>
                                 </span>
-                                <input ref="repeatpassword" className="form-control" placeholder="Please repeat new password" defaultValue={''} />
+                                <input ref="repeatpassword" type="password" className="form-control" placeholder="Please repeat new password" defaultValue={''} />
                             </div>
                         </div>
                         <button type="submit" className="pull-right btn btn-primary">
