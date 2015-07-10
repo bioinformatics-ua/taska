@@ -136,7 +136,8 @@ const Modal = React.createClass({
       title: 'Undefined Title',
       message: 'Undefined Message',
       showConfirm: true,
-      visible: true
+      visible: true,
+      overflow: 'auto'
     }
   },
   render(){
@@ -148,7 +149,7 @@ const Modal = React.createClass({
                             <button type="button" onClick={this.props.close} className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             <h4 className="modal-title">{this.props.title}</h4>
                           </div>
-                          <div className="modal-body">
+                          <div style={{overflow: this.props.overflow}} className="modal-body">
                             {this.props.message}
                           </div>
                           {this.props.showConfirm?

@@ -104,6 +104,22 @@ export default Reflux.createStore({
         );
 
     },
+    onChangeDeadline(ptask, deadline){
+        this.onMethodDetail('changedeadline',
+                            this.__detaildata.hash,
+                            'POST', {
+                                ptask: ptask,
+                                deadline: deadline
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
     getRepr(){
        i++;
        let wf = WorkflowStore.getDetail();

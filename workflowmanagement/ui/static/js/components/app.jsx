@@ -50,7 +50,7 @@ const AlertQueue = React.createClass({
             return <span></span>
 
         if(alert.onConfirm){
-            return <Modal title={alert.title} message={alert.message}
+            return <Modal overflow={alert.overflow} title={alert.title} message={alert.message}
                         close={this.handleClose} showConfirm={true} success={this.askLoss} />
         }
 

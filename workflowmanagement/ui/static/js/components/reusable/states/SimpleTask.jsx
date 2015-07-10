@@ -6,7 +6,12 @@ import {SimpleState} from '../../../react-statemachine/classes.jsx';
 
 import Select from 'react-select';
 
+import StateActions from '../../../actions/StateActions.jsx';
+
 import UserActions from '../../../actions/UserActions.jsx';
+
+import ProcessActions from '../../../actions/ProcessActions.jsx';
+
 import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
@@ -401,6 +406,29 @@ class SimpleTaskRun extends SimpleTask{
                 if(!this.parent().deadline)
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
             },
+            extendDeadline(event){
+                let new_deadline,
+                    setNewDeadline = (date) => {
+                    new_deadline = moment(date).format('YYYY-MM-DDTHH:mm');
+                };
+
+                StateActions.alert({
+                    'title': `Change deadline for ${this.parent().name}`,
+                    'message': <div style={{}}>
+                            <p>Please specify the new deadline.</p>
+                            <DateTimePicker id="newdeadline" onChange={setNewDeadline}
+                                defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+                        </div>,
+                    'onConfirm': (val)=>{
+                        console.log(new_deadline);
+                        console.log(this.parent());
+
+                        ProcessActions.changeDeadline(this.parent().ptask.hash, new_deadline);
+                        //return false;
+                    },
+                    'overflow': 'visible'
+                });
+            },
             render(){
                 return <span>
                     <div key="state-assignee" className="form-group">
@@ -414,14 +442,13 @@ class SimpleTaskRun extends SimpleTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            {/*<input type="text" className="form-control"
-                                            aria-describedby="state-deadline"
-                                            id="state-deadline"
-                                            placeholder="Deadline"
-                                            onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />*/}
+                        {!editable && this.parent().assignee ?
+                            <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
+                                <i title="Extend this task deadline" className="fa fa-plus" /> Extend deadline
+                            </button>
+                        :''}
 
-                            <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
+                        <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 
                     </div>

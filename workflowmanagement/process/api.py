@@ -393,6 +393,38 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+    @detail_route(methods=['post'])
+    def changedeadline(self, request, hash=None):
+        process = self.get_object()
+
+        ptask = None
+        deadline = request.data.get('deadline', None)
+        try:
+            ptask = ProcessTask.all(process=process).get(hash=request.data.get('ptask', None))
+        except:
+            pass
+
+        if ptask and deadline:
+            pt = ProcessTaskSerializer(ptask, data={'deadline': deadline}, partial=True)
+
+            pt.is_valid(raise_exception=True)
+            pt.save()
+
+            users = [process.executioner]
+            auths = ptask.users().order_by('user').distinct('user')
+
+            for ptu in auths:
+                if ptu.user != process.executioner:
+                    users.append(ptu.user)
+
+            History.new(event=History.EDIT, actor=process.executioner,
+                object=ptask, authorized=users, related=[process])
+
+            return Response(ProcessSerializer(process).data)
+
+        return Response({'error': 'unknown'}, status=status.HTTP_400_BAD_REQUEST)
+
     @detail_route(methods=['post'])
     def canceluser(self, request, hash=None):
         try:
