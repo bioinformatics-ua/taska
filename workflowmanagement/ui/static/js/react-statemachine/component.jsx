@@ -966,7 +966,7 @@ let StateMachineComponent = React.createClass({
                                           <input type="title" className="form-control"
                                             id="exampleInputEmail1" aria-describedby="study-title"
                                             placeholder="Enter the protocol title"
-                                            onChange={this.setTitle} value={this.state.title}
+                                            onChange={this.setTitle} defaultValue={this.props.title}
                                             disabled={!this.props.editable} />
                                         </div>
                                     </div>

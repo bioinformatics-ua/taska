@@ -23,6 +23,5 @@
 
 @font-face {
     font-family: 'RwWidgets';
-    src:    url("react-widgets/dist/fonts/rw-widgets.woff"),
-            url("react-widgets/dist/fonts/rw-widgets.ttf");
+    src:    url("react-widgets/dist/fonts/rw-widgets.woff");
 }

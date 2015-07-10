@@ -150,7 +150,7 @@ const StateMachineStore = Reflux.createStore({
         console.log(`Add new state of type ${type} into level ${level}`);
         let type = this.__sm.getStateClass(type);
 
-        let new_state = this.__sm.stateFactory(level, type.Class, {type: type.id, name: this.__sm.nextFreeName()});
+        let new_state = this.__sm.stateFactory(level, type.Class, {type: type.id, name: this.__sm.nextFreeName(), 'output_resources': true});
 
         this.addHistory();
 
@@ -275,7 +275,7 @@ const StateMachineStore = Reflux.createStore({
     onSetTitle(title){
         this.__title=title;
 
-        this.trigger(true);
+        //this.trigger(true);
     },
     onInsertAbove(level){
 

@@ -262,6 +262,6 @@ export default Reflux.createStore({
         //this.trigger();
     },
     getUsers(){
-        return this.__list;
+        return this.__list || [];
     }
 });

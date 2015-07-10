@@ -70,7 +70,6 @@ class SimpleTask extends SimpleState {
                 return this.state.parent.state;
             },
             render(){
-                console.log(this.parent())
                 return <span>
                     <div key="state-descr" className="form-group">
                         <label for="state-description">Task Description</label>
@@ -257,13 +256,13 @@ class SimpleTaskRun extends SimpleTask{
                 let data = {assignee: val};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             setDeadline(e){
                 let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             cancelUser(e){
                 let action = this.state.parent.props.cancelUser;
@@ -400,27 +399,28 @@ class SimpleTaskRun extends SimpleTask{
 
                 return false;
             },
-            componentDidMount(){
+            componentWillMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                UserActions.loadSimpleListIfNecessary.triggerPromise().then(
-                    (users) => {
-                        let map = users.results.map(
-                                    entry => {
-                                        return {
-                                            value: ''+entry.id,
-                                            label: entry.fullname
+                if(this.state.users.length == 0)
+                    UserActions.loadSimpleListIfNecessary.triggerPromise().then(
+                        (users) => {
+                            let map = users.results.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
                                         }
-                                    }
-                        );
-                        if(this.isMounted()){
-                            this.setState(
-                                {
-                                    users: map
-                                }
                             );
+                            if(this.isMounted()){
+                                this.setState(
+                                    {
+                                        users: map
+                                    }
+                                );
+                            }
                         }
-                    }
                 );
 
                 if(!this.parent().deadline)
@@ -440,9 +440,6 @@ class SimpleTaskRun extends SimpleTask{
                                 defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
                         </div>,
                     'onConfirm': (val)=>{
-                        console.log(new_deadline);
-                        console.log(this.parent());
-
                         ProcessActions.changeDeadline(this.parent().ptask.hash, new_deadline);
                         //return false;
                     },
@@ -450,6 +447,13 @@ class SimpleTaskRun extends SimpleTask{
                 });
             },
             render(){
+                let users;
+                try{
+                    users = this.parent().ptask.users;
+                } catch(ex){
+                    users = [];
+                }
+
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
@@ -462,9 +466,9 @@ class SimpleTaskRun extends SimpleTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        {!editable && this.parent().assignee ?
+                        {users.length > 0 ?
                             <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
-                                <i title="Extend this task deadline" className="fa fa-plus" /> Extend deadline
+                                <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
                             </button>
                         :''}
 

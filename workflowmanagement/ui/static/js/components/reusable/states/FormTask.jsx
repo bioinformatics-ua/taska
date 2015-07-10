@@ -250,7 +250,7 @@ class FormTaskRun extends FormTask{
                 let data = {assignee: val};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             setDeadline(e){
                 let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
@@ -446,6 +446,13 @@ class FormTaskRun extends FormTask{
                 });
             },
             render(){
+                let users;
+                try{
+                    users = this.parent().ptask.users;
+                } catch(ex){
+                    users = [];
+                }
+
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
@@ -458,9 +465,9 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        {!editable && this.parent().assignee ?
+                        {users.length > 0 ?
                             <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
-                                <i title="Extend this task deadline" className="fa fa-plus" /> Change deadline
+                                <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
                             </button>
                         :''}
                         <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
