@@ -17,7 +17,6 @@ const ProcessResume = React.createClass({
     process(){
         return this.props.context.props.detail.Process.process;
     },
-
     translateResources(task){
         let files = [];
         for(let user of task.users){
@@ -69,16 +68,14 @@ const ProcessResume = React.createClass({
         let process = this.process();
 
         return (
-        <span>
-            <Tabs tabActive={1}>
-                <Tabs.Panel title={<span><i className="fa fa-file-o"></i> Outputs by Task</span>}>
-                    {this.renderTasks()}
-                </Tabs.Panel>
-                <Tabs.Panel title={<span><i className="fa fa-list-alt"></i> Log</span>}>
-                    <DetailHistoryTable hash={`process/${this.process().hash}`} />
-                </Tabs.Panel>
-            </Tabs>
-        </span>
+                <Tabs tabActive={1}>
+                    <Tabs.Panel title={<span><i className="fa fa-file-o"></i> Outputs by Task</span>}>
+                        {this.renderTasks()}
+                    </Tabs.Panel>
+                    <Tabs.Panel title={<span><i className="fa fa-list-alt"></i> Log</span>}>
+                        <DetailHistoryTable hash={`process/${this.process().hash}`} />
+                    </Tabs.Panel>
+                </Tabs>
         );
     }
 });

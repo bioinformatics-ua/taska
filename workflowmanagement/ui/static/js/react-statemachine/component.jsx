@@ -375,11 +375,11 @@ let StateMachineComponent = React.createClass({
         }
     },
     componentWillUnmount(){
-        console.log('UNMOUNT');
         this.killUI();
         if(this.props.onUnsavedExit){
             this.props.onUnsavedExit(this.getState());
         }
+        StateMachineActions.clearSelect();
     },
     componentWillUpdate(){
         this.killUI();
