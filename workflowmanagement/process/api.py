@@ -509,7 +509,7 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
         return SimpleRequestSerializer(obj.requests() ,many=True).data
 
     def get_dependencies(self, obj):
-        task_deps = obj.processtask.task.dependencies().values_list('dependency')
+        task_deps = obj.processtask.task.dependencies().filter(dependency__output_resources=True).values_list('dependency')
         process = obj.processtask.process
 
         return ProcessTaskSerializer(ProcessTask.all().filter(process=process, task__in=task_deps), many=True).data

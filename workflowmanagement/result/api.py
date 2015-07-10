@@ -84,7 +84,6 @@ class ResultSerializer(serializers.ModelSerializer):
             )
         return serializer.data
 
-
     def get_process_owner(self, obj):
         return obj.processtaskuser.processtask.process.executioner.id
 

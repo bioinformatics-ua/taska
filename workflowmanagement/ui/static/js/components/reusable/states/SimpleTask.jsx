@@ -24,6 +24,8 @@ import {stateColor} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
+import Toggle from 'react-toggle';
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -55,6 +57,11 @@ class SimpleTask extends SimpleState {
                 this.state.parent.setState({description: e.target.value});
                 this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
             },
+            setOutputResource(e){
+                console.log(e.target.checked);
+                this.state.parent.setState({'output_resources': e.target.checked});
+                this.props.dataChange(self.getIdentificator(), {'output_resources': e.target.checked}, false);
+            },
             setResources(related_resources){
                 this.state.parent.setState({resources: related_resources});
                 this.props.dataChange(self.getIdentificator(), {resources: related_resources}, false);
@@ -63,6 +70,7 @@ class SimpleTask extends SimpleState {
                 return this.state.parent.state;
             },
             render(){
+                console.log(this.parent())
                 return <span>
                     <div key="state-descr" className="form-group">
                         <label for="state-description">Task Description</label>
@@ -72,7 +80,17 @@ class SimpleTask extends SimpleState {
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
                     </div>
+
+                    <span>
+                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Pass answers down</label>
+                            <div className="form-group">
+                            <Toggle id="output_resources"
+                                    defaultChecked={this.parent()['output_resources']}
+                                    onChange={this.setOutputResource} disabled={!editable} />
+                            </div>
+                    </span>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
+
 
                         <span>
                         {(this.parent().resources && this.parent().resources.length > 0 || editable)?
@@ -115,7 +133,8 @@ class SimpleTask extends SimpleState {
             description: data.description,
             hash: data.hash,
             type: data.type,
-            resources: resources
+            resources: resources,
+            'output_resources': data['output_resources']
         };
     }
 
@@ -141,7 +160,8 @@ class SimpleTask extends SimpleState {
             sortid: this.getLevel(),
             description: this.getData().description || '',
             dependencies: deps,
-            resourceswrite: resources
+            resourceswrite: resources,
+            'output_resources': this.getData()['output_resources']
         }
     }
 }
