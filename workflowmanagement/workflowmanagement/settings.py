@@ -149,6 +149,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
     'workflowmanagement.context_processors.debug',
     'workflowmanagement.context_processors.base',
+    'workflowmanagement.context_processors.raven'
 )
 
 '''OAUTH2_PROVIDER = {
@@ -202,6 +203,8 @@ EMAIL_URL  = "http://localhost:8000"
 API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+
+RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59@biodatacenter.ieeta.pt:8866/11'
 
 try:
     from local_settings import *

@@ -58,7 +58,7 @@ class FormTask extends SimpleTask {
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
             openPopup(){
-                let add_form = window.open("form/add/headless", "Add forms", "width=800;height=300;");
+                let add_form = window.open("form/add/true", "Add forms", "width=800;height=300;");
 
                 add_form.onunload = () => {
                     let hash = add_form.formHash;

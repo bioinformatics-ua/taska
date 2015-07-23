@@ -34,6 +34,15 @@
        </script>
       </div>
     </div>
+    <script src="//d3nslu0hdya83q.cloudfront.net/dist/1.0/raven.min.js"></script>
+    <script>
+    Raven.config('{{RAVEN_URL}}').install();
+
+    Raven.setUser({
+        username: '{{user.get_full_name}}',
+        email: '{{user.email}}'
+    });
+    </script>
 
     {% if IS_DEBUG %}
     <script src="{% static "bundle.js" %}"></script>
@@ -54,8 +63,6 @@
         window.DJANGO_JS_CSRF = true;
         window.DJANGO_JS_INIT = true;
     </script>
-
-
 
     <script type="text/javascript" src='{% static "js/djangojs/django.min.js" %}'></script>
     <script>

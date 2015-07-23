@@ -54,12 +54,13 @@ function fetch(routes, params) {
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
     StateActions.loadingStart();
     fetch(state.routes, state.params).then((detail) => {
-
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    })/*.catch(
+    }).catch(
         (ex) => {
             console.log(ex);
+
+            Raven.captureException(ex);
             if(ex.status === 404){
                 React.render(<Handler failed={Http404} />, content);
                 StateActions.loadingEnd();
@@ -71,7 +72,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
                 StateActions.loadingEnd();
             }
         }
-    )*/;
+    )
 });
 
 

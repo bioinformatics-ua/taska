@@ -26,3 +26,5 @@ BASE_URL = os.environ.get('BASE_DIR', '')+'/'
 
 # I dont like this here very much but i cant make it work with nginx otherwise... on a subdirectory at least
 FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '')+'/'
+
+RAVEN_URL = os.environ.get('RAVEN_URL', 'https://af2d8ca90da047d0bdef78f674fd2e59@biodatacenter.ieeta.pt:8866/11')

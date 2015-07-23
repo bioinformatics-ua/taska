@@ -290,6 +290,7 @@ export default React.createClass({
                     validate = {params.mode === 'run'}
                     identifier={`workflow_${params.mode}page`}
 
+                    endDetail={undefined}
                     savebar={!params.mode || params.mode === 'view'? false: true}
 
                     selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run'? true: false}
