@@ -34,7 +34,12 @@ from utils.api_related import create_serializer, AliasOrderingFilter
 from process.models import ProcessTask
 
 class JSONSerializerField(serializers.Field):
+    '''Custom type of field that allows a model string field to be serialized/deserialized to and from json, nested inside
+    a django-rest-framework serializer.
+    '''
     def to_internal_value(self, data):
+        ''' Converts json to str for model saving.
+        '''
         try:
             return json.dumps(data)
 
@@ -42,6 +47,8 @@ class JSONSerializerField(serializers.Field):
             return None
 
     def to_representation(self, value):
+        ''' Converts str to json for serialization.
+        '''
         try:
             return json.loads(value)
 
@@ -49,6 +56,12 @@ class JSONSerializerField(serializers.Field):
             return None
 
 class FormSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`form.models.Form` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     schema = JSONSerializerField()
 
     class Meta:
@@ -59,6 +72,12 @@ class FormSerializer(serializers.ModelSerializer):
 
 
 class FormTaskSerializer(TaskSerializer):
+    '''Serializer to handle :class:`form.models.FormTask` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     form = serializers.SlugRelatedField(queryset=Form.all(), slug_field='hash')
     form_repr = serializers.SerializerMethodField()
 
@@ -67,9 +86,17 @@ class FormTaskSerializer(TaskSerializer):
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
     def get_form_repr(self, obj):
+        '''Includes a form serialized representation to the FormTask serializer.
+        '''
         return FormSerializer(obj.form).data
 
 class FormResultSerializer(ResultSerializer):
+    '''Serializer to handle :class:`form.models.FormResult` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     answer = JSONSerializerField()
 
     class Meta(ResultSerializer.Meta):
@@ -77,7 +104,8 @@ class FormResultSerializer(ResultSerializer):
         read_only_fields = ('workflow',)
 
 class FormFilter(django_filters.FilterSet):
-
+    '''Allows the filtering of a django-rest-framework generic viewset by the several types of fields present in a Form
+    '''
     class Meta:
         model = Form
         fields = ('hash', 'title', 'creator', 'schema', 'created_date', 'latest_update', 'public')
@@ -105,26 +133,9 @@ class FormViewSet(  mixins.CreateModelMixin,
 
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
+        ''' Custom queryset which filters all forms so only owned forms are displayed, when retrieving lists.
+        '''
         return Form.all(creator=self.request.user)
-
-    '''def get_object(self):
-        obj = None
-        try:
-            obj = Request.objects.get(
-                Q(public=True) |
-                Q(processtaskuser__processtask__process__executioner=self.request.user) |
-                Q(processtaskuser__user=self.request.user),
-                hash=self.kwargs['hash']
-            )
-        except Request.DoesNotExist:
-            pass
-
-        if obj == None:
-            raise Http404('No object')
-
-        self.check_object_permissions(self.request, obj)
-        return obj
-    '''
 
     def list(self, request, *args, **kwargs):
         """

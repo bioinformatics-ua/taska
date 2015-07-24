@@ -9,6 +9,21 @@ from utils.hashes import createHash
 
 
 class Form(models.Model):
+    '''Holds a form representation.
+
+    This class holds information such as the email notifications preferences and the prefered views.
+
+    Attributes:
+        :hash(str): Hash that represents this form publically.
+        :creator(User):  :class:`django.contrib.auth.models.User` that created this Form object.
+        :schema(str): String containing the Form schema. This should be a valid JSON dump.
+        :created_date(datetime): Date of form schema creation.
+        :latest_update(datetime): Date of last form schema update.
+        :public(boolean): Indication if this object is public or private. Public objects can be seen by all, private objects only by the creator.
+        :title(str): Short description of this form.
+        :removed(boolean): Indication if this object has been logically removed.
+
+    '''
     hash = models.CharField(max_length=50, default="ERROR")
     creator = models.ForeignKey(User)
     schema = models.TextField(blank=True, default='')
@@ -20,7 +35,8 @@ class Form(models.Model):
 
     @staticmethod
     def all(creator=None):
-        ''' Returns all valid process instances (excluding logically removed processes)
+        ''' Returns all valid Form instances (excluding logically removed forms)
+            Also allows filtering by creator.
         '''
         tmp = Form.objects.filter(removed=False)
 
@@ -34,7 +50,7 @@ class Form(models.Model):
 
 @receiver(models.signals.post_save, sender=Form)
 def __generate_form_hash(sender, instance, created, *args, **kwargs):
-    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an form.
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing a form.
     '''
     if created:
         instance.hash=createHash(instance.id)
@@ -56,6 +72,10 @@ class FormTask(Task):
     pass
 
     def get_exporter(self, mode, processtask):
+        ''' this method must override default get_exporter behaviour for a task.
+
+        Without it wouldnt be possible to know how to export a Task.
+        '''
         from export import FormResultExporter
         return FormResultExporter.getInstance(mode, processtask)
 

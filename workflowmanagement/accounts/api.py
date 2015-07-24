@@ -31,9 +31,17 @@ def root(request, format=None):
 
 # Serializers user profile
 class ProfileSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`accounts.models.Profile` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     detail_mode_repr = serializers.SerializerMethodField()
 
     def get_detail_mode_repr(self, obj):
+        '''This method serializes the detail_mode as a textual representation.
+        '''
         try:
             return dict(Profile.DETAIL_MODES)[obj.detail_mode]
         except KeyError:
@@ -47,6 +55,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 # Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`django.contrib.auth.models.User` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     fullname = serializers.SerializerMethodField(required=False)
     last_login = serializers.SerializerMethodField(required=False)
     profile = ProfileSerializer()
@@ -57,6 +71,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id', 'profile')
 
     def get_fullname(self, obj):
+        '''This method serializes the user name as a textual representation, falling back to the email when not available.
+        '''
         tmp = obj.get_full_name()
 
         if tmp == "":
@@ -64,6 +80,8 @@ class UserSerializer(serializers.ModelSerializer):
         return tmp
 
     def get_last_login(self, obj):
+        '''This method serializes the user last login date as a textual representation.
+        '''
         if isinstance(obj.last_login, basestring):
             return obj.last_login
         elif obj.last_login:
@@ -74,6 +92,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        '''This handles the custom user creation, serializating validated data from the web services input
+        into the proper object, plus also inserting profile information, all in the same serialization.
+        '''
         profile_data = None
 
         try:
@@ -97,6 +118,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        '''This handles the custom user update, serializating validated data from the web services input
+        into the proper object, plus also updating profile information, all in the same serialization.
+        '''
         profile_data = None
 
         try:
@@ -120,21 +144,20 @@ class UserSerializer(serializers.ModelSerializer):
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API for User manipulation
+    API to handle User manipulation
 
-        Note: All methods on this class only work if the user belongs to staff
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     def list(self, request, *args, **kwargs):
         """
-        Return a list of users
+        Return a list of users)
         """
         return super(UserViewSet, self).list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """
-        Insert a new user
+        Insert a new user (staff only)
         """
         return super(UserViewSet, self).create(request, *args, **kwargs)
 
@@ -146,26 +169,26 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """
-        Update a user, by id
+        Update a user, by id (staff only)
         """
         return super(UserViewSet, self).update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
         """
-        Partial Update a user, by id
+        Partial Update a user, by id (staff only)
         """
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """
-        Delete a user, by id
+        Delete a user, by id (staff only)
         """
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
 
     @list_route(methods=['get', 'patch'], permission_classes=[permissions.AllowAny])
     def me(self, request):
         """
-        Get personal account details
+        Get personal account details, if logged in.
         """
         if request.user.is_authenticated():
             try:
@@ -191,6 +214,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def check_email(self, request):
+        '''Case insensitive checks if a email is available to be registered as a username.
+        '''
         email = request.data.get('email')
 
         if email != None:
@@ -214,7 +239,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get', 'post'])
     def activate(self, request):
-
+        '''Activates an inactive user. Can only be used by staff users to activate other users.
+        '''
         email = None
 
         if request.method == 'GET':
@@ -259,6 +285,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def register(self, request):
+        ''' Allows users to register themselves. Being then put on a waiting list to be approved.
+        '''
         if request.user.is_authenticated():
             return Response({
                     'error': "An already registered user can't register new users!"
@@ -304,6 +332,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def recover(self, request):
+        ''' Allows users to ask for password recovery(which needs to be confirmed).
+        '''
         if request.user.is_authenticated():
             return Response({
                     'error': "An already logged in user can't recover a password!"
@@ -333,6 +363,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def changepassword(self, request):
+        ''' Allows users to change their own password, after confirming a password recovery.
+        '''
         if request.user.is_authenticated():
             return Response({
                     'error': "An already logged in user can't recover a password!"
@@ -367,7 +399,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def login(self, request):
         """
-            Login user
+            Logs in an user doing case insentitive validation for emails.
         """
         if not request.user.is_authenticated():
             username = request.data.get('username', None)
@@ -407,7 +439,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'])
     def logout(self, request):
         """
-            Logout a logged in user
+            Logs out a logged in user
         """
         logout(request)
 

@@ -19,12 +19,16 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 
 class Command(BaseCommand):
-
+    ''' Allows the creation of a new users using the commandline django management tool,
+        the main difference is allowing specifying the password without user interaction, so it can be used on automation
+        of deployments.
+    '''
     args = '<username> <email> <password> <is_super_user>'
     help = 'Creates a new user on the system'
 
     def createUser(self, is_super, username, email, password):
-
+        ''' Method that handles the user creation itself
+        '''
         try:
             User.objects.get(username=username)
             self.stdout.write("\nERROR:The user %s already exists, choose another username.\n\n" % username)
@@ -44,7 +48,8 @@ class Command(BaseCommand):
             user = User.objects.adduser(username, email, password)
 
     def handle(self, *args, **options):
-
+        '''Command line entry point that parses user input
+        '''
         if len(args) == 3:
             self.createUser(True, args[0], args[1], args[2])
         elif len(args) == 4:
