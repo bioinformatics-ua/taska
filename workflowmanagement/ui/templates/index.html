@@ -45,15 +45,15 @@
     </script>
 
     {% if IS_DEBUG %}
-    <script src="{% static "bundle.js" %}"></script>
+    <script src="{% static "bundle.js" %}?rev={{REVISION}}"></script>
     {% else %}
-    <script src="{% static "bundle.min.js" %}"></script>
+    <script src="{% static "bundle.min.js" %}?rev={{REVISION}}"></script>
     {% endif%}
 
     {% if IS_DEBUG %}
-    <script src="{% static "bundle_vendor.js" %}"></script>
+    <script src="{% static "bundle_vendor.js" %}?rev={{REVISION}}"></script>
     {% else %}
-    <script src="{% static "bundle_vendor.min.js" %}"></script>
+    <script src="{% static "bundle_vendor.min.js" %}?rev={{REVISION}}"></script>
     {% endif%}
 
     <script type="text/javascript" src="djangojs/init.js"></script>
