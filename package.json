@@ -55,7 +55,7 @@
     "prodjs": "browserify -d -t babelify -g [ uglifyify --no-sourcemap --screw-ie8 --bare-returns] -p [ ./workflowmanagement/ui/static/js/css_plugin.js -o ./workflowmanagement/ui/static/bundle.css ] workflowmanagement/ui/static/js/*.jsx -o workflowmanagement/ui/static/bundle.js && uglifyjs workflowmanagement/ui/static/bundle.js > workflowmanagement/ui/static/bundle.min.js",
     "prodless": "lessc ./workflowmanagement/ui/static/less/imports.less ./workflowmanagement/ui/static/css/less_bundle.css",
     "prodcss": "uglifycss ./workflowmanagement/ui/static/imports.css ./workflowmanagement/ui/static/bundle.css ./workflowmanagement/ui/static/css/*.css > ./workflowmanagement/ui/static/bundle.min.css",
-    "prodvendor": "uglifyjs ./workflowmanagement/ui/static/js/vendor/dobtco-formbuilder-vendor.js ./workflowmanagement/ui/static/js/vendor/formbuilder-min.js > ./workflowmanagement/ui/static/bundle_vendor.min.js",
+    "prodvendor": "uglifyjs ./workflowmanagement/ui/static/js/vendor/dobtco-formbuilder-vendor.js ./workflowmanagement/ui/static/js/vendor/formbuilder-min.js ./workflowmanagement/ui/static/js/vendor/formrenderer.js > ./workflowmanagement/ui/static/bundle_vendor.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

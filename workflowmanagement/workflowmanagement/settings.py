@@ -76,7 +76,9 @@ INSTALLED_APPS = (
     # Extra types of task/result
     'form',
 
-    'django_premailer'
+    'django_premailer',
+
+    'raven.contrib.django.raven_compat'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -204,15 +206,61 @@ API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
-RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59@biodatacenter.ieeta.pt:8866/11'
+RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59:b9ae2e4bb1fe4d80bd6012a7ad39720c@bioinformatics.ua.pt/sentry/11'
 
 try:
     from local_settings import *
 except:
     pass
 
+
 STATIC_URL = BASE_URL+'static/'
 
+RAVEN_CONFIG = {
+    'dsn': RAVEN_URL
+}
 
 PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}
