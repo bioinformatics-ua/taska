@@ -43,7 +43,8 @@
     "uglifyjs": "2.4.10",
     "uglifycss": "0.0.13",
     "uglifyify": "3.0.1",
-    "catw": "0.2.0"
+    "catw": "0.2.0",
+    "shell-quote": "1.4.3"
   },
   "scripts": {
     "start": "npm run watchjs & npm run watchvendor & npm run watchless & npm run watchcss",
