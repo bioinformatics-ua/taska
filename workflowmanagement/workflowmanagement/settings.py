@@ -208,13 +208,13 @@ API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
-RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59:b9ae2e4bb1fe4d80bd6012a7ad39720c@bioinformatics.ua.pt/sentry/11'
+RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59@bioinformatics.ua.pt/sentry/11'
+
 
 try:
     from local_settings import *
 except:
     pass
-
 
 STATIC_URL = BASE_URL+'static/'
 

@@ -13,6 +13,9 @@ EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', "admin@example.com")
 
 WEBPAGE_URL = os.environ.get('PUBLIC_IP', 'example.com')
+
+SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'taska')
+
 EMAIL_URL = os.environ.get('EMAIL_URL', WEBPAGE_URL)
 ALLOWED_HOSTS = [
     '.127.0.0.1',  # Allow domain and subdomains
@@ -27,4 +30,4 @@ BASE_URL = os.environ.get('BASE_DIR', '')+'/'
 # I dont like this here very much but i cant make it work with nginx otherwise... on a subdirectory at least
 FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '')+'/'
 
-RAVEN_URL = os.environ.get('RAVEN_URL', 'http://af2d8ca90da047d0bdef78f674fd2e59@bionformatics.ua.pt/sentry/11')
+RAVEN_URL = os.environ.get('RAVEN_URL', 'http://af2d8ca90da047d0bdef78f674fd2e59@bioinformatics.ua.pt/sentry/11')
