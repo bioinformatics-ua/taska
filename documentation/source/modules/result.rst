@@ -14,6 +14,7 @@ Api
 .. automodule:: result.api
     :members:
     :show-inheritance:
+    :no-index:
 
 Models
 -------------
