@@ -127,7 +127,6 @@ export default React.createClass({
                                 <div className="form-control">
                                     <span className="selectBox">
                                         <Toggle key={`ptoggle_${this.state.user.profile.notification}`}
-                                            checked={this.state.user.profile.notification}
                                             defaultChecked={this.state.user.profile.notification}
                                             onChange={this.setNotification}/>
                                     </span>

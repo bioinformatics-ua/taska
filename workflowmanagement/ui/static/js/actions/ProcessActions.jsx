@@ -13,7 +13,8 @@ const ProcessActions = Reflux.createActions(
     'calibrate': {},
     'cancel': {},
     'cancelUser': {},
-    'addUser': {}
+    'addUser': {},
+    'changeDeadline': {}
     }, DetailActionsMixin));
 
 export default ProcessActions;

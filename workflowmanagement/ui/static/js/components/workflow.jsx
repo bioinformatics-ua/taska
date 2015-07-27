@@ -26,6 +26,18 @@ import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
 import {FormTask, FormTaskRun} from './reusable/states/FormTask.jsx';
 
+const RunLabel = React.createClass({
+    render(){
+        return <table className="process-label">
+                    <tr>
+                        <td><div className="circle circle-sm circle-canceled"></div></td>
+                        <td><small>&nbsp;Waiting Configuration&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-default"></div></td>
+                        <td><small>&nbsp;Ready to Run&nbsp;&nbsp;</small></td>
+                    </tr>
+                </table>
+    }
+});
 
 export default React.createClass({
     mixins: [   Router.Navigation,
@@ -35,8 +47,8 @@ export default React.createClass({
         view: {
         },
         edit: {
-            detail: 'Drag and drop task types from below on the plus areas on the right, or click the plus areas to add new tasks.',
-            global: 'You can drag-and-drop existing tasks to move them between levels, by dragging to other levels plus areas.'
+            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your protocol, is to click in the "plus” areas on the right and add the tasks that you want.',
+            global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of other level.'
         },
         run: {
             detail: 'Please fulfill assignee and deadlines before running the protocol as a study.',
@@ -241,6 +253,7 @@ export default React.createClass({
                 :''}
                 <StateMachineComponent key={'workflow'+params.mode}
                     extra={
+                            <span>
                             <PermissionsBar
                                 link="WorkflowEdit"
                                 owner={this.state.workflow['owner_repr']}
@@ -253,9 +266,13 @@ export default React.createClass({
                                 setSearchable={this.setSearchable}
                                 setForkable={this.setForkable}
                                 object={params.object}
+                                title={this.getWorkflow().title}
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
+                            {params.mode === 'run' ?
+                                    <RunLabel />:''}
+                            </span>
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
@@ -266,11 +283,19 @@ export default React.createClass({
                     <span><i className="fa fa-floppy-o"></i> &nbsp;Save Protocol</span>
                     : <span><i className="fa fa-play"></i> Run</span>}
                     initialSm={sm}
-                    savebar={!params.mode || params.mode === 'view'? false: true}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}
                     globalHelp={this.helpMap(params.mode).global}
+
+                    validate = {params.mode === 'run'}
                     identifier={`workflow_${params.mode}page`}
+
+                    endDetail={undefined}
+                    savebar={!params.mode || params.mode === 'view'? false: true}
+
+                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run'? true: false}
+
+
                     {...this.props}/>
             </span>
         );

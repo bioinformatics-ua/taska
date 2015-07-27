@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Workflow Management for Biomedical exploration</title>
-  <meta name="description" content="Workflow Management for Biomedical exploration">
+  <title>TASKA - Workflow Management for Biomedical exploration</title>
+  <meta name="description" content="TASKA - Workflow Management for Biomedical exploration">
   <meta name="author" content="Ricardo Ribeiro">
   <base id="baseurl" href="{{BASE_URL}}" />
   <!--[if lt IE 9]>
@@ -34,15 +34,27 @@
        </script>
       </div>
     </div>
+    <script src="//d3nslu0hdya83q.cloudfront.net/dist/1.0/raven.min.js"></script>
+    <script>
+    Raven.config('{{RAVEN_URL}}').install();
+
+    Raven.setUser({
+        username: '{{user.get_full_name}}',
+        email: '{{user.email}}'
+    });
+    </script>
 
     {% if IS_DEBUG %}
-    <script src="{% static "bundle.js" %}"></script>
+    <script src="{% static "bundle.js" %}?rev={{REVISION}}"></script>
     {% else %}
-    <script src="{% static "bundle.min.js" %}"></script>
+    <script src="{% static "bundle.min.js" %}?rev={{REVISION}}"></script>
     {% endif%}
-    <script src='{% static "js/vendor/dobtco-formbuilder-vendor.js" %}'></script>
-    <script src='{% static "js/vendor/formbuilder-min.js" %}'></script>
-    <script src='{% static "js/vendor/formrenderer.js" %}'></script>
+
+    {% if IS_DEBUG %}
+    <script src="{% static "bundle_vendor.js" %}?rev={{REVISION}}"></script>
+    {% else %}
+    <script src="{% static "bundle_vendor.min.js" %}?rev={{REVISION}}"></script>
+    {% endif%}
 
     <script type="text/javascript" src="djangojs/init.js"></script>
 
@@ -52,8 +64,6 @@
         window.DJANGO_JS_CSRF = true;
         window.DJANGO_JS_INIT = true;
     </script>
-
-
 
     <script type="text/javascript" src='{% static "js/djangojs/django.min.js" %}'></script>
     <script>

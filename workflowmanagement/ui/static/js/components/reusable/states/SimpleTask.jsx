@@ -6,7 +6,12 @@ import {SimpleState} from '../../../react-statemachine/classes.jsx';
 
 import Select from 'react-select';
 
+import StateActions from '../../../actions/StateActions.jsx';
+
 import UserActions from '../../../actions/UserActions.jsx';
+
+import ProcessActions from '../../../actions/ProcessActions.jsx';
+
 import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
@@ -19,6 +24,8 @@ import {stateColor} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
+import Toggle from 'react-toggle';
+
 const dummy = React.createClass({render(){return <span></span>; }});
 
 class SimpleTask extends SimpleState {
@@ -26,10 +33,13 @@ class SimpleTask extends SimpleState {
         super(options);
     }
     static typeIcon(){
-        return <i className="fa fa-check"></i>;
+        return <i className="fa fa-cube"></i>;
     }
     static repr(){
         return 'Simple Task';
+    }
+    static title(){
+        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -46,6 +56,11 @@ class SimpleTask extends SimpleState {
             setDescription(e){
                 this.state.parent.setState({description: e.target.value});
                 this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
+            },
+            setOutputResource(e){
+                console.log(e.target.checked);
+                this.state.parent.setState({'output_resources': e.target.checked});
+                this.props.dataChange(self.getIdentificator(), {'output_resources': e.target.checked}, false);
             },
             setResources(related_resources){
                 this.state.parent.setState({resources: related_resources});
@@ -64,7 +79,17 @@ class SimpleTask extends SimpleState {
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
                     </div>
+
+                    <span>
+                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Pass answers down</label>
+                            <div className="form-group">
+                            <Toggle id="output_resources"
+                                    defaultChecked={this.parent()['output_resources']}
+                                    onChange={this.setOutputResource} disabled={!editable} />
+                            </div>
+                    </span>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
+
 
                         <span>
                         {(this.parent().resources && this.parent().resources.length > 0 || editable)?
@@ -107,7 +132,8 @@ class SimpleTask extends SimpleState {
             description: data.description,
             hash: data.hash,
             type: data.type,
-            resources: resources
+            resources: resources,
+            'output_resources': data['output_resources']
         };
     }
 
@@ -133,7 +159,8 @@ class SimpleTask extends SimpleState {
             sortid: this.getLevel(),
             description: this.getData().description || '',
             dependencies: deps,
-            resourceswrite: resources
+            resourceswrite: resources,
+            'output_resources': this.getData()['output_resources']
         }
     }
 }
@@ -144,7 +171,7 @@ class SimpleTaskRun extends SimpleTask{
     }
     is_valid(){
         let data = this.getData();
-        console.log(data);
+
         return (
             data.deadline
             && data.assignee
@@ -152,6 +179,15 @@ class SimpleTaskRun extends SimpleTask{
         );
 
     }
+
+    status(){
+        if(this.is_valid()){
+            return 'state-filled';
+        }
+
+        return '';
+    }
+
     serialize(){
         let users = [];
         let assignee = this.getData().assignee || '';
@@ -220,13 +256,13 @@ class SimpleTaskRun extends SimpleTask{
                 let data = {assignee: val};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             setDeadline(e){
                 let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             cancelUser(e){
                 let action = this.state.parent.props.cancelUser;
@@ -363,33 +399,61 @@ class SimpleTaskRun extends SimpleTask{
 
                 return false;
             },
-            componentDidMount(){
+            componentWillMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                UserActions.loadSimpleListIfNecessary.triggerPromise().then(
-                    (users) => {
-                        let map = users.results.map(
-                                    entry => {
-                                        return {
-                                            value: ''+entry.id,
-                                            label: entry.fullname
+                if(this.state.users.length == 0)
+                    UserActions.loadSimpleListIfNecessary.triggerPromise().then(
+                        (users) => {
+                            let map = users.results.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
                                         }
-                                    }
-                        );
-                        if(this.isMounted()){
-                            this.setState(
-                                {
-                                    users: map
-                                }
                             );
+                            if(this.isMounted()){
+                                this.setState(
+                                    {
+                                        users: map
+                                    }
+                                );
+                            }
                         }
-                    }
                 );
 
                 if(!this.parent().deadline)
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
             },
+            extendDeadline(event){
+                let new_deadline,
+                    setNewDeadline = (date) => {
+                    new_deadline = moment(date).format('YYYY-MM-DDTHH:mm');
+                };
+
+                StateActions.alert({
+                    'title': `Change deadline for ${this.parent().name}`,
+                    'message': <div style={{}}>
+                            <p>Please specify the new deadline.</p>
+                            <DateTimePicker id="newdeadline" onChange={setNewDeadline}
+                                defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+                        </div>,
+                    'onConfirm': (val)=>{
+                        ProcessActions.changeDeadline(this.parent().ptask.hash, new_deadline);
+                        //return false;
+                    },
+                    'overflow': 'visible'
+                });
+            },
             render(){
+                let users;
+                try{
+                    users = this.parent().ptask.users;
+                } catch(ex){
+                    users = [];
+                }
+
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
@@ -402,14 +466,13 @@ class SimpleTaskRun extends SimpleTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            {/*<input type="text" className="form-control"
-                                            aria-describedby="state-deadline"
-                                            id="state-deadline"
-                                            placeholder="Deadline"
-                                            onChange={this.setDeadline} disabled={this.parent().disabled}
-                                            value={moment(this.parent().deadline).format('YYYY-MM-DDTHH:mm')} />*/}
+                        {users.length > 0 ?
+                            <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
+                                <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
+                            </button>
+                        :''}
 
-                            <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
+                        <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 
                     </div>

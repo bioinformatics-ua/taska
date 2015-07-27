@@ -184,7 +184,7 @@ table {
     width: 50px;
 }
 .manage-td{
-    width: 110px;
+    width: 90px;
 }
 .owner-td{
     width: 160px;
@@ -704,4 +704,10 @@ table {
 
 li.is-active > a {
   cursor: default;
+}
+
+.user-owned {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 6px;
 }

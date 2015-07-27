@@ -15,3 +15,5 @@ celery==3.1.18
 html2text==2015.4.14
 django-premailer==0.1.0
 openpyxl==2.2.2
+raven==5.5.0
+dealer==2.0.4

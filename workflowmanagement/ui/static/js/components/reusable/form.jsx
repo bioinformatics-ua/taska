@@ -92,8 +92,8 @@ const FormTable = React.createClass({
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-list-ul pull-left"></i>
-                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Forms</h3>
-                <Link to="Form" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
+                <h3 className="text-center panel-title">My Forms</h3>
+                <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}  to="Form" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
                   noDataMessage={<center>You currently have no form templates, to create a new form template please click the plus button above.</center>}

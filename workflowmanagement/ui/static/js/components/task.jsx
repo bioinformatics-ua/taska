@@ -364,7 +364,7 @@ export default React.createClass({
                                                 <div className="col-md-9"></div>
                                                 <div className="col-md-3">
                                                         {this.didWrite() ?
-                                                        <Affix key={'savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+                                                        <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
                                                             <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
                                                                 <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
                                                             </button>

@@ -40,6 +40,8 @@ class Task(models.Model):
 
     resources       = models.ManyToManyField(Resource)
 
+    output_resources= models.BooleanField(default=True)
+
     class Meta:
         ordering = ['-id']
 

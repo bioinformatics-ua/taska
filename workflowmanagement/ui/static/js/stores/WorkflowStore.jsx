@@ -95,7 +95,7 @@ const WorkflowStore = Reflux.createStore({
             StateActions.alert(
                 {
                     'title':'Missing Title',
-                    'message': 'The workflow must have a title!'
+                    'message': 'The protocol must have a title!'
                 }
             );
 
@@ -112,6 +112,17 @@ const WorkflowStore = Reflux.createStore({
             if(!state.is_valid())
                 failed.push(state);
             workflow.tasks.push(state.serialize());
+        }
+
+        if(workflow.tasks.length === 0){
+            StateActions.alert(
+                {
+                    'title':'Empty protocol',
+                    'message': 'The protocol cannot be empty, try to add some tasks first.'
+                }
+            );
+
+            return;
         }
 
         if(failed.length > 0){

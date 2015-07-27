@@ -179,6 +179,7 @@ let StateMachineComponent = React.createClass({
             canUndo: StateMachineStore.canUndo(),
             canRedo: StateMachineStore.canRedo(),
             detailVisible: StateMachineStore.getDetailVisible(),
+            detailExtended: StateMachineStore.getDetailExtended()
         }
     },
     getInitialState(){
@@ -199,7 +200,10 @@ let StateMachineComponent = React.createClass({
             onUnsavedExit: undefined,
             detailHelp: "",
             globalHelp: "",
-            identifier: 'statemachine_editor'
+            identifier: 'statemachine_editor',
+            undoredo: false,
+            selectFirst: false,
+            validate: false
         };
     },
     update(data){
@@ -365,13 +369,17 @@ let StateMachineComponent = React.createClass({
     },
     componentDidMount(){
         this.__initUI();
+
+        if(this.props.selectFirst){
+            StateMachineActions.selectFirst();
+        }
     },
     componentWillUnmount(){
-        console.log('UNMOUNT');
         this.killUI();
         if(this.props.onUnsavedExit){
             this.props.onUnsavedExit(this.getState());
         }
+        StateMachineActions.clearSelect();
     },
     componentWillUpdate(){
         this.killUI();
@@ -463,6 +471,10 @@ let StateMachineComponent = React.createClass({
             StateMachineActions.clearSelect();
 
     },
+    extend(event){
+      event.stopPropagation();
+      StateMachineActions.setDetailExtended(!this.state.detailExtended);
+    },
     insertAbove(event){
         event.stopPropagation();
         let level = $(event.target).parent().data('level');
@@ -498,7 +510,11 @@ let StateMachineComponent = React.createClass({
         let getLevel = (level => {
             return level.map(state => {
                 let state_handler_class = "state-handler btn btn-default form-group";
-                let state_class = "state";
+                let state_class = 'state ';
+
+                if(this.props.validate){
+                    state_class += state.status();
+                }
 
                 if (this.state.selected == state.getIdentificator()){
                     state_class = `${state_class} state-selected`;
@@ -546,7 +562,7 @@ let StateMachineComponent = React.createClass({
 
             let state_list = this.state.sm.getStateClasses().map(
                 (stclass) => {
-                    return  <li key={stclass.id}>
+                    return  <li title={stclass.Class.title()} key={stclass.id}>
                                 <a onClick={(event) => {
                                         StateMachineActions.addState(stclass.id, prop)
                                         this.onUpdate();
@@ -757,12 +773,37 @@ let StateMachineComponent = React.createClass({
         }
         this.forceUpdate();
     },
+    valid(){
+        let states = this.state.sm.getStates();
+
+        for(let state of states){
+            if(!state.is_valid())
+                return false;
+        }
+
+        return true;
+    },
+    percentage(){
+        let states = this.state.sm.getStates();
+        let i = 0;
+
+        for(let state of states){
+            if(state.is_valid())
+                i++;
+        }
+
+        try{
+            return Math.round((i*100)/states.length);
+        } catch(err){
+            return 0;
+        }
+    },
     render(){
         let chart = this.getRepresentation();
 
         let state_list = this.state.sm.getStateClasses().map(
             (stclass) => {
-                return  <div key={stclass.id} data-type={stclass.id}
+                return  <div title={stclass.Class.title()} key={stclass.id} data-type={stclass.id}
                 className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             {stclass.Class.typeIcon()} {stclass.Class.repr()}
                         </div>;
@@ -784,10 +825,21 @@ let StateMachineComponent = React.createClass({
                 } else{
                     let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
 
-                    return <span><DRender
-                    deleteConnection={this.deleteConnection}
-                    addDependency={this.addDependency}
-                    dataChange={this.dataChange} {...this.props}/></span>;
+                    return <span>
+                        <DRender
+                        deleteConnection={this.deleteConnection}
+                        addDependency={this.addDependency}
+                        dataChange={this.dataChange} {...this.props}/>
+                        <br />
+                        <center>
+                            <button disabled={!StateMachineStore.hasPrevious()} onClick={StateMachineStore.getPrevious} className="btn btn-default">
+                                <i className="fa fa-chevron-left"></i> Previous
+                            </button>
+                            <button disabled={!StateMachineStore.hasNext()} onClick={StateMachineStore.getNext} className="btn btn-default">
+                                <i className="fa fa-chevron-right"></i> Next
+                            </button>
+                        </center>
+                    </span>;
                 }
 
             }
@@ -809,9 +861,19 @@ let StateMachineComponent = React.createClass({
             detail_seen = localStorage.getItem(`${this.props.identifier}_dtlhelp`);
             global_seen = localStorage.getItem(`${this.props.identifier}_glbhelp`);
         }
+
+        let tasklen = (this.state.detailExtended? 'col-md-12':'col-md-4');
+        let navigator = (
+          <div className="form-group">
+            <button title="Click to expand or retract this area" onClick={this.extend} className="btn btn-default pull-right">
+              {this.state.detailExtended ?<i className="fa fa-times"></i>:<i className="fa fa-expand"></i>}
+            </button>
+          </div>
+        );
         let detailMode2 = () => {
             if(this.props.editable){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
                     <h4>&nbsp;</h4>
                     <hr />
                     {this.props.detailHelp && !detail_seen ?
@@ -820,6 +882,7 @@ let StateMachineComponent = React.createClass({
                                 <strong>Help: </strong> {this.props.detailHelp}
                             </div>
                         :''}
+                    {navigator}
                     <Tabs tabActive={this.state.selected? 2: 1}
                         onAfterChange={makeDraggable}
                     >
@@ -841,7 +904,8 @@ let StateMachineComponent = React.createClass({
                     </div>);
             } else {
                 if(this.state.selected){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
+                                {navigator}
                                 {this.props.detailHelp && !detail_seen ?
                                     <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
                                         <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -874,9 +938,13 @@ let StateMachineComponent = React.createClass({
         };
 
         let mainsize='col-md-10';
+        let mainsize2='col-md-12';
 
-        if(this.props.detailMode === 2)
-            mainsize = 'col-md-8';
+        if(this.props.detailMode === 2){
+            mainsize = (this.state.detailExtended? 'hide':'col-md-8');
+            mainsize2= (this.state.detailExtended? 'hide':'col-md-12');
+
+        }
 
         return (
           <div className="react-statemachine row">
@@ -889,7 +957,7 @@ let StateMachineComponent = React.createClass({
                         :
                             otherModes()
                     }
-                        <div className={this.props.editable? `${mainsize} table-col no-select`:"col-md-12 table-col no-select"}>
+                        <div className={this.props.editable? `${mainsize} table-col no-select`:`${mainsize2} table-col no-select`}>
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="form-group">
@@ -898,7 +966,7 @@ let StateMachineComponent = React.createClass({
                                           <input type="title" className="form-control"
                                             id="exampleInputEmail1" aria-describedby="study-title"
                                             placeholder="Enter the protocol title"
-                                            onChange={this.setTitle} value={this.state.title}
+                                            onChange={this.setTitle} defaultValue={this.props.title}
                                             disabled={!this.props.editable} />
                                         </div>
                                     </div>
@@ -912,11 +980,20 @@ let StateMachineComponent = React.createClass({
                                     <strong>Help: </strong> {this.props.globalHelp}
                                 </div>
                             :''}
+                            {this.props.validate ?
+                                <div className="form-group">
+                                <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                                    <div title={`${this.percentage()}% ready`} style={{backgroundColor: '#19AB27', width: `${this.percentage()}%`, height: '10px'}}></div>
+                                    &nbsp;
+                                </div>
+                                </div>
+                            :''}
                             {this.props.savebar?
-                            <Affix key={'savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
+                            <Affix key={'component_savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
                               <div className="row">
                                     <div className="col-md-12">
                                             <span>
+                                                {this.props.undoredo ?
                                                 <div className="undoredobar pull-left btn-group" role="group">
                                                     <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
                                                         <i title="Undo action" className="fa fa-undo"></i>
@@ -925,10 +1002,13 @@ let StateMachineComponent = React.createClass({
                                                         <i title="Redo action" className="fa fa-repeat"></i>
                                                     </button>
                                                 </div>
+                                                 :''}
 
-                                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                                    {this.props.saveLabel}
-                                                </button>
+                                                 {!this.props.validate || this.valid()?
+                                                    <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                                        {this.props.saveLabel}
+                                                    </button>
+                                                :''}
                                             </span>
                                     </div>
                                     </div>

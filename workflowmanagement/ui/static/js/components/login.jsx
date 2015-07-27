@@ -74,7 +74,8 @@ export default React.createClass({
                         /*onChange={this.setRememberMe}*/ name="remember_me" type="checkbox" value="remember-me" />
                             Remember me
                         </label>
-                        {/*<a href="#" className="pull-right need-help">Forgot password? </a><span className="clearfix"></span>*/}
+                        <Link className="pull-right need-help" to="forgotten">Forgot password ?</Link>
+                        <div className="clearfix"></div>
                         </form>
                     </div>
                     <Link to="register" className="text-center new-account">Create an account </Link>

@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 BASE_URL = "/"
@@ -76,7 +77,9 @@ INSTALLED_APPS = (
     # Extra types of task/result
     'form',
 
-    'django_premailer'
+    'django_premailer',
+
+    'raven.contrib.django.raven_compat'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -149,6 +152,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
     'workflowmanagement.context_processors.debug',
     'workflowmanagement.context_processors.base',
+    'workflowmanagement.context_processors.raven',
+    'dealer.contrib.django.context_processor'
 )
 
 '''OAUTH2_PROVIDER = {
@@ -203,13 +208,61 @@ API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
+RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59:b9ae2e4bb1fe4d80bd6012a7ad39720c@bioinformatics.ua.pt/sentry/11'
+
 try:
     from local_settings import *
 except:
     pass
 
+
 STATIC_URL = BASE_URL+'static/'
 
+RAVEN_CONFIG = {
+    'dsn': RAVEN_URL
+}
 
 PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}

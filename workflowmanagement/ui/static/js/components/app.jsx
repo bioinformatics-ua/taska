@@ -50,7 +50,7 @@ const AlertQueue = React.createClass({
             return <span></span>
 
         if(alert.onConfirm){
-            return <Modal title={alert.title} message={alert.message}
+            return <Modal overflow={alert.overflow} title={alert.title} message={alert.message}
                         close={this.handleClose} showConfirm={true} success={this.askLoss} />
         }
 
@@ -173,7 +173,7 @@ export default React.createClass({
     let headless = this.context.router.getCurrentParams().headless;
     return (
         <div>
-          {headless ?
+          {headless == 'true' ?
           <header>
               <nav className="navbar navbar-default navbar-fixed-top">
                 <div className="container">
@@ -224,7 +224,7 @@ export default React.createClass({
             <Affix className={'breadbar'} offset={36}>
               <div className="row">
                   <div className="col-md-10 pull-left">
-                      <Breadcrumbs separator='' {...this.props} />
+                     <Breadcrumbs separator='' {...this.props} />
                   </div>
                   <LoadingBar />
               </div>
@@ -237,7 +237,7 @@ export default React.createClass({
               </div>
             </div>
           </div>
-          {headless ? '':
+          {headless == 'true' ? '':
           <footer> <a href="http://www.ua.pt"><img src="static/images/logo-ua2.png" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
           <a href="http://bioinformatics.ua.pt"><img src="static/images/bioinformatics.png" /></a></footer>
           }

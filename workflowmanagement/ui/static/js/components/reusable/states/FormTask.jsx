@@ -8,7 +8,12 @@ import Select from 'react-select';
 
 import FormActions from '../../../actions/FormActions.jsx';
 
+import StateActions from '../../../actions/StateActions.jsx';
+
 import UserActions from '../../../actions/UserActions.jsx';
+
+import ProcessActions from '../../../actions/ProcessActions.jsx';
+
 import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
@@ -26,6 +31,9 @@ class FormTask extends SimpleTask {
     }
     static repr(){
         return 'Form Task';
+    }
+    static title(){
+        return "Do you know what is a form tasks? Basically you can do a questionnaire or survey for the users and know the answers. You will be able to export the answers to your statistic application. ";
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -50,7 +58,7 @@ class FormTask extends SimpleTask {
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
             openPopup(){
-                let add_form = window.open("form/add/headless", "Add forms", "width=800;height=300;");
+                let add_form = window.open("form/add/true", "Add forms", "width=800;height=300;");
 
                 add_form.onunload = () => {
                     let hash = add_form.formHash;
@@ -98,7 +106,7 @@ class FormTask extends SimpleTask {
                         <div key="state-form" className="form-group">
                             <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" />
                             </label>
-                                                            {editable ?
+                                {editable ?
                                 <button className="pull-right btn btn-xs btn-success" onClick={this.openPopup}>
                                     <i title="Add new form" className="fa fa-plus" /> Add new Form
                                 </button>
@@ -142,7 +150,6 @@ class FormTask extends SimpleTask {
     is_valid(){
         if(super.is_valid()){
             let data = this.getData();
-            console.log(data);
             return data.form != undefined;
         }
 
@@ -154,6 +161,25 @@ class FormTask extends SimpleTask {
 class FormTaskRun extends FormTask{
     constructor(options){
         super(options);
+    }
+
+    is_valid(){
+        let data = this.getData();
+
+        return (
+            data.deadline
+            && data.assignee
+            && data.assignee.split(',').length > 0
+        );
+
+    }
+
+    status(){
+        if(this.is_valid()){
+            return 'state-filled';
+        }
+
+        return '';
     }
 
     serialize(){
@@ -224,7 +250,7 @@ class FormTaskRun extends FormTask{
                 let data = {assignee: val};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             setDeadline(e){
                 let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
@@ -396,7 +422,37 @@ class FormTaskRun extends FormTask{
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
 
             },
+            extendDeadline(event){
+                let new_deadline,
+                    setNewDeadline = (date) => {
+                    new_deadline = moment(date).format('YYYY-MM-DDTHH:mm');
+                };
+
+                StateActions.alert({
+                    'title': `Change deadline for ${this.parent().name}`,
+                    'message': <div style={{}}>
+                            <p>Please specify the new deadline.</p>
+                            <DateTimePicker id="newdeadline" onChange={setNewDeadline}
+                                defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+                        </div>,
+                    'onConfirm': (val)=>{
+                        console.log(new_deadline);
+                        console.log(this.parent());
+
+                        ProcessActions.changeDeadline(this.parent().ptask.hash, new_deadline);
+                        //return false;
+                    },
+                    'overflow': 'visible'
+                });
+            },
             render(){
+                let users;
+                try{
+                    users = this.parent().ptask.users;
+                } catch(ex){
+                    users = [];
+                }
+
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
@@ -409,6 +465,11 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                        {users.length > 0 ?
+                            <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
+                                <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
+                            </button>
+                        :''}
                         <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 

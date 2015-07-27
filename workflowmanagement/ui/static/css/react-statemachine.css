@@ -103,7 +103,8 @@
 .state-handler-selected, .state_line_selected{
 /*  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(51, 122, 183, 0.61);
   outline: 0 none;*/
-  background-color: #798d8f;
+    background-color: #4a5758;
+    border: 3px solid #4a5758 !important;
 }
 
 .line-options{
@@ -237,4 +238,17 @@
 
 .smalert {
     z-index: 1001;
+}
+
+.ui-state-hover{
+    background-color: #f39c12 !important;
+    color: white;
+    border-color: black;
+    cursor: cell;
+}
+
+.state-filled .state-handler {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid rgb(149, 165, 166);
 }
