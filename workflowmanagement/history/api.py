@@ -41,6 +41,12 @@ class GenericObjectField(serializers.RelatedField):
 
 # Serializers define the API representation.
 class HistorySerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`history.models.History` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     object = GenericObjectField(read_only=True)
     event = serializers.SerializerMethodField()
     object_type = serializers.SerializerMethodField()
@@ -53,15 +59,23 @@ class HistorySerializer(serializers.ModelSerializer):
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
     def get_object_repr(self, obj):
+        '''Polymorphically returns the textual representation(each object decides how to represent itself)
+        '''
         return obj.obj_repr()
 
     def get_event(self, obj):
+        '''Returns a textual representation of the event that ocurred over the object being logged.
+        '''
         return dict(History.EVENTS)[obj.event]
 
     def get_object_type(self, obj):
+        '''Returns a textual representation of the type of object, typically the class name.
+        '''
         return obj.object.__class__.__name__
 
     def get_actor_repr(self, obj):
+        '''Returns a textual representation of the actor playing the action.
+        '''
         return obj.actor.get_full_name() or obj.actor.email
 
 # ViewSets define the view behavior.
@@ -81,70 +95,32 @@ class HistoryViewSet(   mixins.ListModelMixin,
 
     def list(self, request, *args, **kwargs):
         """
-        Return a list of history over all system
+        Return a list of user-related history, across all the system.
 
         """
         return super(HistoryViewSet, self).list(request, args, kwargs)
 
-    '''@detail_route(methods=['get'])
-    def request(self, request, pk=None):
-        """
-        Return a list of history for a given request object by hash
-        """
-        from process.models import Request
-
-        return self.__filterHistory(Request, pk)
-
-    @detail_route(methods=['get'])
-    def process(self, request, pk=None):
-        """
-        Return a list of history for a given process object by hash
-        """
-        from process.models import Process
-
-        return self.__filterHistory(Process, pk)
-
-    @detail_route(methods=['get'])
-    def workflow(self, request, pk=None):
-        """
-        Return a list of history for a given workflow object by hash
-        """
-        from workflow.models import Workflow
-
-        return self.__filterHistory(Workflow, pk)
-
-    @detail_route(methods=['get'])
-    def task(self, request, pk=None):
-        """
-        Return a list of history for a given task object by hash
-        """
-        from tasks.models import Task
-
-        return self.__filterHistory(Task, pk)
-
-    @detail_route(methods=['get'])
-    def result(self, request, pk=None):
-        """
-        Return a list of history for a given result object by hash
-        """
-        from result.models import Result
-
-        return self.__filterHistory(Result, pk)
-    '''
     def __filterHistory(self, Model, pk):
+        '''Internal class that handles the creation of the History  Serializer based on the object type, and its public hash.
 
+            DEPRECATED: In favor of :class:`history.api.FilteredHistory`
+        '''
         serializer = HistorySerializer(many=True, instance=History.type(Model, pk))
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class FilteredHistory(generics.ListAPIView):
+    '''
+        Listing API view that handles filtering the generic history, based on a set of parameters.
+    '''
     queryset = History.objects.none()
     serializer_class = HistorySerializer
     filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
     ordering_fields = ('event', 'date', 'actor')
     ordering_map = {
     }
+    # map of possible history filters
     type_map = {
         'process': 'process.Process',
         'request': 'process.Request',
@@ -154,7 +130,7 @@ class FilteredHistory(generics.ListAPIView):
     }
     def get_queryset(self):
         """
-            Retrieves a list of user assigned process tasks
+            Retrieves the proper object to filter the history by
         """
         kwargs = self.request.parser_context['kwargs']
 

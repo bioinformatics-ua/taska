@@ -1,6 +1,8 @@
 Material Package
 ================
 
+.. automodule:: material
+
 Admin
 -------------
 

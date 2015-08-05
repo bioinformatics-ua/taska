@@ -9,6 +9,13 @@ from django.contrib.contenttypes.models import ContentType
 import django.dispatch
 
 class HistoryRelated(models.Model):
+    '''
+        Describes an indirect relationship with the object, which makes the history relevant, not directly, but in scope.
+        An example of related history, is for example, the history about a ProcessTask, being related with the history from a Process. It may make sense to see related history when seeing the process, but not the other way around.
+
+    Attributes:
+        :object (Model): Any model that inherits from :class:`django.models.Model`
+    '''
     # related object reference
     object_type     = models.ForeignKey(ContentType)
     object_id       = models.PositiveIntegerField()
@@ -29,6 +36,7 @@ class History(models.Model):
         :date (datetime): Date the action was realized
         :object (Model): Any model that inherits from :class:`django.models.Model`
         :authorized (User[]): :class:`django.contrib.auth.models.User` authorized users with acccess to this history
+        :related (ObjectRelated): :class:`history.models.HistoryRelated` related objects to this history
 
     '''
     # Event literals, representing the translation to the possible events the history log can be in
@@ -72,9 +80,16 @@ class History(models.Model):
         ordering = ["-id"]
 
     def obj_repr(self):
+        """
+            Returns a representation of the generic object
+        """
         return self.object.__unicode__()
 
     def actor_repr(self):
+        """
+            Returns textual representation of the actor,
+            preferably a full name, but an email if no name is available.
+        """
         tmp = self.actor.get_full_name()
 
         if tmp != None:
