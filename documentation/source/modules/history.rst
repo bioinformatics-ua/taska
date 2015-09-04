@@ -1,6 +1,8 @@
 History Package
 ===============
 
+.. automodule:: history
+
 Admin
 -------------
 

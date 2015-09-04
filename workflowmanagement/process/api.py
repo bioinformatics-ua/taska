@@ -49,6 +49,12 @@ Process related api calls available
 '''
 
 class ProcessTaskUserSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`process.models.ProcessTaskUser` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     user_repr = serializers.SerializerMethodField()
 
     class Meta:
@@ -58,6 +64,10 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'hash': {'required': False}}
 
     def get_user_repr(self, obj):
+        '''Returns a textual representation of the user playing the action.
+
+            Preferably the user full name, but falling back to the email in case this does not exist.
+        '''
         tmp = unicode(obj.user.get_full_name())
 
         if not tmp:
@@ -66,6 +76,14 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         return tmp
 
 class PTUWithResult(ProcessTaskUserSerializer):
+    '''Serializer to handle :class:`process.models.ProcessTaskUser` objects serialization/deserialization.
+
+    This serializer, beside the usual fields, also includes the result, as nested serializer.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     result = serializers.SerializerMethodField()
 
     def get_result(self, obj):
@@ -78,6 +96,12 @@ class PTUWithResult(ProcessTaskUserSerializer):
         return None
 
 class ProcessTaskSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     task = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
     task_repr = serializers.SerializerMethodField()
 
@@ -91,13 +115,24 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
         extra_kwargs = {'hash': {'required': False}}
 
     def get_deadline_repr(self, obj):
+        '''
+            Returns a ISO 8601 formatted date representation for this processtask deadline
+        '''
         return obj.deadline.strftime("%Y-%m-%dT%H:%M")
 
     def get_task_repr(self, obj):
+        '''
+            Returns a textual representation for the task this process task represents
+        '''
         return obj.task.title
 
     @transaction.atomic
     def create(self, validated_data):
+        '''
+            Handles the creation of ProcessTask entries.
+
+            Returns the created ProcessTask object
+        '''
         users_data = None
 
         try:
@@ -128,6 +163,11 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        '''
+            Handles the update of ProcessTask entries.
+
+            Returns the updated ProcessTask object
+        '''
         users_data = None
 
         try:
@@ -158,6 +198,12 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
 
 # Serializers define the API representation.
 class ProcessSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`process.models.Process` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     tasks = ProcessTaskSerializer(many=True, required=False)
     workflow = serializers.SlugRelatedField(slug_field='hash', queryset=Workflow.objects)
     start_date = serializers.SerializerMethodField()
@@ -172,19 +218,36 @@ class ProcessSerializer(serializers.ModelSerializer):
         extra_kwargs = {'hash': {'required': False}}
 
     def get_progress(self, obj):
+        '''
+            Returns the process completion percentage, calculated from completed tasks
+        '''
         return obj.progress()
 
     def get_start_date(self, obj):
+        '''
+            Returns a ISO 8601 formatted date representation for this process start date
+        '''
         return obj.start_date.strftime("%Y-%m-%d %H:%M")
 
     def get_object_repr(self, obj):
+        '''
+            Returns a textual representation of this Process workflow
+        '''
         return unicode(obj.workflow)
 
     def get_status_repr(self, obj):
+        '''
+            Returns a textual representation of this process current status
+        '''
         return Process.statusCode(obj.status)
 
     @transaction.atomic
     def create(self, validated_data):
+        '''
+            Handles the creation of Process entries.
+
+            Returns the created Process object
+        '''
         tasks_data = None
 
         try:
@@ -193,9 +256,6 @@ class ProcessSerializer(serializers.ModelSerializer):
             pass
 
         process = Process.objects.create(**validated_data)
-
-        for task in tasks_data:
-            print task
 
         # create tasks (if any are passed by this webservice)
         if tasks_data:
@@ -212,6 +272,11 @@ class ProcessSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        '''
+            Handles the update of Process entries.
+
+            Returns the updated Process object
+        '''
         tasks_data = None
 
         try:
@@ -242,6 +307,12 @@ class ProcessSerializer(serializers.ModelSerializer):
 
 
 class DetailProcessSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`process.models.Process` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     tasks = ProcessTaskSerializer(many=True)
     workflow = serializers.SlugRelatedField(slug_field='hash', queryset=Workflow.objects)
 
@@ -251,6 +322,10 @@ class DetailProcessSerializer(serializers.ModelSerializer):
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
 class ProcessFilter(django_filters.FilterSet):
+    '''
+        Process Filter that allows to filter the process viewset by a variety of fields
+        such as `workflow`, `hash`, `start_date`, `end_date` ,`status` and `executioner`.
+    '''
     class Meta:
         model = Process
         fields = ['workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner']
@@ -334,7 +409,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         """
-        Delete a process, by id
+        Logical delete a process, by id
         """
         instance = self.get_object()
 
@@ -349,6 +424,9 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['get'])
     def cancel(self, request, hash=None):
+        """
+        Cancel a process, marking all current executing and waiting tasks as canceled.
+        """
         process = self.get_object()
         process.cancel()
 
@@ -358,6 +436,9 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['post'])
     def adduser(self, request, hash=None):
+        """
+        Add a new user to a process, for a task that is either executing or waiting execution.
+        """
         process = self.get_object()
 
         ptask = None
@@ -393,6 +474,9 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['post'])
     def changedeadline(self, request, hash=None):
+        """
+        Change the deadline for a process task conclusion
+        """
         process = self.get_object()
 
         ptask = None
@@ -424,12 +508,15 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['post'])
     def canceluser(self, request, hash=None):
+        """
+        Cancel a specific user task on a process task.
+        """
         try:
             ptask = ProcessTaskUser.objects\
                     .get(processtask__hash=request.data['ptask'],
                          user__id=request.data['user']
                     )
-            print request.data['val']
+
             if request.data['val'] == True:
                 ptask.reassign()
             else:
@@ -441,6 +528,12 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         return Response(ProcessSerializer(self.get_object()).data)
 
 class MyProcessTaskSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     type = serializers.SerializerMethodField()
     process = serializers.SerializerMethodField()
     process_repr = serializers.SerializerMethodField()
@@ -512,6 +605,9 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
         return ProcessTaskSerializer(ProcessTask.all().filter(process=process, task__in=task_deps), many=True).data
 
 class MyTasks(generics.ListAPIView):
+    """
+        Returns a list of user attributed process tasks across all processes
+    """
     queryset = ProcessTaskUser.objects.none()
     serializer_class = MyProcessTaskUserSerializer
     filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)

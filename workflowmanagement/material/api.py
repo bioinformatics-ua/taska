@@ -37,23 +37,38 @@ from django.shortcuts import render
 import json
 
 class GenericResourceSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`material.models.Resource` objects serialization/deserialization.
 
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     type = serializers.CharField(write_only=True)
 
     def to_representation(self, obj):
+        ''' Converts str to json for serialization.
+        '''
         return obj.to_representation(obj)
 
     def create(self, data):
+        ''' Creates a new resource, by delegating to the several
+        Resource Serializer implementations how to do it.
+        '''
         serializer = data.pop('serializer')
 
         return serializer.create(data)
 
     def update(self, instance, data):
+        ''' Updates resource, by delegating to the several
+        Resource Serializer implementations how to do it.
+        '''
         serializer = data.pop('serializer')
 
         return serializer.update(instance, data)
 
     def to_internal_value(self, data):
+        ''' Converts json to str for model saving.
+        '''
         if data.get('type', False):
             this_model = apps.get_model(data.pop('type'))
 
@@ -69,9 +84,19 @@ class GenericResourceSerializer(serializers.ModelSerializer):
         model = Resource
 
 class ResourceCommentSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`material.models.ResourceComment` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     user_repr = serializers.SerializerMethodField()
 
     def get_user_repr(self, obj):
+        '''
+            Returns a user representation, preferably a full name, but falling by to the
+            email if no full name is available.
+        '''
         return obj.user.get_full_name() or obj.user.email
 
     class Meta:
@@ -80,15 +105,28 @@ class ResourceCommentSerializer(serializers.ModelSerializer):
 
 # Serializers define the API representation.
 class ResourceSerializer(serializers.ModelSerializer):
+    '''Serializer to handle :class:`material.models.Resource` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
     type = serializers.SerializerMethodField()
     creator_repr = serializers.SerializerMethodField()
     #comments = serializers.SerializerMethodField()
 
     def get_type(self, obj):
+        '''
+            Returns polymorphically the Resource specific type.
+        '''
         return obj.type()
 
     def get_creator_repr(self, obj):
-        return obj.creator.get_full_name()
+        '''
+            Returns a user representation, preferably a full name, but falling by to the
+            email if no full name is available.
+        '''
+        return obj.creator.get_full_name() or obj.creator.email
 
     #def get_comments(self, obj):
     #    return ResourceCommentSerializer(obj.resourcecomment_set, many=True).data
@@ -116,11 +154,20 @@ class ResourceSerializer(serializers.ModelSerializer):
         extra_kwargs = {'hash': {'required': False} }
 
 class FileSerializer(ResourceSerializer):
+    '''Serializer to handle :class:`material.models.File` objects serialization/deserialization.
+
+    This class is used by django-rest-framework to handle all object conversions, to and from json,
+    while allowing in the future to change this format with any other without losing the abstraction.
+
+    '''
+
     path = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
 
     def get_path(self, obj):
-
+        '''
+            Returns the path where this file is kept
+        '''
         baseurl = reverse('resource-detail', kwargs={
                 'hash': obj.hash
             })
@@ -128,6 +175,9 @@ class FileSerializer(ResourceSerializer):
         return '%sdownload/' % (baseurl)
 
     def get_size(self, obj):
+        '''
+            Returns this file size
+        '''
         return obj.file.size
 
     class Meta(ResourceSerializer.Meta):
@@ -136,6 +186,10 @@ class FileSerializer(ResourceSerializer):
         extra_kwargs = {'hash': {'required': False}, 'file': {'required': False} }
 
 class ResourceFilter(django_filters.FilterSet):
+    '''
+        Resource Filter that allows to filter the resource viewset by a variety of fields
+        such as `hash`, `create_date`, `latest_update` and `type`.
+    '''
     type = django_filters.CharFilter(name="ttype")
     class Meta:
         model = Resource
@@ -215,6 +269,9 @@ class ResourceViewSet(
 
     @detail_route(methods=['get'])
     def download(self, request, hash):
+        '''
+            Downloads a resource of the type File, if the resource is of other type, no content is returned.
+        '''
         # get the file
         servefile = Resource.all().get(hash=hash)
 
@@ -228,6 +285,10 @@ class ResourceViewSet(
 
     @detail_route(methods=['get', 'post'])
     def comment(self, request, hash):
+        '''
+            Either returns a list of all comments on a given result, when the type of request is get_full_name
+            or adds a new comment if the request method is 'post'
+        '''
         # get the file
         servefile = Resource.all().get(hash=hash)
 
@@ -290,12 +351,22 @@ class BinaryParser(BaseParser):
         return DjangoFile(tmp)
 
 class FileUpload(generics.CreateAPIView):
+    '''
+        GenericView that allows the creation of :class:`material.models.File` objects.
+
+        The file upload is expected to be made with mimetype 'application/octet-stream' the filename should be passed through
+        meta request variable HTTP_X_FILE_NAME.
+
+    '''
     queryset = File.objects.none()
     serializer_class = FileSerializer
     lookup_field = 'hash'
     parser_classes = (BinaryParser,)
 
     def __serializeFile(self, name, creator, this_file):
+        '''
+            Serializes a file, creating a File object
+        '''
         data = {
             'filename': name,
             'type': 'material.File',

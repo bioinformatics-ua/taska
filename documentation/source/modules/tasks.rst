@@ -1,6 +1,8 @@
 Tasks Package
 =============
 
+.. automodule:: tasks
+
 Admin
 -------------
 

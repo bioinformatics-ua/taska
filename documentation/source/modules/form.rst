@@ -1,5 +1,8 @@
-form Package
+Form Package
 ================
+
+.. automodule:: form
+
 
 Admin
 -------------

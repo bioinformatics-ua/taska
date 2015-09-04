@@ -1,6 +1,8 @@
 Utils Package
 =============
 
+.. automodule:: utils
+
 Admin
 -------------
 
