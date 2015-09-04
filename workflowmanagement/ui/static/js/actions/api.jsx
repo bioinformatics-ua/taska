@@ -16,8 +16,25 @@ class Loader{
     }
 
     load(url, callback, unsuccessful_callback=null, type="GET", serialized={}){
+      let headers = {};
+      if(type != 'GET'){
+        /*$.ajax({
+            headers: {
+                'X-HTTP-Method-Override': 'PATCH'
+            },
+            type : "POST",
+        ...
+        });*/
+        headers = {
+          'X-HTTP-Method-Override': type
+        };
+
+        type="POST";
+      }
+
       return new Promise(function(fulfill, reject){
         $.ajax({
+            headers: headers,
             url: url,
             type: type,
             data: serialized,

@@ -332,6 +332,9 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['get'])
     def fork(self, request, hash=None):
+        """
+        Duplicates a public or owned workflow, returning the duplicate
+        """
         workflow = self.get_object()
 
         if workflow.permissions().forkable:

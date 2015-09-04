@@ -125,7 +125,7 @@ class FilteredHistory(generics.ListAPIView):
         'process': 'process.Process',
         'request': 'process.Request',
         'workflow': 'workflow.Workflow',
-        'task': 'task.Task',
+        'task': 'tasks.Task',
         'result': 'result.Result'
     }
     def get_queryset(self):

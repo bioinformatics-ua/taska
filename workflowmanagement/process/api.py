@@ -605,6 +605,9 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
         return ProcessTaskSerializer(ProcessTask.all().filter(process=process, task__in=task_deps), many=True).data
 
 class MyTasks(generics.ListAPIView):
+    """
+        Returns a list of user attributed process tasks across all processes
+    """
     queryset = ProcessTaskUser.objects.none()
     serializer_class = MyProcessTaskUserSerializer
     filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
