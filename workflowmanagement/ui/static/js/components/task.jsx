@@ -367,6 +367,7 @@ export default React.createClass({
                             </div>
                             <div className="clearfix row">
                                 <div className="col-md-12">
+                                    {this.state.task.processtask.status > 1?
                                     <Tabs>
                                         <Tabs.Panel
                                         title={<span><i className="fa fa-tasks"></i> &nbsp;Answer</span>}>
@@ -400,6 +401,13 @@ export default React.createClass({
                                             />
                                         </Tabs.Panel>
                                     </Tabs>
+                                    :
+                                    <div>
+                                        <center><h4>
+                                        This task is scheduled to be executed by you, but is waiting that other intervenients finish their own tasks, which your task depends upon.
+                                        </h4></center>
+                                    </div>
+                                    }
                                 </div>
                             </div>
                         </div>

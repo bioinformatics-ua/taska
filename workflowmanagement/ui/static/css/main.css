@@ -180,6 +180,10 @@ table {
     margin-bottom: 0;
 }
 
+.tasktab-container table{
+    margin: 0 !important;
+}
+
 .event-td{
     width: 50px;
 }
@@ -710,4 +714,9 @@ li.is-active > a {
   display: inline-block;
   vertical-align: middle;
   padding: 0 6px;
+}
+
+.tasktab-container {
+  padding: 0;
+  padding-top: 40px;
 }
