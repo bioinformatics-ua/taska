@@ -13,7 +13,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
         tcn+= dict(instance.__class__.EVENTS)[instance.event].title()+'Template'
 
         tcn = tcn.replace(' ', '')
-        print tcn
+
         try:
             tc = getattr(mailing, tcn)
             tci = None
@@ -24,7 +24,8 @@ def newHistoryNotifications(sender, instance, **kwargs):
             else:
                 tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
-            sendEmail.apply_async([tci])
+            sendEmail.apply_async([tci], countdown=5)
+            #sendEmail(tci)
 
         except AttributeError:
             # Silently ignore, when the template is not defined we just don't send the notification

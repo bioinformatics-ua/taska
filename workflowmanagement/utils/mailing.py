@@ -23,6 +23,11 @@ class MailTemplate:
     def render(self, interested):
         self.is_valid()
 
+        link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
+
+        if link_delegate != None:
+            link_delegate = link_delegate(self.instance.object)
+
         subject = render_to_string(self.subjecttemplate, {
                             'object': self.instance.object,
                             'history': self.instance,
@@ -34,6 +39,7 @@ class MailTemplate:
                 'object': self.instance.object,
                 'history': self.instance,
                 'settings': settings,
+                'link_delegate': link_delegate,
                 'user': interested
             })
 

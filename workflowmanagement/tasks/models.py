@@ -104,6 +104,9 @@ class Task(models.Model):
 
         return tmp
 
+    def subclass(self):
+        return Task.objects.get_subclass(id=self.id)
+
     @staticmethod
     def getPossibleDependencies(workflow, task=None):
         ''' Gives the possible dependencies for a Task, given a workflow.

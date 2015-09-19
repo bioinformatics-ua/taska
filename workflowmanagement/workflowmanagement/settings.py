@@ -208,8 +208,24 @@ API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
-RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59@bioinformatics.ua.pt/sentry/11'
+RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'
 
+INCLUDE_EMAIL_LINKS = True
+
+def ptask_path(obj):
+    task = obj.task.subclass()
+
+    if(task.type() == 'tasks.SimpleTask'):
+        return BASE_URL+'simpletask/'+obj.hash
+
+    if(task.type() == 'form.FormTask'):
+        return BASE_URL+'formtask/'+obj.hash
+
+    return None
+
+MAIL_LINKS = {
+    "ProcessTaskAddTemplate":  ptask_path
+}
 
 try:
     from local_settings import *
