@@ -22,7 +22,7 @@ let fr;
 
 class FormTask extends Task{
     getTypeRepr(){
-        return <span><i className='fa fa-cube'></i> Simple Task</span>;
+        return <span><i className='fa fa-list'></i> Form Task</span>;
     }
     changeComment(e){
         super.setAnswer('comment', e.target.value);

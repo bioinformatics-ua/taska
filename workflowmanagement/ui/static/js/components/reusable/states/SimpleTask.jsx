@@ -54,8 +54,14 @@ class SimpleTask extends SimpleState {
                 return this.getState();
             },
             setDescription(e){
+                console.log('SET DESCR');
                 this.state.parent.setState({description: e.target.value});
                 this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
+            },
+            setEffort(e){
+                console.log('SET EFFORT');
+                this.state.parent.setState({effort: Number.parseFloat(e.target.value)});
+                this.props.dataChange(self.getIdentificator(), {effort: Number.parseFloat(e.target.value)}, false);
             },
             setOutputResource(e){
                 console.log(e.target.checked);
@@ -78,6 +84,13 @@ class SimpleTask extends SimpleState {
                                             placeholder="Enter the state description here"  disabled={!editable}
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
+                    </div>
+
+                    <div key="state-effort" className="form-group">
+                        <label for="state-effort">Required Effort (in hours)</label>
+                            <input type="number" min="0" id="state-effort" className="form-control"
+                                            aria-describedby="state-effort" disabled={!editable}
+                                            onChange={this.setEffort} value={(this.parent().effort)?this.parent().effort:1} />
                     </div>
 
                     <span>
@@ -130,6 +143,7 @@ class SimpleTask extends SimpleState {
         return {
             name: data.title,
             description: data.description,
+            effort: data.effort,
             hash: data.hash,
             type: data.type,
             resources: resources,
@@ -158,6 +172,7 @@ class SimpleTask extends SimpleState {
             type: this.getData().type,
             sortid: this.getLevel(),
             description: this.getData().description || '',
+            effort: this.getData().effort || 1,
             dependencies: deps,
             resourceswrite: resources,
             'output_resources': this.getData()['output_resources']

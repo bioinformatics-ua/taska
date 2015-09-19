@@ -320,7 +320,7 @@ export default React.createClass({
                                     }
 
                                 </div>
-                                 <div className="col-md-12">
+                                 <div className="col-md-9">
                                         <div className="form-group">
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Description</strong></span>
@@ -329,7 +329,17 @@ export default React.createClass({
                                               </span>
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                        <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Required Effort</strong></span>
+                                              <span disabled style={{float: 'none'}} className="form-control">
+                                                {this.state.task.processtask.parent.effort} hours
+                                              </span>
+                                            </div>
+                                        </div>
+                                </div>
                                 {this.state.answer.hash?(
                                     <div className="col-md-12">
                                         <div className="row">
