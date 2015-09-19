@@ -194,6 +194,7 @@ let StateMachineComponent = React.createClass({
     getDefaultProps() {
         return {
             editable: true,
+            editTitle: false,
             detailMode: 0,
             blockSchema: false,
             onUpdate: undefined,
@@ -967,11 +968,13 @@ let StateMachineComponent = React.createClass({
                                             id="exampleInputEmail1" aria-describedby="study-title"
                                             placeholder="Enter the protocol title"
                                             onChange={this.setTitle} defaultValue={this.props.title}
-                                            disabled={!this.props.editable} />
+                                            disabled={!(this.props.editTitle || this.props.editable)} />
                                         </div>
                                     </div>
                                     {this.props.extra}
                                     <hr />
+
+
                                 </div>
                               </div>
                             {this.props.globalHelp && !global_seen ?

@@ -44,6 +44,7 @@ class Process(models.Model):
             (OVERDUE,   'Process has gone over end_date')
         )
     workflow        = models.ForeignKey(Workflow)
+    title           = models.CharField(max_length=200, null=True)
     executioner     = models.ForeignKey(User)
     hash            = models.CharField(max_length=50, unique=True)
     start_date      = models.DateTimeField(auto_now_add=True)
@@ -60,7 +61,7 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return u'%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
+        return u'%s (started %s by %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
 
     def tasks(self):
         return ProcessTask.all(process=self)

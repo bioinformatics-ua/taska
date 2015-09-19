@@ -162,9 +162,11 @@ const WorkflowStore = Reflux.createStore({
     },
 
     onRunProcess(data){
+        console.log(data);
         let process = {
             ***REMOVED*** this.__detaildata.hash,
-            tasks: []
+            tasks: [],
+            title: data.title
         };
 
         let states = data.sm.getStates();

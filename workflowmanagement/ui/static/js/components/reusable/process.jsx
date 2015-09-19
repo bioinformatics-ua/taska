@@ -23,8 +23,8 @@ const ProcessManage = React.createClass({
            <DeleteButton
               success={this.delete}
               identificator = {row}
-              title={`Delete '${row["object_repr"]}'`}
-              message={`Are you sure you want to delete  '${row["object_repr"]} ?'`}  />
+              title={`Delete '${row["title"] || row['object_repr']}'`}
+              message={`Are you sure you want to delete  '${row["title"] || row['object_repr']} ?'`}  />
            </div>;
   }
 });
@@ -47,7 +47,7 @@ const ProcessLink = React.createClass({
     const row = this.props.rowData;
     const object = {object: row.hash}
     return <small>
-            <Link to="Process" params={object}>{row.object_repr}</Link>
+            <Link to="Process" params={object}>{row.title || row.object_repr}</Link>
            </small>;
   }
 });
