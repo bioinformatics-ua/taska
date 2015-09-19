@@ -138,7 +138,6 @@ class ResultSerializer(serializers.ModelSerializer):
                     processtask__task=task,
                     user__id=user
                 )
-            this_ptu.finish()
 
             validated_data[u'processtaskuser'] = this_ptu
         except (Process.DoesNotExist, Task.DoesNotExist, ProcessTaskUser.DoesNotExist):
@@ -146,6 +145,8 @@ class ResultSerializer(serializers.ModelSerializer):
 
 
         result = self.Meta.model.objects.create(**validated_data)
+
+        this_ptu.finish()
 
         users = []
         auths = this_ptu.processtask.users().order_by('user').distinct('user')

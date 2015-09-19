@@ -78,14 +78,17 @@ class SimpleTask extends SimpleState {
 
 
             __createMap(own){
-                console.log(own);
-                let linkmap = {};
+                if(own){
+                    let linkmap = {};
 
-                for(let link of own){
-                    linkmap[link.filename] = 'api/resource/'+link.hash+'/download/';
+                    for(let link of own){
+                        linkmap[link.filename] = 'api/resource/'+link.hash+'/download/';
+                    }
+
+                    return linkmap;
                 }
 
-                return linkmap;
+                return {};
 
             },
             digestDescription(desc, map){

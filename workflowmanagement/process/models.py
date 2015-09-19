@@ -13,6 +13,8 @@ from django.db import transaction
 
 from history.models import History
 
+from material.models import File
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -205,6 +207,22 @@ class ProcessTask(models.Model):
         if missing == 0:
             self.status=ProcessTask.FINISHED
             self.save()
+
+            # IF WE ARE BEFORE A FORM TASK, UPLOAD THE EXPORT RESULTS PASSING THEM BELOW, bit of a hack
+            task = Task.objects.get_subclass(id=self.task.id)
+
+            if task.type() == 'form.FormTask' and task.output_resources:
+
+                exporter = task.get_exporter('csv', self)
+
+                export = exporter.export(export_file=True)
+
+                users = self.users()
+
+                if len(users) > 0:
+                    result = users[0].getResult()
+
+                    result.outputs.add(export)
 
             self.process.move()
 
