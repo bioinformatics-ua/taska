@@ -110,7 +110,7 @@ const TaskTable = React.createClass({
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-tasks pull-left"></i>
-                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">My Tasks</h3>
+                <h3 style={{position: 'absolute', width: '95%'}} className="text-center panel-title">Tasks</h3>
               </div>
               <Griddle
                   noDataMessage={<center>You currently have no tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}

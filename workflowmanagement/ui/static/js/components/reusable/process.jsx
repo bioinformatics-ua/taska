@@ -109,7 +109,7 @@ const ProcessTable = React.createClass({
     ];
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Studies</h3></center>
+                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies</h3></center>
               </div>
               <Griddle
                   noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
