@@ -75,15 +75,59 @@ class SimpleTask extends SimpleState {
             parent(){
                 return this.state.parent.state;
             },
+
+
+            __createMap(own){
+                console.log(own);
+                let linkmap = {};
+
+                for(let link of own){
+                    linkmap[link.filename] = 'api/resource/'+link.hash+'/download/';
+                }
+
+                return linkmap;
+
+            },
+            digestDescription(desc, map){
+                if(desc){
+
+                    let result = desc.replace(/#\((.*?)\)/g, function(a, b){
+                        let hit = map[b];
+
+                        if(hit)
+                            return '<a href="'+map[b]+'">' + b + '</a>';
+                        else
+                            return b;
+
+                    });
+
+                    return result;
+                }
+                return undefined;
+            },
+
             render(){
+
+                let depmap = this.__createMap(this.parent().resources);
+                console.log(depmap);
+                let description = this.digestDescription(this.parent().description, depmap);
+
+
                 return <span>
                     <div key="state-descr" className="form-group">
                         <label for="state-description">Task Description</label>
+                            {editable ?
                             <textarea style={{resize: "vertical"}} id="state-description" rows="6" type="description" className="form-control"
                                             aria-describedby="state-description"
                                             placeholder="Enter the state description here"  disabled={!editable}
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
+                            :
+                            <div style={{height: 'auto', minHeight:'80px', backgroundColor: '#ecf0f1'}} id="state-description" rows="6" className="form-control"
+                                            aria-describedby="state-description">
+                                <span dangerouslySetInnerHTML={{__html: description}} />
+                            </div>
+                        }
                     </div>
 
                     <div key="state-effort" className="form-group">
