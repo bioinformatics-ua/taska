@@ -81,7 +81,7 @@ class SimpleTask extends SimpleState {
                     </div>
 
                     <span>
-                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Pass answers down</label>
+                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Forward Answers</label>
                             <div className="form-group">
                             <Toggle id="output_resources"
                                     defaultChecked={this.parent()['output_resources']}
