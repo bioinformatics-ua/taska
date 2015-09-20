@@ -720,3 +720,15 @@ li.is-active > a {
   padding: 0;
   padding-top: 40px;
 }
+
+
+@media print {
+  .window_print {
+    display: none;
+  }
+    @page
+    {
+        size: auto;   /* auto is the initial value */
+        margin: 0mm;  /* this affects the margin in the printer settings */
+    }
+}

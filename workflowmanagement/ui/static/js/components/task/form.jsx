@@ -69,7 +69,6 @@ class FormTask extends Task{
 
         return React.createClass({
             componentDidMount(){
-                            console.log(context.state);
 
                 let options = {
                     saveCallback: context.saveCallback,

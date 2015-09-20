@@ -6,6 +6,7 @@
 from django.conf.urls import patterns, include, url
 from rest_framework import routers
 
+
 import api
 
 router = routers.DefaultRouter()
@@ -22,5 +23,11 @@ urlpatterns = patterns('',
     url(r'^/my/futuretasks/', api.MyFutureTasks.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', api.MyTaskDependencies.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/', api.MyTask.as_view()),
-    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view())
+
+    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/pdf?$'
+        , api.ResultsPDF.as_view(), name='resultspdf'),
+
+    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view()),
+
+
 )

@@ -1,7 +1,10 @@
 # Docker local settings
 import os
 
-STATIC_ROOT = '/workflow-management/collected'
+
+STATIC_ROOT = '/workflow-management/collected/'
+MEDIA_ROOT = '/workflow-management/collectedmedia/'
+
 DEBUG = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -30,4 +33,6 @@ BASE_URL = os.environ.get('BASE_DIR', '')+'/'
 # I dont like this here very much but i cant make it work with nginx otherwise... on a subdirectory at least
 FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '')+'/'
 
-RAVEN_URL = os.environ.get('RAVEN_URL', 'http://af2d8ca90da047d0bdef78f674fd2e59@bioinformatics.ua.pt/sentry/11')
+RAVEN_URL = os.environ.get('RAVEN_URL', 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13')
+
+WKHTMLTOPDF_CMD = '/usr/local/bin/wkhtmltopdf'

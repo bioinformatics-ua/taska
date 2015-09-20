@@ -418,6 +418,12 @@ class SimpleTaskRun extends SimpleTask{
                                             <i className="fa fa-file-code-o"></i> As JSON</a></li>
                                         <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/xlsx`}>
                                             <i className="fa fa-file-excel-o"></i> As XLSX</a></li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf?as=html`}>
+                                            <i className="fa fa-file-code-o"></i> As HTML</a>
+                                        </li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf`}>
+                                            <i className="fa fa-file-pdf-o"></i> As PDF</a>
+                                        </li>
                                       </ul>
                                     </div>
                                     </th>
