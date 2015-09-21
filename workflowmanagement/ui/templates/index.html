@@ -44,13 +44,13 @@
     });
     </script>
 
-    {% if IS_DEBUG %}
+    {% if not IS_DEBUG %}
     <script src="{% static "bundle.js" %}?rev={{REVISION}}"></script>
     {% else %}
     <script src="{% static "bundle.min.js" %}?rev={{REVISION}}"></script>
     {% endif%}
 
-    {% if IS_DEBUG %}
+    {% if not IS_DEBUG %}
     <script src="{% static "bundle_vendor.js" %}?rev={{REVISION}}"></script>
     {% else %}
     <script src="{% static "bundle_vendor.min.js" %}?rev={{REVISION}}"></script>

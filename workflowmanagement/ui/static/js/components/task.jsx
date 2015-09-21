@@ -246,7 +246,8 @@ export default React.createClass({
         }
 
         let depmap = this.__createMap(this.state.task.processtask.parent.resources, this.state.task.dependencies);
-        let description = this.digestDescription(this.state.task.processtask.parent.description ,depmap);
+        let description = this.digestDescription(this.state.task.processtask.parent.description ,depmap) || '';
+        let getDesc = () => { return {__html: description} };
 
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
@@ -369,7 +370,7 @@ export default React.createClass({
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Description</strong></span>
                                               <span disabled style={{float: 'none'}} className="form-control">
-                                              <span dangerouslySetInnerHTML={{__html: description}} />
+                                              <span dangerouslySetInnerHTML={getDesc()} />
                                               </span>
                                             </div>
                                         </div>

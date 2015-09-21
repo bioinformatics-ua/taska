@@ -113,8 +113,8 @@ class SimpleTask extends SimpleState {
 
                 let depmap = this.__createMap(this.parent().resources);
                 console.log(depmap);
-                let description = this.digestDescription(this.parent().description, depmap);
-
+                let description = this.digestDescription(this.parent().description, depmap) || '';
+                let getDesc = () => { return {__html: description} };
 
                 return <span>
                     <div key="state-descr" className="form-group">
@@ -128,7 +128,7 @@ class SimpleTask extends SimpleState {
                             :
                             <div style={{height: 'auto', minHeight:'80px', backgroundColor: '#ecf0f1'}} id="state-description" rows="6" className="form-control"
                                             aria-describedby="state-description">
-                                <span dangerouslySetInnerHTML={{__html: description}} />
+                                <span dangerouslySetInnerHTML={getDesc()} />
                             </div>
                         }
                     </div>
