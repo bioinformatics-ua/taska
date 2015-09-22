@@ -6,7 +6,7 @@ dev:
 
 run:
 	sh bin/clean_container.sh && \
-	docker-compose up --no-recreate
+	docker-compose up --no-recreate -d
 
 run-dev:
 	sh bin/clean_container_dev.sh && \

@@ -219,7 +219,7 @@ except:
 STATIC_URL = BASE_URL+'static/'
 
 RAVEN_CONFIG = {
-    'dsn': RAVEN_URL
+    'dsn': 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'  
 }
 
 PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
