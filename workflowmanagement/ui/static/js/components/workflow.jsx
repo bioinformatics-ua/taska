@@ -28,7 +28,9 @@ import {FormTask, FormTaskRun} from './reusable/states/FormTask.jsx';
 
 const RunLabel = React.createClass({
     render(){
-        return <table className="process-label">
+        return <span>
+
+                <table className="process-label">
                     <tr>
                         <td><div className="circle circle-sm circle-canceled"></div></td>
                         <td><small>&nbsp;Waiting Configuration&nbsp;&nbsp;</small></td>
@@ -36,6 +38,7 @@ const RunLabel = React.createClass({
                         <td><small>&nbsp;Ready to Run&nbsp;&nbsp;</small></td>
                     </tr>
                 </table>
+                </span>
     }
 });
 
@@ -276,6 +279,7 @@ export default React.createClass({
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
+                    editTitle={params.mode === 'run'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
                     save={params.mode === 'run'? this.runProcess:this.save}
                     onUpdate={this.unsaved}

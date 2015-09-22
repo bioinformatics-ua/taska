@@ -13,6 +13,9 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+def ABS_DIR(rel):
+    return os.path.join(BASE_DIR, rel.replace('/', os.path.sep))
+
 BASE_URL = "/"
 
 # swagger settings
@@ -41,6 +44,12 @@ SWAGGER_SETTINGS = {
 SECRET_KEY = os.environ.get('DOCKER_SECRET', '+g93fk44)x+s%7-$7hb23@saom=#+7@n6lstr8-p7x8z$3#_f9')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+if DEBUG:
+    STATIC_ROOT = ABS_DIR('COLLECTED/')
+    MEDIA_ROOT = ABS_DIR('MEDIA/')
+
+MEDIA_URL = '/media/'
 
 TEMPLATE_DEBUG = True
 
@@ -79,7 +88,9 @@ INSTALLED_APPS = (
 
     'django_premailer',
 
-    'raven.contrib.django.raven_compat'
+    'raven.contrib.django.raven_compat',
+
+    'wkhtmltopdf'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -132,9 +143,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+WKHTMLTOPDF_CMD_OPTIONS = {
+}
+
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
 )
 
 STATICFILES_DIRS = (
@@ -144,6 +159,7 @@ STATICFILES_DIRS = (
     os.path.abspath('../node_modules'),
     os.path.abspath('ui/static'),
 )
+
 
 # Template configurations
 
@@ -191,6 +207,7 @@ TEMPLATE_LOADERS = (
 )
 TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'tasks/templates'),
+    os.path.join(BASE_DIR, 'process/templates'),
     os.path.join(BASE_DIR, 'ui/templates'),
     os.path.join(BASE_DIR, 'utils/templates')
 ]
@@ -208,7 +225,24 @@ API_ACTIVATE_URL = "activate/"
 
 DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
-RAVEN_URL = 'http://af2d8ca90da047d0bdef78f674fd2e59@bioinformatics.ua.pt/sentry/11'
+RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'
+
+INCLUDE_EMAIL_LINKS = True
+
+def ptask_path(obj):
+    task = obj.task.subclass()
+
+    if(task.type() == 'tasks.SimpleTask'):
+        return BASE_URL+'simpletask/'+obj.hash
+
+    if(task.type() == 'form.FormTask'):
+        return BASE_URL+'formtask/'+obj.hash
+
+    return None
+
+MAIL_LINKS = {
+    "ProcessTaskAddTemplate":  ptask_path
+}
 
 
 try:
@@ -216,7 +250,11 @@ try:
 except:
     pass
 
+
+#STATIC_ROOT = BASE_DIR+'/ui/static'
 STATIC_URL = BASE_URL+'static/'
+
+
 
 RAVEN_CONFIG = {
     'dsn': 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'  

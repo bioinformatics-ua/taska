@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TASKA - Workflow Management for Biomedical exploration</title>
+  <meta name="description" content="TASKA - Workflow Management for Biomedical exploration">
+  <meta name="author" content="Ricardo Ribeiro">
+  <base id="baseurl" href="{{BASE_URL}}" />
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="{{STATIC_URL}}bundle.min.css">
+  <link rel="stylesheet" href="{{STATIC_URL}}css/vendor/formbuilder-min.css">
+  <link rel="stylesheet" href="{{STATIC_URL}}css/vendor/formrenderer.css">
+
+</head>
+
+<body style="margin: 0 50px;">
+    <div style="display:none" id="playground">
+
+    </div>
+    <div style="max-width: 1000px; margin: auto">
+        <button class="pull-right window_print btn btn-default" onClick="window.print();"><i class="fa fa-print"></i> Print</button>
+        <center><h1>Result Extract for {{processtask.task.title}}</h1></center>
+        <hr />
+        <strong>Number of Task Assignees:</strong> {{processtask.users|length}}<br />
+        <strong>Number of Answers:</strong> {{results|length}}<br />
+        <strong>Task Status:</strong> {{status}}<br />
+        <hr /><br />
+        <center><h2>User Responses to Formularies</h2></center>
+        <hr />
+    {% for result in results %}
+        <br />
+        <center><h4>Result from {% if result.processtaskuser.user.first_name %}
+         {{result.processtaskuser.user.get_full_name}}
+         {% else %}
+         {{result.processtaskuser.user.email}}
+         {% endif %}
+         </h4></center>
+         <strong>Commentary upon conclusion:</strong>
+         {% if result.comment and result.comment|length > 0 %}
+            {{result.comment}}
+         {% else %}
+            None
+         {% endif %}<br />
+         <strong>Date Conclusion: </strong>{{result.date|date:"Y-M-d H:i:s"}}
+         <br />
+
+        {% if schema %}
+        <form id="{{result.hash}}">
+            <center>Loading</center>
+        </form>
+        {% endif %}
+        <hr /><hr />
+        <br />
+    {% endfor %}
+        <button class="pull-right window_print btn btn-default" onClick="window.print();"><i class="fa fa-print"></i> Print</button>
+
+    </div>
+
+    {% if IS_DEBUG %}
+    <script src="{{STATIC_URL}}bundle.js?rev={{REVISION}}"></script>
+    {% else %}
+    <script src="{{STATIC_URL}}bundle.min.js?rev={{REVISION}}"></script>
+    {% endif%}
+
+    {% if IS_DEBUG %}
+    <script src="{{STATIC_URL}}bundle_vendor.js?rev={{REVISION}}"></script>
+    {% else %}
+    <script src="{{STATIC_URL}}bundle_vendor.min.js?rev={{REVISION}}"></script>
+    {% endif%}
+
+    <script type="text/javascript">
+            {% if schema %}
+                {% for result in results %}
+                    var options = {
+                        project_id: 1,
+                        target: '#{{result.hash}}',
+                        response_fields: {{schema|safe}},
+                        response: {
+                            id: 'xxx',
+                            responses: {{result.answer|safe}}
+                        }
+                    };
+                    var fr{{result.hash}} = new FormRenderer(
+                        options
+                    );
+                {% endfor %}
+            {% endif %}
+
+        $('input, textarea, select  ').prop('disabled', true);
+
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

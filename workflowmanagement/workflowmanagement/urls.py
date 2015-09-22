@@ -10,6 +10,10 @@ import history
 
 from tasks.api import TaskDependenciesView
 
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
+
 #router = routers.DefaultRouter()
 #router.register(r'workflow', include('workflow.urls'))
 
@@ -48,3 +52,7 @@ urlpatterns = patterns('',
 
     url(r'^', include('ui.urls'))
 )
+
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -13,6 +13,8 @@ from django.db import transaction
 
 from history.models import History
 
+from material.models import File
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -42,6 +44,7 @@ class Process(models.Model):
             (OVERDUE,   'Process has gone over end_date')
         )
     workflow        = models.ForeignKey(Workflow)
+    title           = models.CharField(max_length=200, null=True)
     executioner     = models.ForeignKey(User)
     hash            = models.CharField(max_length=50, unique=True)
     start_date      = models.DateTimeField(auto_now_add=True)
@@ -58,7 +61,7 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return u'%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
+        return u'%s (started %s by %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -205,6 +208,22 @@ class ProcessTask(models.Model):
         if missing == 0:
             self.status=ProcessTask.FINISHED
             self.save()
+
+            # IF WE ARE BEFORE A FORM TASK, UPLOAD THE EXPORT RESULTS PASSING THEM BELOW, bit of a hack
+            task = Task.objects.get_subclass(id=self.task.id)
+
+            if task.type() == 'form.FormTask' and task.output_resources:
+
+                exporter = task.get_exporter('csv', self)
+
+                export = exporter.export(export_file=True)
+
+                users = self.users()
+
+                if len(users) > 0:
+                    result = users[0].getResult()
+
+                    result.outputs.add(export)
 
             self.process.move()
 

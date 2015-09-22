@@ -30,6 +30,7 @@ class Task(models.Model):
     title           = models.CharField(max_length=100)
     description     = models.TextField(null=True, blank=True)
     workflow        = models.ForeignKey(Workflow)
+    effort          = models.FloatField()
 
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
@@ -103,6 +104,9 @@ class Task(models.Model):
             return tmp.select_subclasses()
 
         return tmp
+
+    def subclass(self):
+        return Task.objects.get_subclass(id=self.id)
 
     @staticmethod
     def getPossibleDependencies(workflow, task=None):

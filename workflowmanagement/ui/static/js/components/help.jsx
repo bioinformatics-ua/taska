@@ -64,19 +64,19 @@ export default React.createClass({
 
             <p>This dashboard is divided into six areas evidencing all the system's available features and combines the two different user profiles into one single interface.</p>
 
-            <h2>My Protocols</h2>
+            <h2>Protocols</h2>
 
             <p>In this section, user's protocols and public protocols are shown. User's protocols can be edited through a rich visual editor and public protocols can be duplicated (to be modified), or simply used as they are.</p>
 
             <p>This area can be used to create, modify and delete protocols, but also to run protocols as studies, through the run feature. When we want to create a study from a protocol, we must click run and choose the deadlines and assignee's.</p>
 
-            <h2>My Studies</h2>
+            <h2>Studies</h2>
 
             <p>In this section users have access to finished or ongoing (still running) studies. It allows to manage and oversee the studies with an overview, but also analyse and obtain the results from the studies.</p>
 
             <p>Only the user running the study has access to this view.</p>
 
-            <h2>My Tasks</h2>
+            <h2>Tasks</h2>
 
             <p>In this section users can see and answer to tasks assigned to them by study overseers. They are ordered by default based on deadline, so users can prioritize tasks.</p>
 
@@ -84,7 +84,7 @@ export default React.createClass({
 
             <p>In this section, the user can see replied and still to reply requests made by users answering tasks in their studies.</p>
 
-            <h2>My Forms</h2>
+            <h2>Forms</h2>
 
             <p>In this section users can see forms they created and manage them using an rich visual editor.</p>
 

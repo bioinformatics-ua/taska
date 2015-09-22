@@ -199,11 +199,58 @@ export default React.createClass({
         if(this.validate())
             ResultActions.saveAnswer();
     },
+    __createMap(own, deps){
+        let linkmap = {};
+
+        for(let link of own){
+            linkmap[link.filename] = link.path;
+        }
+
+        for(let dep of deps){
+            if(dep.users){
+                for(let user of dep.users){
+
+                    if(user.result){
+                        let user_outputs = user.result.outputs;
+                        if(user_outputs){
+                            for(let output of user_outputs){
+                                linkmap[output.filename] = output.path;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return linkmap;
+
+    },
+    digestDescription(desc, map){
+        if(desc){
+
+            let result = desc.replace(/#\((.*?)\)/g, function(a, b){
+                let hit = map[b];
+
+                if(hit)
+                    return '<a href="'+map[b]+'">' + b + '</a>';
+                else
+                    return b;
+
+            });
+
+            return result;
+        }
+        return undefined;
+    },
     render() {
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;
         }
+
+        let depmap = this.__createMap(this.state.task.processtask.parent.resources, this.state.task.dependencies);
+        let description = this.digestDescription(this.state.task.processtask.parent.description ,depmap) || '';
+        let getDesc = () => { return {__html: description} };
 
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
@@ -252,6 +299,7 @@ export default React.createClass({
                   "displayName": "Requester"
                 }
             ];
+
         return (
             <div className="task-detail row">
                 <div className="col-md-12">
@@ -320,16 +368,26 @@ export default React.createClass({
                                     }
 
                                 </div>
-                                 <div className="col-md-12">
+                                 <div className="col-md-9">
                                         <div className="form-group">
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Description</strong></span>
                                               <span disabled style={{float: 'none'}} className="form-control">
-                                                {this.state.task.processtask.parent.description}
+                                              <span dangerouslySetInnerHTML={getDesc()} />
                                               </span>
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                        <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Required Effort</strong></span>
+                                              <span disabled style={{float: 'none'}} className="form-control">
+                                                {this.state.task.processtask.parent.effort} hours
+                                              </span>
+                                            </div>
+                                        </div>
+                                </div>
                                 {this.state.answer.hash?(
                                     <div className="col-md-12">
                                         <div className="row">
@@ -357,6 +415,7 @@ export default React.createClass({
                             </div>
                             <div className="clearfix row">
                                 <div className="col-md-12">
+                                    {this.state.task.processtask.status > 1?
                                     <Tabs>
                                         <Tabs.Panel
                                         title={<span><i className="fa fa-tasks"></i> &nbsp;Answer</span>}>
@@ -390,6 +449,13 @@ export default React.createClass({
                                             />
                                         </Tabs.Panel>
                                     </Tabs>
+                                    :
+                                    <div>
+                                        <center><h4>
+                                        This task is scheduled to be executed by you, but is waiting that other intervenients finish their own tasks, which your task depends upon.
+                                        </h4></center>
+                                    </div>
+                                    }
                                 </div>
                             </div>
                         </div>

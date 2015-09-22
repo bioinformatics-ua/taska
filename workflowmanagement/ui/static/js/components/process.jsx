@@ -76,7 +76,7 @@ export default React.createClass({
     displayName: route => {
         try {
             let process = route.props.detail.Process.process;
-            return `Process - ${process['object_repr']} (${process['start_date']})`;
+            return `Process - ${process['title'] || process['object_repr']} (${process['start_date']})`;
         } catch(ex){
             return "Process Not Found";
         }
@@ -194,7 +194,7 @@ export default React.createClass({
                             <ProcessLabel />
                         </span>
                     }
-                    title={this.state.workflow.title}
+                    title={this.state.process.title || this.state.workflow.title}
                     editable={params.mode === 'edit'}
                     save={this.save}
                     saveLabel={<span><i className="fa fa-floppy-o"></i> &nbsp;Save Process</span>}

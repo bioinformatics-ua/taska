@@ -16,6 +16,7 @@ from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasS
 from process.models import *
 from history.models import History
 from django.db.models import Q
+from django.shortcuts import render
 
 from workflow.models import Workflow
 from tasks.models import Task
@@ -33,6 +34,11 @@ from django.shortcuts import get_object_or_404
 from tasks.export import ResultExporter
 
 from django.http import HttpResponse, StreamingHttpResponse
+
+from wkhtmltopdf.views import PDFTemplateView, PDFTemplateResponse
+
+from django.conf import settings
+
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -634,6 +640,36 @@ class MyTasks(generics.ListAPIView):
         #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
         return ptasks
 
+class MyFutureTasks(generics.ListAPIView):
+    """
+        Returns a list of user attributed process tasks across all processes for future work
+    """
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_map = {
+        'task': 'processtask__task__hash',
+        'process': 'processtask__process__hash',
+        'processtask': 'processtask_hash',
+        'title': 'processtask__task__title',
+        'deadline': 'processtask__deadline',
+        'type': 'processtask__task__ttype',
+        'task_repr': 'processtask__task__title'
+    }
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+        ptasks = ProcessTaskUser.all(finished=False).filter(
+                Q(processtask__status=ProcessTask.WAITING),
+                user=self.request.user,
+            ).order_by('processtask__deadline') #.values_list('processtask')
+
+        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        return ptasks
+
 class MyTask(generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()
     serializer_class = MyProcessTaskUserDetailSerializer
@@ -992,3 +1028,53 @@ class ProcessTaskResultExport(APIView):
             raise
 
         return Response({'export': export}, 500)
+
+
+class ResultsPDF(PDFTemplateView):
+    template_name='results_pdf.html'
+    filename='results.pdf'
+
+    def get(self, request, hash):
+        from result.models import Result
+
+        ptask = get_object_or_404(ProcessTask, hash=hash)
+
+        if not (
+                request.user == ptask.process.executioner
+                or ptask.process.workflow.workflowpermission.public
+            ):
+            raise Http404
+
+        users = ptask.users().values_list('id', flat=True)
+
+
+        results = Result.objects.filter(removed=False, processtaskuser__in=users).select_subclasses()
+
+        tasktype = ptask.task.subclass()
+        schema=None
+
+        if tasktype.type() == 'form.FormTask':
+            schema = tasktype.form.schema
+
+        context = {
+            'STATIC_URL': settings.STATIC_URL,
+            'processtask': ptask,
+            'schema' : schema,
+            'results': results,
+            'status': ProcessTask.statusCode(ptask.status)
+        }
+
+
+        response_class = self.response_class
+
+        if request.GET.get('as', '') == 'html':
+            return render(request, self.template_name, context)
+
+        return PDFTemplateResponse(request=request,
+                                   template=self.template_name,
+                                   filename=self.filename,
+                                   context= context,
+                                   show_content_in_browser=False,
+                                   cmd_options= {'javascript-delay': 1000},
+                                   )
+

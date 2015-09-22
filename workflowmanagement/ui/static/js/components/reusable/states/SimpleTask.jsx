@@ -54,8 +54,14 @@ class SimpleTask extends SimpleState {
                 return this.getState();
             },
             setDescription(e){
+                console.log('SET DESCR');
                 this.state.parent.setState({description: e.target.value});
                 this.props.dataChange(self.getIdentificator(), {description: e.target.value}, false);
+            },
+            setEffort(e){
+                console.log('SET EFFORT');
+                this.state.parent.setState({effort: Number.parseFloat(e.target.value)});
+                this.props.dataChange(self.getIdentificator(), {effort: Number.parseFloat(e.target.value)}, false);
             },
             setOutputResource(e){
                 console.log(e.target.checked);
@@ -69,19 +75,73 @@ class SimpleTask extends SimpleState {
             parent(){
                 return this.state.parent.state;
             },
+
+
+            __createMap(own){
+                if(own){
+                    let linkmap = {};
+
+                    for(let link of own){
+                        linkmap[link.filename] = 'api/resource/'+link.hash+'/download/';
+                    }
+
+                    return linkmap;
+                }
+
+                return {};
+
+            },
+            digestDescription(desc, map){
+                if(desc){
+
+                    let result = desc.replace(/#\((.*?)\)/g, function(a, b){
+                        let hit = map[b];
+
+                        if(hit)
+                            return '<a href="'+map[b]+'">' + b + '</a>';
+                        else
+                            return b;
+
+                    });
+
+                    return result;
+                }
+                return undefined;
+            },
+
             render(){
+
+                let depmap = this.__createMap(this.parent().resources);
+                console.log(depmap);
+                let description = this.digestDescription(this.parent().description, depmap) || '';
+                let getDesc = () => { return {__html: description} };
+
                 return <span>
                     <div key="state-descr" className="form-group">
                         <label for="state-description">Task Description</label>
+                            {editable ?
                             <textarea style={{resize: "vertical"}} id="state-description" rows="6" type="description" className="form-control"
                                             aria-describedby="state-description"
                                             placeholder="Enter the state description here"  disabled={!editable}
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
+                            :
+                            <div style={{height: 'auto', minHeight:'80px', backgroundColor: '#ecf0f1'}} id="state-description" rows="6" className="form-control"
+                                            aria-describedby="state-description">
+                                <span dangerouslySetInnerHTML={getDesc()} />
+                            </div>
+                        }
+                    </div>
+
+                    <div key="state-effort" className="form-group">
+                        <label for="state-effort">Required Effort (in hours)</label>
+                            <input type="number" min="0" id="state-effort" className="form-control"
+                                            aria-describedby="state-effort" disabled={!editable}
+                                            onChange={this.setEffort} value={(this.parent().effort)?this.parent().effort:1} />
                     </div>
 
                     <span>
-                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Pass answers down</label>
+                            <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Forward Answers</label>
                             <div className="form-group">
                             <Toggle id="output_resources"
                                     defaultChecked={this.parent()['output_resources']}
@@ -130,6 +190,7 @@ class SimpleTask extends SimpleState {
         return {
             name: data.title,
             description: data.description,
+            effort: data.effort,
             hash: data.hash,
             type: data.type,
             resources: resources,
@@ -158,6 +219,7 @@ class SimpleTask extends SimpleState {
             type: this.getData().type,
             sortid: this.getLevel(),
             description: this.getData().description || '',
+            effort: this.getData().effort || 1,
             dependencies: deps,
             resourceswrite: resources,
             'output_resources': this.getData()['output_resources']
@@ -356,6 +418,12 @@ class SimpleTaskRun extends SimpleTask{
                                             <i className="fa fa-file-code-o"></i> As JSON</a></li>
                                         <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/xlsx`}>
                                             <i className="fa fa-file-excel-o"></i> As XLSX</a></li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf?as=html`}>
+                                            <i className="fa fa-file-code-o"></i> As HTML</a>
+                                        </li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf`}>
+                                            <i className="fa fa-file-pdf-o"></i> As PDF</a>
+                                        </li>
                                       </ul>
                                     </div>
                                     </th>
