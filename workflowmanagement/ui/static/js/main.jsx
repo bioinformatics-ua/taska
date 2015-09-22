@@ -56,7 +56,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
     fetch(state.routes, state.params).then((detail) => {
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    }).catch(
+    }); /*.catch(
         (ex) => {
             console.log(ex);
 
@@ -72,7 +72,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
                 StateActions.loadingEnd();
             }
         }
-    )
+    )*/
 });
 
 
