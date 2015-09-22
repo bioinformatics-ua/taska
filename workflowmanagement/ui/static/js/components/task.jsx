@@ -209,10 +209,13 @@ export default React.createClass({
         for(let dep of deps){
             if(dep.users){
                 for(let user of dep.users){
-                    let user_outputs = user.result.outputs;
-                    if(user_outputs){
-                        for(let output of user_outputs){
-                            linkmap[output.filename] = output.path;
+
+                    if(user.result){
+                        let user_outputs = user.result.outputs;
+                        if(user_outputs){
+                            for(let output of user_outputs){
+                                linkmap[output.filename] = output.path;
+                            }
                         }
                     }
                 }
