@@ -104,6 +104,11 @@ class SimpleTask extends SimpleState {
 
                     });
 
+                    result = result.replace(/((http[s]?:\/\/[\w.\/_\-=?]+)|(mailto:[\w.\/@_\-=?]+))/g, function(a, b){
+                        return '<a href="'+b+'">' + b + '</a>';
+
+                    });
+
                     return result;
                 }
                 return undefined;
@@ -126,7 +131,7 @@ class SimpleTask extends SimpleState {
                                             onChange={this.setDescription} value={this.parent().description}>
                             </textarea>
                             :
-                            <div style={{height: 'auto', minHeight:'80px', backgroundColor: '#ecf0f1'}} id="state-description" rows="6" className="form-control"
+                            <div style={{height: 'auto', minHeight:'80px', backgroundColor: '#ecf0f1', 'word-break': 'break-word'}} id="state-description" rows="6" className="form-control"
                                             aria-describedby="state-description">
                                 <span dangerouslySetInnerHTML={getDesc()} />
                             </div>
