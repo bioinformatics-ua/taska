@@ -98,14 +98,14 @@ class SimpleTask extends SimpleState {
                         let hit = map[b];
 
                         if(hit)
-                            return '<a href="'+map[b]+'">' + b + '</a>';
+                            return '<a target="_blank" href="'+map[b]+'">' + b + '</a>';
                         else
                             return b;
 
                     });
 
                     result = result.replace(/((http[s]?:\/\/[\w.\/_\-=?]+)|(mailto:[\w.\/@_\-=?]+))/g, function(a, b){
-                        return '<a href="'+b+'">' + b + '</a>';
+                        return '<a target="_blank" href="'+b+'">' + b + '</a>';
 
                     });
 
