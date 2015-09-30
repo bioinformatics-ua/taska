@@ -229,14 +229,16 @@ RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea88
 
 INCLUDE_EMAIL_LINKS = True
 
-def ptask_path(obj):
+def ptask_path(obj, interested):
     task = obj.task.subclass()
 
+    ptu = obj.user(interested)
+
     if(task.type() == 'tasks.SimpleTask'):
-        return BASE_URL+'simpletask/'+obj.hash
+        return BASE_URL+'simpletask/'+ptu.hash
 
     if(task.type() == 'form.FormTask'):
-        return BASE_URL+'formtask/'+obj.hash
+        return BASE_URL+'formtask/'+ptu.hash
 
     return None
 

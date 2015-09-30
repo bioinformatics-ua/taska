@@ -117,7 +117,7 @@ class SimpleTask extends SimpleState {
             render(){
 
                 let depmap = this.__createMap(this.parent().resources);
-                console.log(depmap);
+
                 let description = this.digestDescription(this.parent().description, depmap) || '';
                 let getDesc = () => { return {__html: description} };
 
