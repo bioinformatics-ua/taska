@@ -214,7 +214,7 @@ class ProcessTask(models.Model):
 
             if task.type() == 'form.FormTask' and task.output_resources:
 
-                exporter = task.get_exporter('csv', self)
+                exporter = task.get_exporter('xlsx', self)
 
                 export = exporter.export(export_file=True)
 
