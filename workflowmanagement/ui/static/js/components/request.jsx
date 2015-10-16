@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 import Reflux from 'reflux';
 
@@ -125,6 +125,7 @@ export default React.createClass({
             let Failed = this.props.failed;
             return <Failed />;
         }
+        console.log(this.state);
         return (
             <div className="request-detail row">
                 <div className="col-md-12">
@@ -150,6 +151,16 @@ export default React.createClass({
                                     </div>
                                 </div>
                             :''}
+                            <div className="row">
+                                <div className="col-md-12">
+                                      <div className="form-group">
+                                        <div className="input-group">
+                                          <span className="input-group-addon"><strong>Recipient</strong></span>
+                                          <input disabled={true} className="form-control" value="Study Manager"/>
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
                             <div className="row">
                                 <div className="col-md-7">
                                       <div className="form-group">
