@@ -416,39 +416,45 @@ export default React.createClass({
                             <div className="clearfix row">
                                 <div className="col-md-12">
                                     {this.state.task.processtask.status > 1?
-                                    <Tabs>
-                                        <Tabs.Panel
-                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Answer</span>}>
-                                            <div className="form-group row">
-                                                <div className="col-md-9"></div>
-                                                <div className="col-md-3">
-                                                        {this.didWrite() ?
-                                                        <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
-                                                            <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
-                                                            </button>
-                                                        </Affix>
-                                                        : ''}
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-md-12">
-                                                    <DetailRender key={this.state.task.processtask.hash} />
-                                                </div>
-                                            </div>
-                                        </Tabs.Panel>
-                                        <Tabs.Panel title={<span><i className="fa fa-level-down"></i> &nbsp;Resource Inputs</span>}>
-                                            <TaskDependencies context={this} />
-                                        </Tabs.Panel>
-                                        <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;Related Requests</span>}>
+
+<div>
+  <ul className="nav nav-tabs" role="tablist">
+    <li role="presentation" className="active"><a href="#answer" aria-controls="answer" role="tab" data-toggle="tab"><i className="fa fa-tasks"></i> &nbsp;Answer</a></li>
+    <li role="presentation"><a href="#resources" aria-controls="resources" role="tab" data-toggle="tab"><i className="fa fa-level-down"></i> &nbsp;Resource Inputs</a></li>
+    <li role="presentation"><a href="#requests" aria-controls="requests" role="tab" data-toggle="tab"><i className="fa fa-life-ring"></i> &nbsp;Related Requests</a></li>
+  </ul>
+  <div className="tab-content">
+    <div role="tabpanel" className="tab-pane active" id="answer">
+        <div className="form-group row">
+            <div className="col-md-9"></div>
+                <div className="col-md-3">
+                    {this.didWrite() ?
+                            <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+                                <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
+                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
+                                </button>
+                            </Affix>
+                            : ''}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <DetailRender key={this.state.task.processtask.hash} />
+                </div>
+        </div>
+    </div>
+    <div role="tabpanel" className="tab-pane" id="resources"><TaskDependencies context={this} /></div>
+    <div role="tabpanel" className="tab-pane" id="requests">
                                             <Griddle
                                             {...table_style}
                                             results={this.state.task.requests}
                                                   columns={["title", "type", "resolved", "hash"]}
                                             columnMetadata={table_meta}
                                             />
-                                        </Tabs.Panel>
-                                    </Tabs>
+    </div>
+  </div>
+
+</div>
                                     :
                                     <div>
                                         <center><h4>
