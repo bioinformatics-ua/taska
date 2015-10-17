@@ -56,7 +56,35 @@ export default Reflux.createStore({
         //this.trigger();
     },
     answerSubmitted(){
+        return this.__rsubmitted || false;
+    },
+    answerSaved(){
         return this.__rfinished || false;
+    },
+    onSubmitAnswer(){
+
+        StateActions.alert(
+        {
+            'title':'Submit Answer',
+            'message': 'This will finalize your work on this task, and submit it for the study manager. Are you sure you want to submit this answer?',
+            onConfirm: (context)=>{
+                StateActions.loadingStart();
+
+                if(this.__detaildata.hash){
+                    this.onMethodDetail('submit', this.__detaildata.hash).then(
+                            (answer) => {
+                                StateActions.loadingEnd();
+                                StateActions.save()
+                                StateActions.dismissAlert();
+                                this.__rsubmitted = true;
+
+                                this.trigger();
+                            }
+                    );
+                }
+            }
+        });
+
     },
     onSaveAnswer(){
         StateActions.loadingStart();

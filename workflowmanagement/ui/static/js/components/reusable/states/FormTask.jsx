@@ -277,6 +277,14 @@ class FormTaskRun extends FormTask{
                     new_assignee: e
                 })
             },
+            refineAnswer(e){
+                let answer_hash = $(e.target).data('answer');
+
+                let action = this.state.parent.props.refineAnswer;
+                if(action){
+                    action(answer_hash);
+                }
+            },
             results(){
                 let me=this;
 
@@ -297,6 +305,8 @@ class FormTaskRun extends FormTask{
                 let stillOn = desc === 'Running' || desc === 'Waiting';
 
                 let renderStatus = function(user){
+                    console.log(user);
+
                     if(user.finished){
                         return (
                             <span>
@@ -304,9 +314,13 @@ class FormTaskRun extends FormTask{
                                     Finished on {moment(user.result.date).format('YYYY-MM-DD HH:mm')}
                                 </span>
                                  &nbsp;&nbsp;&nbsp;
-                                 <Link to={user.result.type}
+                                 <div className="btn btn-group">
+
+                                 <button data-answer={user.hash} onClick={me.refineAnswer} className="btn btn-xs btn-warning">Ask for refinement</button>
+                                 <Link className="btn btn-xs btn-info" to={user.result.type}
                                  params={{object: user.result.hash}}>
                                  See result</Link>
+                                 </div>
                             </span>
                         );
                     } else if(user.reassigned){

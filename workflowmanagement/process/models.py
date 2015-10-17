@@ -104,7 +104,7 @@ class Process(models.Model):
                 ptask.status = ProcessTask.RUNNING
                 ptask.save()
 
-        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING)).count() == 0:
+        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
             self.status = Process.FINISHED
             self.end_date = timezone.now()
 
@@ -164,13 +164,15 @@ class ProcessTask(models.Model):
     FINISHED        = 3
     CANCELED        = 4
     OVERDUE         = 5
+    IMPROVING       = 6
 
     STATUS          = (
             (WAITING,   'Task is waiting execution'),
             (RUNNING,   'Task is running'),
             (FINISHED,  'Task has ended successfully'),
             (CANCELED,  'Task was canceled'),
-            (OVERDUE,   'Task has gone over end_date')
+            (OVERDUE,   'Task has gone over end_date'),
+            (IMPROVING,   'Task is running again to be improved')
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)

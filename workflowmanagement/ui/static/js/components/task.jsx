@@ -80,8 +80,8 @@ export default React.createClass({
                 Reflux.listenTo(TaskStore, 'update'), Reflux.listenTo(ResultStore, 'update')],
     statics: {
         fetch(params, route) {
-            if(route.name.toLowerCase().indexOf('result') !== -1){
-                return new Promise(function (fulfill, reject){
+        if(route.name.toLowerCase().indexOf('result') !== -1){
+            return new Promise(function (fulfill, reject){
 
                 ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                     (result) => {
@@ -97,15 +97,15 @@ export default React.createClass({
 
                     }
                 ).catch(ex=> reject(ex));
-                });
-            } else{
-                return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
-                    (Task) => {
-                        return Task;
-                    }
-                );
-            }
+            });
+        } else{
+            return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
+                (Task) => {
+                    return Task;
+                }
+            );
         }
+    }
     },
     contextTypes: {
         router: React.PropTypes.func.isRequired
@@ -125,6 +125,7 @@ export default React.createClass({
         let tmp = {
             answer: ResultStore.getAnswer(),
             submitted: ResultStore.answerSubmitted(),
+            saved: ResultStore.answerSaved(),
             user: UserStore.getUser(),
             task: TaskStore.getDetail()
         };
@@ -179,8 +180,12 @@ export default React.createClass({
     componentDidUpdate(){
         let detail = Object.keys(this.props.detail)[0];
 
-        if(this.state.submitted && !this.props.detail[detail].result)
+        if(this.state.saved && !this.props.detail[detail].result){
+            this.context.router.transitionTo(this.state.submitted.type, {object: this.state.submitted.hash});
+        }
+        if(this.state.submitted){
             this.context.router.transitionTo('home');
+        }
     },
     update(status){
         let detail = Object.keys(this.props.detail)[0];
@@ -194,6 +199,10 @@ export default React.createClass({
         ResultActions.setAnswer(prop, val);
 
 
+    },
+    submitAnswer(e){
+        if(this.validate())
+            ResultActions.submitAnswer();
     },
     saveAnswer(e){
         if(this.validate())
@@ -226,21 +235,26 @@ export default React.createClass({
 
     },
     digestDescription(desc, map){
-        if(desc){
+                if(desc){
 
-            let result = desc.replace(/#\((.*?)\)/g, function(a, b){
-                let hit = map[b];
+                    let result = desc.replace(/#\((.*?)\)/g, function(a, b){
+                        let hit = map[b];
 
-                if(hit)
-                    return '<a href="'+map[b]+'">' + b + '</a>';
-                else
-                    return b;
+                        if(hit)
+                            return '<a target="_blank" href="'+map[b]+'">' + b + '</a>';
+                        else
+                            return b;
 
-            });
+                    });
 
-            return result;
-        }
-        return undefined;
+                    result = result.replace(/((http[s]?:\/\/[\w.\/_\-=?]+)|(mailto:[\w.\/@_\-=?]+))/g, function(a, b){
+                        return '<a target="_blank" href="'+b+'">' + b + '</a>';
+
+                    });
+
+                    return result;
+                }
+                return undefined;
     },
     render() {
         if(this.props.failed){
@@ -300,6 +314,12 @@ export default React.createClass({
                 }
             ];
 
+        let detail;
+
+        try{
+            detail = Object.keys(this.props.detail)[0];
+        } catch(err){
+        };
         return (
             <div className="task-detail row">
                 <div className="col-md-12">
@@ -373,7 +393,7 @@ export default React.createClass({
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Description</strong></span>
                                               <span disabled style={{float: 'none'}} className="form-control">
-                                              <span dangerouslySetInnerHTML={getDesc()} />
+                                              <span style={{wordBreak: 'break-word'}} dangerouslySetInnerHTML={getDesc()} />
                                               </span>
                                             </div>
                                         </div>
@@ -430,9 +450,16 @@ export default React.createClass({
                 <div className="col-md-3">
                     {this.didWrite() ?
                             <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
-                                <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
+
+                                <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">
+                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save
                                 </button>
+
+                                { detail && this.props.detail && this.props.detail[detail].result?
+                                    <button onClick={this.submitAnswer} className="btn btn-success pull-right">
+                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Submit
+                                </button>:''}
+
                             </Affix>
                             : ''}
                     </div>

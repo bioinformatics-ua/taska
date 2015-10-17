@@ -533,6 +533,31 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(ProcessSerializer(self.get_object()).data)
 
+
+    @transaction.atomic
+    @detail_route(methods=['post'])
+    def refine(self, request, hash=None):
+        """
+            Reverts a specific user task on a process task.
+        """
+        ptu = get_object_or_404(ProcessTaskUser, hash=request.data['ptu'])
+
+        ptu.finished=False
+        ptu.save()
+
+        ptask = ptu.processtask
+
+        ptask.status = ProcessTask.RUNNING
+
+        ptask.save()
+
+        ptask.process.status = Process.RUNNING
+
+        ptask.process.save()
+
+        return Response(ProcessSerializer(self.get_object()).data)
+
+
 class MyProcessTaskSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.
 
@@ -574,6 +599,7 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
     task_repr = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
 
     def get_task_repr(self, obj):
         return obj.processtask.task.title
@@ -583,6 +609,12 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
 
     def get_deadline(self, obj):
         return obj.processtask.deadline
+
+    def get_result(self, obj):
+        try:
+            return obj.result.hash
+        except:
+            return None
 
 class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
     processtask = MyProcessTaskSerializer()
@@ -1029,7 +1061,27 @@ class ProcessTaskResultExport(APIView):
 
         return Response({'export': export}, 500)
 
+'''### Allows to force remaking a processtaskuser
+class ProcessTaskUserRedo(APIView):
+    @transaction.atomic
+    def get(self, request, hash):
+        ptu = get_object_or_404(ProcessTaskUser, hash=hash)
 
+        ptu.finished=False
+        ptu.save()
+
+        ptask = ptu.processtask
+
+        ptask.status = ProcessTask.RUNNING
+
+        ptask.save()
+
+        ptask.process.status = Process.RUNNING
+
+        ptask.process.save()
+
+        return Response(ProcessTaskUserSerializer(ptu).data)
+'''
 class ResultsPDF(PDFTemplateView):
     template_name='results_pdf.html'
     filename='results.pdf'

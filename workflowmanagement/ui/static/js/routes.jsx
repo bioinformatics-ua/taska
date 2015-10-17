@@ -59,7 +59,7 @@ module.exports = (
         <Route name="SimpleTask" path="simpleresult/:object" handler={require('./components/task/simple.jsx')} />
 
         <Route name="FormResult" path="formresult/:object" handler={require('./components/task/form.jsx')} />
-        <Route name="form.FormResult" path="formresult/:object" handler={require('./components/task/form.jsx')} />
+        <Route name="form.FormResult" path="formresult/:object/?:redo?" handler={require('./components/task/form.jsx')} />
 
         <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/form.jsx')} />
         <Route name="FormTask" path="formresult/:object" handler={require('./components/task/form.jsx')} />
