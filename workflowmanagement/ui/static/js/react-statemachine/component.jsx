@@ -589,7 +589,7 @@ let StateMachineComponent = React.createClass({
             ):'';
         };
         list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
-                        <div title="Origin of protocol diagram" id="state-start"  onClick={this.select} className="state-start">
+                        <div title="Origin of study template diagram" id="state-start"  onClick={this.select} className="state-start">
                             <i className="fa fa-3x fa-circle"/>
                         </div>
                         {drop(0,initial_state)}
@@ -891,9 +891,9 @@ let StateMachineComponent = React.createClass({
                             {this.props.blockSchema ?
                                     (<div style={{textAlign: 'justify'}}>
                                         <h3 className="task-type-title panel-title"> <i className="fa fa-2x fa-exclamation-triangle"></i> Attention</h3>
-                                        <p>You won't be able to add/remove states on this protocol, because there are studies associated with it.</p>
+                                        <p>You won't be able to add/remove states on this study template, because there are studies associated with it.</p>
                                         <p>You only will be able to edit detail information on the states.</p>
-                                        <p>To modify any existing protocol with running studies, please duplicate the protocol.</p>
+                                        <p>To modify any existing study template with running studies, please duplicate the study template.</p>
                                     </div>)
                             :{state_list}}
                         </Tabs.Panel>
@@ -963,10 +963,10 @@ let StateMachineComponent = React.createClass({
                               <div className="col-md-12">
                                     <div className="form-group">
                                         <div className="input-group">
-                                          <span className="input-group-addon" id="study-title"><strong>Protocol Title</strong></span>
+                                          <span className="input-group-addon" id="study-title"><strong>Title</strong></span>
                                           <input type="title" className="form-control"
                                             id="exampleInputEmail1" aria-describedby="study-title"
-                                            placeholder="Enter the protocol title"
+                                            placeholder="Enter the title"
                                             onChange={this.setTitle} defaultValue={this.props.title}
                                             disabled={!(this.props.editTitle || this.props.editable)} />
                                         </div>

@@ -225,6 +225,12 @@ class ProcessTask(models.Model):
                 if len(users) > 0:
                     result = users[0].getResult()
 
+                    ex_files = list(result.outputs.all().select_subclasses())
+
+                    for fil in ex_files:
+                        if fil.filename==export.filename:
+                            result.outputs.remove(fil)
+
                     result.outputs.add(export)
 
             self.process.move()

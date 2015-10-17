@@ -19,20 +19,20 @@ export default React.createClass({
 
             <p>The Task is the basic unit on TASKA, everything is a composition or at least related with a task.</p>
             <p>Tasks have inputs and outputs, descriptions and can be of several types, such as Simple Tasks or Form Tasks.</p>
-            <p>Tasks are the unitary block used to construct protocols.</p>
+            <p>Tasks are the unitary block used to construct study templates.</p>
 
-            <h2>Protocol</h2>
+            <h2>Study template</h2>
 
-            <p>A protocol is a composition of dependency related tasks, structured in a ordered way, to accomplish objectives or results.</p>
-            <p>The purpose of protocols is specifying a straightforward structure, that mixes the tasks with a flow that guides them.</p>
-            <p>Protocols can be public or private. Public protocols are available for all registered users.</p>
+            <p>A study template is a composition of dependency related tasks, structured in a ordered way, to accomplish objectives or results.</p>
+            <p>The purpose of study templates is specifying a straightforward structure, that mixes the tasks with a flow that guides them.</p>
+            <p>study templates can be public or private. Public study templates are available for all registered users.</p>
 
-            <p>A protocol works as a template for the study.</p>
+            <p>A study template works as a template for the study.</p>
 
             <h2>Study</h2>
 
-            <p>A study is a protocol's instance, with a specified group of users and deadlines for each of the tasks that composes the protocol.</p>
-            <p>The main concept behind separating protocols from the instances is to easily allow repeatability of tasks across time and intervenients.</p>
+            <p>A study is a study template's instance, with a specified group of users and deadlines for each of the tasks that composes the study template.</p>
+            <p>The main concept behind separating study templates from the instances is to easily allow repeatability of tasks across time and intervenients.</p>
 
             <h2>Request</h2>
 
@@ -64,11 +64,11 @@ export default React.createClass({
 
             <p>This dashboard is divided into six areas evidencing all the system's available features and combines the two different user profiles into one single interface.</p>
 
-            <h2>Protocols</h2>
+            <h2>study templates</h2>
 
-            <p>In this section, user's protocols and public protocols are shown. User's protocols can be edited through a rich visual editor and public protocols can be duplicated (to be modified), or simply used as they are.</p>
+            <p>In this section, user's study templates and public study templates are shown. User's study templates can be edited through a rich visual editor and public study templates can be duplicated (to be modified), or simply used as they are.</p>
 
-            <p>This area can be used to create, modify and delete protocols, but also to run protocols as studies, through the run feature. When we want to create a study from a protocol, we must click run and choose the deadlines and assignee's.</p>
+            <p>This area can be used to create, modify and delete study templates, but also to run study templates as studies, through the run feature. When we want to create a study from a study template, we must click run and choose the deadlines and assignee's.</p>
 
             <h2>Studies</h2>
 

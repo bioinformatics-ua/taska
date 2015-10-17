@@ -68,19 +68,31 @@ export default Reflux.createStore({
             'title':'Submit Answer',
             'message': 'This will finalize your work on this task, and submit it for the study manager. Are you sure you want to submit this answer?',
             onConfirm: (context)=>{
+                var self = this;
                 StateActions.loadingStart();
 
                 if(this.__detaildata.hash){
-                    this.onMethodDetail('submit', this.__detaildata.hash).then(
-                            (answer) => {
-                                StateActions.loadingEnd();
-                                StateActions.save()
-                                StateActions.dismissAlert();
-                                this.__rsubmitted = true;
 
-                                this.trigger();
+                    ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
+                            (answer) => {
+
+                                StateActions.save()
+
+                                self.onMethodDetail('submit', answer.hash).then(
+                                        (answer) => {
+                                            StateActions.loadingEnd();
+                                            StateActions.save()
+                                            StateActions.dismissAlert();
+                                            this.__rsubmitted = true;
+
+                                            this.__detaildata = answer;
+                                            this.trigger();
+                                        }
+                                );
+
                             }
                     );
+
                 }
             }
         });

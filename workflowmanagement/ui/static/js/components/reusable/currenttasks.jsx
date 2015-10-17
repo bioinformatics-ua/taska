@@ -108,6 +108,13 @@ const CurrentTaskTable = React.createClass({
       "displayName": "Title"
       },
       {
+      "columnName": "process_repr",
+      "order": 3,
+      "locked": false,
+      "visible": true,
+      "displayName": "Process"
+      },
+      {
       "columnName": "deadline",
       "order": 4,
       "locked": true,
@@ -120,7 +127,7 @@ const CurrentTaskTable = React.createClass({
     return <Griddle
                       noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "deadline"]}
+                      columns={["type", "task_repr", "process_repr", "deadline"]}
                       columnMetadata={columnMeta} />
   }
 

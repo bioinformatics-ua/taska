@@ -336,19 +336,19 @@ const PermissionsBar = React.createClass({
                             </button>
                       :''}
                       {!this.props.runnable && !this.props.editable && this.props.showRun?
-                          <Link title="Configure protocol as a study" className="btn btn-sm btn-primary" to={this.props.link}
+                          <Link title="Configure study template as a study" className="btn btn-sm btn-primary" to={this.props.link}
                           params={{object: this.props.object, mode:'run'}}>
                           <i className="fa fa-play"></i>
                           </Link>
                       :''}
                       {canedit ?
-                          <Link title="Edit this protocol" className="btn btn-sm btn-warning" to={this.props.link}
+                          <Link title="Edit this study template" className="btn btn-sm btn-warning" to={this.props.link}
                           params={{object: this.props.object, mode:'edit'}}>
                           <i className="fa fa-pencil"></i>
                           </Link>
                       :''}
                       {canedit ?
-                          <DeleteButton title="Delete this protocol"
+                          <DeleteButton title="Delete this study template"
                             success={this.delete}
                             identificator = {this.props.object}
                             deleteLabel={<span><i className="fa fa-times"></i></span>}
