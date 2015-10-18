@@ -603,7 +603,7 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
         '''
             Returns a textual representation for the process this process task is included in
         '''
-        return str(obj.processtask.process)
+        return obj.processtask.process.__unicode__()
 
     def get_task_repr(self, obj):
         return obj.processtask.task.title
