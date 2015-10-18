@@ -27,6 +27,8 @@ import UserStore from '../stores/UserStore.jsx';
 
 import {TaskDependencies} from './TaskDependencies.jsx';
 
+import {depmap} from '../map.jsx';
+
 const RequestTitle = React.createClass({
     render(){
         var row = this.props.rowData;
@@ -179,9 +181,8 @@ export default React.createClass({
     },
     componentDidUpdate(){
         let detail = Object.keys(this.props.detail)[0];
-
         if(this.state.saved && !this.props.detail[detail].result){
-            this.context.router.transitionTo(this.state.submitted.type, {object: this.state.submitted.hash});
+            this.context.router.transitionTo(this.state.saved.type, {object: this.state.saved.hash});
         }
         if(this.state.submitted){
             this.context.router.transitionTo('home');

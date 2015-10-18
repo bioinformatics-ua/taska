@@ -76,7 +76,7 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         '''
         tmp = unicode(obj.user.get_full_name())
 
-        if not tmp:
+        if not tmp or len(tmp) == 0:
             tmp = obj.user.email
 
         return tmp
