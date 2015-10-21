@@ -56,7 +56,47 @@ export default Reflux.createStore({
         //this.trigger();
     },
     answerSubmitted(){
+        return this.__rsubmitted || false;
+    },
+    answerSaved(){
         return this.__rfinished || false;
+    },
+    onSubmitAnswer(){
+
+        StateActions.alert(
+        {
+            'title':'Submit Answer',
+            'message': 'This will finalize your work on this task, and submit it for the study manager. Are you sure you want to submit this answer?',
+            onConfirm: (context)=>{
+                var self = this;
+                StateActions.loadingStart();
+
+                if(this.__detaildata.hash){
+
+                    ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
+                            (answer) => {
+
+                                StateActions.save()
+
+                                self.onMethodDetail('submit', answer.hash).then(
+                                        (answer) => {
+                                            StateActions.loadingEnd();
+                                            StateActions.save()
+                                            StateActions.dismissAlert();
+                                            this.__rsubmitted = true;
+
+                                            this.__detaildata = answer;
+                                            this.trigger();
+                                        }
+                                );
+
+                            }
+                    );
+
+                }
+            }
+        });
+
     },
     onSaveAnswer(){
         StateActions.loadingStart();
@@ -73,6 +113,7 @@ export default Reflux.createStore({
             ResultActions.addDetail.triggerPromise(this.__detaildata).then(
                 (answer) => {
                     StateActions.loadingEnd();
+                    StateActions.save()
                     StateActions.save(true, ()=>{
                         this.__rfinished = answer;
                         this.trigger();

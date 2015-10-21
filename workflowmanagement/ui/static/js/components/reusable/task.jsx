@@ -37,7 +37,7 @@ const TaskTabber = React.createClass({
                 <Tabs.Panel title={<span><i className="fa fa-play"></i> &nbsp;Current Tasks</span>}>
                   <CurrentTaskTable />
                 </Tabs.Panel>
-                <Tabs.Panel title={<span><i className="fa fa-clock-o"></i> &nbsp;Future Tasks</span>}>
+                <Tabs.Panel title={<span><i className="fa fa-clock-o"></i> &nbsp;Scheduled Tasks</span>}>
                   <FutureTaskTable />
                 </Tabs.Panel>
               </Tabs>

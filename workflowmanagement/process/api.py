@@ -76,7 +76,7 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
         '''
         tmp = unicode(obj.user.get_full_name())
 
-        if not tmp:
+        if not tmp or len(tmp) == 0:
             tmp = obj.user.email
 
         return tmp
@@ -533,6 +533,29 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(ProcessSerializer(self.get_object()).data)
 
+    @detail_route(methods=['post'])
+    def refine(self, request, hash=None):
+        """
+            Reverts a specific user task on a process task.
+        """
+        ptu = get_object_or_404(ProcessTaskUser, hash=request.data['ptu'])
+
+        ptu.finished=False
+        ptu.save()
+
+        ptask = ptu.processtask
+
+        ptask.status = ProcessTask.RUNNING
+
+        ptask.save()
+
+        ptask.process.status = Process.RUNNING
+
+        ptask.process.save()
+
+        return Response(ProcessSerializer(self.get_object()).data)
+
+
 class MyProcessTaskSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.
 
@@ -574,6 +597,13 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
     task_repr = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
+    process_repr = serializers.SerializerMethodField()
+    def get_process_repr(self, obj):
+        '''
+            Returns a textual representation for the process this process task is included in
+        '''
+        return obj.processtask.process.__unicode__()
 
     def get_task_repr(self, obj):
         return obj.processtask.task.title
@@ -583,6 +613,12 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
 
     def get_deadline(self, obj):
         return obj.processtask.deadline
+
+    def get_result(self, obj):
+        try:
+            return obj.result.hash
+        except:
+            return None
 
 class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
     processtask = MyProcessTaskSerializer()
@@ -617,7 +653,7 @@ class MyTasks(generics.ListAPIView):
     queryset = ProcessTaskUser.objects.none()
     serializer_class = MyProcessTaskUserSerializer
     filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
-    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'process_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
     ordering_map = {
         'task': 'processtask__task__hash',
         'process': 'processtask__process__hash',
@@ -625,7 +661,8 @@ class MyTasks(generics.ListAPIView):
         'title': 'processtask__task__title',
         'deadline': 'processtask__deadline',
         'type': 'processtask__task__ttype',
-        'task_repr': 'processtask__task__title'
+        'task_repr': 'processtask__task__title',
+        'process_repr': 'processtask__process'
     }
 
     def get_queryset(self):
@@ -1029,7 +1066,27 @@ class ProcessTaskResultExport(APIView):
 
         return Response({'export': export}, 500)
 
+'''### Allows to force remaking a processtaskuser
+class ProcessTaskUserRedo(APIView):
+    @transaction.atomic
+    def get(self, request, hash):
+        ptu = get_object_or_404(ProcessTaskUser, hash=hash)
 
+        ptu.finished=False
+        ptu.save()
+
+        ptask = ptu.processtask
+
+        ptask.status = ProcessTask.RUNNING
+
+        ptask.save()
+
+        ptask.process.status = Process.RUNNING
+
+        ptask.process.save()
+
+        return Response(ProcessTaskUserSerializer(ptu).data)
+'''
 class ResultsPDF(PDFTemplateView):
     template_name='results_pdf.html'
     filename='results.pdf'

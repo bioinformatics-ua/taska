@@ -122,6 +122,10 @@ export default React.createClass({
         console.log(`ADD USER ${user} on process task ${task}`);
         ProcessActions.addUser(task, user);
     },
+    refineAnswer(ptu){
+        console.log(`Refine process task user ${ptu}`);
+        ProcessActions.refineAnswer(ptu);
+    },
     render() {
         if(this.props.failed){
             let Failed = this.props.failed;
@@ -201,6 +205,7 @@ export default React.createClass({
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
                     addNew={this.addNew}
+                    refineAnswer={this.refineAnswer}
                     cancelUser={this.cancelUser}
                     endDetail={ProcessResume}
                     detailMode={this.state.user.profile['detail_mode']}

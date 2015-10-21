@@ -17,6 +17,11 @@ from django.core.files.base import File as DjangoFile
 
 from material.models import File
 
+
+from os import remove
+from shutil import copyfileobj
+import uuid
+
 class ResultExporter(object):
     class Meta:
         task_model = Task
@@ -152,7 +157,7 @@ class ResultExporterCSV(CSVMixin, ResultExporter):
     pass
 
 class JSONMixin(object):
-    def export(self, encode=False):
+    def export(self, encode=False, export_file=False):
         task = self.getTask()
         rows = super(JSONMixin, self).export()
 
@@ -164,7 +169,7 @@ class ResultExporterJSON(JSONMixin, ResultExporter):
     pass
 
 class XLSXMixin(object):
-    def export(self, encode=False):
+    def export(self, encode=False, export_file=False):
         task = self.getTask()
         rows = super(XLSXMixin, self).export(encode=True)
 
@@ -181,6 +186,24 @@ class XLSXMixin(object):
 
 
             ws.append(tmp)
+
+        if export_file :
+            tfile = '/tmp/'+uuid.uuid4().hex
+            wb.save(tfile)
+
+            wkbook = open(tfile)
+            tempFile = tempfile.NamedTemporaryFile()
+            copyfileobj(wkbook, tempFile)
+
+            wkbook.close()
+            remove(tfile)
+
+            dfile = DjangoFile(tempFile)
+
+            f = File(creator=task.workflow.owner, file=dfile, filename='%s_result.xlsx' % task.title.lower(), linked=True)
+            f.save()
+
+            return f
 
         response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
 

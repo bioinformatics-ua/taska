@@ -15,6 +15,8 @@ import moment from 'moment';
 
 import Tabs from 'react-simpletabs';
 
+ import {depmap} from '../../map.jsx';
+
 const TaskDate = React.createClass({
 
   renderMessage(deadline){
@@ -41,12 +43,18 @@ const TaskDate = React.createClass({
 const TaskLink = React.createClass({
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.hash}
+    let object = {object: (row.result? row.result:row.hash)}
+
     return <small title={row.process}>
+            {!row.result ?
             <Link id={`task_${row.hash}`}
               key={row.hash} to={this.props.rowData.type}
-               params={object}>{this.props.rowData.task_repr}</Link><br />
-
+               params={object}>{this.props.rowData.task_repr}</Link>
+            :<span><Link id={`task_${row.hash}`}
+              key={row.result} to={depmap[this.props.rowData.type]}
+               params={object}>{this.props.rowData.task_repr}</Link> <span className="label label-warning">Incomplete</span>
+</span>}
+            <br />
            </small>;
   }
 });
@@ -100,6 +108,13 @@ const CurrentTaskTable = React.createClass({
       "displayName": "Title"
       },
       {
+      "columnName": "process_repr",
+      "order": 3,
+      "locked": false,
+      "visible": true,
+      "displayName": "Process"
+      },
+      {
       "columnName": "deadline",
       "order": 4,
       "locked": true,
@@ -112,7 +127,7 @@ const CurrentTaskTable = React.createClass({
     return <Griddle
                       noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "deadline"]}
+                      columns={["type", "task_repr", "process_repr", "deadline"]}
                       columnMetadata={columnMeta} />
   }
 

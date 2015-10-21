@@ -1,6 +1,7 @@
 'use strict';
 import Reflux from 'reflux';
 import ProcessActions from '../actions/ProcessActions.jsx';
+import StateActions from '../actions/StateActions.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 
@@ -86,6 +87,35 @@ export default Reflux.createStore({
                 this.trigger(this.DETAIL);
             }
         );
+    },
+    onRefineAnswer(ptu){
+
+        StateActions.alert(
+        {
+            'title':'Refine Answer',
+            'message': 'This will mark this answer as incomplete, and will request of the user assigned to it to improve the answer. Are you sure you want to do this ?',
+            onConfirm: (context)=>{
+                StateActions.loadingStart();
+
+                this.onMethodDetail('refine',
+                                    this.__detaildata.hash,
+                                    'POST', {
+                                        ptu: ptu
+                                    })
+                    .then(
+                    (data) => {
+                        StateActions.loadingEnd();
+                        StateActions.save();
+                        StateActions.dismissAlert();
+
+                        this.__detaildata = data;
+                        this.__v++;
+
+                        this.trigger(this.DETAIL);
+                    }
+                );
+            }
+        });
     },
     onAddUser(ptask, user){
         this.onMethodDetail('adduser',

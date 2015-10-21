@@ -26,7 +26,7 @@ class MailTemplate:
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
 
         if link_delegate != None:
-            link_delegate = link_delegate(self.instance.object)
+            link_delegate = link_delegate(self.instance.object, interested)
 
         subject = render_to_string(self.subjecttemplate, {
                             'object': self.instance.object,

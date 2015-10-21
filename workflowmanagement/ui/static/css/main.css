@@ -732,3 +732,15 @@ li.is-active > a {
         margin: 0mm;  /* this affects the margin in the printer settings */
     }
 }
+
+.nav-tabs > li > a {
+    border-top: 4px solid #95A5A6;
+    background-color: #ECF0F1;
+    color: gray;
+}
+.nav-tabs > li.active > a, .nav-tabs>li>a:hover {
+  border-top: 4px solid #337AB7 !important;
+  background-color: white;
+}
+
+

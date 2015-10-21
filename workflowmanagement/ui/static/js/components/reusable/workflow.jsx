@@ -25,7 +25,7 @@ const WorkflowManage = React.createClass({
 
 
             <div className="user-owned">{user && user.id === row.owner ?
-                <i title="You are the creator of this protocol, and are authorized to edit it." className="fa fa-2x fa-user"></i>
+                <i title="You are the creator of this Study Template, and are authorized to edit it." className="fa fa-2x fa-user"></i>
             :''}</div>
             <Link className="btn btn-sm btn-default" to="Workflow"
               params={object2}><i className="fa fa-search"></i></Link>
@@ -110,11 +110,11 @@ const WorkflowTable = React.createClass({
     return  <div className="panel panel-default panel-overflow griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-sitemap pull-left"></i>
-                <h3 className="text-center panel-title">Protocols</h3>
+                <h3 className="text-center panel-title">Study Templates</h3>
                 <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}} to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
-                  noDataMessage={<center>You have not created any protocols yet, click on the plus icon above to create a new protocol.</center>}
+                  noDataMessage={<center>You have not created any study templates yet, click on the plus icon above to create a new study template.</center>}
                   {...this.commonTableSettings()}
                   columns={["title", "owner_repr", "hash"]}
                   columnMetadata={columnMeta} />

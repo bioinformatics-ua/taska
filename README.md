@@ -1,8 +1,12 @@
-Workflow-Management
+TASKA
 =======
 
-Workflow Management for Biomedical exploration
+TASKA: A modular and easily extendable system for
+repeatable workflows
 
+Taska is an open-source web-based, SaaS proposal for a modular and easily extendable workflow-oriented system designed for managing processes of data extraction  and  data-handling  on  multi-user  environments  where  cooperation matters.
+
+A state-of-the-art default client for the web service API based on reactJS is also included to demonstrate the capabilities of such system.
 
 # Minimal Deploy using docker
 

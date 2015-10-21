@@ -98,14 +98,14 @@ class SimpleTask extends SimpleState {
                         let hit = map[b];
 
                         if(hit)
-                            return '<a href="'+map[b]+'">' + b + '</a>';
+                            return '<a target="_blank" href="'+map[b]+'">' + b + '</a>';
                         else
                             return b;
 
                     });
 
                     result = result.replace(/((http[s]?:\/\/[\w.\/_\-=?]+)|(mailto:[\w.\/@_\-=?]+))/g, function(a, b){
-                        return '<a href="'+b+'">' + b + '</a>';
+                        return '<a target="_blank" href="'+b+'">' + b + '</a>';
 
                     });
 
@@ -117,7 +117,7 @@ class SimpleTask extends SimpleState {
             render(){
 
                 let depmap = this.__createMap(this.parent().resources);
-                console.log(depmap);
+
                 let description = this.digestDescription(this.parent().description, depmap) || '';
                 let getDesc = () => { return {__html: description} };
 
@@ -350,6 +350,14 @@ class SimpleTaskRun extends SimpleTask{
                     new_assignee: e
                 })
             },
+            refineAnswer(e){
+                let answer_hash = $(e.target).data('answer');
+
+                let action = this.state.parent.props.refineAnswer;
+                if(action){
+                    action(answer_hash);
+                }
+            },
             results(){
                 let me=this;
 
@@ -376,10 +384,13 @@ class SimpleTaskRun extends SimpleTask{
                                 <span style={{fontSize: '100%'}} className="label label-danger">
                                     Finished on {moment(user.result.date).format('YYYY-MM-DD HH:mm')}
                                 </span>
-                                 &nbsp;&nbsp;&nbsp;
-                                 <Link to={user.result.type}
+                                 <div className="btn btn-group">
+
+                                 <button data-answer={user.hash} onClick={me.refineAnswer} className="btn btn-xs btn-warning">Ask for refinement</button>
+                                 <Link className="btn btn-xs btn-info" to={user.result.type}
                                  params={{object: user.result.hash}}>
                                  See result</Link>
+                                 </div>
                             </span>
                         );
                     } else if(user.reassigned){

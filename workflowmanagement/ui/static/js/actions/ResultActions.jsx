@@ -10,6 +10,7 @@ const ResultActions = Reflux.createActions(
     'loadSuccess':{},
     'load': {},
     'setAnswer': {},
+    'submitAnswer': {},
     'saveAnswer': {},
     'unloadAnswer': {},
     'calibrate': {}

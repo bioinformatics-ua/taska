@@ -34,6 +34,11 @@ const LoggedInHome = React.createClass({
   render: function(){
     return (<span>
           <div className="row flex-container">
+              <div className="col-md-12 flex-container flex-row">
+                <TaskTabber />
+              </div>
+          </div>
+          <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
                 <WorkflowTable user={this.state.user} />
               </div>
@@ -42,21 +47,22 @@ const LoggedInHome = React.createClass({
               </div>
           </div>
           <div className="row flex-container">
-              <div className="col-md-6 flex-container flex-row">
-                <TaskTabber />
-              </div>
-              <div className="col-md-6 flex-container flex-row">
-                <RequestTable />
-              </div>
+
           </div>
           <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
-                <FormTable />
+                <RequestTable />
               </div>
               <div className="col-md-6 flex-container flex-row">
+                <FormTable />
+              </div>
+          </div>
+          <div className="row flex-container">
+              <div className="col-md-12 flex-container flex-row">
                 <GeneralHistoryTable />
               </div>
           </div>
+
       </span>);
   }
 })

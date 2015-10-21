@@ -146,18 +146,6 @@ class ResultSerializer(serializers.ModelSerializer):
 
         result = self.Meta.model.objects.create(**validated_data)
 
-        this_ptu.finish()
-
-        users = []
-        auths = this_ptu.processtask.users().order_by('user').distinct('user')
-
-        for ptu in auths:
-            users.append(ptu.user)
-
-        users.append(process.executioner)
-
-        History.new(event=History.ADD, actor=this_ptu.user, object=result, authorized=users, related=[process])
-
         self.__create_resources(result, outputs)
 
         return result
@@ -283,3 +271,26 @@ class ResultViewSet(    mixins.CreateModelMixin,
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @transaction.atomic
+    @detail_route(methods=['get'])
+    def submit(self, request, hash=None):
+        """
+       Submits a result as complete
+        """
+        result = self.get_object()
+        this_ptu = result.processtaskuser
+        process = this_ptu.processtask.process
+
+        this_ptu.finish()
+
+        users = []
+        auths = this_ptu.processtask.users().order_by('user').distinct('user')
+
+        for ptu in auths:
+            users.append(ptu.user)
+
+        users.append(process.executioner)
+
+        History.new(event=History.ADD, actor=this_ptu.user, object=result, authorized=users, related=[process])
+
+        return Response(GenericResultSerializer(self.get_object()).data)

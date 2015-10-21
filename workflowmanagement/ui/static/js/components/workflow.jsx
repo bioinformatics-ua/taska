@@ -50,11 +50,11 @@ export default React.createClass({
         view: {
         },
         edit: {
-            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your protocol, is to click in the "plus” areas on the right and add the tasks that you want.',
+            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your study template, is to click in the "plus” areas on the right and add the tasks that you want.',
             global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of other level.'
         },
         run: {
-            detail: 'Please fulfill assignee and deadlines before running the protocol as a study.',
+            detail: 'Please fulfill assignee and deadlines before running the study template as a study.',
             global: 'Click tasks to add assignees and deadlines, ready tasks will change color'
         }
     },
@@ -93,9 +93,9 @@ export default React.createClass({
     displayName: route => {
         try{
             let detail = Object.keys(route.props.detail)[0];
-            return `Protocol - ${route.props.detail[detail].title}`;
+            return `Study Template - ${route.props.detail[detail].title}`;
         } catch(ex){
-            return 'Protocol Not Found';
+            return 'Study Template Not Found';
         }
     },
     getWorkflow(){
@@ -284,7 +284,7 @@ export default React.createClass({
                     save={params.mode === 'run'? this.runProcess:this.save}
                     onUpdate={this.unsaved}
                     saveLabel={params.mode !== 'run'?
-                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Protocol</span>
+                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
                     : <span><i className="fa fa-play"></i> Run</span>}
                     initialSm={sm}
                     detailMode={this.state.user.profile['detail_mode']}
