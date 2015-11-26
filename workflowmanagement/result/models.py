@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 from django.dispatch import receiver
 
@@ -51,7 +52,7 @@ class Result(models.Model):
         tmp = Result.objects.filter(removed=False)
 
         if owner != None:
-            tmp=tmp.filter(processtaskuser__processtask__process__executioner=owner)
+            tmp=tmp.filter(Q(processtaskuser__processtask__process__executioner=owner) | Q(processtaskuser__user=owner))
 
         if processtaskuser != None:
             return tmp.get_subclass(processtaskuser=processtaskuser)

@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     url(r'^/my/tasks/', api.MyTasks.as_view()),
     url(r'^/my/futuretasks/', api.MyFutureTasks.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', api.MyTaskDependencies.as_view()),
+    url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', api.MyTaskPreliminary.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/', api.MyTask.as_view()),
 
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/pdf?$'
@@ -30,5 +31,4 @@ urlpatterns = patterns('',
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view()),
 
     #url(r'^/ptu/(?P<hash>[0-9a-zA-Z]+)/redo$', api.ProcessTaskUserRedo.as_view()),
-
 )

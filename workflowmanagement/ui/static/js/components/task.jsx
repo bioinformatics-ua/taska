@@ -10,6 +10,8 @@ import {Authentication} from '../mixins/component.jsx';
 
 import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
 
+import StateActions from '../actions/StateActions.jsx';
+
 import TaskActions from '../actions/TaskActions.jsx';
 
 import TaskStore from '../stores/TaskStore.jsx';
@@ -129,7 +131,8 @@ export default React.createClass({
             submitted: ResultStore.answerSubmitted(),
             saved: ResultStore.answerSaved(),
             user: UserStore.getUser(),
-            task: TaskStore.getDetail()
+            task: TaskStore.getDetail(),
+            dversion: TaskStore.getDepVersion()
         };
         return tmp;
     },
@@ -188,18 +191,20 @@ export default React.createClass({
             this.context.router.transitionTo('home');
         }
     },
-    update(status){
+    update(status, force=false){
         let detail = Object.keys(this.props.detail)[0];
 
         if(this.props.detail[detail].result)
             this.setState(this.__getState(true));
         else
             this.setState(this.__getState());
+
+        if(force){
+            location.reload();
+        }
     },
     setAnswer(prop, val){
         ResultActions.setAnswer(prop, val);
-
-
     },
     submitAnswer(e){
         if(this.validate())
@@ -256,6 +261,11 @@ export default React.createClass({
                     return result;
                 }
                 return undefined;
+    },
+    preliminary(){
+        let hash = this.context.router.getCurrentParams().object;
+
+        TaskActions.preliminary(hash);
     },
     render() {
         if(this.props.failed){
@@ -487,7 +497,10 @@ export default React.createClass({
                                     <div>
                                         <center><h4>
                                         This task is scheduled to be executed by you, but is waiting that other intervenients finish their own tasks, which your task depends upon.
-                                        </h4></center>
+                                        </h4><hr /><h2>Preliminary Inputs</h2></center>
+
+                                        <button onClick={this.preliminary} className="pull-right btn btn-info"><i className="fa fa-refresh"></i> Update Preliminary Inputs</button>
+                                        <TaskDependencies dversion={this.state.dversion} context={this} />
                                     </div>
                                     }
                                 </div>

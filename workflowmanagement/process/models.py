@@ -201,7 +201,7 @@ class ProcessTask(models.Model):
     def user(self, user):
         return ProcessTaskUser.all(processtask=self).get(user=user)
 
-    def move(self):
+    def move(self, force=False):
 
         missing = ProcessTaskUser\
             .all(processtask=self, reassigned=False) \
@@ -214,26 +214,33 @@ class ProcessTask(models.Model):
             # IF WE ARE BEFORE A FORM TASK, UPLOAD THE EXPORT RESULTS PASSING THEM BELOW, bit of a hack
             task = Task.objects.get_subclass(id=self.task.id)
 
-            if task.type() == 'form.FormTask' and task.output_resources:
-
-                exporter = task.get_exporter('xlsx', self)
-
-                export = exporter.export(export_file=True)
-
-                users = self.users()
-
-                if len(users) > 0:
-                    result = users[0].getResult()
-
-                    ex_files = list(result.outputs.all().select_subclasses())
-
-                    for fil in ex_files:
-                        if fil.filename==export.filename:
-                            result.outputs.remove(fil)
-
-                    result.outputs.add(export)
+            self.__exportForm(task)
 
             self.process.move()
+
+        else:
+            if force:
+                self.__exportForm(Task.objects.get_subclass(id=self.task.id))
+
+    def __exportForm(self, task):
+        if task.type() == 'form.FormTask' and task.output_resources:
+
+            exporter = task.get_exporter('xlsx', self)
+
+            export = exporter.export(export_file=True)
+
+            users = self.users()
+
+            if len(users) > 0:
+                result = users[0].getResult()
+
+                ex_files = list(result.outputs.all().select_subclasses())
+
+                for fil in ex_files:
+                    if fil.filename==export.filename:
+                        result.outputs.remove(fil)
+
+                result.outputs.add(export)
 
     @staticmethod
     def all(process=None):
