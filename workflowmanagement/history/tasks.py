@@ -19,4 +19,4 @@ def warnLateDeadlines():
         pusers = ptask.users()
 
         for puser in pusers:
-            History.new(event=History.LATE, actor=puser.user, object=puser, authorized=[], related=[puser.processtask.process])
+            History.new(event=History.LATE, actor=puser.user, object=puser, authorized=[puser.user], related=[puser.processtask.process])

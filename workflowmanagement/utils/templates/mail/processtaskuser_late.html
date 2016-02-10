@@ -1,0 +1,17 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object}} is behind schedule
+{% endblock %}
+
+{% block body %}
+Hello dear user,<br /><br />
+
+This email is meant to inform you that the task {{object}} you have been assigned, is behind schedule.
+
+Please visit your Taska account to complete this task.
+
+<br /><br />
+Best Regards,<br />
+Taska
+{% endblock %}
