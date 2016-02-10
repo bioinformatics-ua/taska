@@ -104,6 +104,10 @@ class Process(models.Model):
                 ptask.status = ProcessTask.RUNNING
                 ptask.save()
 
+                pusers = ptask.users()
+                for puser in pusers:
+                    History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
+
         if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
             self.status = Process.FINISHED
             self.end_date = timezone.now()

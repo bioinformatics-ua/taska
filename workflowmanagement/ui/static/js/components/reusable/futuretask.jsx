@@ -20,7 +20,10 @@ const TaskDateEst = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
+      return <small className="pull-right text-danger">
+    <span className="warnicon">Waiting dep. </span>
+    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
+    </small>;
 
     const diff = moment.duration(now.diff(due)).asDays();
 
@@ -43,7 +46,10 @@ const TaskDate = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
+      return <small className="pull-right text-danger">
+    <span className="warnicon">Waiting dep. </span>
+    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
+    </small>;
 
     const diff = moment.duration(now.diff(due)).asDays();
 

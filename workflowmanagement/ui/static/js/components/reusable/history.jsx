@@ -90,6 +90,11 @@ var HistoryItem = React.createClass({
           text = `${entry.actor_repr} is late on`;
           return <span>{text} {entry.object_repr}</span>;        
 
+        case 'Run':
+          text = `${entry.actor_repr} can now start answering`;
+          return <span>{text} {entry.object_repr}</span>;        
+
+
         default: return entry.event;
       }
     }
@@ -116,6 +121,7 @@ var EventIcon = React.createClass({
         case 'Comment': return <i className="fa fa-comment thumb"></i>;
         case 'Recover': return <i className="fa fa-medkit thumb"></i>;
         case 'Late': return <i className="fa fa-clock-o thumb"></i>;
+        case 'Run': return <i className="fa fa-play thumb"></i>;
 
         default: return event;
       }
