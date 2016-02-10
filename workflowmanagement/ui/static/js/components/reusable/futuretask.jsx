@@ -13,6 +13,32 @@ import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import moment from 'moment';
 
+const TaskDateEst = React.createClass({
+
+  renderMessage(deadline){
+    const now = moment()
+    const due = moment(deadline)
+
+    if(due.isBefore(now))
+      return <small className="pull-right text-danger">
+    <span className="warnicon">Waiting dep. </span>
+    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
+    </small>;
+
+    const diff = moment.duration(now.diff(due)).asDays();
+
+    if(diff < 7)
+      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
+
+    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
+  },
+  render(){
+    const row = this.props.rowData;
+
+    return this.renderMessage(row['start_date'])
+  }
+});
+
 const TaskDate = React.createClass({
 
   renderMessage(deadline){
@@ -20,7 +46,10 @@ const TaskDate = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
+      return <small className="pull-right text-danger">
+    <span className="warnicon">Waiting dep. </span>
+    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
+    </small>;
 
     const diff = moment.duration(now.diff(due)).asDays();
 
@@ -106,8 +135,17 @@ const FutureTaskTable = React.createClass({
       "displayName": "Process"
       },
       {
-      "columnName": "deadline",
+      "columnName": "start_date",
       "order": 4,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'start-td',
+      "customComponent": TaskDateEst,
+      "displayName": "Est. Start"
+      },
+      {
+      "columnName": "deadline",
+      "order": 5,
       "locked": true,
       "visible": true,
       "cssClassName": 'deadline-td',
@@ -118,7 +156,7 @@ const FutureTaskTable = React.createClass({
     return <Griddle
                       noDataMessage={<center>You currently have no future tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "process_repr", "deadline"]}
+                      columns={["type", "task_repr", "process_repr", "start_date", "deadline"]}
                       columnMetadata={columnMeta} />
   }
 

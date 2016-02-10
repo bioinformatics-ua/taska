@@ -17,6 +17,29 @@ import Tabs from 'react-simpletabs';
 
  import {depmap} from '../../map.jsx';
 
+const TaskDateEst = React.createClass({
+
+  renderMessage(deadline){
+    const now = moment()
+    const due = moment(deadline)
+
+    if(due.isBefore(now))
+      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
+
+    const diff = moment.duration(now.diff(due)).asDays();
+
+    if(diff < 7)
+      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
+
+    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
+  },
+  render(){
+    const row = this.props.rowData;
+
+    return this.renderMessage(row['start_date'])
+  }
+});
+
 const TaskDate = React.createClass({
 
   renderMessage(deadline){
@@ -115,8 +138,17 @@ const CurrentTaskTable = React.createClass({
       "displayName": "Process"
       },
       {
-      "columnName": "deadline",
+      "columnName": "start_date",
       "order": 4,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'start_date-td',
+      "customComponent": TaskDateEst,
+      "displayName": "Est. Start"
+      },
+      {
+      "columnName": "deadline",
+      "order": 5,
       "locked": true,
       "visible": true,
       "cssClassName": 'deadline-td',
@@ -127,7 +159,7 @@ const CurrentTaskTable = React.createClass({
     return <Griddle
                       noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "process_repr", "deadline"]}
+                      columns={["type", "task_repr", "process_repr", "start_date", "deadline"]}
                       columnMetadata={columnMeta} />
   }
 

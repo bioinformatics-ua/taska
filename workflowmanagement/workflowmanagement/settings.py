@@ -306,3 +306,9 @@ LOGGING = {
         },
     },
 }
+
+
+# Periodic user updates about late deadlines
+LATE_DAY='friday'
+LATE_HOUR = 3
+LATE_MIN = 0

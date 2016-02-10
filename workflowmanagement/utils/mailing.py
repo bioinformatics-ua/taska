@@ -85,6 +85,13 @@ class ProcessTaskAddTemplate(MailTemplate):
     subjecttemplate="mail/processtask_add_subject.html"
     template="mail/processtask_add.html"
 
+class ProcessTaskUserLateTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_late_subject.html"
+    template="mail/processtaskuser_late.html"
+
+class ProcessTaskUserRunTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_run_subject.html"
+    template="mail/processtaskuser_run.html"
 
 class ResultAddTemplate(MailTemplate):
     subjecttemplate="mail/result_add_subject.html"
@@ -107,3 +114,4 @@ class UserApproveTemplate(MailTemplate):
 class UserRecoveryRecoverTemplate(MailTemplate):
     subjecttemplate="mail/userrecovery_recover_subject.html"
     template="mail/userrecovery_recover.html"
+

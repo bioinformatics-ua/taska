@@ -61,7 +61,7 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return u'%s (started %s by %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name())
+        return u'%s (started %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"))
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -103,6 +103,10 @@ class Process(models.Model):
             if move:
                 ptask.status = ProcessTask.RUNNING
                 ptask.save()
+
+                pusers = ptask.users()
+                for puser in pusers:
+                    History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
 
         if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
             self.status = Process.FINISHED
@@ -234,13 +238,24 @@ class ProcessTask(models.Model):
             if len(users) > 0:
                 result = users[0].getResult()
 
-                ex_files = list(result.outputs.all().select_subclasses())
+                if result:
+                    ex_files = list(result.outputs.all().select_subclasses())
 
-                for fil in ex_files:
-                    if fil.filename==export.filename:
-                        result.outputs.remove(fil)
+                    for fil in ex_files:
+                        if fil.filename==export.filename:
+                            result.outputs.remove(fil)
 
-                result.outputs.add(export)
+                    result.outputs.add(export)
+
+    def calculateStart(self):
+        deps = self.task.dependencies().values_list('id', flat=True)
+
+        pdeps = ProcessTask.all().filter(task__in=deps).order_by('-deadline')
+
+        if pdeps.count() > 0:
+            return pdeps[0].deadline
+
+        return self.process.start_date
 
     @staticmethod
     def all(process=None):
