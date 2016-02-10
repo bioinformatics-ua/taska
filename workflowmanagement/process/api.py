@@ -599,6 +599,12 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
     deadline = serializers.SerializerMethodField()
     result = serializers.SerializerMethodField()
     process_repr = serializers.SerializerMethodField()
+
+    start_date = serializers.SerializerMethodField()
+
+    def get_start_date(self, obj):
+        return obj.processtask.calculateStart()
+
     def get_process_repr(self, obj):
         '''
             Returns a textual representation for the process this process task is included in
@@ -625,6 +631,7 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
     requests = serializers.SerializerMethodField()
     task_repr = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
     dependencies = serializers.SerializerMethodField()
 
@@ -633,6 +640,9 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
 
     def get_type(self, obj):
         return Task.objects.get_subclass(id=obj.processtask.task.id).type()
+
+    def get_start_date(self, obj):
+        return obj.processtask.calculateStart()
 
     def get_deadline(self, obj):
         return obj.processtask.deadline
