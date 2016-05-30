@@ -36,12 +36,14 @@ class Process(models.Model):
     FINISHED        = 2
     CANCELED        = 3
     OVERDUE         = 4
+    WAITING         = 5
 
     STATUS          = (
             (RUNNING,   'Process is running'),
             (FINISHED,  'Process has ended successfully'),
             (CANCELED,  'Process was canceled'),
-            (OVERDUE,   'Process has gone over end_date')
+            (OVERDUE,   'Process has gone over end_date'),
+            (WAITING,   'Process is waiting for users availability')
         )
     workflow        = models.ForeignKey(Workflow)
     title           = models.CharField(max_length=200, null=True)
@@ -87,34 +89,34 @@ class Process(models.Model):
             Reaccess tasks status (so we can move the state machine forward)
         '''
         ptasks = self.tasks()
+        if self.status != Process.WAITING:
+            wlist = ptasks.filter(status=ProcessTask.WAITING)
 
-        wlist = ptasks.filter(status=ProcessTask.WAITING)
+            for ptask in wlist:
+                move = True
+                deps = ptask.task.dependencies()
 
-        for ptask in wlist:
-            move = True
-            deps = ptask.task.dependencies()
+                for dep in deps:
+                    pdep = ptasks.get(task=dep.dependency)
 
-            for dep in deps:
-                pdep = ptasks.get(task=dep.dependency)
+                    if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
+                        move=False
 
-                if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
-                    move=False
+                if move:
+                    ptask.status = ProcessTask.RUNNING
+                    ptask.save()
 
-            if move:
-                ptask.status = ProcessTask.RUNNING
-                ptask.save()
+                    pusers = ptask.users()
+                    for puser in pusers:
+                        History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
 
-                pusers = ptask.users()
-                for puser in pusers:
-                    History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
+            if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
+                self.status = Process.FINISHED
+                self.end_date = timezone.now()
 
-        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
-            self.status = Process.FINISHED
-            self.end_date = timezone.now()
+                History.new(event=History.DONE, actor=self.executioner, object=self)
 
-            History.new(event=History.DONE, actor=self.executioner, object=self)
-
-            self.save()
+                self.save()
 
     def progress(self):
         all = ProcessTask.all(process=self).count()
@@ -169,6 +171,7 @@ class ProcessTask(models.Model):
     CANCELED        = 4
     OVERDUE         = 5
     IMPROVING       = 6
+    WAITING_AVAILABILITY = 7
 
     STATUS          = (
             (WAITING,   'Task is waiting execution'),
@@ -176,7 +179,8 @@ class ProcessTask(models.Model):
             (FINISHED,  'Task has ended successfully'),
             (CANCELED,  'Task was canceled'),
             (OVERDUE,   'Task has gone over end_date'),
-            (IMPROVING,   'Task is running again to be improved')
+            (IMPROVING,   'Task is running again to be improved'),
+            (WAITING_AVAILABILITY, 'Task is waiting for users availability')
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)
@@ -287,7 +291,19 @@ class ProcessTaskUser(models.Model):
         :processtask (ProcessTask): class:`ProcessTask` related with this instance
         :reassigned (boolean): Indicates if this user was reassignment in the middle of a task
         :reassign_date (datetime): Timestamp of this user reassignment (if any)
+        ...
+        :status (smallint): Indicator of the status of the user decision
     '''
+    # Status literals, representing the translation to the statuses the process task can be in
+    WAITING         = 1
+    ACCEPTED        = 2
+    REJECTED        = 3
+
+    STATUS          = (
+            (WAITING,   'Task is waiting confirmation from user'),
+            (ACCEPTED,  'Task was accepted'),
+            (REJECTED,  'Task was rejected')
+        )
 
     user            = models.ForeignKey(User)
     processtask     = models.ForeignKey(ProcessTask)
@@ -295,6 +311,7 @@ class ProcessTaskUser(models.Model):
     reassign_date   = models.DateTimeField(null=True, blank=True)
     finished        = models.BooleanField(default=False)
     hash            = models.CharField(max_length=50)
+    status          = models.PositiveSmallIntegerField(choices=STATUS, default=WAITING)
 
     class Meta:
         ordering = ['-processtask__deadline']
@@ -338,11 +355,24 @@ class ProcessTaskUser(models.Model):
 
         self.processtask.move()
 
+    def accept(self):
+        self.status=ProcessTaskUser.ACCEPTED
+        self.save()
+
+        self.processtask.move()
+
+    def reject(self):
+        self.status=ProcessTaskUser.REJECTED
+        self.save()
+
+        self.processtask.move()
+
     @staticmethod
     def all(processtask=None, related=False, finished=None, reassigned=None):
         ''' Returns all valid processtask instances
 
         '''
+
         tmp = None
         if related:
             tmp = ProcessTaskUser.objects.select_related('processtask').all()

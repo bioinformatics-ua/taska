@@ -75,11 +75,12 @@ class ProcessTaskUserSerializer(serializers.ModelSerializer):
             Preferably the user full name, but falling back to the email in case this does not exist.
         '''
         tmp = unicode(obj.user.get_full_name())
-
+        
         if not tmp or len(tmp) == 0:
             tmp = obj.user.email
 
         return tmp
+
 
 class PTUWithResult(ProcessTaskUserSerializer):
     '''Serializer to handle :class:`process.models.ProcessTaskUser` objects serialization/deserialization.
@@ -153,7 +154,7 @@ class ProcessTaskSerializer(serializers.ModelSerializer):
             for user_data in users_data:
                 user_data['processtask'] = processtask
                 serializer = ProcessTaskUserSerializer()
-
+                print user_data
                 ptu = serializer.create(user_data)
 
         users = []
@@ -756,8 +757,80 @@ class MyTaskDependencies(generics.ListAPIView):
 
         return ProcessTask.all().filter(process=process, task__in=task_deps)
 
+class MyTaskAproveViewSet(viewsets.ModelViewSet):
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = ProcessTaskUserSerializer
+    lookup_field = 'hash'
 
+    @list_route(methods=['post'])
+    def acceptAllByProcess(self, request):
+        hashProcess = request.GET.get('hash')
 
+        list_obj = []
+        try:
+            list_obj = ProcessTaskUser.all().filter(
+                    processtask__process__hash=hashProcess,
+                    user=self.request.user
+                )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        for obj in list_obj:
+            obj.accept()
+
+        return Response({"Result":"Success"})
+    
+    @list_route(methods=['post'])
+    def rejectAllByProcess(self, request):
+        hashProcess = request.GET.get('hash')
+
+        list_obj = []
+        try:
+            list_obj = ProcessTaskUser.all().filter(
+                    processtask__process__hash=hashProcess,
+                    user=self.request.user
+                )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        for obj in list_obj:
+            obj.reject()
+
+        return Response({"Result":"Success"})
+
+    @list_route(methods=['post'])
+    def accept(self, request):
+        hashField = request.GET.get('hash')
+
+        obj = None
+        try:
+            obj = ProcessTaskUser.all().get(
+                    hash=hashField,
+                    user=self.request.user
+                )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        obj.accept()
+
+        return Response({"Result":"Success"})
+
+    @list_route(methods=['post'])
+    def reject(self, request):
+        hashField = request.GET.get('hash')
+
+        obj = None
+        try:
+            obj = ProcessTaskUser.all().get(
+                    hash=hashField,
+                    user=self.request.user
+                )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        obj.reject()
+
+        return Response({"Result":"Success"})
 
 class MyTaskPreliminary(generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()

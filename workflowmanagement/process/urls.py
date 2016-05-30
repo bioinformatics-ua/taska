@@ -12,7 +12,7 @@ import api
 router = routers.DefaultRouter()
 router.register(r'/requests', api.RequestsViewSet)
 router.register(r'', api.ProcessViewSet)
-
+router.register(r'/my/task/aprove', api.MyTaskAproveViewSet)
 
 # trick to add root to the router generated urls
 router_tricks = router.urls #+ [url(r'^', api.root)]
@@ -31,4 +31,5 @@ urlpatterns = patterns('',
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view()),
 
     #url(r'^/ptu/(?P<hash>[0-9a-zA-Z]+)/redo$', api.ProcessTaskUserRedo.as_view()),
+
 )

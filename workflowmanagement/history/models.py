@@ -137,6 +137,7 @@ class History(models.Model):
                 action.related.add(hr)
 
         print 'NEW HISTORY'
+        #self.before_send.send(sender=self.__class__, instance=action)
         self.post_new.send(sender=self.__class__, instance=action)
 
         return action
@@ -168,3 +169,4 @@ class History(models.Model):
 
     # Signals
     post_new = django.dispatch.Signal(providing_args=["instance"])
+    #before_send = django.dispatch.Signal(providing_args=["instance"])
