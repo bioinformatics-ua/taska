@@ -20,8 +20,10 @@ module.exports = (
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
         <Route name="register" path="register" handler={require('./components/register.jsx')}/>
-
+            
         <Route name="activate" path="activate/:email" handler={require('./components/activate.jsx')}/>
+            
+        <Route name="ConfirmeTasks" path="askForAvailability/:hash" handler={require('./components/ConfirmeTasks.jsx')}/>
 
         <Route name="forgotten" path="forgotten" handler={require('./components/forgotten.jsx')}/>
 

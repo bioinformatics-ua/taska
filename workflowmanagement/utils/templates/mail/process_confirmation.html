@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-Workflow {{object}} is awaiting for your confirmation
+Study {{object}} is awaiting for your confirmation
 {% endblock %}
 
 {% block body %}
@@ -9,15 +9,17 @@ Hello dear user,<br /><br />
 
 This email is meant to ask for your availability to do that tasks 
 <br />
-{{list_tasks}}
 
-{% if settings.INCLUDE_EMAIL_LINKS and link_accept_all and link_reject_all %}
-<br /> <br />
+{% for task in list_tasks %}
+    {{ task }} <br />
+{% endfor %}
 
-You can accept all tasks <a href="{{link_accept_all}}">here</a>
 
+
+{% if link_open_plataform %}
 <br />
-If you aren't available, you can reject all tasks related with this workflow <a href="{{link_reject_all}}">here</a>
+
+You can accept or reject all tasks about this study <a href="{{link_open_plataform}}">here</a>
 
 {% endif %}
 <br /><br />

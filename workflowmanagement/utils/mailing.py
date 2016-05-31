@@ -27,19 +27,11 @@ class MailTemplate:
 
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
         link_open_plataform = None
-        link_accept_all = None
-        link_reject_all = None
         list_tasks = None
 
         if isinstance(self.instance.object, Process):
-            link_open_plataform = "link" #settings.MAIL_LINKS.get(self.__class__.__name__, None)
-            link_accept_all = "link" #settings.MAIL_LINKS.get(self.__class__.__name__ + "Accept", None)
-            link_reject_all = "link" #settings.MAIL_LINKS.get(self.__class__.__name__ + "Reject", None)
+            link_open_plataform = "askForAvailability/"  + self.instance.object.hash
             list_tasks = self.instance.object.tasks()
-            print(self.instance.object.status)
-            print(self.instance.object.tasks())
-
-
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
@@ -57,8 +49,6 @@ class MailTemplate:
                                        'settings': settings,
                                        'link_delegate': link_delegate,
                                        'user': interested,
-                                       'link_accept_all': link_accept_all,
-                                       'link_reject_all': link_reject_all,
                                        'list_tasks': list_tasks,
                                        'link_open_plataform': link_open_plataform
                                    })

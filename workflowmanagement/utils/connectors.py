@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from utils import mailing
 from tasks import sendEmail
 
-from process.models import Process
+from process.models import Process, ProcessTask
 
 #@receiver(History.before_send)
 #def newHistoryBeforeNotifications(sender, instance, **kwargs):
@@ -35,6 +35,10 @@ def newHistoryNotifications(sender, instance, **kwargs):
         if isinstance(instance.object, Process):
             if(instance.object.status == Process.WAITING):
                 tcn+= 'Waiting'
+
+        if isinstance(instance.object, ProcessTask):
+            if (instance.object.status == ProcessTask.WAITING_AVAILABILITY):
+                tcn += 'Waiting'
 
         #Event + template
         tcn+= dict(instance.__class__.EVENTS)[instance.event].title()+'Template' 

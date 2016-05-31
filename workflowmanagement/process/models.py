@@ -209,6 +209,17 @@ class ProcessTask(models.Model):
     def user(self, user):
         return ProcessTaskUser.all(processtask=self).get(user=user)
 
+    def refreshState(self):
+        allUser = ProcessTaskUser \
+            .all(processtask=self, reassigned=False)
+
+        for usr in allUser:
+            tmp = ProcessTaskUser \
+                .get(processtask=self, user=usr)
+            print "status"
+            print tmp.status
+
+
     def move(self, force=False):
 
         missing = ProcessTaskUser\
@@ -356,15 +367,19 @@ class ProcessTaskUser(models.Model):
         self.processtask.move()
 
     def accept(self):
-        self.status=ProcessTaskUser.ACCEPTED
-        self.save()
+        #Descomentar isto depois
+        #self.status=ProcessTaskUser.ACCEPTED
+        #self.save()
 
+        self.processtask.refreshState()
         self.processtask.move()
 
     def reject(self):
-        self.status=ProcessTaskUser.REJECTED
-        self.save()
+        # Descomentar isto depois
+        #self.status=ProcessTaskUser.REJECTED
+        #self.save()
 
+        self.processtask.refreshState()
         self.processtask.move()
 
     @staticmethod
