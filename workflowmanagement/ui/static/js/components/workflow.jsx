@@ -203,7 +203,11 @@ export default React.createClass({
         WorkflowActions.fork();
     },
     runProcess(data){
+        console.log(data);
         WorkflowActions.runProcess(data);
+    },
+    checkAvailability(data){
+        WorkflowActions.checkAvailability(data);
     },
     closePopup(){
         WorkflowActions.calibrate();
@@ -234,7 +238,7 @@ export default React.createClass({
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
             this.context.router.replaceWith('/404');
 
-        let sm = this.load(params.mode === 'run');
+        let sm = this.load(params.mode === 'run' );
 
         return (
             <span>
@@ -273,19 +277,28 @@ export default React.createClass({
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
-                            {params.mode === 'run' ?
-                                    <RunLabel />:''}
+                            {params.mode === 'run'? <RunLabel />:''}
                             </span>
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
                     editTitle={params.mode === 'run'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
-                    save={params.mode === 'run'? this.runProcess:this.save}
+                    save={params.mode === 'run'? '': this.save}
+                    runProcess={this.runProcess}
+                    checkAvailability = {this.checkAvailability}
                     onUpdate={this.unsaved}
-                    saveLabel={params.mode !== 'run'?
-                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
-                    : <span><i className="fa fa-play"></i> Run</span>}
+                    mode = {params.mode}
+                    saveLabel={params.mode === 'run'?
+                        <div>
+                        </div>
+                        :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }
+/*
+                    saveLabel={params.mode === 'run'?
+                        <span><i className="fa fa-play"></i> Run</span>
+                            :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }*/
                     initialSm={sm}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}
@@ -297,7 +310,7 @@ export default React.createClass({
                     endDetail={undefined}
                     savebar={!params.mode || params.mode === 'view'? false: true}
 
-                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run'? true: false}
+                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run' ? true: false}
 
 
                     {...this.props}/>

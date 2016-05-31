@@ -5,6 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import html2text
 
+from process.models import Process
+
 class MailTemplate:
     def __init__(self, instance, destinies):
         self.instance = instance
@@ -24,29 +26,47 @@ class MailTemplate:
         self.is_valid()
 
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
+        link_open_plataform = None
+        link_accept_all = None
+        link_reject_all = None
+        list_tasks = None
+
+        if isinstance(self.instance.object, Process):
+            link_open_plataform = "link" #settings.MAIL_LINKS.get(self.__class__.__name__, None)
+            link_accept_all = "link" #settings.MAIL_LINKS.get(self.__class__.__name__ + "Accept", None)
+            link_reject_all = "link" #settings.MAIL_LINKS.get(self.__class__.__name__ + "Reject", None)
+            list_tasks = self.instance.object.tasks()
+            print(self.instance.object.status)
+            print(self.instance.object.tasks())
+
+
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
 
         subject = render_to_string(self.subjecttemplate, {
-                            'object': self.instance.object,
-                            'history': self.instance,
-                            'settings': settings,
-                            'user': interested
-                        }).replace('\n', '')
+            'object': self.instance.object,
+            'history': self.instance,
+            'settings': settings,
+            'user': interested
+        }).replace('\n', '')
         message = render_to_string(self.template,
-            {
-                'object': self.instance.object,
-                'history': self.instance,
-                'settings': settings,
-                'link_delegate': link_delegate,
-                'user': interested
-            })
+                                   {
+                                       'object': self.instance.object,
+                                       'history': self.instance,
+                                       'settings': settings,
+                                       'link_delegate': link_delegate,
+                                       'user': interested,
+                                       'link_accept_all': link_accept_all,
+                                       'link_reject_all': link_reject_all,
+                                       'list_tasks': list_tasks,
+                                       'link_open_plataform': link_open_plataform
+                                   })
 
         return (subject, message)
 
     def send_mail(self):
-
+        
         if not self.working:
             raise Exception('Must call is_valid() method, before sending mail')
 
@@ -84,6 +104,16 @@ class ProcessDoneTemplate(MailTemplate):
 class ProcessTaskAddTemplate(MailTemplate):
     subjecttemplate="mail/processtask_add_subject.html"
     template="mail/processtask_add.html"
+
+
+
+
+class ProcessWaitingAddTemplate(MailTemplate):
+    subjecttemplate="mail/process_confirmation_subject.html"
+    template="mail/process_confirmation.html"
+
+
+
 
 class ProcessTaskUserLateTemplate(MailTemplate):
     subjecttemplate="mail/processtaskuser_late_subject.html"

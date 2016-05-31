@@ -10,6 +10,8 @@ hotkey.activate();
 
 import {ContextMenu} from './contextmenu.jsx';
 
+import WorkflowActions from '../actions/WorkflowActions.jsx';
+
 import Tabs from 'react-simpletabs';
 
 import cline from '../vendor/jquery.domline';
@@ -204,7 +206,9 @@ let StateMachineComponent = React.createClass({
             identifier: 'statemachine_editor',
             undoredo: false,
             selectFirst: false,
-            validate: false
+            validate: false,
+            checkAvailability: null,
+            runProcess: null
         };
     },
     update(data){
@@ -799,6 +803,12 @@ let StateMachineComponent = React.createClass({
             return 0;
         }
     },
+    runProcess(data){
+        this.props.runProcess(this.getState());
+    },
+    checkAvailability(data){
+        this.props.checkAvailability(this.getState());
+    },
     render(){
         let chart = this.getRepresentation();
 
@@ -1008,9 +1018,18 @@ let StateMachineComponent = React.createClass({
                                                  :''}
 
                                                  {!this.props.validate || this.valid()?
-                                                    <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                                     this.props.mode === 'run'?
+                                                     <div className="savestate btn-group">
+                                                         <button onClick={this.runProcess} className="btn btn-primary savestate">
+                                                            <i className="fa fa-play"></i> Run
+                                                         </button>
+                                                         <button onClick={this.checkAvailability} className="btn btn-primary savestate">
+                                                            <i className="fa fa-chevron-circle-right"></i> Ask for availability
+                                                         </button>
+                                                     </div>
+                                                     :<button onClick={this.saveWorkflow} className="btn btn-primary savestate">
                                                         {this.props.saveLabel}
-                                                    </button>
+                                                     </button>
                                                 :''}
                                             </span>
                                     </div>

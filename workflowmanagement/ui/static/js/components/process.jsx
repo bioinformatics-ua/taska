@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, DeleteButton} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -114,6 +114,9 @@ export default React.createClass({
     cancel(){
         ProcessActions.cancel();
     },
+    runProcess(){
+
+    },
     cancelUser(task, user, val){
         console.log(`CANCEL USER ${user} on process task ${task}`);
         ProcessActions.cancelUser(task, user, val);
@@ -151,14 +154,29 @@ export default React.createClass({
                                 editable={params.mode === 'edit'}
                                 showEdit={false}
                                 runnable={params.mode === 'run'}
-                                extra={this.state.process.status === 1 || this.state.process.status === 4?
+                                extra={this.state.process.status === 1 || this.state.process.status === 4 ?
                                     <DeleteButton
                                       success={this.cancel}
                                       identificator = {false}
                                       deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
                                       title={`Cancel ${this.state.process['object_repr']}`}
                                       message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
-                                      : ''
+                                      : this.state.process.status === 5 ?
+                                    <span>
+                                    <DeleteButton
+                                      success={this.cancel}
+                                      identificator = {false}
+                                      deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
+                                      title={`Cancel ${this.state.process['object_repr']}`}
+                                      message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
+                                    <RunButton
+                                      success={this.runProcess}
+                                      identificator = {false}
+                                      runLabel= {<span><i className="fa fa-play"></i> Run</span>}
+                                      title={`Run ${this.state.process['object_repr']}`}
+                                      message={`Some of the users have not confirmed their availability! Are you sure you want to run  ${this.state.process['object_repr']} ?`}  />
+                                    </span>
+                                      :''
                                 }
                                 showRun={false}
                                 object={params.object}

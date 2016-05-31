@@ -1,0 +1,26 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+Workflow {{object}} is awaiting for your confirmation
+{% endblock %}
+
+{% block body %}
+Hello dear user,<br /><br />
+
+This email is meant to ask for your availability to do that tasks 
+<br />
+{{list_tasks}}
+
+{% if settings.INCLUDE_EMAIL_LINKS and link_accept_all and link_reject_all %}
+<br /> <br />
+
+You can accept all tasks <a href="{{link_accept_all}}">here</a>
+
+<br />
+If you aren't available, you can reject all tasks related with this workflow <a href="{{link_reject_all}}">here</a>
+
+{% endif %}
+<br /><br />
+Best Regards,<br />
+Taska
+{% endblock %}

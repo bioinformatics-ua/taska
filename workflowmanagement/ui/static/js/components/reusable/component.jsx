@@ -224,6 +224,45 @@ const DeleteButton = React.createClass({
   // }}}
 });
 
+const RunButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    getDefaultProps(){
+      return {
+        runLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
+      };
+    },
+    render: function() {
+        return <button className={`btn ${this.props.extraCss} btn-sm btn-primary`} onClick={this.handleClick}>{this.props.runLabel}</button>;
+    },
+    renderLayer: function() {
+        if (this.state.clicked) 
+        {
+            //if everything ok
+                //run
+            //else
+                //show message and ask if want to continue
+            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        } else {
+            return <span />;
+        }
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
+
 const PermissionsBar = React.createClass({
     getDefaultProps() {
         return {
@@ -303,7 +342,7 @@ const PermissionsBar = React.createClass({
       this.context.router.transitionTo('home');
     },
     render(){
-        let canedit = !this.props.editable && !this.props.runnable && this.props.showEdit;
+        let canedit = !this.props.editable && !this.props.runnable && !this.props.confirmable && this.props.showEdit;
         return (<span>
                 {this.props.owner ?
                 <div className="row">
@@ -323,19 +362,19 @@ const PermissionsBar = React.createClass({
                 this.renderPermissions()
                 }
 
-                    {!this.props.editable && !this.props.runnable && this.props.showEdit ?
+                    {!this.props.editable && !this.props.runnable && !this.props.confirmable && this.props.showEdit ?
                         <div style={{zIndex: 200, position: 'absolute', left: '15px', bottom: '-40px'}}>
                             <small><strong>Associated Processes: </strong> {this.props.listProcesses.length}</small>
                         </div>
                     :''}
                     <div  style={{width: '100%', textAlign: 'right', zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
                     <div className="btn btn-group">
-                      {!this.props.runnable && !this.props.editable && this.props.showRun && this.props.forkable ?
+                      {!this.props.runnable && !this.props.confirmable && !this.props.editable && this.props.showRun && this.props.forkable ?
                             <button style={{border: '1px solid #95a5a6'}} onClick={this.setFork} className="btn btn-sm btn-default">
                               <i className="fa fa-code-fork"></i> &nbsp;Duplicate
                             </button>
                       :''}
-                      {!this.props.runnable && !this.props.editable && this.props.showRun?
+                      {!this.props.runnable && !this.props.confirmable && !this.props.editable && this.props.showRun?
                           <Link title="Configure study template as a study" className="btn btn-sm btn-primary" to={this.props.link}
                           params={{object: this.props.object, mode:'run'}}>
                           <i className="fa fa-play"></i>
@@ -378,6 +417,8 @@ const ProcessStatus = React.createClass({
         extra+=' circle-grey'; label='Canceled'; break;
       case 4:
         extra+=' circle-warning'; label='Overdue'; break;
+      case 5:
+        extra+=' circle-default'; label='Waiting'; break;
     }
     return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label> </span>;
   },
@@ -390,6 +431,6 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar, ProcessStatus, Affix}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, RunButton, PermissionsBar, ProcessStatus, Affix}
 
 

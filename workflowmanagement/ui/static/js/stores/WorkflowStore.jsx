@@ -160,13 +160,50 @@ const WorkflowStore = Reflux.createStore({
                 );
         }
     },
+    onCheckAvailability(data)
+    {
+        console.log(data);
+        let process = {
+            ***REMOVED*** this.__detaildata.hash,
+            tasks: [],
+            title: data.title,
+            status: 5
+        };
 
+        let states = data.sm.getStates();
+        let missing = [];
+        
+        for(let state of states){
+            let serialized = state.serialize();
+
+            if(!state.is_valid()){
+                missing.push(serialized);
+            }
+            
+            process.tasks.push(serialized);
+        }
+        this.__missing = missing
+
+        if(this.__missing.length == 0){
+            StateActions.loadingStart();
+            ProcessActions.addDetail.triggerPromise(process).then(
+                (process) => {
+                    StateActions.loadingEnd();
+                    this.__pfinished = process;
+                    this.trigger();
+                }
+            )
+        }
+
+        this.trigger();
+    },
     onRunProcess(data){
         console.log(data);
         let process = {
             ***REMOVED*** this.__detaildata.hash,
             tasks: [],
-            title: data.title
+            title: data.title,
+            status: 1
         };
 
         let states = data.sm.getStates();
