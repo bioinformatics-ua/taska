@@ -6,6 +6,7 @@ import {Authentication} from '../mixins/component.jsx';
 
 import UserActions from '../actions/UserActions.jsx';
 import UserStore from '../stores/UserStore.jsx';
+import ProcessActions from '../actions/ProcessActions.jsx';
 
 export default React.createClass({
     displayName: "Confirme tasks",
@@ -26,12 +27,12 @@ export default React.createClass({
     accept(){
         let params = this.context.router.getCurrentParams();
 
-        //UserActions.approve(params.email);
+        ProcessActions.accept(params.hash);
     },
     reject(){
         let params = this.context.router.getCurrentParams();
-
-        //UserActions.approve(params.email);
+        
+        ProcessActions.reject(params.hash);
     },
     render() {
         let params = this.context.router.getCurrentParams();

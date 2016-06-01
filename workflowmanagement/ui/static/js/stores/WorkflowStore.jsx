@@ -173,13 +173,14 @@ const WorkflowStore = Reflux.createStore({
         let states = data.sm.getStates();
         let missing = [];
         
-        for(let state of states){
+        for(let state of states)
+        {
             let serialized = state.serialize();
 
             if(!state.is_valid()){
                 missing.push(serialized);
             }
-            
+
             process.tasks.push(serialized);
         }
         this.__missing = missing

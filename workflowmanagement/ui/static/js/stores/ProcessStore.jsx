@@ -150,6 +150,37 @@ export default Reflux.createStore({
             }
         );
     },
+    onReject(hash){
+        this.onMethodDetail('my/task/aprove/rejectAllByProcess',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onAccept(hash){
+        this.onMethodDetail('my/task/aprove/acceptAllByProcess',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+
+    },
     getRepr(){
        i++;
        let wf = WorkflowStore.getDetail();

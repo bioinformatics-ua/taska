@@ -267,6 +267,9 @@ class ProcessSerializer(serializers.ModelSerializer):
         # create tasks (if any are passed by this webservice)
         if tasks_data:
             for task_data in tasks_data:
+                if process.status == Process.WAITING:
+                    task_data['status'] = ProcessTask.WAITING_AVAILABILITY
+
                 task_data['process'] = process
                 serializer = ProcessTaskSerializer()
 
@@ -764,7 +767,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def acceptAllByProcess(self, request):
-        hashProcess = request.GET.get('hash')
+        hashProcess = request.data['hash']
 
         list_obj = []
         try:
@@ -782,7 +785,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
     
     @list_route(methods=['post'])
     def rejectAllByProcess(self, request):
-        hashProcess = request.GET.get('hash')
+        hashProcess = request.data['hash']
 
         list_obj = []
         try:
@@ -800,7 +803,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def accept(self, request):
-        hashField = request.GET.get('hash')
+        hashField = request.data['hash']
 
         obj = None
         try:
@@ -817,7 +820,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def reject(self, request):
-        hashField = request.GET.get('hash')
+        hashField = request.data['hash']
 
         obj = None
         try:

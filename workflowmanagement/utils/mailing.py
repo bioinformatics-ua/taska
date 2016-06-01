@@ -30,8 +30,9 @@ class MailTemplate:
         list_tasks = None
 
         if isinstance(self.instance.object, Process):
-            link_open_plataform = "askForAvailability/"  + self.instance.object.hash
-            list_tasks = self.instance.object.tasks()
+            if(self.instance.object.status == Process.WAITING):
+                link_open_plataform = "askForAvailability/"  + self.instance.object.hash
+                list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
@@ -66,8 +67,8 @@ class MailTemplate:
         print self.destinies
 
         for interested in self.destinies:
-            print interested
-            print interested.is_staff
+            #print interested
+            #print interested.is_staff
             (subject, message) = self.render(interested)
 
             msg = EmailMultiAlternatives(

@@ -68,6 +68,15 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
+    def getAllUsersEnvolved(self):
+        tmp = []
+        tasks = self.tasks()
+        for task in tasks:
+            for taskUser in ProcessTaskUser.all(processtask=task):
+                if taskUser.getUser() not in tmp:
+                    tmp += [taskUser.getUser()]
+        return tmp
+
     @transaction.atomic
     def cancel(self):
         ''' Cancels a process, also canceling all pending tasks in it
@@ -172,6 +181,7 @@ class ProcessTask(models.Model):
     OVERDUE         = 5
     IMPROVING       = 6
     WAITING_AVAILABILITY = 7
+    REJECTED        = 8
 
     STATUS          = (
             (WAITING,   'Task is waiting execution'),
@@ -180,7 +190,8 @@ class ProcessTask(models.Model):
             (CANCELED,  'Task was canceled'),
             (OVERDUE,   'Task has gone over end_date'),
             (IMPROVING,   'Task is running again to be improved'),
-            (WAITING_AVAILABILITY, 'Task is waiting for users availability')
+            (WAITING_AVAILABILITY, 'Task is waiting for users availability'),
+            (REJECTED, 'Task has some users that rejected this task')
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)
@@ -210,14 +221,24 @@ class ProcessTask(models.Model):
         return ProcessTaskUser.all(processtask=self).get(user=user)
 
     def refreshState(self):
+        #translate
+        #Verificar se todos aceitaram
+        #   Se sim, mudar estado para waiting
+        #   Se nao, manter estado de waitingavailability
+        #   Se alguem recusou, mudar estado para rejected
+
         allUser = ProcessTaskUser \
             .all(processtask=self, reassigned=False)
+        allAccepted = True
 
         for usr in allUser:
-            tmp = ProcessTaskUser \
-                .get(processtask=self, user=usr)
-            print "status"
-            print tmp.status
+            if usr.status ==  ProcessTaskUser.REJECTED:
+                self.status = ProcessTask.REJECTED
+            elif usr.status == ProcessTaskUser.WAITING:
+                allAccepted = False
+
+        if allAccepted:
+            self.status = ProcessTask.WAITING
 
 
     def move(self, force=False):
@@ -335,6 +356,8 @@ class ProcessTaskUser(models.Model):
             Q(processtaskuser=self)
             | Q(processtaskuser__processtask=self.processtask, public=True)
             )
+    def getUser(self):
+        return self.user
 
     def getResult(self):
         from result.models import Result
@@ -367,17 +390,15 @@ class ProcessTaskUser(models.Model):
         self.processtask.move()
 
     def accept(self):
-        #Descomentar isto depois
-        #self.status=ProcessTaskUser.ACCEPTED
-        #self.save()
+        self.status=ProcessTaskUser.ACCEPTED
+        self.save()
 
         self.processtask.refreshState()
         self.processtask.move()
 
     def reject(self):
-        # Descomentar isto depois
-        #self.status=ProcessTaskUser.REJECTED
-        #self.save()
+        self.status=ProcessTaskUser.REJECTED
+        self.save()
 
         self.processtask.refreshState()
         self.processtask.move()
