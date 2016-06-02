@@ -56,7 +56,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
 
             if isinstance(instance.object, Process):
                 if (instance.object.status == Process.WAITING):
-                    #Usar todos os users envolvidos no process
+                    #Use all users envolved in the process
                     tci = tc(instance, instance.object.getAllUsersEnvolved())
 
             #sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha

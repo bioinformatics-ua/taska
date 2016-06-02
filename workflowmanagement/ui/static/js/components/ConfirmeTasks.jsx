@@ -20,9 +20,9 @@ export default React.createClass({
         };
     },
     componentDidMount(){
-        if(this.state.user && !this.state.user['is_staff']){
+      /*  if(this.state.user && !this.state.user['is_staff']){
             this.context.router.transitionTo('home');
-        }
+        }*/
     },
     accept(){
         let params = this.context.router.getCurrentParams();

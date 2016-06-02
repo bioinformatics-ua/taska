@@ -20,7 +20,7 @@ import checksum from 'json-checksum';
 
 import Uploader from '../uploader.jsx';
 
-import {stateColor} from '../../../map.jsx';
+import {stateColor, singleStateColor} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
@@ -270,10 +270,13 @@ class SimpleTaskRun extends SimpleTask{
             task: this.getData().hash
         }
     }
-    stateStyle(){
+    stateStyle(user){
         if(this.getData().ptask)
-            return stateColor(this.getData().ptask);
-
+            //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
+            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8 )
+                return stateColor(this.getData().ptask);
+            else if(user != undefined)
+                return singleStateColor(user.status);
         return {};
     }
     stateDesc(){
@@ -296,6 +299,13 @@ class SimpleTaskRun extends SimpleTask{
                     return 'Canceled';
                 case 5:
                     return 'Overdue';
+                case 7:
+                    return 'Waiting for answer';
+                case 8:
+                    return "Rejected";
+                default:
+                    console.log("Task status: ");
+                    console.log(this.getData().ptask.status);
             }
 
 
@@ -358,6 +368,9 @@ class SimpleTaskRun extends SimpleTask{
                     action(answer_hash);
                 }
             },
+            reasign(e){
+                console.log("Reasign");
+            },
             results(){
                 let me=this;
 
@@ -376,8 +389,23 @@ class SimpleTaskRun extends SimpleTask{
                 }
                 let desc = self.stateDesc();
                 let stillOn = desc === 'Running' || desc === 'Waiting';
+                let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
 
                 let renderStatus = function(user){
+                    if (forAvailability)
+                        switch(user.status)
+                        {
+                            case 1:
+                                desc = 'Waiting for answer';
+                                break;
+                            case 2:
+                                desc = 'Accepted';
+                                break;
+                            case 3:
+                                desc = 'Rejected';
+                                break;
+                        }
+
                     if(user.finished){
                         return (
                             <span>
@@ -398,19 +426,25 @@ class SimpleTaskRun extends SimpleTask{
                             <span style={{fontSize: '100%'}} className="label label-warning">
                                 Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
                             </span>&nbsp;&nbsp;&nbsp;
-                            {stillOn ?
+                            {stillOn || forAvailability ?
                             <a data-assignee={user.user} data-cancel="false" onClick={me.cancelUser}>Uncancel ?</a> :''}
                             </span>
                         );
                     } else {
-
+                        console.log("este");
+                        console.log(user);
                         return (
                             <span>
-                            <span className="label" style={self.stateStyle()}>
+                            <span className="label" style={self.stateStyle(user)}>
                                 {desc}
                             </span> &nbsp;&nbsp;&nbsp;
-                            {stillOn ?
-                           <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> :''}
+                            {stillOn || forAvailability ?
+                            (forAvailability ?
+                            <span>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.reasign}>Reasign</a>
+                            </span>:
+                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''}
                             </span>
                         );
                     }
