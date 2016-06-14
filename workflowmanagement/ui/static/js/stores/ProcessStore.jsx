@@ -181,6 +181,38 @@ export default Reflux.createStore({
         );
 
     },
+    onStartProcess(hash){
+        this.onMethodDetail('startProcess',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onReassignRejectedUser(hash, oldUser, newUser){
+        this.onMethodDetail('reassignRejectedUser',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash,
+                                oldUser: oldUser,
+                                newUser: newUser
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
     getRepr(){
        i++;
        let wf = WorkflowStore.getDetail();

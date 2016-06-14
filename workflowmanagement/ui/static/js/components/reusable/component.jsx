@@ -8,6 +8,8 @@ import {LayeredComponentMixin} from '../../mixins/component.jsx';
 
 import Toggle from 'react-toggle';
 
+import Select from 'react-select';
+
 import WorkflowActions from '../../actions/WorkflowActions.jsx';
 
 const Loading = React.createClass({
@@ -137,8 +139,12 @@ const Modal = React.createClass({
       message: 'Undefined Message',
       showConfirm: true,
       visible: true,
-      overflow: 'auto'
+      overflow: 'auto',
+      withReassigning: false
     }
+  },
+  newAssignee(){
+
   },
   render(){
     if(this.props.visible)
@@ -154,8 +160,17 @@ const Modal = React.createClass({
                           </div>
                           {this.props.showConfirm?
                           <div className="modal-footer">
-                              <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                              <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                              {(this.props.withReassigning) ?
+                              <div>
+                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">This task</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">All tasks</button>
+                              </div>
+                                :
+                              <div>
+                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                              </div>}
                           </div>
                           :''}
                         </div>
@@ -246,6 +261,41 @@ const RunButton = React.createClass({
             //else
                 //show message and ask if want to continue
             return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        } else {
+            return <span />;
+        }
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
+
+const ReassigningButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    getDefaultProps(){
+      return {
+        runLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
+      };
+    },
+    render: function() {
+        return (<button onClick={this.handleClick}>{this.props.runLabel}</button>);
+    },
+    renderLayer: function() {
+        if (this.state.clicked)
+        {
+            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose}  withReassigning={true} />
         } else {
             return <span />;
         }
@@ -431,6 +481,6 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, RunButton, PermissionsBar, ProcessStatus, Affix}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
 
 

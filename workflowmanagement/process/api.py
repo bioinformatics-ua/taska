@@ -559,6 +559,35 @@ class ProcessViewSet(  mixins.CreateModelMixin,
 
         return Response(ProcessSerializer(self.get_object()).data)
 
+    @detail_route(methods=['post'])
+    def startProcess(self, request, hash=None):
+        try:
+            obj = Process.all().filter(
+                hash=hash
+            )
+            obj[0].start()
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        return Response({"Result": "Success"})
+
+    @detail_route(methods=['post'])
+    def reassignRejectedUser(self, request, hash=None, oldUser=None, newUser=None):
+        '''
+        Receive the hash of the task because the resign is done in the taskSimple, but we want resign in all
+        process, so the service is implemented in this class
+         '''
+
+        print(oldUser + '    ' + newUser)
+        #try:
+         #   obj = ProcessTask.all().filter(
+          #      processtask__hash=hash
+           # )
+         #   print obj
+         #   obj[0].resignRejectedUser()
+        #except ProcessTaskUser.DoesNotExist:
+         #   raise Http404
+        return Response({"Result": "Success"})
 
 class MyProcessTaskSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.

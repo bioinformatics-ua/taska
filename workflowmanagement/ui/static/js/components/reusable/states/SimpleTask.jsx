@@ -14,6 +14,8 @@ import ProcessActions from '../../../actions/ProcessActions.jsx';
 
 import UserStore from '../../../stores/UserStore.jsx';
 
+import {ReassigningButton} from '../component.jsx';
+
 import moment from 'moment';
 
 import checksum from 'json-checksum';
@@ -368,8 +370,19 @@ class SimpleTaskRun extends SimpleTask{
                     action(answer_hash);
                 }
             },
-            reasign(e){
-                console.log("Reasign");
+            showReassignSelect(e){
+                //Provisorio
+                let action = this.state.parent.props.cancelUser;
+                if(action){
+                    action(self.getData().ptask.hash,
+                        Number.parseInt($(e.target).data('assignee')),
+                        $(e.target).data('cancel'));
+                }
+            },
+            reassign(){
+                //Pass the task hash
+                //ProcessActions.reassignRejectedUser(this.parent().ptask.hash,);
+                console.log("AQUUI");
             },
             results(){
                 let me=this;
@@ -431,8 +444,6 @@ class SimpleTaskRun extends SimpleTask{
                             </span>
                         );
                     } else {
-                        console.log("este");
-                        console.log(user);
                         return (
                             <span>
                             <span className="label" style={self.stateStyle(user)}>
@@ -442,7 +453,7 @@ class SimpleTaskRun extends SimpleTask{
                             (forAvailability ?
                             <span>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
-                                <a data-assignee={user.user} data-cancel="true" onClick={me.reasign}>Reasign</a>
+                                {/*<a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>*/}
                             </span>:
                             <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''}
                             </span>
@@ -496,7 +507,7 @@ class SimpleTaskRun extends SimpleTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn ?<span className="clearfix">
+                        { stillOn || forAvailability ?<span className="clearfix">
                         <div className="row">
 
                             <div className="col-md-12">

@@ -115,7 +115,8 @@ export default React.createClass({
         ProcessActions.cancel();
     },
     runProcess(){
-
+        //Call function to change process state and tasks state
+        ProcessActions.startProcess(this.state.process['hash']);
     },
     cancelUser(task, user, val){
         console.log(`CANCEL USER ${user} on process task ${task}`);

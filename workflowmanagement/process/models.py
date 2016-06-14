@@ -84,7 +84,10 @@ class Process(models.Model):
         ptasks = self.tasks()
 
         for ptask in ptasks:
-            if ptask.status == ProcessTask.WAITING or ptask.status == ProcessTask.RUNNING:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY  or\
+                    ptask.status == ProcessTask.REJECTED or\
+                    ptask.status == ProcessTask.WAITING or\
+                    ptask.status == ProcessTask.RUNNING:
                 ptask.status = ProcessTask.CANCELED
                 ptask.save()
 
@@ -135,6 +138,19 @@ class Process(models.Model):
             return done*100 / all
         except ZeroDivisionError:
             return 0
+
+    def start(self):
+        ptasks = self.tasks()
+
+        for ptask in ptasks:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY or \
+                            ptask.status == ProcessTask.REJECTED:
+                ptask.status = ProcessTask.WAITING
+                ptask.save()
+
+        self.status = Process.RUNNING
+        self.save()
+        self.move()
 
     class Meta:
         ordering = ["-id"]
@@ -239,7 +255,6 @@ class ProcessTask(models.Model):
 
         if allAccepted:
             self.status = ProcessTask.WAITING
-
 
     def move(self, force=False):
 

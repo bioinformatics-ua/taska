@@ -17,7 +17,9 @@ const ProcessActions = Reflux.createActions(
     'addUser': {},
     'changeDeadline': {},
     'accept': {},
-    'reject': {}
+    'reject': {},
+    'startProcess':{},
+    'reassignRejectedUser':{}
     }, DetailActionsMixin));
 
 export default ProcessActions;
