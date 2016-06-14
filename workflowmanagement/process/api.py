@@ -572,13 +572,16 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         return Response({"Result": "Success"})
 
     @detail_route(methods=['post'])
-    def reassignRejectedUser(self, request, hash=None, oldUser=None, newUser=None):
+    def reassignRejectedUser(self, request, hash=None, oldUser=None, newUser=None, all=None):
         '''
         Receive the hash of the task because the resign is done in the taskSimple, but we want resign in all
         process, so the service is implemented in this class
          '''
+        print ("deu")
+        #print(oldUser)
 
-        print(oldUser + '    ' + newUser)
+        #print(newUser)
+        #print(all)
         #try:
          #   obj = ProcessTask.all().filter(
           #      processtask__hash=hash

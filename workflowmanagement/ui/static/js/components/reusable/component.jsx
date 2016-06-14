@@ -164,7 +164,7 @@ const Modal = React.createClass({
                               <div>
                                 <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
                                 <button type="button" onClick={this.props.success} className="btn btn-primary">This task</button>
-                                <button type="button" onClick={this.props.success} className="btn btn-primary">All tasks</button>
+                                <button type="button" onClick={this.props.allTasks} className="btn btn-primary">All tasks</button>
                               </div>
                                 :
                               <div>
@@ -283,6 +283,9 @@ const ReassigningButton = React.createClass({
     success(e){
       this.props.success(this.props.identificator);
     },
+    allTasks(e){
+      this.props.allTasks(this.props.identificator);
+    },
     getDefaultProps(){
       return {
         runLabel: <i className="fa fa-times"></i>,
@@ -290,12 +293,12 @@ const ReassigningButton = React.createClass({
       };
     },
     render: function() {
-        return (<button onClick={this.handleClick}>{this.props.runLabel}</button>);
+        return (<button className="btn btn-success" onClick={this.handleClick}>{this.props.runLabel}</button>);
     },
     renderLayer: function() {
         if (this.state.clicked)
         {
-            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose}  withReassigning={true} />
+            return <Modal title={this.props.title} message={this.props.message} allTasks={this.allTasks} success={this.success} close={this.handleClose}  withReassigning={true} />
         } else {
             return <span />;
         }

@@ -14,7 +14,7 @@ import ProcessActions from '../../../actions/ProcessActions.jsx';
 
 import UserStore from '../../../stores/UserStore.jsx';
 
-import {ReassigningButton} from '../component.jsx';
+import {ReassigningButton, Modal} from '../component.jsx';
 
 import moment from 'moment';
 
@@ -321,8 +321,10 @@ class SimpleTaskRun extends SimpleTask{
                 return {
                     parent: this.props.main,
                     users: [],
-                    new_assignee: undefined
-
+                    new_assignee: undefined,
+                    new_reassigning: undefined,
+                    oldUser: undefined,
+                    showReassign: false
                 };
             },
             getInitialState(){
@@ -362,6 +364,11 @@ class SimpleTaskRun extends SimpleTask{
                     new_assignee: e
                 })
             },
+            newReassigning(e){
+                this.setState({
+                    new_reassigning: e
+                })
+            },
             refineAnswer(e){
                 let answer_hash = $(e.target).data('answer');
 
@@ -371,18 +378,27 @@ class SimpleTaskRun extends SimpleTask{
                 }
             },
             showReassignSelect(e){
-                //Provisorio
-                let action = this.state.parent.props.cancelUser;
-                if(action){
-                    action(self.getData().ptask.hash,
-                        Number.parseInt($(e.target).data('assignee')),
-                        $(e.target).data('cancel'));
-                }
+                this.setState({
+                    showReassign: true,
+                    oldUser: Number.parseInt($(e.target).data('assignee'))
+                })
+
             },
-            reassign(){
-                //Pass the task hash
-                //ProcessActions.reassignRejectedUser(this.parent().ptask.hash,);
-                console.log("AQUUI");
+            reassign(e){
+                console.log("reassign only one");
+                ProcessActions.reassignRejectedUser(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, false);
+
+                this.setState({
+                    showReassign: false
+                })
+            },
+            reassignAll(e){
+                console.log("reassign all");
+                ProcessActions.reassignRejectedUser(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, true);
+
+                this.setState({
+                    showReassign: false
+                })
             },
             results(){
                 let me=this;
@@ -453,7 +469,7 @@ class SimpleTaskRun extends SimpleTask{
                             (forAvailability ?
                             <span>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
-                                {/*<a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>*/}
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
                             </span>:
                             <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''}
                             </span>
@@ -520,6 +536,23 @@ class SimpleTaskRun extends SimpleTask{
                                     <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
                                   </span>
                                 </div>
+                                <br />
+                                {this.state.showReassign ?
+                                <div className="input-group reassign">
+                                        <Select placeholder="Search for users to reassigning" onChange={this.newReassigning}
+                                            value={this.state.new_reassigning} name="form-field-name"
+                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                        } />
+                                  <span className="input-group-btn">
+                                    <ReassigningButton
+                                      success={me.reassign}
+                                      allTasks={me.reassignAll}
+                                      identificator = {false}
+                                      runLabel= {<span><i className="fa fa-plus"></i></span>}
+                                      title={'Reassigning'}
+                                      message={'You can reassign only this task or all tasks that this user are envolved!'}  />
+                                  </span>
+                                </div>:''}
                             </div>
                         </div><br />
                         </span>: ''}
@@ -586,11 +619,10 @@ class SimpleTaskRun extends SimpleTask{
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-
                             {this.state.users.length > 0?
-                            <Select onChange={this.setAssignee} placeholder="Search for assignees"
-                            value={this.parent().assignee} name="form-field-name"
-                            multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                                    value={this.parent().assignee} name="form-field-name"
+                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">

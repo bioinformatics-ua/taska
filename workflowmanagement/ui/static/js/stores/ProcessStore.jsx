@@ -196,13 +196,14 @@ export default Reflux.createStore({
             }
         );
     },
-    onReassignRejectedUser(hash, oldUser, newUser){
+    onReassignRejectedUser(hash, oldUser, newUser, all){
         this.onMethodDetail('reassignRejectedUser',
-                            this.__detaildata.hash,
+                            this.__detaildata.hash, //O problema está aqui
                             'POST', {
                                 hash: hash,
                                 oldUser: oldUser,
-                                newUser: newUser
+                                newUser: newUser,
+                                all: all
                             })
             .then(
             (data) => {
