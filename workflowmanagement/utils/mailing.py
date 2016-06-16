@@ -39,6 +39,7 @@ class MailTemplate:
 
         subject = render_to_string(self.subjecttemplate, {
             'object': self.instance.object,
+            'studyName': self.instance.object.title,
             'history': self.instance,
             'settings': settings,
             'user': interested
@@ -46,12 +47,15 @@ class MailTemplate:
         message = render_to_string(self.template,
                                    {
                                        'object': self.instance.object,
+                                       'studyName': self.instance.object.title,
                                        'history': self.instance,
                                        'settings': settings,
                                        'link_delegate': link_delegate,
                                        'user': interested,
                                        'list_tasks': list_tasks,
-                                       'link_open_plataform': link_open_plataform
+                                       'link_open_plataform': link_open_plataform,
+                                       'startDate': self.instance.object.start_date,
+                                       'leaderName': self.instance.object.executioner
                                    })
 
         return (subject, message)

@@ -1,27 +1,23 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-Study {{object}} is awaiting for your confirmation
+[TASKA] Confirm your participation to {{ studyName }} (REQUIRES FEEDBACK)
 {% endblock %}
 
 {% block body %}
-Hello dear user,<br /><br />
 
-This email is meant to ask for your availability to do that tasks 
-<br />
+Dear {{ user }},<br /> <br />
 
-{% for task in list_tasks %}
-    {{ task }} <br />
-{% endfor %}
+the study study {{ studyName }} has started on {{ startDate }}, under the leadership of {{ leaderName }}.
+<br /><br />
+With this email you are asked to confirm your participation in the study.
+<br /><br />
+Please access your TASKA account from this <a href="{{link_open_plataform}}">link</a> to see the list of your tasks. You are asked to accept each single task, and accept or discuss the corresponding deadlines.
+<br /><br />
+In case of doubts, please contact {{ leaderName }} using this form <address of the feedback form>
 
-
-{% if link_open_plataform %}
-<br />
-
-You can accept or reject all tasks about this study <a href="{{link_open_plataform}}">here</a>
-
-{% endif %}
 <br /><br />
 Best Regards,<br />
-Taska
+Taska (on behalf of {{ leaderName }})
+
 {% endblock %}
