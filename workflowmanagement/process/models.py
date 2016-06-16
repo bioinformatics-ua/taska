@@ -152,6 +152,22 @@ class Process(models.Model):
         self.save()
         self.move()
 
+    def validateAcceptions(self):
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            for ptasksUser in ProcessTaskUser.all(processtask=ptask):
+                if(ptasksUser.status == ProcessTaskUser.WAITING or \
+                               ptasksUser.status == ProcessTaskUser.REJECTED ):
+                    return False
+        return True
+
+    def resignRejectedUser(self, oldUser, newUser):
+        #Resign all tasks that the old user belongs
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            ptask.resignRejectedUser(oldUser, newUser)
+        self.save()
+
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Processes"
@@ -255,6 +271,17 @@ class ProcessTask(models.Model):
 
         if allAccepted:
             self.status = ProcessTask.WAITING
+
+    def resignRejectedUser(self, oldUser, newUser):
+        tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
+        exists = ProcessTaskUser.all(processtask=self).filter(user=newUser).count()
+        if exists == 0:
+            for task in tasks:
+                task.changeUser(newUser)
+        else:
+            for task in tasks:
+                task.delete()
+        self.save()
 
     def move(self, force=False):
 
@@ -383,6 +410,11 @@ class ProcessTaskUser(models.Model):
             pass
 
         return None
+
+    def changeUser(self, newUser):
+        self.user=User.objects.get(id=newUser)
+        self.status=ProcessTaskUser.WAITING
+        self.save()
 
     def reassign(self):
         self.reassigned=True

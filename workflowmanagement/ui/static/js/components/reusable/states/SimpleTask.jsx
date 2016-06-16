@@ -385,26 +385,34 @@ class SimpleTaskRun extends SimpleTask{
 
             },
             reassign(e){
-                console.log("reassign only one");
-                ProcessActions.reassignRejectedUser(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, false);
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, false);
+                }
 
                 this.setState({
                     showReassign: false
                 })
             },
             reassignAll(e){
-                console.log("reassign all");
-                ProcessActions.reassignRejectedUser(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, true);
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, true);
+                }
 
                 this.setState({
                     showReassign: false
                 })
             },
+
             results(){
                 let me=this;
 
                 let users;
                 let status;
+
                 if(!this.parent().assignee)
                     return;
 
@@ -416,6 +424,7 @@ class SimpleTaskRun extends SimpleTask{
                 } catch(ex){
                     users = [];
                 }
+
                 let desc = self.stateDesc();
                 let stillOn = desc === 'Running' || desc === 'Waiting';
                 let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
@@ -510,7 +519,7 @@ class SimpleTaskRun extends SimpleTask{
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="userTable">
                                 {users.map(
                                     (user, index) => {
                                             return (
@@ -560,6 +569,7 @@ class SimpleTaskRun extends SimpleTask{
                 }
 
                 return false;
+
             },
             componentWillMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...

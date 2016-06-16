@@ -134,6 +134,21 @@ export default Reflux.createStore({
         );
 
     },
+    onValidateAcceptions(){
+        this.onMethodDetail('validateAcceptions',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
     onChangeDeadline(ptask, deadline){
         this.onMethodDetail('changedeadline',
                             this.__detaildata.hash,
@@ -196,14 +211,14 @@ export default Reflux.createStore({
             }
         );
     },
-    onReassignRejectedUser(hash, oldUser, newUser, all){
+    onReassignRejectedUser(hash, oldUser, newUser, allTasks){
         this.onMethodDetail('reassignRejectedUser',
-                            this.__detaildata.hash, //O problema está aqui
+                            this.__detaildata.hash,
                             'POST', {
                                 hash: hash,
                                 oldUser: oldUser,
                                 newUser: newUser,
-                                all: all
+                                allTasks: allTasks
                             })
             .then(
             (data) => {

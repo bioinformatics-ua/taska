@@ -118,9 +118,16 @@ export default React.createClass({
         //Call function to change process state and tasks state
         ProcessActions.startProcess(this.state.process['hash']);
     },
+    validateAcceptions(){
+        console.log("validate");
+        ProcessActions.validateAcceptions(this.state.process['hash']);
+    },
     cancelUser(task, user, val){
         console.log(`CANCEL USER ${user} on process task ${task}`);
         ProcessActions.cancelUser(task, user, val);
+    },
+    reassignRejectedUser(hash, oldUser, newUser, all){
+        ProcessActions.reassignRejectedUser(hash, oldUser, newUser, all);
     },
     addNew(task, user){
         console.log(`ADD USER ${user} on process task ${task}`);
@@ -172,6 +179,7 @@ export default React.createClass({
                                       message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
                                     <RunButton
                                       success={this.runProcess}
+                                      validateAcceptions={this.validateAcceptions}
                                       identificator = {false}
                                       runLabel= {<span><i className="fa fa-play"></i> Run</span>}
                                       title={`Run ${this.state.process['object_repr']}`}
@@ -224,6 +232,7 @@ export default React.createClass({
                     initialSm={sm}
                     savebar={!params.mode || params.mode === 'view'? false: true}
                     addNew={this.addNew}
+                    reassignRejectedUser={this.reassignRejectedUser}
                     refineAnswer={this.refineAnswer}
                     cancelUser={this.cancelUser}
                     endDetail={ProcessResume}

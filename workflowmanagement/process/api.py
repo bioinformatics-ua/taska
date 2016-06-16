@@ -572,25 +572,45 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         return Response({"Result": "Success"})
 
     @detail_route(methods=['post'])
-    def reassignRejectedUser(self, request, hash=None, oldUser=None, newUser=None, all=None):
+    def validateAcceptions(self, request, hash=None):
+        try:
+            obj = Process.all().filter(
+                hash=hash
+            )
+            if(obj[0].validateAcceptions()):
+                return Response({"Valid": "true"})
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        return Response({"Valid": "false"})
+
+    @detail_route(methods=['post'])
+    def reassignRejectedUser(self, request, hash=None):
         '''
         Receive the hash of the task because the resign is done in the taskSimple, but we want resign in all
         process, so the service is implemented in this class
          '''
-        print ("deu")
-        #print(oldUser)
 
-        #print(newUser)
-        #print(all)
-        #try:
-         #   obj = ProcessTask.all().filter(
-          #      processtask__hash=hash
-           # )
-         #   print obj
-         #   obj[0].resignRejectedUser()
-        #except ProcessTaskUser.DoesNotExist:
-         #   raise Http404
-        return Response({"Result": "Success"})
+        ptask_hash=request.data.get('hash',None)
+
+        if request.data.get('allTasks',None) == True:
+            try:
+                obj = Process.all().filter(
+                    hash=hash
+                )
+                obj[0].resignRejectedUser(request.data.get('oldUser',None),request.data.get('newUser',None))
+            except ProcessTaskUser.DoesNotExist:
+                raise Http404
+        else:
+            try:
+                obj = ProcessTask.all().filter(
+                    hash=ptask_hash
+                )
+                obj[0].resignRejectedUser(request.data.get('oldUser', None), request.data.get('newUser', None))
+            except ProcessTaskUser.DoesNotExist:
+                raise Http404
+        process = self.get_object()
+        return Response(ProcessSerializer(process).data)
 
 class MyProcessTaskSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`process.models.ProcessTask` objects serialization/deserialization.
