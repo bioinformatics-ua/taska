@@ -37,12 +37,17 @@ class MailTemplate:
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
 
+        if len(interested.first_name) > 0:
+            user = interested.first_name + " " + interested.last_name
+        else:
+            user = interested
+
         subject = render_to_string(self.subjecttemplate, {
             'object': self.instance.object,
             'studyName': self.instance.object.title,
             'history': self.instance,
             'settings': settings,
-            'user': interested
+            'user': user
         }).replace('\n', '')
         message = render_to_string(self.template,
                                    {
@@ -51,7 +56,7 @@ class MailTemplate:
                                        'history': self.instance,
                                        'settings': settings,
                                        'link_delegate': link_delegate,
-                                       'user': interested,
+                                       'user': user,
                                        'list_tasks': list_tasks,
                                        'link_open_plataform': link_open_plataform,
                                        'startDate': self.instance.object.start_date,
