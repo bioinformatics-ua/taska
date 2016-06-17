@@ -17,6 +17,8 @@ import Tabs from 'react-simpletabs';
 
 import {CurrentTaskTable} from './currenttasks.jsx';
 import {FutureTaskTable} from './futuretask.jsx';
+import {CompletedTaskTable} from './completedtasks.jsx';
+import {RejectedTaskTable} from './rejectedtasks.jsx';
 
 
 const TaskTabber = React.createClass({
@@ -39,6 +41,12 @@ const TaskTabber = React.createClass({
                 </Tabs.Panel>
                 <Tabs.Panel title={<span><i className="fa fa-clock-o"></i> &nbsp;Scheduled Tasks</span>}>
                   <FutureTaskTable />
+                </Tabs.Panel>
+                <Tabs.Panel title={<span><i className="fa fa-check"></i> &nbsp;Completed</span>}>
+                  <CompletedTaskTable />
+                </Tabs.Panel>
+                <Tabs.Panel title={<span><i className="fa fa-times"></i> &nbsp;Rejected</span>}>
+                  <RejectedTaskTable />
                 </Tabs.Panel>
               </Tabs>
               </div>

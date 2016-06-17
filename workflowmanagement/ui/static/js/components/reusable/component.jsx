@@ -256,9 +256,10 @@ const RunButton = React.createClass({
     renderLayer: function() {
         if (this.state.clicked) 
         {
-            if (this.props.validateAcceptions)
-                this.props.success(this.props.identificator);
-            else
+            console.log(this.props.validateAcceptions);
+            //if (this.props.validateAcceptions)
+                //this.props.success(this.props.identificator);
+            //else
                 return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
         } else {
             return <span />;
