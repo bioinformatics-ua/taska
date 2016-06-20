@@ -10,6 +10,8 @@ import Toggle from 'react-toggle';
 
 import Select from 'react-select';
 
+import ProcessStore from '../../stores/ProcessStore.jsx';
+import ProcessActions from '../../actions/ProcessActions.jsx';
 import WorkflowActions from '../../actions/WorkflowActions.jsx';
 
 const Loading = React.createClass({
@@ -242,7 +244,7 @@ const DeleteButton = React.createClass({
 const RunButton = React.createClass({
   mixins: [LayeredComponentMixin],
     success(e){
-      this.props.success(this.props.identificator);
+        this.props.success(this.props.identificator);
     },
     getDefaultProps(){
       return {
@@ -256,10 +258,12 @@ const RunButton = React.createClass({
     renderLayer: function() {
         if (this.state.clicked) 
         {
-            console.log(this.props.validateAcceptions);
-            //if (this.props.validateAcceptions)
-                //this.props.success(this.props.identificator);
-            //else
+            if (this.state.validate)
+            {
+                this.success(true);
+                return <span />;
+            }
+            else
                 return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
         } else {
             return <span />;
@@ -270,10 +274,18 @@ const RunButton = React.createClass({
         this.setState({ clicked: false });
     },
   handleClick: function() {
-    this.setState({ clicked: !this.state.clicked });
+    ProcessActions.validateAcceptions(this.props.hash);
+    this.setState({
+        clicked: !this.state.clicked,
+        validate: ProcessStore.getValidation(this.props.hash)
+    });
   },
   getInitialState: function() {
-    return { clicked: false };
+    ProcessActions.validateAcceptions(this.props.hash);
+    return {
+        clicked: false,
+        validate: ProcessStore.getValidation(this.props.hash)
+    };
   }
   // }}}
 });

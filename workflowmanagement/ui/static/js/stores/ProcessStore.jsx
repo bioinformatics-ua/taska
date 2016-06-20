@@ -40,6 +40,7 @@ export default Reflux.createStore({
         }, state);
     },
     init(){
+        this.__validation = [];
         this.__missing=[];
         this.__v=1;
     },
@@ -134,18 +135,16 @@ export default Reflux.createStore({
         );
 
     },
-    onValidateAcceptions(){
-        this.onMethodDetail('validateAcceptions',
-                            this.__detaildata.hash,
-                            'POST', {
-                                hash: hash
-                            })
-            .then(
-            (data) => {
-                this.__detaildata = data;
-                this.__v++;
-
-                this.trigger(this.DETAIL);
+    getValidation(hash){
+        return this.__validation[hash];
+    },
+    onValidateAcceptions(hash){
+        this.onMethodDetail('validateAcceptions', hash).then(
+            (result) => {
+                console.log(hash);
+                console.log(result.valid);
+                this.__validation[hash] = result.valid;
+                this.trigger();
             }
         );
     },
@@ -165,11 +164,11 @@ export default Reflux.createStore({
             }
         );
     },
-    onReject(hash){
-        this.onMethodDetail('my/task/aprove/rejectAllByProcess',
+    onReject(ptuhash){
+        this.onMethodDetail('my/task/aprove/reject',
                             this.__detaildata.hash,
                             'POST', {
-                                hash: hash
+                                ptuhash: ptuhash
                             })
             .then(
             (data) => {
@@ -180,11 +179,11 @@ export default Reflux.createStore({
             }
         );
     },
-    onAccept(hash){
-        this.onMethodDetail('my/task/aprove/acceptAllByProcess',
+    onAccept(ptuhash){
+        this.onMethodDetail('my/task/aprove/accept',
                             this.__detaildata.hash,
                             'POST', {
-                                hash: hash
+                                ptuhash: ptuhash
                             })
             .then(
             (data) => {

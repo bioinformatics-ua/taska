@@ -19,6 +19,7 @@ import {CurrentTaskTable} from './currenttasks.jsx';
 import {FutureTaskTable} from './futuretask.jsx';
 import {CompletedTaskTable} from './completedtasks.jsx';
 import {RejectedTaskTable} from './rejectedtasks.jsx';
+import {WaitingTaskTable} from './waitingtasks.jsx';
 
 
 const TaskTabber = React.createClass({
@@ -42,10 +43,13 @@ const TaskTabber = React.createClass({
                 <Tabs.Panel title={<span><i className="fa fa-clock-o"></i> &nbsp;Scheduled Tasks</span>}>
                   <FutureTaskTable />
                 </Tabs.Panel>
-                <Tabs.Panel title={<span><i className="fa fa-check"></i> &nbsp;Completed</span>}>
+                <Tabs.Panel title={<span><i className="fa fa-question"></i> &nbsp;Waiting for answer</span>}>
+                  <WaitingTaskTable />
+                </Tabs.Panel>
+                <Tabs.Panel title={<span><i className="fa fa-check"></i> &nbsp;Completed Tasks</span>}>
                   <CompletedTaskTable />
                 </Tabs.Panel>
-                <Tabs.Panel title={<span><i className="fa fa-times"></i> &nbsp;Rejected</span>}>
+                <Tabs.Panel title={<span><i className="fa fa-times"></i> &nbsp;Rejected Tasks</span>}>
                   <RejectedTaskTable />
                 </Tabs.Panel>
               </Tabs>

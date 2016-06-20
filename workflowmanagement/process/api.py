@@ -572,18 +572,19 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         process = self.get_object()
         return Response(ProcessSerializer(process).data)
 
-    @detail_route(methods=['post'])
+    @detail_route(methods=['get'])
     def validateAcceptions(self, request, hash=None):
         try:
             obj = Process.all().filter(
                 hash=hash
             )
             if(obj[0].validateAcceptions()):
-                return Response({"Valid": "true"})
+                print("true")
+                return Response({"valid": True})
         except ProcessTaskUser.DoesNotExist:
             raise Http404
-
-        return Response({"Valid": "false"})
+        print("false")
+        return Response({"valid": False})
 
     @detail_route(methods=['post'])
     def reassignRejectedUser(self, request, hash=None):
@@ -769,10 +770,10 @@ class MyRejectedTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=False)#.filter(
-            #Q(processtask__status=ProcessTask.RUNNING),#Change this
-            #user=self.request.user,
-        #).order_by('processtask__deadline')
+        ptasks = ProcessTaskUser.all(finished=False).filter(
+            Q(status=ProcessTaskUser.REJECTED),
+            user=self.request.user,
+        ).order_by('processtask__deadline')
         return ptasks
 
 class MyCompletedTasks(generics.ListAPIView):
@@ -800,10 +801,11 @@ class MyCompletedTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=False)#.filter(
-            #Q(processtask__status=ProcessTask.RUNNING), #Change this
-           # user=self.request.user,
-        #).order_by('processtask__deadline')
+        ptasks = ProcessTaskUser.all(finished=True).filter(
+            Q(status=ProcessTaskUser.FINISHED),
+            user=self.request.user,
+        ).order_by('processtask__deadline')
+
         return ptasks
 
 
@@ -830,7 +832,39 @@ class MyFutureTasks(generics.ListAPIView):
             Retrieves a list of user assigned process tasks
         """
         ptasks = ProcessTaskUser.all(finished=False).filter(
-                Q(processtask__status=ProcessTask.WAITING),
+                Q(Q(processtask__status=ProcessTask.WAITING) | Q(processtask__status=ProcessTask.WAITING_AVAILABILITY)) &
+                ~Q(status=ProcessTaskUser.REJECTED) &
+                ~Q(status=ProcessTaskUser.WAITING),
+                user=self.request.user,
+            ).order_by('processtask__deadline') #.values_list('processtask')
+
+        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        return ptasks
+
+class MyWaitingTasks(generics.ListAPIView):
+    """
+        Returns a list of user attributed process tasks across all processes for future work
+    """
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_map = {
+        'task': 'processtask__task__hash',
+        'process': 'processtask__process__hash',
+        'processtask': 'processtask_hash',
+        'title': 'processtask__task__title',
+        'deadline': 'processtask__deadline',
+        'type': 'processtask__task__ttype',
+        'task_repr': 'processtask__task__title'
+    }
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+        ptasks = ProcessTaskUser.all(finished=False).filter(
+                Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
                 user=self.request.user,
             ).order_by('processtask__deadline') #.values_list('processtask')
 
@@ -919,7 +953,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def accept(self, request):
-        hashField = request.data['hash']
+        hashField = request.data['ptuhash']
 
         obj = None
         try:
@@ -936,7 +970,7 @@ class MyTaskAproveViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def reject(self, request):
-        hashField = request.data['hash']
+        hashField = request.data['ptuhash']
 
         obj = None
         try:

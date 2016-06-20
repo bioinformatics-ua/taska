@@ -116,6 +116,9 @@ class Process(models.Model):
 
                 if move:
                     ptask.status = ProcessTask.RUNNING
+                    ptus = ProcessTaskUser.all(processtask=ptask)
+                    for ptu in ptus:
+                        ptu.status = ProcessTaskUser.RUNNING
                     ptask.save()
 
                     pusers = ptask.users()
@@ -372,11 +375,21 @@ class ProcessTaskUser(models.Model):
     WAITING         = 1
     ACCEPTED        = 2
     REJECTED        = 3
+    RUNNING         = 4
+    FINISHED        = 5
+    CANCELED        = 6
+    OVERDUE         = 7
+    IMPROVING       = 8
 
     STATUS          = (
             (WAITING,   'Task is waiting confirmation from user'),
             (ACCEPTED,  'Task was accepted'),
-            (REJECTED,  'Task was rejected')
+            (REJECTED,  'Task was rejected'),
+            (RUNNING, 'Task is running'),
+            (FINISHED, 'Task has ended successfully'),
+            (CANCELED, 'Task was canceled'),
+            (OVERDUE, 'Task has gone over end_date'),
+            (IMPROVING, 'Task is running again to be improved')
         )
 
     user            = models.ForeignKey(User)
@@ -432,6 +445,7 @@ class ProcessTaskUser(models.Model):
 
     def finish(self):
         self.finished=True
+        self.status=ProcessTaskUser.FINISHED
         self.save()
 
         self.processtask.move()

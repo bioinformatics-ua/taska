@@ -3,13 +3,15 @@ import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
-import RejectedTaskActions from '../../actions/RejectedTaskActions.jsx';
-import RejectedTaskStore from '../../stores/RejectedTaskStore.jsx';
+import WaitingTaskActions from '../../actions/WaitingTaskActions.jsx';
+import WaitingTaskStore from '../../stores/WaitingTaskStore.jsx';
 
 import Griddle from 'griddle-react';
 
 import {Loading, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
+
+import ProcessActions from '../../actions/ProcessActions.jsx';
 
 import moment from 'moment';
 
@@ -96,13 +98,42 @@ const TaskType = React.createClass({
 });
 
 
+const TaskAvailability = React.createClass({
+  accept(){
+    ProcessActions.accept(this.props.rowData.hash);
+  },
+  reject(){
+    ProcessActions.reject(this.props.rowData.hash);
+  },
+  render: function(){
+    return (<span>
+              <button onClick={this.accept} className="btn btn-success">Accept</button>
+              <button onClick={this.reject} className="btn btn-danger">Reject</button>
+            </span>);
+  }
+});
 
-const RejectedTaskTable = React.createClass({
-    tableAction: RejectedTaskActions.load,
-    tableStore: RejectedTaskStore,
-    mixins: [Reflux.listenTo(RejectedTaskStore, 'update'), TableComponentMixin],
+const TaskComment = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <small title={row.process}>
+            <Link id={`task_${row.hash}`}
+              key={row.hash} to={this.props.rowData.type}
+               params={object}>{this.props.rowData.task_repr}</Link><br />
+
+           </small>;
+  }
+});
+
+
+const WaitingTaskTable = React.createClass({
+    tableAction: WaitingTaskActions.load,
+    tableStore: WaitingTaskStore,
+    mixins: [Reflux.listenTo(WaitingTaskStore, 'update'), TableComponentMixin],
     getInitialState: function() {
-        return {};
+        return {
+        };
     },
     update: function(data){
         this.setState(this.getState());
@@ -135,6 +166,15 @@ const RejectedTaskTable = React.createClass({
       "displayName": "Process"
       },
       {
+      "columnName": "start_date",
+      "order": 4,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'start-td',
+      "customComponent": TaskDateEst,
+      "displayName": "Est. Start"
+      },
+      {
       "columnName": "deadline",
       "order": 5,
       "locked": true,
@@ -142,15 +182,33 @@ const RejectedTaskTable = React.createClass({
       "cssClassName": 'deadline-td',
       "customComponent": TaskDate,
       "displayName": "Deadline"
+      },
+      {
+      "columnName": "availability",
+      "order": 6,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'availability-td',
+      "customComponent": TaskAvailability,
+      "displayName": "Availability"
+      },
+      {
+      "columnName": "comments",
+      "order": 7,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'comments-td',
+      "customComponent": TaskComment,
+      "displayName": "Comment"
       }
     ];
     return <Griddle
-                      noDataMessage={<center>You currently have no rejected tasks yet. This tasks are all the tasks that you have rejected.</center>}
+                      noDataMessage={<center>You currently have no completed tasks yet. This tasks are all the tasks that you have completed.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "process_repr", "deadline"]}
+                      columns={["type", "task_repr", "process_repr", "start_date", "deadline", "availability", "comments"]}
                       columnMetadata={columnMeta} />
   }
 
 });
 
-export default {RejectedTaskTable}
+export default {WaitingTaskTable}
