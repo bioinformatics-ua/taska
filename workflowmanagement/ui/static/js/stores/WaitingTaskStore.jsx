@@ -20,13 +20,14 @@ export default Reflux.createStore({
     },
     mixins: [TableStoreMixin, Reflux.connect(ResultStore, "dummy"),
         DetailStoreMixin.factory(
-            new DetailLoader({model: 'process/my/waitingtask'}),
+            new DetailLoader({model: 'process/my/waitingtasks'}),
             'hash',
             WaitingTaskActions
         )
     ],
     listenables: [WaitingTaskActions],
     load: function (state) {
+        console.log("load waiting");
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);
@@ -37,7 +38,39 @@ export default Reflux.createStore({
     init(){
         this.answer = {};
         this.dversion = 0;
+        this.v=1;
+    },
+    onAccept(ptuhash){
+        this.onMethodDetail('accept',
+                            this.__detaildata.hash,
+                            'POST', {
+                                ptuhash: ptuhash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
 
+                this.load(this.__current);
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onReject(ptuhash){
+        this.onMethodDetail('reject',
+                            this.__detaildata.hash,
+                            'POST', {
+                                ptuhash: ptuhash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.load(this.__current);
+                this.trigger(this.DETAIL);
+            }
+        );
     },
     onPreliminary(hash){
         StateActions.alert(

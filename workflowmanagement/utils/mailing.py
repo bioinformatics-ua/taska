@@ -31,7 +31,7 @@ class MailTemplate:
 
         if isinstance(self.instance.object, Process):
             if(self.instance.object.status == Process.WAITING):
-                link_open_plataform = "askForAvailability/"  + self.instance.object.hash
+                link_open_plataform = ""
                 list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
 
         if link_delegate != None:

@@ -452,6 +452,8 @@ class ProcessTaskUser(models.Model):
 
     def accept(self):
         self.status=ProcessTaskUser.ACCEPTED
+        if (self.processtask.status == ProcessTask.RUNNING):
+            self.status=ProcessTaskUser.RUNNING
         self.save()
 
         self.processtask.refreshState()

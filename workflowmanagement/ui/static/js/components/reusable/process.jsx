@@ -61,6 +61,7 @@ const ProcessTable = React.createClass({
     },
     update: function(data){
         this.setState(this.getState());
+        console.log("set state process");
     },
   render: function () {
     const columnMeta = [

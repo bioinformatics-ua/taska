@@ -97,19 +97,18 @@ const TaskType = React.createClass({
   }
 });
 
-
 const TaskAvailability = React.createClass({
   accept(){
-    ProcessActions.accept(this.props.rowData.hash);
+    WaitingTaskActions.accept(this.props.rowData.hash);
   },
   reject(){
-    ProcessActions.reject(this.props.rowData.hash);
+    WaitingTaskActions.reject(this.props.rowData.hash);
   },
   render: function(){
-    return (<span>
+    return (<div className="btn-group" role="group" >
               <button onClick={this.accept} className="btn btn-success">Accept</button>
               <button onClick={this.reject} className="btn btn-danger">Reject</button>
-            </span>);
+            </div>);
   }
 });
 
@@ -137,6 +136,7 @@ const WaitingTaskTable = React.createClass({
     },
     update: function(data){
         this.setState(this.getState());
+      console.log("set state");
     },
   render: function () {
 
@@ -191,8 +191,8 @@ const WaitingTaskTable = React.createClass({
       "cssClassName": 'availability-td',
       "customComponent": TaskAvailability,
       "displayName": "Availability"
-      },
-      {
+      }
+      /*{
       "columnName": "comments",
       "order": 7,
       "locked": true,
@@ -200,12 +200,12 @@ const WaitingTaskTable = React.createClass({
       "cssClassName": 'comments-td',
       "customComponent": TaskComment,
       "displayName": "Comment"
-      }
+      }*/
     ];
     return <Griddle
                       noDataMessage={<center>You currently have no completed tasks yet. This tasks are all the tasks that you have completed.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "process_repr", "start_date", "deadline", "availability", "comments"]}
+                      columns={["type", "task_repr", "process_repr", "start_date", "deadline", "availability"]}
                       columnMetadata={columnMeta} />
   }
 

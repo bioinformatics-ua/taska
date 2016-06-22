@@ -33,6 +33,7 @@ export default Reflux.createStore({
     ],
     listenables: [ProcessActions],
     load: function (state) {
+        console.log("load process");
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);
@@ -163,37 +164,6 @@ export default Reflux.createStore({
                 this.trigger(this.DETAIL);
             }
         );
-    },
-    onReject(ptuhash){
-        this.onMethodDetail('my/task/aprove/reject',
-                            this.__detaildata.hash,
-                            'POST', {
-                                ptuhash: ptuhash
-                            })
-            .then(
-            (data) => {
-                this.__detaildata = data;
-                this.__v++;
-
-                this.trigger(this.DETAIL);
-            }
-        );
-    },
-    onAccept(ptuhash){
-        this.onMethodDetail('my/task/aprove/accept',
-                            this.__detaildata.hash,
-                            'POST', {
-                                ptuhash: ptuhash
-                            })
-            .then(
-            (data) => {
-                this.__detaildata = data;
-                this.__v++;
-
-                this.trigger(this.DETAIL);
-            }
-        );
-
     },
     onStartProcess(hash){
         this.onMethodDetail('startProcess',

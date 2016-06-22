@@ -579,11 +579,10 @@ class ProcessViewSet(  mixins.CreateModelMixin,
                 hash=hash
             )
             if(obj[0].validateAcceptions()):
-                print("true")
                 return Response({"valid": True})
         except ProcessTaskUser.DoesNotExist:
             raise Http404
-        print("false")
+
         return Response({"valid": False})
 
     @detail_route(methods=['post'])
@@ -745,6 +744,85 @@ class MyTasks(generics.ListAPIView):
         #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
         return ptasks
 
+
+class MyWaitingTasks(mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.ListModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin,
+                     viewsets.GenericViewSet):
+    """
+        Returns a list of user attributed process tasks across all processes for future work
+    """
+
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
+    lookup_field = 'hash'
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_map = {
+        'task': 'processtask__task__hash',
+        'process': 'processtask__process__hash',
+        'processtask': 'processtask_hash',
+        'title': 'processtask__task__title',
+        'deadline': 'processtask__deadline',
+        'type': 'processtask__task__ttype',
+        'task_repr': 'processtask__task__title'
+    }
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+        ptasks = ProcessTaskUser.all(finished=False).filter(
+                Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
+                user=self.request.user,
+            ).order_by('processtask__deadline') #.values_list('processtask')
+
+        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        return ptasks
+
+    @list_route(methods=['post'])
+    def accept(self, request):
+        hashField = request.data['ptuhash']
+
+        obj = None
+        process =None
+        try:
+            obj = ProcessTaskUser.all().get(
+                hash=hashField,
+                user=self.request.user
+            )
+            obj.accept()
+            process = Process.all().get(
+                processtask__processtaskuser__hash=hashField
+            )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(methods=['post'])
+    def reject(self, request):
+        hashField = request.data['ptuhash']
+
+        obj = None
+        process = None
+        try:
+            obj = ProcessTaskUser.all().get(
+                hash=hashField,
+                user=self.request.user
+            )
+            obj.reject()
+            process = Process.all().get(
+                processtask__processtaskuser__hash=hashField
+            )
+        except ProcessTaskUser.DoesNotExist:
+            raise Http404
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class MyRejectedTasks(generics.ListAPIView):
     """
         Returns a list of user attributed process tasks across all processes
@@ -841,36 +919,6 @@ class MyFutureTasks(generics.ListAPIView):
         #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
         return ptasks
 
-class MyWaitingTasks(generics.ListAPIView):
-    """
-        Returns a list of user attributed process tasks across all processes for future work
-    """
-    queryset = ProcessTaskUser.objects.none()
-    serializer_class = MyProcessTaskUserSerializer
-    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
-    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
-    ordering_map = {
-        'task': 'processtask__task__hash',
-        'process': 'processtask__process__hash',
-        'processtask': 'processtask_hash',
-        'title': 'processtask__task__title',
-        'deadline': 'processtask__deadline',
-        'type': 'processtask__task__ttype',
-        'task_repr': 'processtask__task__title'
-    }
-
-    def get_queryset(self):
-        """
-            Retrieves a list of user assigned process tasks
-        """
-        ptasks = ProcessTaskUser.all(finished=False).filter(
-                Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
-                user=self.request.user,
-            ).order_by('processtask__deadline') #.values_list('processtask')
-
-        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
-        return ptasks
-
 class MyTask(generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()
     serializer_class = MyProcessTaskUserDetailSerializer
@@ -909,81 +957,6 @@ class MyTaskDependencies(generics.ListAPIView):
         process = obj.processtask.process
 
         return ProcessTask.all().filter(process=process, task__in=task_deps)
-
-class MyTaskAproveViewSet(viewsets.ModelViewSet):
-    queryset = ProcessTaskUser.objects.none()
-    serializer_class = ProcessTaskUserSerializer
-    lookup_field = 'hash'
-
-    @list_route(methods=['post'])
-    def acceptAllByProcess(self, request):
-        hashProcess = request.data['hash']
-
-        list_obj = []
-        try:
-            list_obj = ProcessTaskUser.all().filter(
-                    processtask__process__hash=hashProcess,
-                    user=self.request.user
-                )
-        except ProcessTaskUser.DoesNotExist:
-            raise Http404
-
-        for obj in list_obj:
-            obj.accept()
-
-        return Response({"Result":"Success"})
-    
-    @list_route(methods=['post'])
-    def rejectAllByProcess(self, request):
-        hashProcess = request.data['hash']
-
-        list_obj = []
-        try:
-            list_obj = ProcessTaskUser.all().filter(
-                    processtask__process__hash=hashProcess,
-                    user=self.request.user
-                )
-        except ProcessTaskUser.DoesNotExist:
-            raise Http404
-
-        for obj in list_obj:
-            obj.reject()
-
-        return Response({"Result":"Success"})
-
-    @list_route(methods=['post'])
-    def accept(self, request):
-        hashField = request.data['ptuhash']
-
-        obj = None
-        try:
-            obj = ProcessTaskUser.all().get(
-                    hash=hashField,
-                    user=self.request.user
-                )
-        except ProcessTaskUser.DoesNotExist:
-            raise Http404
-
-        obj.accept()
-
-        return Response({"Result":"Success"})
-
-    @list_route(methods=['post'])
-    def reject(self, request):
-        hashField = request.data['ptuhash']
-
-        obj = None
-        try:
-            obj = ProcessTaskUser.all().get(
-                    hash=hashField,
-                    user=self.request.user
-                )
-        except ProcessTaskUser.DoesNotExist:
-            raise Http404
-
-        obj.reject()
-
-        return Response({"Result":"Success"})
 
 class MyTaskPreliminary(generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()
