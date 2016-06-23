@@ -42,7 +42,7 @@ export default Reflux.createStore({
     },
     onAccept(ptuhash){
         this.onMethodDetail('accept',
-                            this.__detaildata.hash,
+                            null,
                             'POST', {
                                 ptuhash: ptuhash
                             })
@@ -58,7 +58,7 @@ export default Reflux.createStore({
     },
     onReject(ptuhash){
         this.onMethodDetail('reject',
-                            this.__detaildata.hash,
+                            null,
                             'POST', {
                                 ptuhash: ptuhash
                             })

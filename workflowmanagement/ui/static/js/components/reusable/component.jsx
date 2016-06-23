@@ -241,6 +241,37 @@ const DeleteButton = React.createClass({
   // }}}
 });
 
+const AcceptButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+      this.props.success(this.props.identificator);
+    },
+    getDefaultProps(){
+      return {
+        deleteLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
+      };
+    },
+    render: function() {
+        return <button className={`btn ${this.props.extraCss}`} onClick={this.success}>{this.props.label}</button>;
+    },
+    renderLayer: function() {
+            return <span />;
+
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
+
 const RunButton = React.createClass({
   mixins: [LayeredComponentMixin],
     success(e){
@@ -496,6 +527,6 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton,  RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
 
 

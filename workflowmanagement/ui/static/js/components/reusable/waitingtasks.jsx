@@ -8,7 +8,7 @@ import WaitingTaskStore from '../../stores/WaitingTaskStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton} from './component.jsx'
+import {Loading, AcceptButton, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import ProcessActions from '../../actions/ProcessActions.jsx';
@@ -98,16 +98,26 @@ const TaskType = React.createClass({
 });
 
 const TaskAvailability = React.createClass({
-  accept(){
-    WaitingTaskActions.accept(this.props.rowData.hash);
+  accept(row){
+    WaitingTaskActions.accept(row.hash);
   },
-  reject(){
-    WaitingTaskActions.reject(this.props.rowData.hash);
+  reject(row){
+    WaitingTaskActions.reject(row.hash);
   },
   render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
     return (<div className="btn-group" role="group" >
-              <button onClick={this.accept} className="btn btn-success">Accept</button>
-              <button onClick={this.reject} className="btn btn-danger">Reject</button>
+            <AcceptButton
+              success={this.accept}
+              identificator = {row}
+              label={"Accept"}
+              extraCss={"btn-sm btn-success"} />
+            <AcceptButton
+              success={this.reject}
+              identificator = {row}
+              label={"Reject"}
+              extraCss={"btn-sm btn-danger"} />
             </div>);
   }
 });
