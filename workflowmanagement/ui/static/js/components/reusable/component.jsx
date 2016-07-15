@@ -10,7 +10,6 @@ import Toggle from 'react-toggle';
 
 import Select from 'react-select';
 
-import ProcessStore from '../../stores/ProcessStore.jsx';
 import ProcessActions from '../../actions/ProcessActions.jsx';
 import WorkflowActions from '../../actions/WorkflowActions.jsx';
 
@@ -178,7 +177,6 @@ const Modal = React.createClass({
                         </div>
                       </div>
                     </div>;
-
     return undefined;
   }
 });
@@ -287,7 +285,7 @@ const RunButton = React.createClass({
         return <button className={`btn ${this.props.extraCss} btn-sm btn-primary`} onClick={this.handleClick}>{this.props.runLabel}</button>;
     },
     renderLayer: function() {
-        if (this.state.clicked) 
+        if (this.state.clicked)
         {
             if (this.state.validate)
             {
@@ -308,14 +306,14 @@ const RunButton = React.createClass({
     ProcessActions.validateAcceptions(this.props.hash);
     this.setState({
         clicked: !this.state.clicked,
-        validate: ProcessStore.getValidation(this.props.hash)
+        validate: this.props.getValidation()
     });
   },
   getInitialState: function() {
     ProcessActions.validateAcceptions(this.props.hash);
     return {
         clicked: false,
-        validate: ProcessStore.getValidation(this.props.hash)
+        validate: this.props.getValidation()
     };
   }
   // }}}
@@ -323,11 +321,11 @@ const RunButton = React.createClass({
 
 const ReassigningButton = React.createClass({
   mixins: [LayeredComponentMixin],
-    success(e){
-      this.props.success(this.props.identificator);
+    success(){
+      this.props.success();
     },
-    allTasks(e){
-      this.props.allTasks(this.props.identificator);
+    allTasks(){
+      this.props.allTasks();
     },
     getDefaultProps(){
       return {
@@ -342,9 +340,9 @@ const ReassigningButton = React.createClass({
         if (this.state.clicked)
         {
             return <Modal title={this.props.title} message={this.props.message} allTasks={this.allTasks} success={this.success} close={this.handleClose}  withReassigning={true} />
-        } else {
-            return <span />;
         }
+            return <span />;
+
     },
     // {{{
     handleClose: function() {
@@ -527,6 +525,6 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton,  RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
 
 

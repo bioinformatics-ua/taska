@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import html2text
 
-from process.models import Process
+from process.models import Process, Request
 
 class MailTemplate:
     def __init__(self, instance, destinies):
@@ -25,14 +25,14 @@ class MailTemplate:
     def render(self, interested):
         self.is_valid()
 
+        #Variables
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
-        link_open_plataform = None
+        link_open_plataform = ""
         list_tasks = None
-
-        if isinstance(self.instance.object, Process):
-            if(self.instance.object.status == Process.WAITING):
-                link_open_plataform = ""
-                list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
+        title = None
+        start_date = None
+        executioner = None
+        task = None
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
@@ -42,9 +42,25 @@ class MailTemplate:
         else:
             user = interested
 
+        #When is a process instance
+        if isinstance(self.instance.object, Process):
+            if(self.instance.object.status == Process.WAITING):
+                list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
+            title = self.instance.object.title
+            start_date = self.instance.object.start_date
+            executioner = self.instance.object.executioner
+
+        # When is a request instance
+        if isinstance(self.instance.object, Request):
+            task = self.instance.object.processtaskuser.processtask.task.title
+            executioner = self.instance.object.processtaskuser.processtask.process.executioner
+            user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
+            link_open_plataform = "request/"+ self.instance.object.hash
+
         subject = render_to_string(self.subjecttemplate, {
             'object': self.instance.object,
-            'studyName': self.instance.object.title,
+            'studyName': title,
+            'taskName': task,
             'history': self.instance,
             'settings': settings,
             'user': user
@@ -52,15 +68,16 @@ class MailTemplate:
         message = render_to_string(self.template,
                                    {
                                        'object': self.instance.object,
-                                       'studyName': self.instance.object.title,
+                                       'studyName': title,
                                        'history': self.instance,
                                        'settings': settings,
                                        'link_delegate': link_delegate,
                                        'user': user,
                                        'list_tasks': list_tasks,
                                        'link_open_plataform': link_open_plataform,
-                                       'startDate': self.instance.object.start_date,
-                                       'leaderName': self.instance.object.executioner
+                                       'startDate': start_date,
+                                       'leaderName': executioner,
+                                       'task':task
                                    })
 
         return (subject, message)
@@ -105,12 +122,28 @@ class ProcessTaskAddTemplate(MailTemplate):
     subjecttemplate="mail/processtask_add_subject.html"
     template="mail/processtask_add.html"
 
-
-
-
 class ProcessWaitingAddTemplate(MailTemplate):
     subjecttemplate="mail/process_confirmation_subject.html"
     template="mail/process_confirmation.html"
+
+
+
+class RequestClarificationAskTemplate(MailTemplate):
+    subjecttemplate="mail/request_clarification_add_subject.html"
+    template="mail/request_clarification_add.html"
+
+class RequestReassignAskTemplate(MailTemplate):
+    subjecttemplate="mail/request_reassign_add_subject.html"
+    template="mail/request_reassign_add.html"
+
+class RequestClarificationAnswerTemplate(MailTemplate):
+    subjecttemplate="mail/request_clarification_edit_subject.html"
+    template="mail/request_clarification_edit.html"
+
+class RequestReassignAnswerTemplate(MailTemplate):
+    subjecttemplate="mail/request_reassign_edit_subject.html"
+    template="mail/request_reassign_edit.html"
+
 
 
 

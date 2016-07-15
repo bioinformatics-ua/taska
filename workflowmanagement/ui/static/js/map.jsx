@@ -83,7 +83,7 @@ const singleStateColor = function(taskStatus){
         case 2://Accepted
             return {
                 border: '1px solid #ccc',
-                color: 'black',
+                color: 'white',
                 backgroundColor: '#436600',
                 fontSize: '100%'
             };
@@ -91,7 +91,7 @@ const singleStateColor = function(taskStatus){
             return {
                 border: '1px solid #ccc',
                 color: 'black',
-                backgroundColor: 'rgb(215, 25, 28)',
+                backgroundColor: "tomato",//'rgb(215, 25, 28)',
                 fontSize: '100%'
             };
     }

@@ -14,7 +14,7 @@ import ProcessActions from '../../../actions/ProcessActions.jsx';
 
 import UserStore from '../../../stores/UserStore.jsx';
 
-import {ReassigningButton, Modal} from '../component.jsx';
+import {ReassigningButton} from '../component.jsx';
 
 import moment from 'moment';
 
@@ -29,6 +29,8 @@ import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 import Toggle from 'react-toggle';
 
 const dummy = React.createClass({render(){return <span></span>; }});
+
+
 
 class SimpleTask extends SimpleState {
     constructor(options){
@@ -384,7 +386,7 @@ class SimpleTaskRun extends SimpleTask{
                 })
 
             },
-            reassign(e){
+            reassign(){
                 let action = this.state.parent.props.reassignRejectedUser;
 
                 if(action){
@@ -395,7 +397,7 @@ class SimpleTaskRun extends SimpleTask{
                     showReassign: false
                 })
             },
-            reassignAll(e){
+            reassignAll(){
                 let action = this.state.parent.props.reassignRejectedUser;
 
                 if(action){
@@ -560,6 +562,7 @@ class SimpleTaskRun extends SimpleTask{
                                       runLabel= {<span><i className="fa fa-plus"></i></span>}
                                       title={'Reassigning'}
                                       message={'You can reassign only this task or all tasks that this user are envolved!'}  />
+
                                   </span>
                                 </div>:''}
                             </div>
