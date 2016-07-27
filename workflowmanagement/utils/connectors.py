@@ -65,10 +65,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
             # Silently ignore, when the template is not defined we just don't send the notification
             # i personally  think it makes sense not sending an email notification if theres no template
             # since we cant mandate the history being all notificated (like p.e. access events)
-            #pass
-            #APAGAR ISTO E COLOCAR pass
-            print ("Falhou aqui: " + tcn)
-            print e
+            pass
     except:
         raise
         #raise Exception('Error discovering Class template name for %s' % instance.__class__)
