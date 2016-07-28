@@ -281,6 +281,9 @@ class ProcessTask(models.Model):
         if exists == 0:
             for task in tasks:
                 task.changeUser(newUser)
+
+                History.new(event=History.ADD, actor=task.processtask.process.executioner, object=task.processtask.process,
+                            authorized=[newUser], related=[task.processtask.process])
         else:
             for task in tasks:
                 task.delete()

@@ -611,6 +611,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
             except ProcessTaskUser.DoesNotExist:
                 raise Http404
         process = self.get_object()
+
         return Response(ProcessSerializer(process).data)
 
 class MyProcessTaskSerializer(serializers.ModelSerializer):

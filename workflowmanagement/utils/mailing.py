@@ -27,7 +27,7 @@ class MailTemplate:
 
         #Variables
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
-        link_open_plataform = ""
+        link_open_plataform = settings.BASE_URL
         list_tasks = None
         title = None
         start_date = None
@@ -55,7 +55,7 @@ class MailTemplate:
             task = self.instance.object.processtaskuser.processtask.task.title
             executioner = self.instance.object.processtaskuser.processtask.process.executioner
             user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
-            link_open_plataform = "request/"+ self.instance.object.hash
+            link_open_plataform += "request/"+ self.instance.object.hash
 
         subject = render_to_string(self.subjecttemplate, {
             'object': self.instance.object,
