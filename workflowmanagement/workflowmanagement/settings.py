@@ -113,11 +113,11 @@ WSGI_APPLICATION = 'workflowmanagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'workflow_dev', # Or path to database file if using sqlite3.
-        'USER': 'postgres', # Not used with sqlite3.
-        'PASSWORD':  'postgres', # Not used with sqlite3.
-        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432', # Set to empty string for default. Not used with sqlite3.
+        'NAME': os.environ.get('DOCKER_POSTGRES_DB', 'workflow_dev'), # Or path to database file if using sqlite3.
+        'USER': os.environ.get('DOCKER_POSTGRES_USER', 'workflow_dev'), # Not used with sqlite3.
+        'PASSWORD': os.environ.get('DOCKER_POSTGRES_PASS', '12345'), # Not used with sqlite3.
+        'HOST': os.environ.get('DOCKER_POSTGRES_HOST', 'localhost'), # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': os.environ.get('DOCKER_POSTGRES_PORT', '5432'), # Set to empty string for default. Not used with sqlite3.
         #'AUTOCOMMIT': True,
         #'autocommit': True,
         #'OPTIONS': {
@@ -217,25 +217,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
 # by default it never expires
 SESSION_COOKIE_AGE = 12*3600
 
-##########################################
-# Para enviar emails mas apagar quando for para produtivo
-##########################################
-EMAIL_HOST='exchange.ua.pt'
-EMAIL_PORT=25
-EMAIL_HOST_USER='joao.rafael.almeida@ua.pt'
-EMAIL_HOST_PASSWORD='Merdinha69-'
-EMAIL_USE_TLS=True
-
-DEFAULT_FROM_EMAIL='joao.rafael.almeida@ua.pt'
-###########################################
-
 EMAIL_URL  = "http://localhost:8000"
 
 # api default
 #API_ACTIVATE_URL = "api/account/activate/?email="
 API_ACTIVATE_URL = "activate/"
 
-####DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
 
 RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'
 
