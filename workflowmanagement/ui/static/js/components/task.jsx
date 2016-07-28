@@ -143,13 +143,19 @@ export default React.createClass({
         return false;
     },
     didWrite(){
-        if(!this.state.answer.hash)
+        if(!this.state.answer.hash) {
             return true;
+        }
 
         if(this.state.user.id === this.state.answer.user)
             return true;
 
         return false;
+    },
+    waitingTask(){
+        if(this.state.task.processtask.status == 7)//Waiting availability
+            return false;
+        return this.didWrite();
     },
     getInitialState(){
         try {
@@ -459,7 +465,7 @@ export default React.createClass({
         <div className="form-group row">
             <div className="col-md-9"></div>
                 <div className="col-md-3">
-                    {this.didWrite() ?
+                    {this.waitingTask() ?
                             <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
 
                                 <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">

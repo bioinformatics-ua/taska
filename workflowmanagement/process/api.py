@@ -922,9 +922,9 @@ class MyFutureTasks(generics.ListAPIView):
             Retrieves a list of user assigned process tasks
         """
         ptasks = ProcessTaskUser.all(finished=False).filter(
-                Q(Q(processtask__status=ProcessTask.WAITING) | Q(processtask__status=ProcessTask.WAITING_AVAILABILITY)) &
                 ~Q(status=ProcessTaskUser.REJECTED) &
-                ~Q(status=ProcessTaskUser.WAITING),
+                Q(Q(Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
+                  Q(processtask__status=ProcessTask.WAITING)),
                 user=self.request.user,
             ).order_by('processtask__deadline') #.values_list('processtask')
 
