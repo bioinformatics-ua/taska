@@ -153,6 +153,7 @@ export default React.createClass({
         return false;
     },
     waitingTask(){
+        console.log(this.state.task.processtask);
         if(this.state.task.processtask.status == 7)//Waiting availability
             return false;
         return this.didWrite();
@@ -219,6 +220,9 @@ export default React.createClass({
     saveAnswer(e){
         if(this.validate())
             ResultActions.saveAnswer();
+    },
+    showWorkflow(){
+        console.log("show");
     },
     __createMap(own, deps){
         let linkmap = {};
@@ -463,11 +467,17 @@ export default React.createClass({
   <div className="tab-content">
     <div role="tabpanel" className="tab-pane active" id="answer">
         <div className="form-group row">
-            <div className="col-md-9"></div>
-                <div className="col-md-3">
-                    {this.waitingTask() ?
-                            <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+            <div className="col-md-8"></div>
+                <div className="col-md-4">
 
+
+                    <Link to="Process" params={{object: this.state.task.processtask.process}}>
+                        <button style={{marginLeft: '4px'}} onClick={this.showWorkflow} className="btn btn-info pull-right">
+                        <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
+                    </button>
+                    </Link>
+                    {this.waitingTask() ?
+                        <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
                                 <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">
                                     <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save
                                 </button>
@@ -479,6 +489,7 @@ export default React.createClass({
 
                             </Affix>
                             : ''}
+
                     </div>
                 </div>
                 <div className="row">
