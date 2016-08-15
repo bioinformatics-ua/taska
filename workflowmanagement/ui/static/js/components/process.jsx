@@ -145,7 +145,7 @@ export default React.createClass({
         console.log('RENDER PROCESS ');
         let params = this.context.router.getCurrentParams();
 
-        if(params.mode && !(params.mode === 'edit' || params.mode === 'view'))
+        if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'showOnly'))
             this.context.router.replaceWith('/404');
 
         let [sm, checksum] = this.state.workflowrepr;
@@ -155,6 +155,7 @@ export default React.createClass({
                 <StateMachineComponent key={'process'+params.mode+checksum}
                     extra={
                         <span>
+                        {params.mode && !(params.mode === 'edit' || params.mode === 'view') ? '':
                             <PermissionsBar
                                 link="ProcessEdit"
                                 owner={this.state.workflow['owner_repr']}
@@ -189,7 +190,7 @@ export default React.createClass({
                                 }
                                 showRun={false}
                                 object={params.object}
-                                {...this.state.workflow.permissions} />
+                                {...this.state.workflow.permissions} />}
                             <div className="row">
                                 <div className="col-md-5">
                                     <div className="form-group">
@@ -230,13 +231,14 @@ export default React.createClass({
                     save={this.save}
                     saveLabel={<span><i className="fa fa-floppy-o"></i> &nbsp;Save Process</span>}
                     initialSm={sm}
-                    savebar={!params.mode || params.mode === 'view'? false: true}
+                    savebar={!params.mode || params.mode === 'view' || params.mode === 'showOnly' ? false: true}
                     addNew={this.addNew}
                     reassignRejectedUser={this.reassignRejectedUser}
                     refineAnswer={this.refineAnswer}
                     cancelUser={this.cancelUser}
                     endDetail={ProcessResume}
                     detailMode={this.state.user.profile['detail_mode']}
+                    showOnly={params.mode === 'showOnly'}
 
                     selectFirst={true}
 

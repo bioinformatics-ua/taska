@@ -354,6 +354,13 @@ class FormTaskRun extends FormTask{
                 let desc = self.stateDesc();
                 let stillOn = desc === 'Running' || desc === 'Waiting';
                 let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
 
                 let renderStatus = function(user){
                     if (forAvailability)
@@ -402,13 +409,13 @@ class FormTaskRun extends FormTask{
                             <span className="label" style={self.stateStyle(user)}>
                                 {desc}
                             </span> &nbsp;&nbsp;&nbsp;
-                            {stillOn || forAvailability ?
+                            {onlyShow ? (stillOn || forAvailability ?
                             (forAvailability ?
                             <span>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
                             </span>:
-                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''}
+                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''):''}
                             </span>
                         );
                     }
@@ -462,7 +469,7 @@ class FormTaskRun extends FormTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn || forAvailability ?<span className="clearfix">
+                        { onlyShow ? (stillOn || forAvailability ?<span className="clearfix">
                         <div className="row">
 
                             <div className="col-md-12">
@@ -494,7 +501,7 @@ class FormTaskRun extends FormTask{
                                 </div>:''}
                             </div>
                         </div><br />
-                        </span>: ''}
+                        </span>: ''):''}
                     </span>);
                 }
 
@@ -557,6 +564,13 @@ class FormTaskRun extends FormTask{
                 } catch(ex){
                     users = [];
                 }
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
 
                 return <span>
                     <div key="state-assignee" className="form-group">
@@ -570,11 +584,11 @@ class FormTaskRun extends FormTask{
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        {users.length > 0 ?
+                        {onlyShow ? (users.length > 0 ?
                             <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
                                 <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
                             </button>
-                        :''}
+                        :''):''}
                         <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 

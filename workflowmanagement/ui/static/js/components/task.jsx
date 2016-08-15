@@ -471,10 +471,10 @@ export default React.createClass({
                 <div className="col-md-4">
 
 
-                    <Link to="Process" params={{object: this.state.task.processtask.process}}>
+                    <Link to="Process" params={{object: this.state.task.processtask.process  + '/showOnly'}}>
                         <button style={{marginLeft: '4px'}} onClick={this.showWorkflow} className="btn btn-info pull-right">
-                        <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
-                    </button>
+                            <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
+                        </button>
                     </Link>
                     {this.waitingTask() ?
                         <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
