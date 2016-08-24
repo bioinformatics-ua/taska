@@ -525,6 +525,78 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix}
+const ProcessLabel = React.createClass({
+    render(){
+        return <table className="process-label" align="right">
+                    <tr>
+                        <td><div className="circle circle-sm circle-default"></div></td>
+                        <td><small>&nbsp;Waiting&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-primary"></div></td>
+                        <td><small>&nbsp;Running&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-success"></div></td>
+                        <td><small>&nbsp;Finished&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-warning"></div></td>
+                        <td><small>&nbsp;Overdue&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm"></div></td>
+                        <td><small>&nbsp;Canceled&nbsp;&nbsp;</small></td>
+                    </tr>
+                    <div className="pull-right">
+                        {this.props.linkStatusDetails === undefined ? '' : this.props.linkStatusDetails}
+                    </div>
+                </table>
+
+    }
+});
+
+const ProcessDetailBar = React.createClass({
+    getInitialState(){
+       return {
+           startDate: this.props.startDate,
+           endDate: this.props.endDate,
+           status: this.props.status,
+           progress: this.props.progress
+        }
+    },
+    render(){
+        return(<div>
+                             <div className="row">
+                                <div className="col-md-5">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="startdate">
+                                                <strong>Start Date</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.startDate} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-5">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon" id="enddate">
+                                                <strong>End Date</strong>
+                                            </span>
+                                            <input className="form-control" readOnly value={this.state.endDate} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <ProcessStatus label="True" rowData={{status: this.state.status}} />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                            <div title={`${this.state.progress}% completed`} style={{backgroundColor: '#19AB27', width: `${this.state.progress}%`, height: '10px'}}></div>
+                            &nbsp;</div>
+            </div>
+        )
+    }
+});
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
 
 

@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -28,24 +28,7 @@ import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
 import {ProcessResume} from './ProcessResume.jsx';
 
-const ProcessLabel = React.createClass({
-    render(){
-        return <table className="process-label">
-                    <tr>
-                        <td><div className="circle circle-sm circle-default"></div></td>
-                        <td><small>&nbsp;Waiting&nbsp;&nbsp;</small></td>
-                        <td><div className="circle circle-sm circle-primary"></div></td>
-                        <td><small>&nbsp;Running&nbsp;&nbsp;</small></td>
-                        <td><div className="circle circle-sm circle-success"></div></td>
-                        <td><small>&nbsp;Finished&nbsp;&nbsp;</small></td>
-                        <td><div className="circle circle-sm circle-warning"></div></td>
-                        <td><small>&nbsp;Overdue&nbsp;&nbsp;</small></td>
-                        <td><div className="circle circle-sm"></div></td>
-                        <td><small>&nbsp;Canceled&nbsp;&nbsp;</small></td>
-                    </tr>
-                </table>
-    }
-});
+
 var i = 0;
 export default React.createClass({
     mixins: [   Router.Navigation,
@@ -191,39 +174,17 @@ export default React.createClass({
                                 showRun={false}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />}
-                            <div className="row">
-                                <div className="col-md-5">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <span className="input-group-addon" id="startdate">
-                                                <strong>Start Date</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.process['start_date']} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-5">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <span className="input-group-addon" id="enddate">
-                                                <strong>End Date</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.process['end_date'] || '---'} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-2">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <ProcessStatus label="True" rowData={{status: this.state.process.status}} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
-                            <div title={`${this.state.process.progress}% completed`} style={{backgroundColor: '#19AB27', width: `${this.state.process.progress}%`, height: '10px'}}></div>
-                            &nbsp;</div>
-                            <ProcessLabel />
+
+                            <ProcessDetailBar
+                                startDate={this.state.process['start_date']}
+                                endDate={this.state.process['end_date'] || '---'}
+                                status={this.state.process.status}
+                                progress={this.state.process.progress}
+                            />
+                            <ProcessLabel 
+                                linkStatusDetails={<small><Link to="StatusDetail" params={{object: params.object}}>Show assignees</Link></small>}
+                            />
+
                         </span>
                     }
                     title={this.state.process.title || this.state.workflow.title}

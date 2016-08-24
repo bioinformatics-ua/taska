@@ -1008,6 +1008,36 @@ class MyTaskPreliminary(generics.RetrieveAPIView):
 
         return ptasks
 
+class StatusDetail(generics.ListAPIView):
+    """
+        Returns a list of user attributed process tasks across all processes for future work
+    """
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_map = {
+        'task': 'processtask__task__hash',
+        'process': 'processtask__process__hash',
+        'processtask': 'processtask_hash',
+        'title': 'processtask__task__title',
+        'deadline': 'processtask__deadline',
+        'type': 'processtask__task__ttype',
+        'task_repr': 'processtask__task__title'
+    }
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+
+        ptasks = ProcessTaskUser.all(finished=False).filter(processtask__process__hash=self.kwargs['hash']
+
+            ).order_by('processtask__deadline') #.values_list('processtask')
+
+        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        return ptasks
+
 #############################################################################################
 ###
 ### Request related api calls available

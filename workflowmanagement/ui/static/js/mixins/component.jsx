@@ -147,7 +147,7 @@ const TableComponentMixin = {
     },
     commonTableStyle: function(){
 
-    }
+    },
 };
 
 // From http://jsfiddle.net/LBAr8/

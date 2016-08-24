@@ -66,7 +66,7 @@ module.exports = (
         <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/form.jsx')} />
         <Route name="FormTask" path="formresult/:object" handler={require('./components/task/form.jsx')} />
 
-
+        <Route name="StatusDetail" path="statusDetail/:object" handler={require('./components/ManageStatusDetail.jsx')} />
 
         <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>
         <Route name="InternalError" path="/500" handler={require('./components/500.jsx')}/>

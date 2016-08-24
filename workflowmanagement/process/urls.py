@@ -20,10 +20,14 @@ router_tricks = router.urls #+ [url(r'^', api.root)]
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
     url(r'^/my/tasks/', api.MyTasks.as_view()),
+
     url(r'^/my/rejectedtasks/', api.MyRejectedTasks.as_view()),
     url(r'^/my/waitingtasks/', api.MyWaitingTasks.as_view({'get': 'list'})),
     url(r'^/my/completedtasks/', api.MyCompletedTasks.as_view()),
     url(r'^/my/futuretasks/', api.MyFutureTasks.as_view()),
+
+    url(r'^/my/statusdetail/(?P<hash>[^/.]+)/', api.StatusDetail.as_view()),
+
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', api.MyTaskDependencies.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', api.MyTaskPreliminary.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/', api.MyTask.as_view()),
