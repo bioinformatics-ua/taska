@@ -102,13 +102,23 @@ export default React.createClass({
   newReassigning(e){
       this.setState({ new_reassigning: e });
   },
+  reloadProcess(){
+      ProcessActions.loadDetailIfNecessary.triggerPromise(this.state.process.hash).then(
+          (Process) => {
+              this.setState({process: Process});
+
+          }
+      ).catch(ex=>reject(ex));
+  },
   reassign(){
       StatusDetailActions.reassignRejectedUser(this.state.process.hash, this.state.ptuhash, this.state.oldUser, this.state.new_reassigning, false);
       this.setState({ showReassign: false, new_reassigning: undefined });
+      this.reloadProcess();
   },
   reassignAll(){
       StatusDetailActions.reassignRejectedUser(this.state.process.hash, this.state.ptuhash, this.state.oldUser, this.state.new_reassigning, true);
       this.setState({ showReassign: false, new_reassigning: undefined });
+      this.reloadProcess();
   },
   render() {
     let params = this.context.router.getCurrentParams();
