@@ -11,7 +11,7 @@ const WaitingTaskActions = Reflux.createActions(
     'load': {},
     'preliminary': {},
     'accept':{},
-    'reject':{}
+    'reject':{},
     }, DetailActionsMixin));
 
 export default WaitingTaskActions;

@@ -10,7 +10,8 @@ const StatusDetailActions = Reflux.createActions(
     'loadSuccess':{},
     'load': {},
     'preliminary': {},
-    'loadByHash': {}
+    'loadByHash': {},
+    'reassignRejectedUser':{},
     }, DetailActionsMixin));
 
 export default StatusDetailActions;

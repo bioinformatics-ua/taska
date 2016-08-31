@@ -20,18 +20,18 @@ export default Reflux.createStore({
     },
     mixins: [TableStoreMixin, Reflux.connect(ResultStore, "dummy"),
         DetailStoreMixin.factory(
-            new DetailLoader({model: 'process/my/statusdetail/'}),
+            new DetailLoader({model: 'process/my/statusdetail'}),
             'hash',
             StatusDetailActions
         )
     ],
     listenables: [StatusDetailActions],
     load: function (state) {
-        console.log(state);
-        loader = new ListLoader({model: 'process/my/statusdetail/'+state.hash});
+        console.log(state.hash);
+        loader = new ListLoader({model: 'process/my/statusdetail/'+state.hash});//+state.hash
+        console.log(loader);
         let self = this;
         loader.load(function(data){
-            console.log(data);
             self.updatePaginator(state);
             StatusDetailActions.loadSuccess(data);
         }, state);
@@ -69,6 +69,25 @@ export default Reflux.createStore({
                 );
             }
         });
+    },
+    onReassignRejectedUser(phash, hash, oldUser, newUser, allTasks){
+        this.onMethodDetail(phash+'/'+phash+'/reassignRejectedUser',
+                            null,
+                            'POST', {
+                                hash: hash,
+                                oldUser: oldUser,
+                                newUser: newUser,
+                                allTasks: allTasks
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.load(this.__current);//confirme this line
+                this.trigger(this.DETAIL);
+            }
+        );
     },
     getDepVersion(){
         return this.dversion;

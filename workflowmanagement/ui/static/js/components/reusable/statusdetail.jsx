@@ -44,15 +44,12 @@ const TaskType = React.createClass({
 });
 
 const ReassigningTask  = React.createClass({
-  showReassignSelect(user){
-    console.log("");
+  showReassignSelect(e){
+    this.props.metadata.showReassign(e);
   },
   render: function(){
-    /** INCOMPLET **/
     const row = this.props.rowData;
-    console.log("AAAQASAS");
-    console.log(row);
-    return <a data-assignee={row.user} data-cancel="true" onClick={this.showReassignSelect}>Reassigning  </a>;
+    return <a data-assignee={row.user} data-ptuhash={row.processtask.hash} data-pthash={row.processtask.task} data-cancel="true" onClick={this.showReassignSelect}>Reassigning  </a>;
   }
 });
 
@@ -95,6 +92,9 @@ const StatusDetailTable = React.createClass({
     update: function(data){
         this.setState(this.getState());
     },
+  showReassign(e){
+    this.props.showReassign(e);
+  },
   render: function () {
     const columnMeta = [
       {
@@ -134,6 +134,7 @@ const StatusDetailTable = React.createClass({
       "locked": false,
       "visible": true,
       "customComponent": ReassigningTask,
+      "showReassign": this.showReassign,
       "displayName": " "
       }
     ];
@@ -142,7 +143,7 @@ const StatusDetailTable = React.createClass({
           <Griddle
                       noDataMessage={<center>Something is wrong with this study! Please contact the administrator</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "user_repr", "status"]}
+                      columns={["type", "task_repr", "user_repr", "status","reassigning"]}
                       columnMetadata={columnMeta} />
         </div>
     )

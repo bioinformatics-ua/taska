@@ -591,7 +591,6 @@ class ProcessViewSet(  mixins.CreateModelMixin,
         Receive the hash of the task because the resign is done in the taskSimple, but we want resign in all
         process, so the service is implemented in this class
          '''
-
         ptask_hash=request.data.get('hash',None)
 
         if request.data.get('allTasks',None) == True:
@@ -611,7 +610,7 @@ class ProcessViewSet(  mixins.CreateModelMixin,
             except ProcessTaskUser.DoesNotExist:
                 raise Http404
         process = self.get_object()
-
+        
         return Response(ProcessSerializer(process).data)
 
 class MyProcessTaskSerializer(serializers.ModelSerializer):
@@ -714,6 +713,8 @@ class MyProcessTaskUserDetailSerializer(ProcessTaskUserSerializer):
 
         return ProcessTaskSerializer(ProcessTask.all().filter(process=process, task__in=task_deps), many=True).data
 
+
+
 class MyTasks(generics.ListAPIView):
     """
         Returns a list of user attributed process tasks across all processes
@@ -756,6 +757,67 @@ class MyTasks(generics.ListAPIView):
             raise Http404
 
         return Response({"TaskName": "Not Found"})
+
+class StatusDetail(mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.ListModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin,
+                     viewsets.GenericViewSet):
+    """
+        Returns a list of user attributed process tasks across all processes for future work
+    """
+    queryset = ProcessTaskUser.objects.none()
+    serializer_class = MyProcessTaskUserSerializer
+    lookup_field = 'hash'
+    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
+    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
+    ordering_map = {
+        'task': 'processtask__task__hash',
+        'process': 'processtask__process__hash',
+        'processtask': 'processtask_hash',
+        'title': 'processtask__task__title',
+        'deadline': 'processtask__deadline',
+        'type': 'processtask__task__ttype',
+        'task_repr': 'processtask__task__title'
+    }
+
+    def get_queryset(self):
+        """
+            Retrieves a list of user assigned process tasks
+        """
+
+        ptasks = ProcessTaskUser.all(finished=False).filter(processtask__process__hash=self.kwargs['phash'])\
+            .order_by('processtask__deadline')
+
+        return ptasks
+
+    @detail_route(methods=['post'])
+    def reassignRejectedUser(self, request, phash=None, hash=None):
+        '''
+        Receive the hash of the task because the resign is done in the taskSimple, but we want resign in all
+        process, so the service is implemented in this class
+         '''
+        ptask_hash = request.data.get('hash', None)
+
+        if request.data.get('allTasks', None) == True:
+            try:
+                obj = Process.all().filter(
+                    hash=hash
+                )
+                obj[0].resignRejectedUser(request.data.get('oldUser', None), request.data.get('newUser', None))
+            except ProcessTaskUser.DoesNotExist:
+                raise Http404
+        else:
+            try:
+                obj = ProcessTask.all().filter(
+                    hash=ptask_hash
+                )
+                print obj
+                obj[0].resignRejectedUser(request.data.get('oldUser', None), request.data.get('newUser', None))
+            except ProcessTaskUser.DoesNotExist:
+                raise Http404
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class MyWaitingTasks(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
@@ -1008,35 +1070,7 @@ class MyTaskPreliminary(generics.RetrieveAPIView):
 
         return ptasks
 
-class StatusDetail(generics.ListAPIView):
-    """
-        Returns a list of user attributed process tasks across all processes for future work
-    """
-    queryset = ProcessTaskUser.objects.none()
-    serializer_class = MyProcessTaskUserSerializer
-    filter_backends = (filters.DjangoFilterBackend, AliasOrderingFilter)
-    ordering_fields = ('user', 'title', 'task', 'task_repr', 'type', 'deadline', 'reassigned', 'reassign_date', 'finished', 'process','processtask')
-    ordering_map = {
-        'task': 'processtask__task__hash',
-        'process': 'processtask__process__hash',
-        'processtask': 'processtask_hash',
-        'title': 'processtask__task__title',
-        'deadline': 'processtask__deadline',
-        'type': 'processtask__task__ttype',
-        'task_repr': 'processtask__task__title'
-    }
 
-    def get_queryset(self):
-        """
-            Retrieves a list of user assigned process tasks
-        """
-
-        ptasks = ProcessTaskUser.all(finished=False).filter(processtask__process__hash=self.kwargs['hash']
-
-            ).order_by('processtask__deadline') #.values_list('processtask')
-
-        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
-        return ptasks
 
 #############################################################################################
 ###
