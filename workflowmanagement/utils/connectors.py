@@ -58,8 +58,8 @@ def newHistoryNotifications(sender, instance, **kwargs):
                     tci = tc(instance, [instance.object.processtaskuser.user])
 
 
-            #sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
-            sendEmail(tci) #Comentar esta
+            sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
+            #sendEmail(tci) #Comentar esta
 
         except AttributeError as e:
             # Silently ignore, when the template is not defined we just don't send the notification
