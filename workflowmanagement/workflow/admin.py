@@ -34,9 +34,9 @@ class WorkflowTaskInline(admin.TabularInline):
     def has_add_permission(self, request):
         return False
     # we must change the queryset to allow the select to be based on the subclasses type, since the Task is generic
-    def get_queryset(self, request):
-        qs = super(WorkflowTaskInline, self).queryset(request)
-        return qs.select_subclasses()
+    # def get_queryset(self, request):
+    #     qs = super(WorkflowTaskInline, self).queryset(request)
+    #     return qs.select_subclasses()
 
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):

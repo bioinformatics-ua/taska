@@ -25,8 +25,12 @@ export default Reflux.createStore({
             this.trigger();
         }
     },
-    onSave: function(trigger=true){
+    onSave: function(trigger=true, callback){
         this.__unsaved = false;
+
+        if(callback){
+            callback();
+        }
 
         if(trigger)
             this.trigger();

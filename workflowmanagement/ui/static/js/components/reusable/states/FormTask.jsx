@@ -8,12 +8,19 @@ import Select from 'react-select';
 
 import FormActions from '../../../actions/FormActions.jsx';
 
+import StateActions from '../../../actions/StateActions.jsx';
+
 import UserActions from '../../../actions/UserActions.jsx';
+
+import {ReassigningButton} from '../component.jsx';
+
+import ProcessActions from '../../../actions/ProcessActions.jsx';
+
 import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
 
-import {stateColor} from '../../../map.jsx';
+import {stateColor, singleStateColor} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
@@ -26,6 +33,9 @@ class FormTask extends SimpleTask {
     }
     static repr(){
         return 'Form Task';
+    }
+    static title(){
+        return "Do you know what is a form tasks? Basically you can do a questionnaire or survey for the users and know the answers. You will be able to export the answers to your statistic application. ";
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -49,11 +59,25 @@ class FormTask extends SimpleTask {
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, false);
             },
-            componentDidMount(){
-                // For some reason i was getting a refresh loop, when getting the action result from the store...
-                // so exceptionally, i decided to do it directly, the result is still cached anyway
-                FormActions.loadSimpleListIfNecessary.triggerPromise(200).then(
+            openPopup(){
+                let add_form = window.open("form/add/true", "Add forms", "width=800;height=300;");
+
+                add_form.onunload = () => {
+                    let hash = add_form.formHash;
+
+                    if(hash){
+                        console.log(hash);
+                        this.props.dataChange(self.getIdentificator(), {form: hash}, false);
+                        this.refreshForm();
+                    }
+                };
+            },
+            refreshForm(){
+                console.log('refreshing form');
+                FormActions.loadSimpleList.triggerPromise(200).then(
                     (forms) => {
+                        console.log('updated forms list');
+
                         let map = forms.results.map(
                                     entry => {
                                         return {
@@ -63,6 +87,7 @@ class FormTask extends SimpleTask {
                                     }
                         );
                         if(this.isMounted()){
+                            console.log('SETTING STATE');
                             this.setState(
                                 {
                                     forms: map
@@ -72,16 +97,27 @@ class FormTask extends SimpleTask {
                     }
                 );
             },
+            componentDidMount(){
+                // For some reason i was getting a refresh loop, when getting the action result from the store...
+                // so exceptionally, i decided to do it directly, the result is still cached anyway
+                this.refreshForm();
+            },
             render(){
                 return (
                     <span>
                         <div key="state-form" className="form-group">
-                            <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                            <label for="state-form">Form schema  <i title="This field is mandatory" className=" text-danger fa fa-asterisk" />
+                            </label>
+                                {editable ?
+                                <button className="pull-right btn btn-xs btn-success" onClick={this.openPopup}>
+                                    <i title="Add new form" className="fa fa-plus" /> Add new Form
+                                </button>
+                                :''}
                                 {this.state.forms.length > 0?
-                                <Select onChange={this.setform}
+                                <Select placeholder="Search for form" onChange={this.setform}
                                 value={this.parent().form} name="form-field-name"
                                 multi={false} options={this.state.forms} disabled={!editable} />
-                                :"There's no forms yet, please add one first from the main dashboard."}
+                                :<span><br/>There's no form yet, please add one first.</span>}
                         </div>
                     <ChildComponent dataChange={this.props.dataChange} main={this.props.main} />
 
@@ -116,7 +152,6 @@ class FormTask extends SimpleTask {
     is_valid(){
         if(super.is_valid()){
             let data = this.getData();
-            console.log(data);
             return data.form != undefined;
         }
 
@@ -128,6 +163,25 @@ class FormTask extends SimpleTask {
 class FormTaskRun extends FormTask{
     constructor(options){
         super(options);
+    }
+
+    is_valid(){
+        let data = this.getData();
+
+        return (
+            data.deadline
+            && data.assignee
+            && data.assignee.split(',').length > 0
+        );
+
+    }
+
+    status(){
+        if(this.is_valid()){
+            return 'state-filled';
+        }
+
+        return '';
     }
 
     serialize(){
@@ -145,10 +199,13 @@ class FormTaskRun extends FormTask{
             task: this.getData().hash
         }
     }
-    stateStyle(){
-        if(this.getData().ptask)
-            return stateColor(this.getData().ptask);
-
+    stateStyle(user){
+         if(this.getData().ptask)
+            //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
+            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8 )
+                return stateColor(this.getData().ptask);
+            else if(user != undefined)
+                return singleStateColor(user.status);
         return {};
     }
     stateDesc(){
@@ -171,6 +228,13 @@ class FormTaskRun extends FormTask{
                     return 'Canceled';
                 case 5:
                     return 'Overdue';
+                case 7:
+                    return 'Waiting for answer';
+                case 8:
+                    return "Rejected";
+                default:
+                    console.log("Task status: ");
+                    console.log(this.getData().ptask.status);
             }
 
 
@@ -184,7 +248,10 @@ class FormTaskRun extends FormTask{
                 return {
                     parent: this.props.main,
                     users: [],
-                    new_assignee: undefined
+                    new_assignee: undefined,
+                    new_reassigning: undefined,
+                    oldUser: undefined,
+                    showReassign: false
 
                 };
             },
@@ -198,7 +265,7 @@ class FormTaskRun extends FormTask{
                 let data = {assignee: val};
 
                 this.state.parent.setState(data);
-                this.props.dataChange(self.getIdentificator(), data, false);
+                this.props.dataChange(self.getIdentificator(), data, true);
             },
             setDeadline(e){
                 let data = {deadline: moment(e).format('YYYY-MM-DDTHH:mm')};
@@ -225,6 +292,49 @@ class FormTaskRun extends FormTask{
                     new_assignee: e
                 })
             },
+            newReassigning(e){
+                this.setState({
+                    new_reassigning: e
+                })
+            },
+            refineAnswer(e){
+                let answer_hash = $(e.target).data('answer');
+
+                let action = this.state.parent.props.refineAnswer;
+                if(action){
+                    action(answer_hash);
+                }
+            },
+            showReassignSelect(e){
+                this.setState({
+                    showReassign: true,
+                    oldUser: Number.parseInt($(e.target).data('assignee'))
+                })
+
+            },
+            reassign(){
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, false);
+                }
+
+                this.setState({
+                    showReassign: false
+                })
+            },
+            reassignAll(){
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, true);
+                }
+
+                this.setState({
+                    showReassign: false
+                })
+            },
+
             results(){
                 let me=this;
 
@@ -243,8 +353,30 @@ class FormTaskRun extends FormTask{
                 }
                 let desc = self.stateDesc();
                 let stillOn = desc === 'Running' || desc === 'Waiting';
+                let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
 
                 let renderStatus = function(user){
+                    if (forAvailability)
+                        switch(user.status)
+                        {
+                            case 1:
+                                desc = 'Waiting for answer';
+                                break;
+                            case 2:
+                                desc = 'Accepted';
+                                break;
+                            case 3:
+                                desc = 'Rejected';
+                                break;
+                        }
+
                     if(user.finished){
                         return (
                             <span>
@@ -252,9 +384,13 @@ class FormTaskRun extends FormTask{
                                     Finished on {moment(user.result.date).format('YYYY-MM-DD HH:mm')}
                                 </span>
                                  &nbsp;&nbsp;&nbsp;
-                                 <Link to={user.result.type}
+                                 <div className="btn btn-group">
+
+                                 <button data-answer={user.hash} onClick={me.refineAnswer} className="btn btn-xs btn-warning">Ask for refinement</button>
+                                 <Link className="btn btn-xs btn-info" to={user.result.type}
                                  params={{object: user.result.hash}}>
                                  See result</Link>
+                                 </div>
                             </span>
                         );
                     } else if(user.reassigned){
@@ -262,7 +398,7 @@ class FormTaskRun extends FormTask{
                             <span style={{fontSize: '100%'}} className="label label-warning">
                                 Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
                             </span>&nbsp;&nbsp;&nbsp;
-                            {stillOn ?
+                            {stillOn || forAvailability ?
                             <a data-assignee={user.user} data-cancel="false" onClick={me.cancelUser}>Uncancel ?</a> :''}
                             </span>
                         );
@@ -270,11 +406,16 @@ class FormTaskRun extends FormTask{
 
                         return (
                             <span>
-                            <span className="label" style={self.stateStyle()}>
+                            <span className="label" style={self.stateStyle(user)}>
                                 {desc}
                             </span> &nbsp;&nbsp;&nbsp;
-                            {stillOn ?
-                           <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> :''}
+                            {onlyShow ? (stillOn || forAvailability ?
+                            (forAvailability ?
+                            <span>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
+                            </span>:
+                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''):''}
                             </span>
                         );
                     }
@@ -299,6 +440,12 @@ class FormTaskRun extends FormTask{
                                             <i className="fa fa-file-code-o"></i> As JSON</a></li>
                                         <li><a href={`api/process/processtask/${this.parent().ptask.hash}/export/xlsx`}>
                                             <i className="fa fa-file-excel-o"></i> As XLSX</a></li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf?as=html`}>
+                                            <i className="fa fa-file-code-o"></i> As HTML</a>
+                                        </li>
+                                        <li><a target="_blank" href={`api/process/processtask/${this.parent().ptask.hash}/export/pdf`}>
+                                            <i className="fa fa-file-pdf-o"></i> As PDF</a>
+                                        </li>
                                       </ul>
                                     </div>
 
@@ -322,7 +469,7 @@ class FormTaskRun extends FormTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn ?<span className="clearfix">
+                        { onlyShow ? (stillOn || forAvailability ?<span className="clearfix">
                         <div className="row">
 
                             <div className="col-md-12">
@@ -335,9 +482,26 @@ class FormTaskRun extends FormTask{
                                     <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
                                   </span>
                                 </div>
+                                <br />
+                                {this.state.showReassign ?
+                                <div className="input-group reassign">
+                                        <Select placeholder="Search for users to reassigning" onChange={this.newReassigning}
+                                            value={this.state.new_reassigning} name="form-field-name"
+                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                        } />
+                                  <span className="input-group-btn">
+                                    <ReassigningButton
+                                      success={me.reassign}
+                                      allTasks={me.reassignAll}
+                                      identificator = {false}
+                                      runLabel= {<span><i className="fa fa-plus"></i></span>}
+                                      title={'Reassigning'}
+                                      message={'You can reassign only this task or all tasks that this user are envolved!'}  />
+                                  </span>
+                                </div>:''}
                             </div>
                         </div><br />
-                        </span>: ''}
+                        </span>: ''):''}
                     </span>);
                 }
 
@@ -367,27 +531,65 @@ class FormTaskRun extends FormTask{
                 );
 
                 if(!this.parent().deadline)
-                    this.setDeadline({
-                        target: {
-                            value: moment().add(10, 'days').format('YYYY-MM-DDTHH:mm')
-                        }
-                    });
+                    this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
 
             },
+            extendDeadline(event){
+                let new_deadline,
+                    setNewDeadline = (date) => {
+                    new_deadline = moment(date).format('YYYY-MM-DDTHH:mm');
+                };
+
+                StateActions.alert({
+                    'title': `Change deadline for ${this.parent().name}`,
+                    'message': <div style={{}}>
+                            <p>Please specify the new deadline.</p>
+                            <DateTimePicker id="newdeadline" onChange={setNewDeadline}
+                                defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
+                        </div>,
+                    'onConfirm': (val)=>{
+                        console.log(new_deadline);
+                        console.log(this.parent());
+
+                        ProcessActions.changeDeadline(this.parent().ptask.hash, new_deadline);
+                        //return false;
+                    },
+                    'overflow': 'visible'
+                });
+            },
             render(){
+                let users;
+                try{
+                    users = this.parent().ptask.users;
+                } catch(ex){
+                    users = [];
+                }
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
+
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
 
                             {this.state.users.length > 0?
-                            <Select onChange={this.setAssignee}
+                            <Select onChange={this.setAssignee} placeholder="Search for assignees"
                             value={this.parent().assignee} name="form-field-name"
                             multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        <DateTimePicker onChange={this.setDeadline} disabled={this.parent().disabled}
+                        {onlyShow ? (users.length > 0 ?
+                            <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
+                                <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
+                            </button>
+                        :''):''}
+                        <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
 
                     </div>

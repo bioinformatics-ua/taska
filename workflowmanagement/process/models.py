@@ -13,6 +13,8 @@ from django.db import transaction
 
 from history.models import History
 
+from material.models import File
+
 class Process(models.Model):
     '''A process is an running instance of a Workflow.
 
@@ -34,14 +36,17 @@ class Process(models.Model):
     FINISHED        = 2
     CANCELED        = 3
     OVERDUE         = 4
+    WAITING         = 5
 
     STATUS          = (
             (RUNNING,   'Process is running'),
             (FINISHED,  'Process has ended successfully'),
             (CANCELED,  'Process was canceled'),
-            (OVERDUE,   'Process has gone over end_date')
+            (OVERDUE,   'Process has gone over end_date'),
+            (WAITING,   'Process is waiting for users availability')
         )
     workflow        = models.ForeignKey(Workflow)
+    title           = models.CharField(max_length=200, null=True)
     executioner     = models.ForeignKey(User)
     hash            = models.CharField(max_length=50, unique=True)
     start_date      = models.DateTimeField(auto_now_add=True)
@@ -58,10 +63,19 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return ('%s (started %s by %s)' % (self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"), self.executioner.get_full_name()))
+        return u'%s (started %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"))
 
     def tasks(self):
         return ProcessTask.all(process=self)
+
+    def getAllUsersEnvolved(self):
+        tmp = []
+        tasks = self.tasks()
+        for task in tasks:
+            for taskUser in ProcessTaskUser.all(processtask=task):
+                if taskUser.getUser() not in tmp:
+                    tmp += [taskUser.getUser()]
+        return tmp
 
     @transaction.atomic
     def cancel(self):
@@ -70,7 +84,10 @@ class Process(models.Model):
         ptasks = self.tasks()
 
         for ptask in ptasks:
-            if ptask.status == ProcessTask.WAITING or ptask.status == ProcessTask.RUNNING:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY  or\
+                    ptask.status == ProcessTask.REJECTED or\
+                    ptask.status == ProcessTask.WAITING or\
+                    ptask.status == ProcessTask.RUNNING:
                 ptask.status = ProcessTask.CANCELED
                 ptask.save()
 
@@ -84,30 +101,37 @@ class Process(models.Model):
             Reaccess tasks status (so we can move the state machine forward)
         '''
         ptasks = self.tasks()
+        if self.status != Process.WAITING:
+            wlist = ptasks.filter(status=ProcessTask.WAITING)
 
-        wlist = ptasks.filter(status=ProcessTask.WAITING)
+            for ptask in wlist:
+                move = True
+                deps = ptask.task.dependencies()
 
-        for ptask in wlist:
-            move = True
-            deps = ptask.task.dependencies()
+                for dep in deps:
+                    pdep = ptasks.get(task=dep.dependency)
 
-            for dep in deps:
-                pdep = ptasks.get(task=dep.dependency)
+                    if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
+                        move=False
 
-                if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
-                    move=False
+                if move:
+                    ptask.status = ProcessTask.RUNNING
+                    ptus = ProcessTaskUser.all(processtask=ptask)
+                    for ptu in ptus:
+                        ptu.status = ProcessTaskUser.RUNNING
+                    ptask.save()
 
-            if move:
-                ptask.status = ProcessTask.RUNNING
-                ptask.save()
+                    pusers = ptask.users()
+                    for puser in pusers:
+                        History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
 
-        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING)).count() == 0:
-            self.status = Process.FINISHED
-            self.end_date = timezone.now()
+            if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
+                self.status = Process.FINISHED
+                self.end_date = timezone.now()
 
-            History.new(event=History.DONE, actor=self.executioner, object=self)
+                History.new(event=History.DONE, actor=self.executioner, object=self)
 
-            self.save()
+                self.save()
 
     def progress(self):
         all = ProcessTask.all(process=self).count()
@@ -117,6 +141,35 @@ class Process(models.Model):
             return done*100 / all
         except ZeroDivisionError:
             return 0
+
+    def start(self):
+        ptasks = self.tasks()
+
+        for ptask in ptasks:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY or \
+                            ptask.status == ProcessTask.REJECTED:
+                ptask.status = ProcessTask.WAITING
+                ptask.save()
+
+        self.status = Process.RUNNING
+        self.save()
+        self.move()
+
+    def validateAcceptions(self):
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            for ptasksUser in ProcessTaskUser.all(processtask=ptask):
+                if(ptasksUser.status == ProcessTaskUser.WAITING or \
+                               ptasksUser.status == ProcessTaskUser.REJECTED ):
+                    return False
+        return True
+
+    def resignRejectedUser(self, oldUser, newUser):
+        #Resign all tasks that the old user belongs
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            ptask.resignRejectedUser(oldUser, newUser)
+        self.save()
 
     class Meta:
         ordering = ["-id"]
@@ -161,13 +214,19 @@ class ProcessTask(models.Model):
     FINISHED        = 3
     CANCELED        = 4
     OVERDUE         = 5
+    IMPROVING       = 6
+    WAITING_AVAILABILITY = 7
+    REJECTED        = 8
 
     STATUS          = (
             (WAITING,   'Task is waiting execution'),
             (RUNNING,   'Task is running'),
             (FINISHED,  'Task has ended successfully'),
             (CANCELED,  'Task was canceled'),
-            (OVERDUE,   'Task has gone over end_date')
+            (OVERDUE,   'Task has gone over end_date'),
+            (IMPROVING,   'Task is running again to be improved'),
+            (WAITING_AVAILABILITY, 'Task is waiting for users availability'),
+            (REJECTED, 'Task has some users that rejected this task')
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)
@@ -184,7 +243,7 @@ class ProcessTask(models.Model):
             return "Unknown"
 
     def __unicode__(self):
-        return ('%s - %s' % (self.task, self.process))
+        return u'%s - %s' % (self.task, self.process)
 
     def rpr(self):
         ts = Task.all().get_subclass(id=self.task.id)
@@ -196,7 +255,41 @@ class ProcessTask(models.Model):
     def user(self, user):
         return ProcessTaskUser.all(processtask=self).get(user=user)
 
-    def move(self):
+    def refreshState(self):
+        #translate
+        #Verificar se todos aceitaram
+        #   Se sim, mudar estado para waiting
+        #   Se nao, manter estado de waitingavailability
+        #   Se alguem recusou, mudar estado para rejected
+
+        allUser = ProcessTaskUser \
+            .all(processtask=self, reassigned=False)
+        allAccepted = True
+
+        for usr in allUser:
+            if usr.status ==  ProcessTaskUser.REJECTED:
+                self.status = ProcessTask.REJECTED
+            elif usr.status == ProcessTaskUser.WAITING:
+                allAccepted = False
+
+        if allAccepted:
+            self.status = ProcessTask.WAITING
+
+    def resignRejectedUser(self, oldUser, newUser):
+        tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
+        exists = ProcessTaskUser.all(processtask=self).filter(user=newUser).count()
+        if exists == 0:
+            for task in tasks:
+                task.changeUser(newUser)
+
+                History.new(event=History.ADD, actor=task.processtask.process.executioner, object=task.processtask.process,
+                            authorized=[newUser], related=[task.processtask.process])
+        else:
+            for task in tasks:
+                task.delete()
+        self.save()
+
+    def move(self, force=False):
 
         missing = ProcessTaskUser\
             .all(processtask=self, reassigned=False) \
@@ -206,7 +299,47 @@ class ProcessTask(models.Model):
             self.status=ProcessTask.FINISHED
             self.save()
 
+            # IF WE ARE BEFORE A FORM TASK, UPLOAD THE EXPORT RESULTS PASSING THEM BELOW, bit of a hack
+            task = Task.objects.get_subclass(id=self.task.id)
+
+            self.__exportForm(task)
+
             self.process.move()
+
+        else:
+            if force:
+                self.__exportForm(Task.objects.get_subclass(id=self.task.id))
+
+    def __exportForm(self, task):
+        if task.type() == 'form.FormTask' and task.output_resources:
+
+            exporter = task.get_exporter('xlsx', self)
+
+            export = exporter.export(export_file=True)
+
+            users = self.users()
+
+            if len(users) > 0:
+                result = users[0].getResult()
+
+                if result:
+                    ex_files = list(result.outputs.all().select_subclasses())
+
+                    for fil in ex_files:
+                        if fil.filename==export.filename:
+                            result.outputs.remove(fil)
+
+                    result.outputs.add(export)
+
+    def calculateStart(self):
+        deps = self.task.dependencies().values_list('id', flat=True)
+
+        pdeps = ProcessTask.all().filter(task__in=deps).order_by('-deadline')
+
+        if pdeps.count() > 0:
+            return pdeps[0].deadline
+
+        return self.process.start_date
 
     @staticmethod
     def all(process=None):
@@ -238,38 +371,66 @@ class ProcessTaskUser(models.Model):
         :processtask (ProcessTask): class:`ProcessTask` related with this instance
         :reassigned (boolean): Indicates if this user was reassignment in the middle of a task
         :reassign_date (datetime): Timestamp of this user reassignment (if any)
+        ...
+        :status (smallint): Indicator of the status of the user decision
     '''
+    # Status literals, representing the translation to the statuses the process task can be in
+    WAITING         = 1
+    ACCEPTED        = 2
+    REJECTED        = 3
+    RUNNING         = 4
+    FINISHED        = 5
+    CANCELED        = 6
+    OVERDUE         = 7
+    IMPROVING       = 8
+
+    STATUS          = (
+            (WAITING,   'Task is waiting confirmation from user'),
+            (ACCEPTED,  'Task was accepted'),
+            (REJECTED,  'Task was rejected'),
+            (RUNNING, 'Task is running'),
+            (FINISHED, 'Task has ended successfully'),
+            (CANCELED, 'Task was canceled'),
+            (OVERDUE, 'Task has gone over end_date'),
+            (IMPROVING, 'Task is running again to be improved')
+        )
 
     user            = models.ForeignKey(User)
     processtask     = models.ForeignKey(ProcessTask)
     reassigned      = models.BooleanField(default=False)
     reassign_date   = models.DateTimeField(null=True, blank=True)
     finished        = models.BooleanField(default=False)
+    hash            = models.CharField(max_length=50)
+    status          = models.PositiveSmallIntegerField(choices=STATUS, default=WAITING)
 
     class Meta:
         ordering = ['-processtask__deadline']
 
     def __unicode__(self):
-        return ('%s - %s' % (self.processtask, self.user))
+        return u'%s - %s' % (self.processtask, self.user)
 
     def requests(self):
         return Request.objects.filter(
             Q(processtaskuser=self)
             | Q(processtaskuser__processtask=self.processtask, public=True)
             )
+    def getUser(self):
+        return self.user
 
     def getResult(self):
         from result.models import Result
         try:
-            results = Result.all().filter(processtaskuser=self)
-
-            if len(results) > 0:
-                return results[0]
+            return Result.all(processtaskuser=self)
 
         except Result.DoesNotExist, IndexError:
             pass
 
         return None
+
+    def changeUser(self, newUser):
+        self.user=User.objects.get(id=newUser)
+        self.status=ProcessTaskUser.WAITING
+        self.save()
 
     def reassign(self):
         self.reassigned=True
@@ -287,8 +448,25 @@ class ProcessTaskUser(models.Model):
 
     def finish(self):
         self.finished=True
+        self.status=ProcessTaskUser.FINISHED
         self.save()
 
+        self.processtask.move()
+
+    def accept(self):
+        self.status=ProcessTaskUser.ACCEPTED
+        if (self.processtask.status == ProcessTask.RUNNING):
+            self.status=ProcessTaskUser.RUNNING
+        self.save()
+
+        self.processtask.refreshState()
+        self.processtask.move()
+
+    def reject(self):
+        self.status=ProcessTaskUser.REJECTED
+        self.save()
+
+        self.processtask.refreshState()
         self.processtask.move()
 
     @staticmethod
@@ -296,6 +474,7 @@ class ProcessTaskUser(models.Model):
         ''' Returns all valid processtask instances
 
         '''
+
         tmp = None
         if related:
             tmp = ProcessTaskUser.objects.select_related('processtask').all()
@@ -312,6 +491,14 @@ class ProcessTaskUser(models.Model):
             tmp = tmp.filter(processtask=processtask)
 
         return tmp
+
+@receiver(models.signals.post_save, sender=ProcessTaskUser)
+def __generate_ptu_hash(sender, instance, created, *args, **kwargs):
+    '''This method uses the post_save signal to automatically generate unique public hashes to be used when referencing an process task user.
+    '''
+    if created:
+        instance.hash=createHash(instance.id)
+        instance.save()
 
 class Request(models.Model):
     '''Represents a request made over a ProcessTask assignment.
@@ -377,7 +564,7 @@ class Request(models.Model):
 
     def __unicode__(self):
         ptask = self.processtaskuser.processtask
-        return "Request for Task %s in Process %s" % (ptask.task.__str__(), ptask.process.__str__())
+        return u"Request for Task %s in Process %s" % (ptask.task, ptask.process)
 
 
 @receiver(models.signals.post_save, sender=Request)

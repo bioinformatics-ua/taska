@@ -22,7 +22,7 @@ let fr;
 
 class FormTask extends Task{
     getTypeRepr(){
-        return <span><i className='fa fa-check'></i> Simple Task</span>;
+        return <span><i className='fa fa-list'></i> Form Task</span>;
     }
     changeComment(e){
         super.setAnswer('comment', e.target.value);
@@ -69,8 +69,7 @@ class FormTask extends Task{
 
         return React.createClass({
             componentDidMount(){
-                console.log(context.state.answer.answer);
-                console.log(context.state.task.processtask.parent['form_repr'].schema);
+
                 let options = {
                     saveCallback: context.saveCallback,
                     project_id: 1,

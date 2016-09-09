@@ -1,6 +1,8 @@
 Process Package
 ===============
 
+.. automodule:: process
+
 Admin
 -------------
 

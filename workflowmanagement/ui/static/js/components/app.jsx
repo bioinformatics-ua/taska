@@ -50,7 +50,7 @@ const AlertQueue = React.createClass({
             return <span></span>
 
         if(alert.onConfirm){
-            return <Modal title={alert.title} message={alert.message}
+            return <Modal overflow={alert.overflow} title={alert.title} message={alert.message}
                         close={this.handleClose} showConfirm={true} success={this.askLoss} />
         }
 
@@ -139,7 +139,7 @@ export default React.createClass({
     getInitialState() {
       return this.__getState();
     },
-    componentDidMount(){
+    clamp(){
         $('[data-clamp]').each(function () {
             var elem = $(this);
             var parentPanel = elem.data('clamp');
@@ -153,14 +153,37 @@ export default React.createClass({
             $(window).resize(resizeFn);
         });
     },
+    componentDidMount(){
+      this.clamp();
+    },
+    componentDidUpdate(){
+      this.clamp();
+    },
     update(data){
         this.setState(this.__getState());
     },
+
+    stringParams(){
+      var qd = {};
+      location.search.substr(1).split("&").forEach(function(item) {var k = item.split("=")[0], v = item.split("=")[1]; v = v && decodeURIComponent(v); (k in qd) ? qd[k].push(v) : qd[k] = [v]})
+      return qd;
+    },
     render(){
     var name = this.context.router.getCurrentPath();
-
+    let headless = this.context.router.getCurrentParams().headless;
     return (
         <div>
+          {headless == 'true' ?
+          <header>
+              <nav className="navbar navbar-default navbar-fixed-top">
+                <div className="container">
+                    <div className="navbar-header">
+                        <center className="navbar-brand" style={{color: 'white', fontSize: '12px'}}>Please fullfill the action, save and when you're satisfied just close this window.</center>
+                    </div>
+                </div>
+              </nav>
+          </header>
+          :
           <header>
               <nav className="navbar navbar-default navbar-fixed-top">
                 <div className="container">
@@ -187,6 +210,7 @@ export default React.createClass({
                           </span>
                         </div>
                       </div>
+          }
         </form>*/}
                     <UserDropdown url="api/account/me/" />
 
@@ -194,17 +218,18 @@ export default React.createClass({
                 </div><!-- /.container-fluid -->
               </nav>
           </header>
+          }
           <div className="container">
             <AlertQueue />
             <Affix className={'breadbar'} offset={36}>
               <div className="row">
                   <div className="col-md-10 pull-left">
-                      <Breadcrumbs separator='' {...this.props} />
+                     <Breadcrumbs separator='' {...this.props} />
                   </div>
                   <LoadingBar />
               </div>
             </Affix>
-            <RouteHandler key={name} {...this.props} />
+            <RouteHandler key={name} headless={headless != undefined} {...this.props} />
           </div>
           <div className="container">
             <div className="row">
@@ -212,7 +237,10 @@ export default React.createClass({
               </div>
             </div>
           </div>
-          <footer>© Ricardo Ribeiro & University of Aveiro - 2015</footer>
+          {headless == 'true' ? '':
+          <footer> <a href="http://www.ua.pt"><img src="static/images/logo-ua2.png" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a href="http://bioinformatics.ua.pt"><img src="static/images/bioinformatics.png" /></a></footer>
+          }
         </div>
     );
   }

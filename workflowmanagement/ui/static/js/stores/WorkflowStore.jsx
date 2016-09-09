@@ -95,9 +95,11 @@ const WorkflowStore = Reflux.createStore({
             StateActions.alert(
                 {
                     'title':'Missing Title',
-                    'message': 'The workflow must have a title!'
+                    'message': 'The study template must have a title!'
                 }
             );
+
+            return;
         }
 
         workflow.tasks = [];
@@ -110,6 +112,17 @@ const WorkflowStore = Reflux.createStore({
             if(!state.is_valid())
                 failed.push(state);
             workflow.tasks.push(state.serialize());
+        }
+
+        if(workflow.tasks.length === 0){
+            StateActions.alert(
+                {
+                    'title':'Empty study template',
+                    'message': 'The study template cannot be empty, try to add some tasks first.'
+                }
+            );
+
+            return;
         }
 
         if(failed.length > 0){
@@ -130,7 +143,7 @@ const WorkflowStore = Reflux.createStore({
                 WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
-                            StateActions.save()
+                            StateActions.save();
                             this.trigger();
                         }
                 );
@@ -138,18 +151,60 @@ const WorkflowStore = Reflux.createStore({
                   WorkflowActions.addDetail.triggerPromise(workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
-                            StateActions.save()
-                            this.__wfinished = workflow;
-                            this.trigger();
+                            StateActions.save(true, ()=>{
+                                this.__wfinished = workflow;
+                                this.trigger();
+                            });
+
                         }
                 );
         }
     },
-
-    onRunProcess(data){
+    onCheckAvailability(data)
+    {
+        console.log(data);
         let process = {
             ***REMOVED*** this.__detaildata.hash,
-            tasks: []
+            tasks: [],
+            title: data.title,
+            status: 5
+        };
+
+        let states = data.sm.getStates();
+        let missing = [];
+        
+        for(let state of states)
+        {
+            let serialized = state.serialize();
+
+            if(!state.is_valid()){
+                missing.push(serialized);
+            }
+
+            process.tasks.push(serialized);
+        }
+        this.__missing = missing
+
+        if(this.__missing.length == 0){
+            StateActions.loadingStart();
+            ProcessActions.addDetail.triggerPromise(process).then(
+                (process) => {
+                    StateActions.loadingEnd();
+                    this.__pfinished = process;
+                    this.trigger();
+                }
+            )
+        }
+
+        this.trigger();
+    },
+    onRunProcess(data){
+        console.log(data);
+        let process = {
+            ***REMOVED*** this.__detaildata.hash,
+            tasks: [],
+            title: data.title,
+            status: 1
         };
 
         let states = data.sm.getStates();
@@ -187,7 +242,7 @@ const WorkflowStore = Reflux.createStore({
 
         if(workflow.hash){
             StateActions.loadingStart();
-            WorkflowActions.methodDetail.triggerPromise('fork', workflow.hash).then(
+            this.onMethodDetail('fork', workflow.hash).then(
                 (workflow) => {
                     StateActions.loadingEnd();
                     this.__wfinished = workflow;

@@ -1,6 +1,8 @@
 Result Package
 ==============
 
+.. automodule:: result
+
 Admin
 -------------
 

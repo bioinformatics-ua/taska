@@ -10,6 +10,8 @@ hotkey.activate();
 
 import {ContextMenu} from './contextmenu.jsx';
 
+import WorkflowActions from '../actions/WorkflowActions.jsx';
+
 import Tabs from 'react-simpletabs';
 
 import cline from '../vendor/jquery.domline';
@@ -34,6 +36,104 @@ import cline from '../vendor/jquery.domline';
         if (doPrevent)
             e.preventDefault();
     });
+
+/** Affix react component from: https://gist.github.com/julianocomg/296469e414db1202fc86
+ * @author Juliano Castilho <julianocomg@gmail.com>
+ */
+
+import joinClasses from 'react/lib/joinClasses';
+
+let Affix = React.createClass({
+  /**
+   * @type {Object}
+   */
+  propTypes: {
+    offset: React.PropTypes.number
+  },
+
+  /**
+   * @return {Object}
+   */
+  getDefaultProps() {
+    return {
+      offset: 0,
+      clamp: '.widthreference',
+      fill: true
+    };
+  },
+
+  /**
+   * @return {Object}
+   */
+  getInitialState() {
+    return {
+      affix: false
+    };
+  },
+
+  /**
+   * @return {void}
+   */
+  handleScroll() {
+    var affix = this.state.affix;
+    var offset = this.props.offset;
+    var scrollTop = document.body.scrollTop;
+
+    if (!affix && scrollTop >= offset) {
+      this.setState({
+        affix: true
+      });
+    }
+
+    if (affix && scrollTop < offset) {
+      this.setState({
+        affix: false
+      });
+    }
+  },
+
+  /**
+   * @return {void}
+   */
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+
+  /**
+   * @return {void}
+   */
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
+
+  render() {
+    var affix = this.state.affix ? 'affixed' : '';
+    var offset = this.props.offset;
+    var className = this.props.className;
+
+    var clamp_str= isNaN(this.props.clamp);
+
+    return (
+      <span>
+      {clamp_str ?
+      <div data-clamp={this.props.clamp} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+        :
+      <div style={{width: this.props.clamp+'px'}} className={joinClasses(className, affix)}>
+        {this.props.children}
+      </div>
+      }
+
+      {this.props.fill ?
+        <div style={{height: offset}}>&nbsp;</div>
+      :''}
+      </span>
+    );
+  }
+
+});
+
 
 const ModalDetail = React.createClass({
   getInitialState(){
@@ -81,6 +181,7 @@ let StateMachineComponent = React.createClass({
             canUndo: StateMachineStore.canUndo(),
             canRedo: StateMachineStore.canRedo(),
             detailVisible: StateMachineStore.getDetailVisible(),
+            detailExtended: StateMachineStore.getDetailExtended()
         }
     },
     getInitialState(){
@@ -95,10 +196,19 @@ let StateMachineComponent = React.createClass({
     getDefaultProps() {
         return {
             editable: true,
+            editTitle: false,
             detailMode: 0,
             blockSchema: false,
             onUpdate: undefined,
-            onUnsavedExit: undefined
+            onUnsavedExit: undefined,
+            detailHelp: "",
+            globalHelp: "",
+            identifier: 'statemachine_editor',
+            undoredo: false,
+            selectFirst: false,
+            validate: false,
+            checkAvailability: null,
+            runProcess: null
         };
     },
     update(data){
@@ -264,20 +374,39 @@ let StateMachineComponent = React.createClass({
     },
     componentDidMount(){
         this.__initUI();
+
+        if(this.props.selectFirst){
+            StateMachineActions.selectFirst();
+        }
     },
     componentWillUnmount(){
-        console.log('UNMOUNT');
         this.killUI();
         if(this.props.onUnsavedExit){
             this.props.onUnsavedExit(this.getState());
         }
+        StateMachineActions.clearSelect();
     },
     componentWillUpdate(){
         this.killUI();
 
     },
+    clamp(){
+        $('[data-clamp]').each(function () {
+            var elem = $(this);
+            var parentPanel = elem.data('clamp');
+
+            var resizeFn = function () {
+                var sideBarNavWidth = $(parentPanel).width() - parseInt(elem.css('paddingLeft')) - parseInt(elem.css('paddingRight')) - parseInt(elem.css('marginLeft')) - parseInt(elem.css('marginRight')) - parseInt(elem.css('borderLeftWidth')) - parseInt(elem.css('borderRightWidth'));
+                elem.css('width', sideBarNavWidth);
+            };
+
+            resizeFn();
+            $(window).resize(resizeFn);
+        });
+    },
     componentDidUpdate(){
         this.__initUI();
+        this.clamp();
 
         // if in below mode jump to it on selection
         /*if(this.props.detailMode === 1){
@@ -347,6 +476,10 @@ let StateMachineComponent = React.createClass({
             StateMachineActions.clearSelect();
 
     },
+    extend(event){
+      event.stopPropagation();
+      StateMachineActions.setDetailExtended(!this.state.detailExtended);
+    },
     insertAbove(event){
         event.stopPropagation();
         let level = $(event.target).parent().data('level');
@@ -382,7 +515,11 @@ let StateMachineComponent = React.createClass({
         let getLevel = (level => {
             return level.map(state => {
                 let state_handler_class = "state-handler btn btn-default form-group";
-                let state_class = "state";
+                let state_class = 'state ';
+
+                if(this.props.validate){
+                    state_class += state.status();
+                }
 
                 if (this.state.selected == state.getIdentificator()){
                     state_class = `${state_class} state-selected`;
@@ -409,8 +546,8 @@ let StateMachineComponent = React.createClass({
                 ):'';
               return <div key={`i${state.getIdentificator()}_v${state.getVersion()}`} className={state_class}>
                         <div title={state.label()} style={state.stateStyle()} onClick={this.select} data-level={state.getLevel()} id={state.getIdentificator()} className={state_handler_class}>
-                            <label onClick={this.cancel}>{state.label()}</label>
-                            <input type="text" className="clickedit form-control" defaultValue={state.label()} ></input>
+                            <label key={state.label()+'_label'} onClick={this.cancel}>{state.label()}</label>
+                            <input key={state.label()+'_input'} type="text" className="clickedit form-control" defaultValue={state.label()} />
                             <div>
                                 <div className="pull-right">
                                     <small>{state.type()}</small>
@@ -430,7 +567,7 @@ let StateMachineComponent = React.createClass({
 
             let state_list = this.state.sm.getStateClasses().map(
                 (stclass) => {
-                    return  <li key={stclass.id}>
+                    return  <li title={stclass.Class.title()} key={stclass.id}>
                                 <a onClick={(event) => {
                                         StateMachineActions.addState(stclass.id, prop)
                                         this.onUpdate();
@@ -456,7 +593,7 @@ let StateMachineComponent = React.createClass({
             ):'';
         };
         list.push(<div key="level0" onDoubleClick={this.clearSelect} className="well well-sm state-level no-select text-center">
-                        <div title="Origin of study Workflow diagram" id="state-start"  onClick={this.select} className="state-start">
+                        <div title="Origin of study template diagram" id="state-start"  onClick={this.select} className="state-start">
                             <i className="fa fa-3x fa-circle"/>
                         </div>
                         {drop(0,initial_state)}
@@ -493,7 +630,6 @@ let StateMachineComponent = React.createClass({
                 </div>
             );
         }
-        if(this.state.sm.getNextLevel() > 1){
             let classes = "state-end";
 
             if(this.state.selected === 'state-end')
@@ -511,7 +647,7 @@ let StateMachineComponent = React.createClass({
                     {drop(this.state.sm.getNextLevel())}
                 </div>
             );
-        }
+
         return list;
     },
     __renderLine(elem1, elem2, variate=true){
@@ -623,13 +759,63 @@ let StateMachineComponent = React.createClass({
         StateMachineActions.redo();
         this.onUpdate();
     },
+    supportsLocal() {
+      try {
+        return 'localStorage' in window && window['localStorage'] !== null;
+      } catch (e) {
+        return false;
+      }
+    },
+    markGlbSeen() {
+        if(this.supportsLocal()){
+            localStorage.setItem(`${this.props.identifier}_glbhelp`, true)
+        }
+        this.forceUpdate();
+    },
+    markDtlSeen() {
+        if(this.supportsLocal()){
+            localStorage.setItem(`${this.props.identifier}_dtlhelp`, true)
+        }
+        this.forceUpdate();
+    },
+    valid(){
+        let states = this.state.sm.getStates();
+
+        for(let state of states){
+            if(!state.is_valid())
+                return false;
+        }
+
+        return true;
+    },
+    percentage(){
+        let states = this.state.sm.getStates();
+        let i = 0;
+
+        for(let state of states){
+            if(state.is_valid())
+                i++;
+        }
+
+        try{
+            return Math.round((i*100)/states.length);
+        } catch(err){
+            return 0;
+        }
+    },
+    runProcess(data){
+        this.props.runProcess(this.getState());
+    },
+    checkAvailability(data){
+        this.props.checkAvailability(this.getState());
+    },
     render(){
         let chart = this.getRepresentation();
 
         let state_list = this.state.sm.getStateClasses().map(
             (stclass) => {
-                return  <div key={stclass.id} data-type={stclass.id}
-                className="task-type col-md-12 col-xs-4 btn btn-default btn-block new-state">
+                return  <div title={stclass.Class.title()} key={stclass.id} data-type={stclass.id}
+                className="task-type col-md-12 col-xs-4 btn btn-default new-state">
                             {stclass.Class.typeIcon()} {stclass.Class.repr()}
                         </div>;
             }
@@ -650,10 +836,21 @@ let StateMachineComponent = React.createClass({
                 } else{
                     let DRender = this.state.sm.detailRender(Number.parseInt(this.state.selected), editable);
 
-                    return <span><DRender
-                    deleteConnection={this.deleteConnection}
-                    addDependency={this.addDependency}
-                    dataChange={this.dataChange} {...this.props}/></span>;
+                    return <span>
+                        <DRender
+                        deleteConnection={this.deleteConnection}
+                        addDependency={this.addDependency}
+                        dataChange={this.dataChange} {...this.props}/>
+                        <br />
+                        <center>
+                            <button disabled={!StateMachineStore.hasPrevious()} onClick={StateMachineStore.getPrevious} className="btn btn-default">
+                                <i className="fa fa-chevron-left"></i> Previous
+                            </button>
+                            <button disabled={!StateMachineStore.hasNext()} onClick={StateMachineStore.getNext} className="btn btn-default">
+                                <i className="fa fa-chevron-right"></i> Next
+                            </button>
+                        </center>
+                    </span>;
                 }
 
             }
@@ -670,33 +867,62 @@ let StateMachineComponent = React.createClass({
             );
         };
 
+        let detail_seen, global_seen;
+        if(this.supportsLocal()){
+            detail_seen = localStorage.getItem(`${this.props.identifier}_dtlhelp`);
+            global_seen = localStorage.getItem(`${this.props.identifier}_glbhelp`);
+        }
+
+        let tasklen = (this.state.detailExtended? 'col-md-12':'col-md-4');
+        let navigator = (
+          <div className="form-group">
+            <button title="Click to expand or retract this area" onClick={this.extend} className="btn btn-default pull-right">
+              {this.state.detailExtended ?<i className="fa fa-times"></i>:<i className="fa fa-expand"></i>}
+            </button>
+          </div>
+        );
         let detailMode2 = () => {
             if(this.props.editable){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
                     <h4>&nbsp;</h4>
                     <hr />
+                    {this.props.detailHelp && !detail_seen ?
+                            <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
+                                <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                <strong>Help: </strong> {this.props.detailHelp}
+                            </div>
+                        :''}
+                    {navigator}
                     <Tabs tabActive={this.state.selected? 2: 1}
                         onAfterChange={makeDraggable}
                     >
-                        <Tabs.Panel title={<span><i className="fa fa-plus"></i> Add Task</span>}>
+                        <Tabs.Panel title="Add Task">
                             {this.props.blockSchema ?
                                     (<div style={{textAlign: 'justify'}}>
                                         <h3 className="task-type-title panel-title"> <i className="fa fa-2x fa-exclamation-triangle"></i> Attention</h3>
-                                        <p>You won't be able to add/remove states on this workflow, because there are processes associated with it.</p>
+                                        <p>You won't be able to add/remove states on this study template, because there are studies associated with it.</p>
                                         <p>You only will be able to edit detail information on the states.</p>
-                                        <p>To modify and existing workflow with running processes, please duplicate the schema.</p>
+                                        <p>To modify any existing study template with running studies, please duplicate the study template.</p>
                                     </div>)
                             :{state_list}}
                         </Tabs.Panel>
                         {this.state.selected?
-                        <Tabs.Panel title={<span><i className="fa fa-pencil"></i> Edit Task</span>}>
+                        <Tabs.Panel title="Edit Task">
                             {state_detail(this.props.editable)}
                         </Tabs.Panel>: ''}
                     </Tabs>
                     </div>);
             } else {
                 if(this.state.selected){
-                    return (<div ref="taskbar" className="clearfix taskbar col-md-4 table-col">
+                    return (<div ref="taskbar" className={`clearfix taskbar ${tasklen} table-col`}>
+                                {navigator}
+                                {this.props.detailHelp && !detail_seen ?
+                                    <div className="smalert alert alert-warning alert-dismissible fade in" role="alert">
+                                        <button type="button" onClick={this.markDtlSeen}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        <strong>Help: </strong> {this.props.detailHelp}
+                                    </div>
+                                :''}
                                 <span>{state_detail(this.props.editable)}</span>
                             </div>);
                 }
@@ -723,13 +949,18 @@ let StateMachineComponent = React.createClass({
         };
 
         let mainsize='col-md-10';
+        let mainsize2='col-md-12';
 
-        if(this.props.detailMode === 2)
-            mainsize = 'col-md-8';
+        if(this.props.detailMode === 2){
+            mainsize = (this.state.detailExtended? 'hide':'col-md-8');
+            mainsize2= (this.state.detailExtended? 'hide':'col-md-12');
+
+        }
 
         return (
           <div className="react-statemachine row">
           <div className="col-md-12 no-select">
+
                 <div style={{width: '100%'}} ref="statemachine" className="panel panel-default table-container">
                     <div className="panel-body table-row">
                     {this.props.detailMode === 2 ?
@@ -737,47 +968,83 @@ let StateMachineComponent = React.createClass({
                         :
                             otherModes()
                     }
-                        <div className={this.props.editable? `${mainsize} table-col no-select`:"col-md-12 table-col no-select"}>
+                        <div className={this.props.editable? `${mainsize} table-col no-select`:`${mainsize2} table-col no-select`}>
                                 <div className="row">
                               <div className="col-md-12">
                                     <div className="form-group">
                                         <div className="input-group">
-                                          <span className="input-group-addon" id="study-title"><strong>Study Title</strong></span>
+                                          <span className="input-group-addon" id="study-title"><strong>Title</strong></span>
                                           <input type="title" className="form-control"
                                             id="exampleInputEmail1" aria-describedby="study-title"
-                                            placeholder="Enter the workflow title"
-                                            onChange={this.setTitle} value={this.state.title}
-                                            disabled={!this.props.editable} />
+                                            placeholder="Enter the title"
+                                            onChange={this.setTitle} defaultValue={this.props.title}
+                                            disabled={!(this.props.editTitle || this.props.editable)} />
                                         </div>
                                     </div>
                                     {this.props.extra}
                                     <hr />
+
+
                                 </div>
                               </div>
-                              <div className="row">
-                                <div className="col-md-12">
-                            {this.props.savebar?
-                            <span>
-                                <div className="undoredobar pull-left btn-group" role="group">
-                                    <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
-                                        <i title="Undo action" className="fa fa-undo"></i>
-                                    </button>
-                                    <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
-                                        <i title="Redo action" className="fa fa-repeat"></i>
-                                    </button>
+                            {this.props.globalHelp && !global_seen ?
+                                <div className="alert alert-warning alert-dismissible fade in" role="alert">
+                                    <button style={{zIndex: 1001}} type="button" onClick={this.markGlbSeen} className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    <strong>Help: </strong> {this.props.globalHelp}
                                 </div>
-
-                                <button onClick={this.saveWorkflow} className="btn btn-primary savestate">
-                                    {this.props.saveLabel}
-                                </button>
-                                </span>
                             :''}
-                                    <div ref="chart" id="state_machine_chart">
-                                        <div ref="movable">
-                                            {chart}
+                            {this.props.validate ?
+                                <div className="form-group">
+                                <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                                    <div title={`${this.percentage()}% ready`} style={{backgroundColor: '#19AB27', width: `${this.percentage()}%`, height: '10px'}}></div>
+                                    &nbsp;
+                                </div>
+                                </div>
+                            :''}
+                            {this.props.savebar?
+                            <Affix key={'component_savebar'+this.state.selected} className={'savebar'} clamp={'#state_machine_chart'} fill={false} offset={130}>
+                              <div className="row">
+                                    <div className="col-md-12">
+                                            <span>
+                                                {this.props.undoredo ?
+                                                <div className="undoredobar pull-left btn-group" role="group">
+                                                    <button className="btn btn-default" onClick={this.undo} disabled={!this.state.canUndo}>
+                                                        <i title="Undo action" className="fa fa-undo"></i>
+                                                    </button>
+                                                    <button className="btn btn-default" onClick={this.redo} disabled={!this.state.canRedo}>
+                                                        <i title="Redo action" className="fa fa-repeat"></i>
+                                                    </button>
+                                                </div>
+                                                 :''}
+
+                                                 {!this.props.validate || this.valid()?
+                                                     this.props.mode === 'run'?
+                                                     <div className="savestate btn-group">
+                                                         <button onClick={this.runProcess} className="btn btn-primary savestate">
+                                                            <i className="fa fa-play"></i> Run
+                                                         </button>
+                                                         <button onClick={this.checkAvailability} className="btn btn-primary savestate">
+                                                            <i className="fa fa-chevron-circle-right"></i> Ask for availability
+                                                         </button>
+                                                     </div>
+                                                     :<button onClick={this.saveWorkflow} className="btn btn-primary savestate">
+                                                        {this.props.saveLabel}
+                                                     </button>
+                                                :''}
+                                            </span>
+                                    </div>
+                                    </div>
+                            </Affix>
+                            :''}
+
+                            <div className="row">
+                                    <div className="col-md-12">
+                                        <div ref="chart" id="state_machine_chart">
+                                            <div ref="movable">
+                                                {chart}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                               </div>
                             {this.props.detailMode === 0?
                                 <ModalDetail visible={this.props.editable?this.state.detailVisible:undefined} clearSelect={this.clearPopup} component={state_detail(this.props.editable)} />

@@ -35,12 +35,15 @@ export default Reflux.createStore({
         this.__detaildata = {
             process: params.process,
             task: params.task,
-            user: UserStore.getUser().id
+            user: UserStore.getUser().id,
+            public: false
         }
 
         if(params.default){
             this.__detaildata.type = params.default;
         }
+
+        this.__rfinished = undefined;
     },
     getResponse(){
         return this.__response || {};

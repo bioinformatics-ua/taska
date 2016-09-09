@@ -1,5 +1,14 @@
 'use strict';
+
 window.$ = window.jQuery = require('jquery');
+
+window._ = window.underscore = require('underscore');
+
+window.Backbone = require('backbone');
+
+window.Backbone.DeepModel = require('backbone-deep-model');
+
+window.Backbone.$ = window.$;
 
 window.rivets = require('rivets');
 
@@ -25,6 +34,10 @@ import Http0 from './components/0.jsx';
 
 const content = document.getElementById('playground');
 
+/*require('./vendor/dobtco-formbuilder-vendor');
+window.FormBuilder = require('./vendor/formbuilder-min');
+window.FormRenderer = require('./vendor/formrenderer');*/
+
 // For each route, if the route specifies a fetch function, treat it as an async-data needy route
 function fetch(routes, params) {
     let data = {};
@@ -41,12 +54,13 @@ function fetch(routes, params) {
 Router.run(routes, Router.HistoryLocation, (Handler, state) => {
     StateActions.loadingStart();
     fetch(state.routes, state.params).then((detail) => {
-
         React.render(<Handler detail={detail} />, content);
         StateActions.loadingEnd();
-    }).catch(
+    }); /*.catch(
         (ex) => {
             console.log(ex);
+
+            Raven.captureException(ex);
             if(ex.status === 404){
                 React.render(<Handler failed={Http404} />, content);
                 StateActions.loadingEnd();
@@ -58,7 +72,7 @@ Router.run(routes, Router.HistoryLocation, (Handler, state) => {
                 StateActions.loadingEnd();
             }
         }
-    );
+    )*/
 });
 
 

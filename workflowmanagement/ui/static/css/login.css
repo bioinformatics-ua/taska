@@ -14,7 +14,7 @@
     margin-left: 20px;
 }
 .account-wall input{
-    font-family: fa;
+    font-family: 'fa', 'opensans';
 }
 
 .form-signin .form-control

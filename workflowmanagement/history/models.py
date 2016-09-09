@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 from django.contrib.auth.models import User
 
@@ -6,6 +7,19 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 import django.dispatch
+
+class HistoryRelated(models.Model):
+    '''
+        Describes an indirect relationship with the object, which makes the history relevant, not directly, but in scope.
+        An example of related history, is for example, the history about a ProcessTask, being related with the history from a Process. It may make sense to see related history when seeing the process, but not the other way around.
+
+    Attributes:
+        :object (Model): Any model that inherits from :class:`django.models.Model`
+    '''
+    # related object reference
+    object_type     = models.ForeignKey(ContentType)
+    object_id       = models.PositiveIntegerField()
+    object          = GenericForeignKey('object_type', 'object_id')
 
 class History(models.Model):
     ''' Describes all actions executed over the system.
@@ -22,6 +36,7 @@ class History(models.Model):
         :date (datetime): Date the action was realized
         :object (Model): Any model that inherits from :class:`django.models.Model`
         :authorized (User[]): :class:`django.contrib.auth.models.User` authorized users with acccess to this history
+        :related (ObjectRelated): :class:`history.models.HistoryRelated` related objects to this history
 
     '''
     # Event literals, representing the translation to the possible events the history log can be in
@@ -32,6 +47,10 @@ class History(models.Model):
     CANCEL          = 5
     DONE            = 6
     APPROVE         = 7
+    COMMENT         = 8
+    RECOVER         = 9
+    LATE            = 10
+    RUN             = 11
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -40,7 +59,11 @@ class History(models.Model):
             (ACCESS,    'Access'),
             (CANCEL,    'Cancel'),
             (DONE,      'Done'),
-            (APPROVE,   'Approve')
+            (APPROVE,   'Approve'),
+            (COMMENT,   'Comment'),
+            (RECOVER,   'Recover'),
+            (LATE,      'Late'),
+            (RUN,       'Run')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
@@ -54,14 +77,23 @@ class History(models.Model):
 
     authorized      = models.ManyToManyField(User, related_name='authorized')
 
+    related         = models.ManyToManyField(HistoryRelated, related_name='related')
+
     class Meta:
         verbose_name_plural = "Historic"
         ordering = ["-id"]
 
     def obj_repr(self):
-        return self.object.__unicode__().decode('utf-8')
+        """
+            Returns a representation of the generic object
+        """
+        return self.object.__unicode__()
 
     def actor_repr(self):
+        """
+            Returns textual representation of the actor,
+            preferably a full name, but an email if no name is available.
+        """
         tmp = self.actor.get_full_name()
 
         if tmp != None:
@@ -84,7 +116,7 @@ class History(models.Model):
 
 
     @classmethod
-    def new(self, event, actor, object, authorized=None):
+    def new(self, event, actor, object, authorized=None, related=None):
         """
         Generates a new generic history object
         """
@@ -96,13 +128,22 @@ class History(models.Model):
         if authorized != None:
             for elem in authorized:
                 action.authorized.add(elem)
+
+        if related != None:
+            for relation in related:
+                hr = HistoryRelated(object=relation)
+                hr.save()
+
+                action.related.add(hr)
+
         print 'NEW HISTORY'
+        #self.before_send.send(sender=self.__class__, instance=action)
         self.post_new.send(sender=self.__class__, instance=action)
 
         return action
 
     @staticmethod
-    def type(Model, pk):
+    def type(Model, pk, related=False):
         """
         Retrieves all history objects for a given Model
         """
@@ -117,6 +158,9 @@ class History(models.Model):
 
             type = ContentType.objects.get_for_model(req)
 
+            if related:
+                return History.objects.filter(Q(object_type=type, object_id=req.id) | Q(related__object_type=type, related__object_id=req.id))
+
             return History.objects.filter(object_type=type, object_id=req.id)
         except Model.DoesNotExist:
             pass
@@ -125,3 +169,4 @@ class History(models.Model):
 
     # Signals
     post_new = django.dispatch.Signal(providing_args=["instance"])
+    #before_send = django.dispatch.Signal(providing_args=["instance"])

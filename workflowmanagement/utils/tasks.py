@@ -5,6 +5,6 @@ from celery import shared_task
 
 @shared_task
 def sendEmail(template):
-    template.render()
+    template.is_valid()
 
     template.send_mail()

@@ -8,7 +8,7 @@ import ProcessStore from '../../stores/ProcessStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton, PermissionsBar, ProcessStatus} from './component.jsx'
+import {Loading, DeleteButton, AcceptButton, PermissionsBar, ProcessStatus} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const ProcessManage = React.createClass({
@@ -23,9 +23,20 @@ const ProcessManage = React.createClass({
            <DeleteButton
               success={this.delete}
               identificator = {row}
-              title={`Delete '${row["object_repr"]}'`}
-              message={`Are you sure you want to delete  '${row["object_repr"]} ?'`}  />
+              title={`Delete '${row["title"] || row['object_repr']}'`}
+              message={`Are you sure you want to delete  '${row["title"] || row['object_repr']} ?'`}  />
            </div>;
+  }
+});
+
+const ProcessStatusDetail = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+
+      return(<small>
+                <ProcessStatus rowData={this.props.rowData} />
+                </small>);
   }
 });
 
@@ -42,12 +53,22 @@ const ProcessProgress = React.createClass({
   }
 });
 
+const ProcessLinkDetail = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <small>
+            <Link to="StatusDetail" params={object}>Show assignees</Link>
+           </small>;
+  }
+});
+
 const ProcessLink = React.createClass({
   render: function(){
     const row = this.props.rowData;
     const object = {object: row.hash}
     return <small>
-            <Link to="Process" params={object}>{row.object_repr}</Link>
+            <Link to="Process" params={object}>{row.title || row.object_repr}</Link>
            </small>;
   }
 });
@@ -61,6 +82,7 @@ const ProcessTable = React.createClass({
     },
     update: function(data){
         this.setState(this.getState());
+        console.log("set state process");
     },
   render: function () {
     const columnMeta = [
@@ -93,13 +115,20 @@ const ProcessTable = React.createClass({
       "order": 4,
       "locked": true,
       "visible": true,
-      "customComponent": ProcessStatus,
-      "cssClassName": "process-td",
+      "customComponent": ProcessStatusDetail,
       "displayName": "Status"
       },
       {
-      "columnName": "hash",
+      "columnName": "link_status",
       "order": 5,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessLinkDetail,
+      "displayName": " "
+      },
+      {
+      "columnName": "hash",
+      "order": 6,
       "locked": true,
       "visible": true,
       "customComponent": ProcessManage,
@@ -109,12 +138,12 @@ const ProcessTable = React.createClass({
     ];
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">My Processes</h3></center>
+                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies</h3></center>
               </div>
               <Griddle
-                  noDataMessage={<center>You have not ran any processes yet, to run a new process you must first create a study and then run it.</center>}
+                  noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
                   {...this.commonTableSettings()}
-                  columns={["object_repr","start_date", 'progress', 'status', "hash"]}
+                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }

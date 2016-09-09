@@ -12,15 +12,18 @@ const StateMachineActions = Reflux.createActions([
     'addDependency',
     'deleteDependency',
     'select',
+    'selectFirst',
     'clearSelect',
     'setTitle',
     'insertAbove',
     'removeRow',
     'setStateTitle',
     'setDetailVisible',
+    'setDetailExtended',
     'dataChange',
     'undo',
-    'redo'
+    'redo',
+    'forceUpdate'
 ]);
 
 export default StateMachineActions;

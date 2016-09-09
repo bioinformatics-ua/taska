@@ -9,7 +9,7 @@ const DetailActionsMixin = {
     'postDetail': {asyncResult: true},
     'addDetail': {asyncResult: true},
     'deleteDetail': {asyncResult: true},
-    'methodDetail': {asyncResult: true}
+    'methodDetail': {}
 
 };
 

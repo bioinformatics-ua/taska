@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OLD_CONTAINER=$(docker ps -a | grep bioinformatics-ua/workflow-management | awk '{print $1}')
+OLD_CONTAINER=$(docker ps -a | grep bioinformatics-ua/workflow-management:latest | awk '{print $1}')
 
 if [ -z $OLD_CONTAINER ]; then
     echo 'No old container to clean'

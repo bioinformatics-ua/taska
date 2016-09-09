@@ -50,6 +50,50 @@ const stateColor = function(ptask){
                 color: 'white',
                 fontSize: '100%'
             };
+
+        case 7:
+            return {
+                border: '1px solid #ccc',
+                color: 'black',
+                backgroundColor: 'white',
+                fontSize: '100%'
+            };
+        case 8:
+            return {
+                border: '1px solid #ccc',
+                color: 'black',
+                backgroundColor: 'rgb(215, 25, 28)',
+                fontSize: '100%'
+            };
+    }
+
+    return {};
+};
+
+
+const singleStateColor = function(taskStatus){
+    switch(taskStatus){
+        case 1://Waiting
+            return {
+                border: '1px solid #ccc',
+                color: 'black',
+                backgroundColor: 'white',
+                fontSize: '100%'
+            };
+        case 2://Accepted
+            return {
+                border: '1px solid #ccc',
+                color: 'white',
+                backgroundColor: '#436600',
+                fontSize: '100%'
+            };
+        case 3://Rejected
+            return {
+                border: '1px solid #ccc',
+                color: 'black',
+                backgroundColor: "tomato",//'rgb(215, 25, 28)',
+                fontSize: '100%'
+            };
     }
 
     return {};
@@ -61,4 +105,4 @@ const depmap = {
     'form.FormTask': 'form.FormResult'
 };
 
-export default {stateColor, depmap};
+export default {stateColor, singleStateColor, depmap};

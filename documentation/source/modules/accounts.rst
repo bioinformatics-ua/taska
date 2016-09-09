@@ -1,5 +1,7 @@
 Accounts Package
-=============
+================
+
+.. automodule:: accounts
 
 Admin
 -------------

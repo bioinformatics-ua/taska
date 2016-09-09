@@ -54,7 +54,7 @@ class State{
             return true;
         }
         // else is a reading
-        let name = this.__data['name'] || this.__container.nextFreeName();
+        let name = this.__data['name'] ;//|| this.__container.nextFreeName();
 
         return name;
     }
@@ -139,98 +139,111 @@ class State{
 
     detailRender(editable=true, ChildComponent=dummy){
         var self = this;
+        let shared = this.__container.__shared;
 
-        return React.createClass({
-            getInitialState() {
-                return self.__data;
-            },
-            setTitle(e){
-                this.setState({name: e.target.value});
-                this.props.dataChange(self.getIdentificator(), {name: e.target.value}, false);
-            },
-            addDependency(e){
-                this.props.addDependency(
-                    self.getIdentificator(),
-                    Number.parseInt($(e.target).data('id'))
-                );
-            },
-            deleteConnection(e){
-                this.props.deleteConnection(
-                    self.getIdentificator(), Number.parseInt($(e.target).data('id'))
-                );
-            },
-            componentWillMount(){
-            },
-            componentWillUnmount(){
-                // keep safe in case something did not trigger datachange properly
-                // cant do this because it messes data state from children (dont know why :( )
-                //this.props.dataChange(self.getIdentificator(), this.state, false);
-            },
-            render(){
-                let dependencies = self.getDependencies().map((dependency) => {
-                    return <span key={dependency.getIdentificator()}
-                    className="state-dep-label label state-dep-label label-default">
-                        {dependency.label()}
-                        &nbsp;&nbsp;
-                        {editable?
-                        <i data-id={dependency.getIdentificator()}
-                        onClick={this.deleteConnection} className="fa fa-times"></i>
-                        :''}
-                        </span>
-                });
+        var cache = shared[''+this.getIdentificator()];
+        if(cache){
+            return cache;
+        } else {
 
-                const possible_newdeps = [],
-                      abovestates = self.__container.getStates(self.getLevel());
 
-                for(let state of abovestates){
-                    if(__getArrayPos(self.getDependencies(), state) === -1)
-                        possible_newdeps.push(state);
-                }
-                if(editable){
-                    const possibledropdown = possible_newdeps.map(
-                            (state) => {
-                                return <li key={state.getIdentificator()}>
-                                    <a className="point" data-id={state.getIdentificator()} onClick={this.addDependency}>{state.label()}</a>
-                                    </li>;
-                            }
+            const detail = React.createClass({
+                getInitialState() {
+                    return self.__data;
+                },
+                setTitle(e){
+                    this.setState({name: e.target.value});
+                    this.props.dataChange(self.getIdentificator(), {name: e.target.value}, true);
+                },
+                addDependency(e){
+                    this.props.addDependency(
+                        self.getIdentificator(),
+                        Number.parseInt($(e.target).data('id'))
                     );
+                },
+                deleteConnection(e){
+                    this.props.deleteConnection(
+                        self.getIdentificator(), Number.parseInt($(e.target).data('id'))
+                    );
+                },
+                componentWillMount(){
+                },
+                componentWillUnmount(){
+                    // keep safe in case something did not trigger datachange properly
+                    // cant do this because it messes data state from children (dont know why :( )
+                    //this.props.dataChange(self.getIdentificator(), this.state, false);
+                },
+                render(){
+                    let dependencies = self.getDependencies().map((dependency) => {
+                        return <span key={dependency.getIdentificator()}
+                        className="state-dep-label label state-dep-label label-default">
+                            {dependency.label()}
+                            &nbsp;&nbsp;
+                            {editable?
+                            <i data-id={dependency.getIdentificator()}
+                            onClick={this.deleteConnection} className="fa fa-times"></i>
+                            :''}
+                            </span>
+                    });
 
-                    if(possibledropdown.length > 0)
-                        dependencies.push(
-                                <div className="btn-group dropup">
-                                  <span type="button" className="point label state-dep-label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                    Add dependency <span className="caret"></span>
-                                    <span className="sr-only">Toggle Dropdown</span>
-                                  </span>
+                    const possible_newdeps = [],
+                          abovestates = self.__container.getStates(self.getLevel());
 
-                                  <ul className="dropdown-menu dropdown-menu-right" role="menu">
-                                    {possibledropdown}
-                                  </ul>
+                    for(let state of abovestates){
+                        if(__getArrayPos(self.getDependencies(), state) === -1)
+                            possible_newdeps.push(state);
+                    }
+                    if(editable){
+                        const possibledropdown = possible_newdeps.map(
+                                (state) => {
+                                    return <li key={state.getIdentificator()}>
+                                        <a className="point" data-id={state.getIdentificator()} onClick={this.addDependency}>{state.label()}</a>
+                                        </li>;
+                                }
+                        );
+
+                        if(possibledropdown.length > 0)
+                            dependencies.push(
+                                    <div className="btn-group dropup">
+                                      <span type="button" className="point label state-dep-label label-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        Add dependency <span className="caret"></span>
+                                        <span className="sr-only">Toggle Dropdown</span>
+                                      </span>
+
+                                      <ul className="dropdown-menu dropdown-menu-right" role="menu">
+                                        {possibledropdown}
+                                      </ul>
+                                    </div>
+                                );
+                    }
+
+                    return (
+                    <span id="detailview">
+                        <div key="state-name" className="form-group">
+                            <label for="state-title">Task Name <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                            <input type="title" className="form-control"
+                                            aria-describedby="state-title"
+                                            placeholder="Enter the state name"
+                                            onChange={this.setTitle} value={this.state.name} disabled={!editable} />
+                        </div>
+                        <div key="state-deps" className="form-group">
+                            <label for="state-dependencies">Dependencies</label>
+                                <div id="state-dependencies" aria-describedby="study-deps">
+                                 {dependencies.length === 0?
+                                    "There are no possible dependencies for this task.": dependencies}
                                 </div>
-                            );
+                        </div>
+                        <ChildComponent dataChange={this.props.dataChange} main={this} />
+                    </span>
+                    );
                 }
+            });
 
-                return (
-                <span id="detailview">
-                    <div key="state-name" className="form-group">
-                        <label for="state-title">Task Name <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        <input type="title" className="form-control"
-                                        aria-describedby="state-title"
-                                        placeholder="Enter the state name"
-                                        onChange={this.setTitle} value={this.state.name} disabled={!editable} />
-                    </div>
-                    <div key="state-deps" className="form-group">
-                        <label for="state-dependencies">Dependencies</label>
-                            <div id="state-dependencies" aria-describedby="study-deps">
-                             {dependencies.length === 0?
-                                "There are no possible dependencies for this task.": dependencies}
-                            </div>
-                    </div>
-                    <ChildComponent dataChange={this.props.dataChange} main={this} />
-                </span>
-                );
-            }
-        });
+            shared[''+this.getIdentificator()] = detail;
+
+            return detail;
+        }
+
     }
 
     detailProcess(data){
@@ -240,10 +253,12 @@ class State{
     static typeIcon(){
         return <i></i>;
     }
+    static title(){
+        return 'Title';
+    }
     static repr(){
         return 'Task';
     }
-
     static deserializeOptions(data){
         if(data.name === undefined)
             throw `data object must have at least a name property to be possible to deserialize it,
@@ -271,6 +286,9 @@ class State{
         let data = this.getData();
         return data.name != undefined;
     }
+    status(){
+        return '';
+    }
 }
 
 class SimpleState extends State {
@@ -283,19 +301,96 @@ class SimpleState extends State {
     static repr(){
         return 'Simple State';
     }
+    static title(){
+        return 'Simple unit';
+    }
 }
 
 class StateMachine{
     constructor(){
+        this.__shared = {};
         this.__internal_counter = 0;
         this.__states = [];
         this.__level = {};
-        this.__nextLevel = 0;
+        this.__nextLevel = 1;
         this.__stateclasses = [];
     }
+
+    getPrevious(selected_state){
+        let this_level = this.__level[selected_state.getLevel()];
+        let level_index = Number.parseInt(selected_state.getLevel());
+
+        let i = __getArrayPos(this_level, selected_state.getIdentificator());
+
+        // Impossible exception situation shouldnt happen never
+        if(i === -1)
+            return undefined;
+
+        // The selected state is the first on his level, so we move to the level above
+        else if(i === 0){
+            // If we are already at the top, we cant upper than this
+            try{
+                let prev_level = this.__level[''+(level_index-1)];
+
+                // Account for possible temporary discontinuities
+                if(prev_level.length > 0){
+                    // Return the last state of previous line
+                    return prev_level[prev_level.length-1];
+                }
+
+            } catch(err){
+                // If we are already at the bottom, we cant down more than this
+            };
+        } else {
+            // If we are in the middle just return the previous one, on the same level
+            return this_level[i-1];
+        }
+
+        return undefined;
+    }
+    getNext(selected_state){
+        let this_level = this.__level[selected_state.getLevel()];
+        let level_index = Number.parseInt(selected_state.getLevel());
+
+        let i = __getArrayPos(this_level, selected_state.getIdentificator());
+
+        // Impossible exception situation shouldnt happen never
+        if(i === -1)
+            return undefined;
+
+        // The selected state is the last on his level, so we move to the level below
+        else if(i === this_level.length-1){
+            try{
+                let next_level = this.__level[''+(level_index+1)]
+
+                // Account for possible temporary discontinuities
+                if(next_level.length > 0){
+                    return next_level[0];
+                }
+
+            } catch(err){
+                // If we are already at the bottom, we cant down more than this
+            };
+        } else {
+            // If we are in the middle just return the next one, on the same level
+            return this_level[i+1];
+        }
+
+        return undefined;
+    }
+    selectFirst(){
+        try {
+            return this.__level[1][0];
+        } catch(err){
+            // noething
+        }
+        return undefined;
+
+    }
+
     nextFreeName(){
-        let base = name = 'Unnamed';
-        let i=0;
+        const base = 'Unnamed';
+        let name = 'Unnamed', i=0;
         while(this.__nameExists(name)){
             i++;
             name = `${base} ${i}`;
@@ -510,6 +605,8 @@ class StateMachine{
     }
 
     deleteState(remove_identificator){
+        this.removeDiscontinuities();
+
         let st_index = __getArrayPos(this.__states, remove_identificator);
         let removed_state = this.__states.splice(st_index,1);
 

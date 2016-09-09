@@ -30,6 +30,9 @@ class Resource(models.Model):
     objects         = InheritanceManager()
 
     def clone(self):
+        '''
+            Clones a resource, creating a copy and returning it
+        '''
         new_kwargs = dict([(fld.name, getattr(self, fld.name)) for fld in self._meta.fields if fld.name != self._meta.pk.name]);
         try:
             del new_kwargs['hash']
@@ -39,10 +42,17 @@ class Resource(models.Model):
         return self.__class__.objects.create(**new_kwargs)
 
     def remove(self):
+        '''
+            Logically removes a Resource
+        '''
         self.removed=True
         self.save()
 
     def link(self):
+        '''
+            Links a Resource to a Workflow. Until a Resource is linked he has no context.
+            Unlinked resources will be periodically cleaned.
+        '''
         pass
 
     @staticmethod
@@ -61,24 +71,35 @@ class Resource(models.Model):
         return tmp
 
     def type(self):
+        ''' Returns the specific resource type, polymorphically
+        '''
         return self._meta.app_label + '.' +self.__class__.__name__
 
     def to_representation(self, instance):
+        ''' Converts str to json for serialization.
+        '''
         serializer = self.get_serializer()
 
         return serializer.to_representation(instance)
 
     def to_internal_value(self, instance):
+        ''' Converts json to str for model saving.
+        '''
         serializer = self.get_serializer()
 
         return serializer.to_internal_value(instance)
 
     @staticmethod
     def init_serializer(instance=None, data=None, many=False, partial=False):
+        ''' Initializes a serializer able to process this specific type of Resource
+            Each Resource child should specify this field.
+        '''
         from .api import ResourceSerializer
         return ResourceSerializer(instance=instance, data=data, many=many, partial=partial)
 
     def get_serializer(self):
+        ''' Returns a serializer to process this kind of Resource
+        '''
         serializer_name = '__%s'%(self.type())
         serializer = None
 
@@ -106,6 +127,24 @@ def __generate_resource_hash(sender, instance, created, *args, **kwargs):
         instance.ttype = instance.type()
         instance.save()
 
+### Resource comments
+class ResourceComment(models.Model):
+    '''Represents a resource comment, given by a certain user
+
+    Attributes:
+        :id (int): Private sequential identificator
+        :start_date (datetime): Creation date of comment
+        :latest_update (datetime): Date of latest update on comment
+        :removed (boolean): Logical indicator of removal status of this resource comment
+
+    '''
+    resource        = models.ForeignKey(Resource)
+    user            = models.ForeignKey(User)
+    create_date     = models.DateTimeField(auto_now_add=True)
+    latest_update   = models.DateTimeField(auto_now=True)
+    comment         = models.CharField(max_length=2000)
+    removed         = models.BooleanField(default=False)
+
 ### File resource
 
 def fileHash(instance, filename):
@@ -125,6 +164,9 @@ class File(Resource):
     linked   = models.BooleanField(default=False)
 
     def clone(self):
+        '''
+            Clones a file resource, also creating a physical copy of the file
+        '''
         f = File(filename=self.filename, file=self.file, linked=self.linked)
         f.save()
 
@@ -152,4 +194,4 @@ class File(Resource):
     pass
 
     def __unicode__(self):
-        return self.file.name
+        return self.filename

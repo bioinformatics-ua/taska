@@ -10,7 +10,11 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+def ABS_DIR(rel):
+    return os.path.join(BASE_DIR, rel.replace('/', os.path.sep))
 
 BASE_URL = "/"
 
@@ -40,6 +44,12 @@ SWAGGER_SETTINGS = {
 SECRET_KEY = os.environ.get('DOCKER_SECRET', '+g93fk44)x+s%7-$7hb23@saom=#+7@n6lstr8-p7x8z$3#_f9')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+if DEBUG:
+    STATIC_ROOT = ABS_DIR('COLLECTED/')
+    MEDIA_ROOT = ABS_DIR('MEDIA/')
+
+MEDIA_URL = '/media/'
 
 TEMPLATE_DEBUG = True
 
@@ -76,7 +86,11 @@ INSTALLED_APPS = (
     # Extra types of task/result
     'form',
 
-    'django_premailer'
+    'django_premailer',
+
+    'raven.contrib.django.raven_compat',
+
+    'wkhtmltopdf'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -92,7 +106,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'workflowmanagement.urls'
 
 WSGI_APPLICATION = 'workflowmanagement.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -130,9 +143,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+WKHTMLTOPDF_CMD_OPTIONS = {
+}
+
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
 )
 
 STATICFILES_DIRS = (
@@ -143,6 +160,7 @@ STATICFILES_DIRS = (
     os.path.abspath('ui/static'),
 )
 
+
 # Template configurations
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -150,6 +168,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
     'workflowmanagement.context_processors.debug',
     'workflowmanagement.context_processors.base',
+    'workflowmanagement.context_processors.raven',
+    'dealer.contrib.django.context_processor'
 )
 
 '''OAUTH2_PROVIDER = {
@@ -187,6 +207,7 @@ TEMPLATE_LOADERS = (
 )
 TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'tasks/templates'),
+    os.path.join(BASE_DIR, 'process/templates'),
     os.path.join(BASE_DIR, 'ui/templates'),
     os.path.join(BASE_DIR, 'utils/templates')
 ]
@@ -202,15 +223,92 @@ EMAIL_URL  = "http://localhost:8000"
 #API_ACTIVATE_URL = "api/account/activate/?email="
 API_ACTIVATE_URL = "activate/"
 
+DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+
+RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'
+
+INCLUDE_EMAIL_LINKS = True
+
+def ptask_path(obj, interested):
+    task = obj.task.subclass()
+
+    ptu = obj.user(interested)
+
+    if(task.type() == 'tasks.SimpleTask'):
+        return BASE_URL+'simpletask/'+ptu.hash
+
+    if(task.type() == 'form.FormTask'):
+        return BASE_URL+'formtask/'+ptu.hash
+
+    return None
+
+MAIL_LINKS = {
+    "ProcessTaskAddTemplate":  ptask_path
+}
+
 
 try:
     from local_settings import *
 except:
     pass
 
+
+#STATIC_ROOT = BASE_DIR+'/ui/static'
 STATIC_URL = BASE_URL+'static/'
 
-DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+
+
+RAVEN_CONFIG = {
+    'dsn': 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'  
+}
 
 PREMAILER_OPTIONS = dict(base_url=EMAIL_URL, remove_classes=False)
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}
+
+
+# Periodic user updates about late deadlines
+LATE_DAY='friday'
+LATE_HOUR = 3
+LATE_MIN = 0

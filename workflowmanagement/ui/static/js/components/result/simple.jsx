@@ -18,7 +18,7 @@ import Result from '../result.jsx'
 
 class SimpleResult extends Result{
     getTypeRepr(){
-        return <span><i className='fa fa-check'></i> Simple Result</span>;
+        return <span><i className='fa fa-cube'></i> Simple Result</span>;
     }
     detailResultRender(){
         const context = this;

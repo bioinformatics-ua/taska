@@ -30,6 +30,7 @@ class Task(models.Model):
     title           = models.CharField(max_length=100)
     description     = models.TextField(null=True, blank=True)
     workflow        = models.ForeignKey(Workflow)
+    effort          = models.FloatField()
 
     # We need this to be able to properly guess the type
     objects         = InheritanceManager()
@@ -39,6 +40,8 @@ class Task(models.Model):
     ttype           = models.CharField(max_length=100)
 
     resources       = models.ManyToManyField(Resource)
+
+    output_resources= models.BooleanField(default=True)
 
     class Meta:
         ordering = ['-id']
@@ -101,6 +104,9 @@ class Task(models.Model):
             return tmp.select_subclasses()
 
         return tmp
+
+    def subclass(self):
+        return Task.objects.get_subclass(id=self.id)
 
     @staticmethod
     def getPossibleDependencies(workflow, task=None):
@@ -195,7 +201,7 @@ class TaskDependency(models.Model):
     def __unicode__(self):
         '''
         '''
-        return "TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))
+        return u"TaskDependency: {maintask: %s | dependency %s }" % (str(self.maintask), str(self.dependency))
 
 class SimpleTask(Task):
     '''Basic concretization of a generic task.

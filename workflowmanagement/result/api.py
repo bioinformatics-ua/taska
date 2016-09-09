@@ -74,7 +74,7 @@ class ResultSerializer(serializers.ModelSerializer):
     user_repr = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
     outputswrite = serializers.ListField(child=serializers.CharField(), write_only=True)
-    processtaskuser = MyProcessTaskUserDetailSerializer()
+    processtaskuser = serializers.SlugRelatedField(slug_field='hash', queryset=ProcessTaskUser.objects)
     process_owner = serializers.SerializerMethodField()
 
     def get_outputs(self, obj):
@@ -83,7 +83,6 @@ class ResultSerializer(serializers.ModelSerializer):
                 many=True
             )
         return serializer.data
-
 
     def get_process_owner(self, obj):
         return obj.processtaskuser.processtask.process.executioner.id
@@ -128,31 +127,24 @@ class ResultSerializer(serializers.ModelSerializer):
         task    = validated_data.pop('task')
         user    = validated_data.pop('user')
         outputs = validated_data.pop('outputswrite', None)
+
+        this_ptu     = None
         try:
             process = Process.objects.get(hash=process)
             task = Task.objects.get(hash=task)
 
-            ptu = ProcessTaskUser.objects.get(
+            this_ptu = ProcessTaskUser.objects.get(
                     processtask__process=process,
                     processtask__task=task,
                     user__id=user
                 )
-            ptu.finish()
 
-            validated_data[u'processtaskuser'] = ptu
+            validated_data[u'processtaskuser'] = this_ptu
         except (Process.DoesNotExist, Task.DoesNotExist, ProcessTaskUser.DoesNotExist):
             return None
 
 
         result = self.Meta.model.objects.create(**validated_data)
-
-        users = []
-        auths = ptu.processtask.users().order_by('user').distinct('user')
-
-        for ptu in auths:
-            users.append(ptu.user)
-
-        History.new(event=History.ADD, actor=process.executioner, object=result, authorized=users)
 
         self.__create_resources(result, outputs)
 
@@ -165,8 +157,6 @@ class ResultSerializer(serializers.ModelSerializer):
         task    = data.pop('task')
         user    = data.pop('user')
         outputs = data.pop('outputswrite', None)
-
-        print data
 
         for attr, value in data.items():
             setattr(instance, attr, value)
@@ -236,7 +226,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
 
         serializer, headers = create_serializer(self, request)
 
-        History.new(event=History.ADD, actor=request.user, object=serializer.instance)
+        #History.new(event=History.ADD, actor=request.user, object=serializer.instance)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -253,7 +243,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        History.new(event=History.EDIT, actor=request.user, object=instance)
+        #History.new(event=History.EDIT, actor=request.user, object=instance)
 
         return Response(serializer.data)
 
@@ -263,7 +253,7 @@ class ResultViewSet(    mixins.CreateModelMixin,
 
         """
         instance = self.get_object()
-        History.new(event=History.ACCESS, actor=request.user, object=instance)
+        History.new(event=History.ACCESS, actor=request.user, object=instance, related=[instance.processtaskuser.processtask.process])
 
         return super(ResultViewSet, self).retrieve(request, args, kwargs)
 
@@ -277,7 +267,30 @@ class ResultViewSet(    mixins.CreateModelMixin,
         instance.removed = True
         instance.save()
 
-        History.new(event=History.DELETE, actor=request.user, object=instance)
+        History.new(event=History.DELETE, actor=request.user, object=instance, related=[instance.processtaskuser.processtask.process])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @transaction.atomic
+    @detail_route(methods=['get'])
+    def submit(self, request, hash=None):
+        """
+       Submits a result as complete
+        """
+        result = self.get_object()
+        this_ptu = result.processtaskuser
+        process = this_ptu.processtask.process
+
+        this_ptu.finish()
+
+        users = []
+        auths = this_ptu.processtask.users().order_by('user').distinct('user')
+
+        for ptu in auths:
+            users.append(ptu.user)
+
+        users.append(process.executioner)
+
+        History.new(event=History.ADD, actor=this_ptu.user, object=result, authorized=users, related=[process])
+
+        return Response(GenericResultSerializer(self.get_object()).data)

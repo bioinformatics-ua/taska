@@ -36,6 +36,50 @@ export default Reflux.createStore({
     dummy(s){},
     init(){
         this.answer = {};
+        this.dversion = 0;
+        this.task_repr = "";
 
+    },
+    onPreliminary(hash){
+        StateActions.alert(
+        {
+            'title':'Update Preliminary Results',
+            'message': 'This will allow preview of incomplete results for scheduled task dependencies. Are you sure you want to generate preview results ?',
+            onConfirm: (context)=>{
+                StateActions.loadingStart();
+
+                console.log(hash);
+
+                this.onMethodDetail('preliminary_outputs', hash)
+                    .then(
+                    (data) => {
+                        StateActions.loadingEnd();
+                        StateActions.dismissAlert();
+
+                        StateActions.alert({
+                            'title':'Preliminary Results Requested',
+                            'message': 'Preliminary results have been requested, and will be briefly available.'
+                        });
+
+                        this.dversion++;
+                        this.trigger(this.DETAIL, true);
+                    }
+                );
+            }
+        });
+    },
+    getTask(hash){
+        this.onMethodDetail('getTaskName', hash).then(
+            (result) => {
+                this.task_repr = result.task_repr;
+
+                this.trigger();
+            }
+        );
+
+        return this.task_repr;
+    },
+    getDepVersion(){
+        return this.dversion;
     }
 });

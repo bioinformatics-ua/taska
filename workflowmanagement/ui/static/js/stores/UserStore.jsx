@@ -25,6 +25,7 @@ export default Reflux.createStore({
     init(){
         this.__loginfail = false;
         this.__success_register = false;
+        this.__success_recover = false;
     },
     getUser(){
 
@@ -121,7 +122,7 @@ export default Reflux.createStore({
             UserActions.postDetail.triggerPromise('me', data).then(
                     (user) => {
                         StateActions.loadingEnd();
-                        this.trigger();
+                        this.trigger(pass);
                     }
             );
         }
@@ -152,7 +153,7 @@ export default Reflux.createStore({
             });
         }
         else {
-            UserActions.methodDetail.triggerPromise('register', undefined, 'POST', this.__detaildata).then(
+            this.onMethodDetail('register', undefined, 'POST', this.__detaildata).then(
                 (user) => {
                     StateActions.loadingEnd();
 
@@ -171,11 +172,61 @@ export default Reflux.createStore({
             );
         }
     },
+    onRecoverPassword(email){
+        if(!(email && this.isEmail(email))){
+            StateActions.alert({
+                'title':"Email must be a valid email",
+                'message': "The email must follow a pattern like <user>@<domain>"
+            });
+        }
+        else {
+            this.onMethodDetail('recover', undefined, 'POST', {email: email}).then(
+                (user) => {
+                    StateActions.loadingEnd();
+
+                    if(user.error){
+                        StateActions.alert({
+                            'title':"Error recovering password.",
+                            'message': user.error
+                        });
+                    } else {
+                        this.__success_recover=true;
+                    }
+
+                    this.trigger();
+                }
+            );
+        }
+    },
+    onChangePassword(hash, password){
+        this.onMethodDetail('changepassword', undefined, 'POST', {
+            hash: hash,
+            password: password
+        }).then(
+            (user) => {
+                StateActions.loadingEnd();
+
+                if(user.error){
+                    StateActions.alert({
+                        'title':"Error changing password.",
+                        'message': user.error
+                    });
+                } else {
+                    this.__success_recover=true;
+                }
+
+                this.trigger();
+            }
+        );
+    },
     hasRegistered(){
         return this.__success_register;
     },
+    hasRecovered(){
+        return this.__success_recover;
+    },
     onApprove(email){
-        UserActions.methodDetail.triggerPromise('activate', undefined, 'POST', {
+        this.onMethodDetail('activate', undefined, 'POST', {
             'email': email
         }).then(
             (response) => {
@@ -200,7 +251,7 @@ export default Reflux.createStore({
     onSetField(field, value){
         this.__detaildata[field] = value;
 
-        this.trigger();
+        //this.trigger();
     },
     onSetProfileField(field, value){
         if(!this.__detaildata.profile)
@@ -208,9 +259,9 @@ export default Reflux.createStore({
 
         this.__detaildata.profile[field] = value;
 
-        this.trigger();
+        //this.trigger();
     },
     getUsers(){
-        return this.__list;
+        return this.__list || [];
     }
 });

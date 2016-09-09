@@ -1,14 +1,15 @@
 # coding=utf-8
 import django_filters
-from rest_framework import renderers, serializers, viewsets, permissions, mixins
-from rest_framework.decorators import api_view
+from rest_framework import renderers, serializers, viewsets, permissions, mixins, status, filters
+from rest_framework.decorators import api_view, detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import status, filters
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
+
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
 from .models import *
@@ -19,6 +20,7 @@ from history.models import History
 from utils.api_related import create_serializer, AliasOrderingFilter
 
 import copy
+
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -37,6 +39,11 @@ class WorkflowSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
     tasks = GenericTaskSerializer(many=True, required=False)
     assoc_processes = serializers.SerializerMethodField()
+
+    owner_repr = serializers.SerializerMethodField()
+
+    def get_owner_repr(self, obj):
+        return obj.owner.get_full_name() or obj.owner.email
 
     def get_assoc_processes(self, obj):
         return obj.assocProcesses().values_list('hash', flat=True)
@@ -126,6 +133,11 @@ class WorkflowDetailSerializer(serializers.ModelSerializer):
 
     assoc_processes = serializers.SerializerMethodField()
 
+    owner_repr = serializers.SerializerMethodField()
+
+    def get_owner_repr(self, obj):
+        return obj.owner.get_full_name() or obj.owner.email
+
     def get_assoc_processes(self, obj):
         return obj.assocProcesses().values_list('hash', flat=True)
 
@@ -166,7 +178,8 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
     ordering_map = {
         'public': 'workflowpermission__public',
         'searchable': 'workflowpermission__searchable',
-        'forkable': 'workflowpermission__forkable'
+        'forkable': 'workflowpermission__forkable',
+        'owner_repr': 'owner__id'
     }
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
@@ -277,6 +290,9 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
         instance = self.get_object()
 
+
+        if instance.owner != request.user:
+            raise PermissionDenied
         # create tasks if they dont exist, and replace links... i couldnt think of a better way to do this...
         # without implicating several connections. or this
         d = self.__linkTasks(request.data.copy(), instance)
@@ -316,10 +332,13 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
     @detail_route(methods=['get'])
     def fork(self, request, hash=None):
+        """
+        Duplicates a public or owned workflow, returning the duplicate
+        """
         workflow = self.get_object()
 
         if workflow.permissions().forkable:
-            new_workflow = workflow.fork()
+            new_workflow = workflow.fork(owner=request.user)
 
             History.new(event=History.ADD, actor=request.user, object=new_workflow)
 

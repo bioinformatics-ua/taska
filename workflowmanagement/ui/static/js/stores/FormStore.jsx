@@ -95,9 +95,11 @@ export default Reflux.createStore({
                 FormActions.addDetail.triggerPromise(sForm).then(
                         (form) => {
                             StateActions.loadingEnd();
-                            this.__rfinished = form;
-                            StateActions.save();
-                            this.trigger();
+                            StateActions.save(true, ()=>{
+                                this.__rfinished = form;
+                                this.trigger();
+                            });
+
                         }
                 );
             }

@@ -153,11 +153,13 @@ class DetailStoreMixin{
                 );
             },
             onMethodDetail(method, hash, type='GET', data={}){
-                loader.method(method, hash, type, data).then(
-                    data => {
-                        this.__Actions.methodDetail.completed(data);
-                    }
-                );
+                return new Promise(function (fulfill, reject){
+                    loader.method(method, hash, type, data).then(
+                        data => {
+                            fulfill(data);
+                        }
+                    ).catch(ex=>reject(ex));
+                });
             },
             onLoadDetailIfNecessary(hash) {
                 if(this.loaded === hash){

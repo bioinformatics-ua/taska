@@ -8,7 +8,9 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
+
+import StateActions from '../actions/StateActions.jsx';
 
 import TaskActions from '../actions/TaskActions.jsx';
 
@@ -26,6 +28,8 @@ import ResultStore from '../stores/ResultStore.jsx';
 import UserStore from '../stores/UserStore.jsx';
 
 import {TaskDependencies} from './TaskDependencies.jsx';
+
+import {depmap} from '../map.jsx';
 
 const RequestTitle = React.createClass({
     render(){
@@ -80,25 +84,32 @@ export default React.createClass({
                 Reflux.listenTo(TaskStore, 'update'), Reflux.listenTo(ResultStore, 'update')],
     statics: {
         fetch(params, route) {
-            if(route.name.toLowerCase().indexOf('result') !== -1){
-                return new Promise(function (fulfill, reject){
+        if(route.name.toLowerCase().indexOf('result') !== -1){
+            return new Promise(function (fulfill, reject){
 
                 ResultActions.loadDetailIfNecessary.triggerPromise(params.object).then(
                     (result) => {
+
+                        return TaskActions.loadDetailIfNecessary.triggerPromise(result.processtaskuser).then(
+                            (task) => {
                                 fulfill({
                                     result: result,
+                                    task: task
                                 });
+                            }
+                        );
+
                     }
                 ).catch(ex=> reject(ex));
-                });
-            } else{
-                return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
-                    (Task) => {
-                        return Task;
-                    }
-                );
-            }
+            });
+        } else{
+            return TaskActions.loadDetailIfNecessary.triggerPromise(params.object).then(
+                (Task) => {
+                    return Task;
+                }
+            );
         }
+    }
     },
     contextTypes: {
         router: React.PropTypes.func.isRequired
@@ -118,17 +129,11 @@ export default React.createClass({
         let tmp = {
             answer: ResultStore.getAnswer(),
             submitted: ResultStore.answerSubmitted(),
-            user: UserStore.getUser()
+            saved: ResultStore.answerSaved(),
+            user: UserStore.getUser(),
+            task: TaskStore.getDetail(),
+            dversion: TaskStore.getDepVersion()
         };
-
-        if(result || (this.state && this.state.isResult)){
-            tmp.task = tmp.answer.processtaskuser;
-        } else {
-            tmp.task = TaskStore.getDetail();
-        }
-
-        console.log(tmp.answer);
-
         return tmp;
     },
     isMine(){
@@ -138,13 +143,20 @@ export default React.createClass({
         return false;
     },
     didWrite(){
-        if(!this.state.answer.hash)
+        if(!this.state.answer.hash) {
             return true;
+        }
 
         if(this.state.user.id === this.state.answer.user)
             return true;
 
         return false;
+    },
+    waitingTask(){
+        console.log(this.state.task.processtask);
+        if(this.state.task.processtask.status == 7)//Waiting availability
+            return false;
+        return this.didWrite();
     },
     getInitialState(){
         try {
@@ -166,43 +178,114 @@ export default React.createClass({
         } catch(ex){
             r = undefined;
         }
+        if(this.state.task.hash){
+            delete this.state.task.hash;
+        }
 
-        ResultActions.calibrate($.extend(this.state.task, {hash: r}));
+        ResultActions.calibrate(
+            $.extend(this.state.task, {hash: r})
+        );
     },
     componentWillUnmount(){
         ResultActions.unloadAnswer();
     },
     componentDidUpdate(){
         let detail = Object.keys(this.props.detail)[0];
-
-        if(this.state.submitted && !this.props.detail[detail].result)
+        if(this.state.saved && !this.props.detail[detail].result){
+            this.context.router.transitionTo(this.state.saved.type, {object: this.state.saved.hash});
+        }
+        if(this.state.submitted){
             this.context.router.transitionTo('home');
+        }
     },
-    update(status){
-        console.log('UPDATE');
-
+    update(status, force=false){
         let detail = Object.keys(this.props.detail)[0];
 
         if(this.props.detail[detail].result)
             this.setState(this.__getState(true));
         else
             this.setState(this.__getState());
+
+        if(force){
+            location.reload();
+        }
     },
     setAnswer(prop, val){
         ResultActions.setAnswer(prop, val);
-
-
+    },
+    submitAnswer(e){
+        if(this.validate())
+            ResultActions.submitAnswer();
     },
     saveAnswer(e){
         if(this.validate())
             ResultActions.saveAnswer();
     },
+    showWorkflow(){
+        console.log("show");
+    },
+    __createMap(own, deps){
+        let linkmap = {};
+
+        for(let link of own){
+            linkmap[link.filename] = link.path;
+        }
+
+        for(let dep of deps){
+            if(dep.users){
+                for(let user of dep.users){
+
+                    if(user.result){
+                        let user_outputs = user.result.outputs;
+                        if(user_outputs){
+                            for(let output of user_outputs){
+                                linkmap[output.filename] = output.path;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return linkmap;
+
+    },
+    digestDescription(desc, map){
+                if(desc){
+
+                    let result = desc.replace(/#\((.*?)\)/g, function(a, b){
+                        let hit = map[b];
+
+                        if(hit)
+                            return '<a target="_blank" href="'+map[b]+'">' + b + '</a>';
+                        else
+                            return b;
+
+                    });
+
+                    result = result.replace(/((http[s]?:\/\/[\w.\/_\-=?]+)|(mailto:[\w.\/@_\-=?]+))/g, function(a, b){
+                        return '<a target="_blank" href="'+b+'">' + b + '</a>';
+
+                    });
+
+                    return result;
+                }
+                return undefined;
+    },
+    preliminary(){
+        let hash = this.context.router.getCurrentParams().object;
+
+        TaskActions.preliminary(hash);
+    },
     render() {
-        console.log('RENDER');
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;
         }
+
+        let depmap = this.__createMap(this.state.task.processtask.parent.resources, this.state.task.dependencies);
+        let description = this.digestDescription(this.state.task.processtask.parent.description ,depmap) || '';
+        let getDesc = () => { return {__html: description} };
 
         let DetailRender = this.detailRender();
         let deadline = moment(this.state.task.deadline);
@@ -251,6 +334,13 @@ export default React.createClass({
                   "displayName": "Requester"
                 }
             ];
+
+        let detail;
+
+        try{
+            detail = Object.keys(this.props.detail)[0];
+        } catch(err){
+        };
         return (
             <div className="task-detail row">
                 <div className="col-md-12">
@@ -266,7 +356,7 @@ export default React.createClass({
                                       </div>
                                       <div className="form-group">
                                         <div className="input-group">
-                                          <span className="input-group-addon"><strong>Process</strong></span>
+                                          <span className="input-group-addon"><strong>Study</strong></span>
                                           <span disabled className="form-control">{this.state.task.processtask['process_repr']}</span>
                                         </div>
                                       </div>
@@ -293,7 +383,7 @@ export default React.createClass({
                                       </div>
 
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-3 reassignments">
                                     {this.didWrite()?
                                     (<div className="btn-group-vertical btn-block" role="group">
                                         <Link to="RequestAdd" params={{
@@ -308,7 +398,7 @@ export default React.createClass({
                                             object: 'add',
                                             process: this.state.task.processtask.process,
                                             task: this.state.task.processtask.task,
-                                            default: 1
+                                            default: 2
                                         }} className="btn btn-default">
                                             <i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification
                                         </Link>
@@ -319,16 +409,26 @@ export default React.createClass({
                                     }
 
                                 </div>
-                                 <div className="col-md-12">
+                                 <div className="col-md-9">
                                         <div className="form-group">
                                             <div className="input-group">
                                               <span className="input-group-addon"><strong>Description</strong></span>
                                               <span disabled style={{float: 'none'}} className="form-control">
-                                                {this.state.task.processtask.parent.description}
+                                              <span style={{wordBreak: 'break-word'}} dangerouslySetInnerHTML={getDesc()} />
                                               </span>
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                        <div className="form-group">
+                                            <div className="input-group">
+                                              <span className="input-group-addon"><strong>Required Effort</strong></span>
+                                              <span disabled style={{float: 'none'}} className="form-control">
+                                                {this.state.task.processtask.parent.effort} hours
+                                              </span>
+                                            </div>
+                                        </div>
+                                </div>
                                 {this.state.answer.hash?(
                                     <div className="col-md-12">
                                         <div className="row">
@@ -356,37 +456,70 @@ export default React.createClass({
                             </div>
                             <div className="clearfix row">
                                 <div className="col-md-12">
-                                    <Tabs>
-                                        <Tabs.Panel
-                                        title={<span><i className="fa fa-tasks"></i> &nbsp;Answer</span>}>
-                                            <div className="form-group row">
-                                                <div className="col-md-9"></div>
-                                                <div className="col-md-3">
-                                                        {this.didWrite() ?
-                                                        <button onClick={this.saveAnswer} className="btn btn-primary btn-block btn-default">
-                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Answer
-                                                        </button>
-                                                        : ''}
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-md-12">
-                                                    <DetailRender key={this.state.task.processtask.hash} />
-                                                </div>
-                                            </div>
-                                        </Tabs.Panel>
-                                        <Tabs.Panel title={<span><i className="fa fa-level-down"></i> &nbsp;Resource Inputs</span>}>
-                                            <TaskDependencies context={this} />
-                                        </Tabs.Panel>
-                                        <Tabs.Panel title={<span><i className="fa fa-life-ring"></i> &nbsp;Related Requests</span>}>
+                                    {this.state.task.processtask.status > 1?
+
+<div>
+  <ul className="nav nav-tabs" role="tablist">
+    <li role="presentation" className="active"><a href="#answer" aria-controls="answer" role="tab" data-toggle="tab"><i className="fa fa-tasks"></i> &nbsp;Answer</a></li>
+    <li role="presentation"><a href="#resources" aria-controls="resources" role="tab" data-toggle="tab"><i className="fa fa-level-down"></i> &nbsp;Resource Inputs</a></li>
+    <li role="presentation"><a href="#requests" aria-controls="requests" role="tab" data-toggle="tab"><i className="fa fa-life-ring"></i> &nbsp;Related Requests</a></li>
+  </ul>
+  <div className="tab-content">
+    <div role="tabpanel" className="tab-pane active" id="answer">
+        <div className="form-group row">
+            <div className="col-md-8"></div>
+                <div className="col-md-4">
+
+
+                    <Link to="Process" params={{object: this.state.task.processtask.process  + '/showOnly'}}>
+                        <button style={{marginLeft: '4px'}} onClick={this.showWorkflow} className="btn btn-info pull-right">
+                            <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
+                        </button>
+                    </Link>
+                    {this.waitingTask() ?
+                        <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+                                <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">
+                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save
+                                </button>
+
+                                { detail && this.props.detail && this.props.detail[detail].result?
+                                    <button onClick={this.submitAnswer} className="btn btn-success pull-right">
+                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Submit
+                                </button>:''}
+
+                            </Affix>
+                            : ''}
+
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <DetailRender key={this.state.task.processtask.hash} />
+                </div>
+        </div>
+    </div>
+    <div role="tabpanel" className="tab-pane" id="resources"><TaskDependencies context={this} /></div>
+    <div role="tabpanel" className="tab-pane" id="requests">
                                             <Griddle
                                             {...table_style}
                                             results={this.state.task.requests}
                                                   columns={["title", "type", "resolved", "hash"]}
                                             columnMetadata={table_meta}
                                             />
-                                        </Tabs.Panel>
-                                    </Tabs>
+    </div>
+  </div>
+
+</div>
+                                    :
+                                    <div>
+                                        <center><h4>
+                                        This task is scheduled to be executed by you, but is waiting that other intervenients finish their own tasks, which your task depends upon.
+                                        </h4><hr /><h2>Preliminary Inputs</h2></center>
+
+                                        <button onClick={this.preliminary} className="pull-right btn btn-info"><i className="fa fa-refresh"></i> Update Preliminary Inputs</button>
+                                        <TaskDependencies dversion={this.state.dversion} context={this} />
+                                    </div>
+                                    }
                                 </div>
                             </div>
                         </div>

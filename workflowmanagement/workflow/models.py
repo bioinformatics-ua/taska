@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.db.models import Q
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
@@ -57,7 +58,7 @@ class Workflow(models.Model):
         return self.__class__.objects.create(**new_kwargs)
 
     @transaction.atomic
-    def fork(self):
+    def fork(self, owner=None):
         fork = self.clone()
         fork.permissions()
 
@@ -77,6 +78,10 @@ class Workflow(models.Model):
             depmap[task.id].replaceDependencies(deps)
 
         fork.title = "%s (Fork)" % fork.title
+
+        if owner != None:
+            fork.owner = owner
+
         fork.save()
 
         return fork
@@ -91,12 +96,12 @@ class Workflow(models.Model):
         tmp = Workflow.objects.filter(removed=False)
 
         if user != None:
-            tmp=tmp.filter(owner=user)
+            tmp=tmp.filter(Q(owner=user) | Q(workflowpermission__public=True))
 
         if workflow != None:
-            tmp=tmp.filter(workflow=workflow)
+            tmp=tmp.filter(Q(workflow=workflow) | Q(workflowpermission__public=True))
         # else
-        return tmp.filter(workflowpermission__public=True)
+        return tmp
 
     def __unicode__(self):
         '''Returns the workflow name, based on the title, or unnamed if the workflow doesn't have a name
@@ -135,5 +140,5 @@ class WorkflowPermission(models.Model):
         '''Returns a certain workflow permissions on a string
         '''
 
-        return str(self.workflow)+' Permissions[ Public='+str(self.public)+', Searchable='+str(self.searchable)+', Forkable='+str(self.forkable)+']'
+        return unicode(self.workflow)+' Permissions[ Public='+unicode(self.public)+', Searchable='+unicode(self.searchable)+', Forkable='+unicode(self.forkable)+']'
 

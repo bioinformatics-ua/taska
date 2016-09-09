@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
 
 import FormActions from '../actions/FormActions.jsx';
 
@@ -66,6 +66,8 @@ export default React.createClass({
         FormActions.calibrate();
     },
     componentDidMount(){
+        window.formHash = this.state.form.hash;
+
         let fb = new Formbuilder({
             selector: '#form_manager',
             bootstrapData: this.state.form.schema
@@ -76,7 +78,7 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.addedform){
-            this.context.router.transitionTo('Form', {object: this.state.addedform.hash})
+            this.context.router.transitionTo('Form', {object: this.state.addedform.hash, headless: this.props.headless})
         }
     },
     update(status){
@@ -118,11 +120,13 @@ export default React.createClass({
                                         </div>
                                       </div>
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-3 save_container">
                                         {this.didWrite()?
-                                            <button onClick={this.setForm} className="btn btn-primary btn-block btn-default">
-                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Form
-                                            </button>
+                                            <Affix key={'form_savebar'} className={'savebar'} clamp={'.save_container'} fill={false} offset={40}>
+                                                <button onClick={this.setForm} className="btn btn-primary btn-block btn-default">
+                                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Form
+                                                </button>
+                                            </Affix>
                                         :''}
                                 </div>
                             </div>

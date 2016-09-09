@@ -26,11 +26,51 @@ import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
 import {FormTask, FormTaskRun} from './reusable/states/FormTask.jsx';
 
+const RunLabel = React.createClass({
+    render(){
+        return <span>
+
+                <table className="process-label">
+                    <tr>
+                        <td><div className="circle circle-sm circle-canceled"></div></td>
+                        <td><small>&nbsp;Waiting Configuration&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-default"></div></td>
+                        <td><small>&nbsp;Ready to Run&nbsp;&nbsp;</small></td>
+                    </tr>
+                </table>
+                </span>
+    }
+});
 
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
                 Reflux.listenTo(WorkflowStore, 'update')],
+    helpMapBlueprint: {
+        view: {
+        },
+        edit: {
+            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your study template, is to click in the "plus” areas on the right and add the tasks that you want.',
+            global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of other level.'
+        },
+        run: {
+            detail: 'Please fulfill assignee and deadlines before running the study template as a study.',
+            global: 'Click tasks to add assignees and deadlines, ready tasks will change color'
+        }
+    },
+    helpMap(mode){
+        let result;
+        try{
+            result = this.helpMapBlueprint[mode];
+        }
+        catch(err){
+            // nothing
+        }
+        if(result === undefined)
+            return {};
+
+        return result;
+    },
     statics: {
         fetch(params) {
             if(params.object == 'add'){
@@ -53,19 +93,14 @@ export default React.createClass({
     displayName: route => {
         try{
             let detail = Object.keys(route.props.detail)[0];
-            return `Study - ${route.props.detail[detail].title}`;
+            return `Study Template - ${route.props.detail[detail].title}`;
         } catch(ex){
-            return 'Study Not Found';
+            return 'Study Template Not Found';
         }
     },
     getWorkflow(){
-        return this.props.detail
-        try{
-            let detail = Object.keys(this.props.detail)[0];
-            return `Study - ${route.props.detail[detail].title}`;
-        } catch(ex){
-            return 'Study Not Found';
-        }
+        let detail = Object.keys(this.props.detail)[0];
+        return this.props.detail[detail];
     },
     __getState(){
         return {
@@ -94,6 +129,8 @@ export default React.createClass({
                 this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
 
         }
+        // hotfix to breadcrumbs on add
+        $('a[href$="/workflow/add"]').hide();
     },
     update(status){
         if(status == WorkflowStore.DETAIL){
@@ -166,7 +203,11 @@ export default React.createClass({
         WorkflowActions.fork();
     },
     runProcess(data){
+        console.log(data);
         WorkflowActions.runProcess(data);
+    },
+    checkAvailability(data){
+        WorkflowActions.checkAvailability(data);
     },
     closePopup(){
         WorkflowActions.calibrate();
@@ -176,6 +217,15 @@ export default React.createClass({
 
         if(params.mode === 'edit')
             StateActions.waitSave();
+    },
+    didWrite(){
+        if(!this.state.workflow.owner)
+            return true;
+
+        if(this.state.user.id === this.state.workflow.owner)
+            return true;
+
+        return false;
     },
     render() {
         if(this.props.failed){
@@ -188,13 +238,13 @@ export default React.createClass({
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
             this.context.router.replaceWith('/404');
 
-        let sm = this.load(params.mode === 'run');
+        let sm = this.load(params.mode === 'run' );
 
         return (
             <span>
                 {this.state.missing.length > 0?
                     <Modal title="Missing information"
-                        message={<span>You have to specify deadlines and assignee's for all tasks.<br />
+                        message={<span>You have to specify deadlines and assignee's for all tasks. This can be specified by clicking on the tasks and changing the values on the bottom of their detail view.<br />
                             <br />
                             The following tasks don't have deadlines or assignee's:
                             <ul>
@@ -210,31 +260,59 @@ export default React.createClass({
                 :''}
                 <StateMachineComponent key={'workflow'+params.mode}
                     extra={
-                        <PermissionsBar
-                            link="WorkflowEdit"
-                            forkable={params.mode === 'forkable'}
-                            editable={params.mode === 'edit'}
-                            runnable={params.mode === 'run'}
-                            setFork={this.fork}
-                            setPublic={this.setPublic}
-                            setSearchable={this.setSearchable}
-                            setForkable={this.setForkable}
-                            object={params.object}
-                            runProcess={this.runProcess}
-                            listProcesses={this.state.workflow['assoc_processes']}
-                            {...this.state.workflow.permissions} />
+                            <span>
+                            <PermissionsBar
+                                link="WorkflowEdit"
+                                owner={this.state.workflow['owner_repr']}
+                                forkable={params.mode === 'forkable'}
+                                editable={params.mode === 'edit'}
+                                runnable={params.mode === 'run'}
+                                showEdit={this.didWrite()}
+                                setFork={this.fork}
+                                setPublic={this.setPublic}
+                                setSearchable={this.setSearchable}
+                                setForkable={this.setForkable}
+                                object={params.object}
+                                title={this.getWorkflow().title}
+                                runProcess={this.runProcess}
+                                listProcesses={this.state.workflow['assoc_processes']}
+                                {...this.state.workflow.permissions} />
+                            {params.mode === 'run'? <RunLabel />:''}
+                            </span>
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
+                    editTitle={params.mode === 'run'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
-                    save={params.mode === 'run'? this.runProcess:this.save}
+                    save={params.mode === 'run'? '': this.save}
+                    runProcess={this.runProcess}
+                    checkAvailability = {this.checkAvailability}
                     onUpdate={this.unsaved}
-                    saveLabel={params.mode !== 'run'?
-                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
-                    : <span><i className="fa fa-play"></i> Run</span>}
+                    mode = {params.mode}
+                    saveLabel={params.mode === 'run'?
+                        <div>
+                        </div>
+                        :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }
+/*
+                    saveLabel={params.mode === 'run'?
+                        <span><i className="fa fa-play"></i> Run</span>
+                            :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }*/
                     initialSm={sm}
-                    savebar={!params.mode || params.mode === 'view'? false: true}
                     detailMode={this.state.user.profile['detail_mode']}
+                    detailHelp={this.helpMap(params.mode).detail}
+                    globalHelp={this.helpMap(params.mode).global}
+
+                    validate = {params.mode === 'run'}
+                    identifier={`workflow_${params.mode}page`}
+
+                    endDetail={undefined}
+                    savebar={!params.mode || params.mode === 'view'? false: true}
+
+                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run' ? true: false}
+
+
                     {...this.props}/>
             </span>
         );

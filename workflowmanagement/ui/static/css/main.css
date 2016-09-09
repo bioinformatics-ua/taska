@@ -45,7 +45,7 @@ footer {
 
 }
 
-.affixed:after{
+.breadbar.affixed:after{
 
     height: 6px;
     width: 100%;
@@ -59,6 +59,18 @@ footer {
     background: -ms-linear-gradient(top, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
     background: linear-gradient(to bottom, rgba(163,163,163,1) 0%, rgba(255,255,255,0) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3a3', endColorstr='#ffffff', GradientType=0 );
+}
+
+.savebar.affixed {
+    position:fixed;
+    z-index:1020;
+    top:120px;
+}
+
+.workflowbar.affixed {
+    position:fixed;
+    z-index:1020;
+    top:120px;
 }
 
 table {
@@ -168,11 +180,18 @@ table {
     margin-bottom: 0;
 }
 
+.tasktab-container table{
+    margin: 0 !important;
+}
+
 .event-td{
     width: 50px;
 }
 .manage-td{
-    width: 130px;
+    width: 90px;
+}
+.owner-td{
+    width: 160px;
 }
 .type-td{
   width: 60px;
@@ -275,7 +294,7 @@ table {
 }
 
 .process-td{
-    width: 57px;
+    width: 47px;
 }
 
 .circle {
@@ -686,3 +705,42 @@ table {
 .disabledFrenderer{
   background-color: #eee !important;
 }
+
+li.is-active > a {
+  cursor: default;
+}
+
+.user-owned {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 6px;
+}
+
+.tasktab-container {
+  padding: 0;
+  padding-top: 40px;
+}
+
+
+@media print {
+  .window_print {
+    display: none;
+  }
+    @page
+    {
+        size: auto;   /* auto is the initial value */
+        margin: 0mm;  /* this affects the margin in the printer settings */
+    }
+}
+
+.nav-tabs > li > a {
+    border-top: 4px solid #95A5A6;
+    background-color: #ECF0F1;
+    color: gray;
+}
+.nav-tabs > li.active > a, .nav-tabs>li>a:hover {
+  border-top: 4px solid #337AB7 !important;
+  background-color: white;
+}
+
+

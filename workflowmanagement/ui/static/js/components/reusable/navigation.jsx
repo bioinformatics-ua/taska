@@ -53,6 +53,9 @@ var UserDropdown = React.createClass({
                         <Tab to='default' className="boldit"><i className="fa fa-home"></i> HOME</Tab>
                     </li>
                     <li>
+                        <Tab to='help' className="boldit"><i className="fa fa-question-circle"></i> HELP</Tab>
+                    </li>
+                    <li>
                         <Tab to='about' className="boldit"><i className="fa fa-info-circle"></i> ABOUT</Tab>
                     </li>
                     <li className="dropdown">

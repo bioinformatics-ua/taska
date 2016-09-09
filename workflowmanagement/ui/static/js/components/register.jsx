@@ -65,6 +65,8 @@ export default React.createClass({
         UserActions.setProfileField('notification', e.target.checked);
     },
     register(e){
+        e.preventDefault();
+
         UserActions.registerUser()
     },
     componentDidUpdate(){
@@ -79,6 +81,7 @@ export default React.createClass({
     render: function () {
         return (
             <span>
+                <form onSubmit={this.register}>
                 <div className="row">
                     <div className="profileform col-md-8 col-md-offset-2">
                         <h3>Register Account</h3>
@@ -89,7 +92,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Email</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setEmail} value={this.state.user.email} />
+                                <input className="form-control" onChange={this.setEmail} defaultValue={this.state.user.email} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -97,7 +100,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>First Name</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setFirst} value={this.state.user['first_name']} />
+                                <input className="form-control" onChange={this.setFirst} defaultValue={this.state.user['first_name']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -105,7 +108,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Last Name</strong>
                                 </span>
-                                <input className="form-control" onChange={this.setLast} value={this.state.user['last_name']} />
+                                <input className="form-control" onChange={this.setLast} defaultValue={this.state.user['last_name']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -113,7 +116,7 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="" type="password" onChange={this.setPassword} value={this.state.user['password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setPassword} defaultValue={this.state.user['password']} />
                             </div>
                         </div>
                         <div className="form-group">
@@ -121,10 +124,10 @@ export default React.createClass({
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Confirm Password</strong>
                                 </span>
-                                <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} value={this.state.user['confirm_password']} />
+                                <input className="form-control" placeholder="" type="password" onChange={this.setConfirmPassword} defaultValue={this.state.user['confirm_password']} />
                             </div>
                         </div>
-                        <div className="form-group">
+                        {/*<div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="detailmode">
                                     <strong>Detail Render</strong>
@@ -152,7 +155,8 @@ export default React.createClass({
                                 </div>
                             </div>
                         </div>
-                        {/*<div className="form-group">
+
+                        <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
                                     <strong>Country</strong>
@@ -162,11 +166,12 @@ export default React.createClass({
                                  options={[]} />
                             </div>
                         </div>*/}
-                        <button onClick={this.register} className="pull-right btn btn-primary">
+                        <button type="submit" className="pull-right btn btn-primary">
                             <i className="fa fa-floppy-o"></i> &nbsp;Register
                         </button>
                     </div>
                 </div>
+                </form>
             </span>);
     }
 });

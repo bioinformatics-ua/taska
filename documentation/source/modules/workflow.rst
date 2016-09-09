@@ -1,6 +1,8 @@
 Workflow Package
 ================
 
+.. automodule:: workflow
+
 Admin
 -------------
 

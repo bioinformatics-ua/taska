@@ -34,10 +34,9 @@ const TaskDependencies = React.createClass({
 
         return files;
     },
-    translateResources(users){
+    translateResources(task){
         let files = [];
-
-        for(let user of users){
+        for(let user of task.users){
             if(user.result){
                 let resources = user.result.outputs;
                 for(let resource of resources){
@@ -47,7 +46,7 @@ const TaskDependencies = React.createClass({
                             filename: resource.filename,
                             size: resource.size,
                             creator: resource['creator_repr'],
-                            task: user.result.processtaskuser.processtask.parent.title,
+                            task: task['task_repr'],
                             date: moment(resource['create_date']).fromNow(),
                             status: 'Finished',
                             progress: 100,
@@ -62,7 +61,7 @@ const TaskDependencies = React.createClass({
 
     },
     __renderTask(task){
-        return this.translateResources(task.users);
+        return this.translateResources(task);
         return (
                 <Uploader
                     editable={false}
@@ -75,7 +74,7 @@ const TaskDependencies = React.createClass({
 
         let resources = tasks.reduce(
             (array, task) =>
-                $.extend(array, this.__renderTask(task))
+                $.merge(array, this.__renderTask(task))
             ,[]
         );
         return (
