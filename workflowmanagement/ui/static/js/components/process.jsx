@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus, ProcessDefineDelayBar, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -174,6 +174,10 @@ export default React.createClass({
                                 showRun={false}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />}
+                            {this.state.process['notifications'] ?
+                                <ProcessDefineDelayBar
+                                    active={true}
+                                    disabled={true}/>: ''}
 
                             <ProcessDetailBar
                                 startDate={this.state.process['start_date']}

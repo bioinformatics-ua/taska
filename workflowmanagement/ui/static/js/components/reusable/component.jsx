@@ -10,8 +10,11 @@ import Toggle from 'react-toggle';
 
 import Select from 'react-select';
 
+import moment from 'moment';
+
 import ProcessActions from '../../actions/ProcessActions.jsx';
 import WorkflowActions from '../../actions/WorkflowActions.jsx';
+import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
 const Loading = React.createClass({
   render: function(){
@@ -357,6 +360,10 @@ const ReassigningButton = React.createClass({
   // }}}
 });
 
+
+
+
+
 const PermissionsBar = React.createClass({
     getDefaultProps() {
         return {
@@ -597,6 +604,130 @@ const ProcessDetailBar = React.createClass({
         )
     }
 });
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
+
+
+const ProcessDefineDelayBar = React.createClass({
+    getDefaultProps() {
+        return {
+            disabled: false,
+            deadLine: moment().toDate(),
+            setNotifiable: function(){},
+            active: true,
+        };
+    },
+    getState(){
+        return {
+            active: this.props.active,
+            numDaysBefore: 0,
+            numDaysAfter: 0,
+            numIntervalDays: 0,
+            disabled: this.props.disabled,
+        }
+    },
+    getInitialState(){
+       return  this.getState();
+    },
+    setNotifiable(){
+        this.setState({ disabled: !this.state.disabled });
+        //If notifications is disable, clean variables
+        if(!this.state.disabled)
+            this.setState({ numDaysBefore: 0,
+                            numDaysAfter: 0,
+                            numIntervalDays: 0});
+    },
+    setNumDaysBefore(e){
+        this.setState({ numDaysBefore: e });
+    },
+    setNumDaysAfter(e){
+        this.setState({ numDaysAfter: e });
+    },
+    setNotificationsDeadline(e){
+        this.setState({ numIntervalDays: (moment(e).diff(moment(), 'days')+1) });
+    },
+    render(){
+        var optionsBeforeDeadline = [
+            { value: '1', label: '1 day' },
+            { value: '2', label: '2 days' },
+            { value: '3', label: '3 days' },
+            { value: '4', label: '4 days' },
+            { value: '5', label: '5 days' },
+            { value: '6', label: '6 days' },
+            { value: '7', label: '7 days' }
+        ];
+        //I did it that way because in the future I can change the options more easily
+        var optionsAfterDeadline = optionsBeforeDeadline;
+
+        return(<div>
+                <div className="row">
+                    <div className="col-md-6">
+
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="study-title"><strong>Delay notifications</strong></span>
+                                
+                                <div className="form-control">
+                                    <span className="selectBox">
+                                        <Toggle id="public"
+                                                defaultChecked={this.state.active}
+                                                onChange={this.setNotifiable}
+                                                disabled={this.props.disabled}/>
+                                        <span className="selectLabel">&nbsp;Active</span>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="study-title"><strong>Before deadline</strong></span>
+                                    <Select placeholder="Nº of days"
+                                            name="form-field-name"
+                                            value={this.state.numDaysBefore}
+                                            options={optionsBeforeDeadline}
+                                            onChange={this.setNumDaysBefore}
+                                            disabled={this.state.disabled}/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="study-title"><strong>Send until</strong></span>
+                                <DateTimePicker onChange={this.setNotificationsDeadline}
+                                                defaultValue={this.props.deadLine}
+                                                format={"yyyy-MM-dd"}
+                                                time={false}
+                                                disabled={this.state.disabled}/>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="study-title"><strong>Send every</strong></span>
+                                    <Select placeholder="Nº of days"
+                                            name="form-field-name"
+                                            value={this.state.numDaysAfter}
+                                            options={optionsAfterDeadline}
+                                            onChange={this.setNumDaysAfter}
+                                            disabled={this.state.disabled}/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        )
+    }
+});
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ProcessDefineDelayBar, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
 
 

@@ -53,6 +53,10 @@ class Process(models.Model):
     end_date        = models.DateTimeField(null=True)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     removed         = models.BooleanField(default=False)
+    notifications   = models.BooleanField(default=False)
+    days_after_delay        = models.IntegerField(default=0)
+    num_notification_after  = models.IntegerField(default=0)
+    days_before_delay       = models.IntegerField(default=0)
 
     @staticmethod
     def statusCode(interpret_code):

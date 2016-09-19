@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessDefineDelayBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import StateActions from '../actions/StateActions.jsx';
@@ -277,6 +277,10 @@ export default React.createClass({
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
+
+                            <ProcessDefineDelayBar
+                                disabled={false}/>
+
                             {params.mode === 'run'? <RunLabel />:''}
                             </span>
                     }

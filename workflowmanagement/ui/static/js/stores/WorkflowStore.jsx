@@ -199,12 +199,17 @@ const WorkflowStore = Reflux.createStore({
         this.trigger();
     },
     onRunProcess(data){
+        console.log("AAAAAAAAAAAAAAA");
         console.log(data);
         let process = {
             ***REMOVED*** this.__detaildata.hash,
             tasks: [],
             title: data.title,
-            status: 1
+            status: 1,
+            notifications: true,//Get this from somewhere
+            days_after_delay: 0,
+            num_notification_after: 0,
+            days_before_delay: 0
         };
 
         let states = data.sm.getStates();

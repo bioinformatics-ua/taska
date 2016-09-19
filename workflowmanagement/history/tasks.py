@@ -4,6 +4,7 @@ from celery import shared_task
 from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 
+
 from django.utils import timezone
 
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.conf import settings
 from history.models import History
 from process.models import ProcessTask
 
-@periodic_task(run_every=crontab(minute=settings.LATE_MIN, hour=settings.LATE_HOUR, day_of_week=settings.LATE_DAY))
+@periodic_task(run_every=crontab(minute=settings.LATE_MIN, hour=settings.LATE_HOUR, day_of_week=settings.LATE_DAY))#minute=settings.LATE_MIN, hour=settings.LATE_HOUR, day_of_week=settings.LATE_DAY
 def warnLateDeadlines():
 
     ptasks = ProcessTask.all().filter(status=ProcessTask.RUNNING, deadline__lt=timezone.now())

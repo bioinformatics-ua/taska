@@ -275,12 +275,14 @@ class SimpleTaskRun extends SimpleTask{
         }
     }
     stateStyle(user){
-        if(this.getData().ptask)
-            //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
-            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8 )
+        if (this.getData().ptask)
+        //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
+            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8)
                 return stateColor(this.getData().ptask);
-            else if(user != undefined)
+            else if (user != undefined)
                 return singleStateColor(user.status);
+            else
+                return stateColor(this.getData().ptask); //This line is because there are new status (7 and 8, maybe more in the future), so to fill the statemachine i need this condition
         return {};
     }
     stateDesc(){
