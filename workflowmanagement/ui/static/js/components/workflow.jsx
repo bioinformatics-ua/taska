@@ -108,7 +108,16 @@ export default React.createClass({
             addedWorkflow: WorkflowStore.getWorkflowAddFinished(),
             ***REMOVED*** WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing(),
-            user: UserStore.getUser()
+            user: UserStore.getUser(),
+            notificationsDetail: this.getDefaultNotificationsDetail(),
+        }
+    },
+    getDefaultNotificationsDetail(){
+        return{
+            active: false,
+            numDaysBefore: 0,
+            numDaysAfter: 0,
+            sendNotificationUntil: null,
         }
     },
     getInitialState(){
@@ -203,11 +212,27 @@ export default React.createClass({
         WorkflowActions.fork();
     },
     runProcess(data){
+        this.changeData(data);
+        
+        console.log("Working in WorkflowStore.runProcess()2");
         console.log(data);
+
         WorkflowActions.runProcess(data);
     },
     checkAvailability(data){
+        this.changeData(data);
         WorkflowActions.checkAvailability(data);
+    },
+    setNotification(active, numDaysBefore, numDaysAfter, sendNotificationUntil){
+        let tmpState = {
+            active: active,
+            numDaysBefore: numDaysBefore,
+            numDaysAfter: numDaysAfter,
+            sendNotificationUntil: sendNotificationUntil};
+        this.setState({notificationsDetail: tmpState});
+    },
+    changeData(data){
+        data.notificationsDetail= this.state.notificationsDetail;
     },
     closePopup(){
         WorkflowActions.calibrate();
@@ -278,8 +303,12 @@ export default React.createClass({
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
 
-                            <ProcessDefineDelayBar
-                                disabled={false}/>
+                            {params.mode === 'run'?
+                                <ProcessDefineDelayBar
+                                    active={false}
+                                    disabled={true}
+                                    setNotification={this.setNotification}/>:''}
+
 
                             {params.mode === 'run'? <RunLabel />:''}
                             </span>

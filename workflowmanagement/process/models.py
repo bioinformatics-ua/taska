@@ -55,7 +55,7 @@ class Process(models.Model):
     removed         = models.BooleanField(default=False)
     notifications   = models.BooleanField(default=False)
     days_after_delay        = models.IntegerField(default=0)
-    num_notification_after  = models.IntegerField(default=0)
+    send_notification_until = models.DateTimeField(null=True)
     days_before_delay       = models.IntegerField(default=0)
 
     @staticmethod

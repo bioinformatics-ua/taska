@@ -609,18 +609,24 @@ const ProcessDetailBar = React.createClass({
 const ProcessDefineDelayBar = React.createClass({
     getDefaultProps() {
         return {
-            disabled: false,
-            deadLine: moment().toDate(),
-            setNotifiable: function(){},
             active: true,
+            disabled: false,
+            toggleDisabled: false,
+            setNotifiable: function(){},
+            numDaysBefore: 0,
+            numDaysAfter: 0,
+            sendNotificationUntil: null,
+            defaultDate: null,
+
         };
     },
     getState(){
+        console.log(this.props.numDaysAfter);
         return {
             active: this.props.active,
-            numDaysBefore: 0,
-            numDaysAfter: 0,
-            numIntervalDays: 0,
+            numDaysBefore: this.props.numDaysBefore != 0 ? this.props.numDaysBefore.toString() : this.props.numDaysBefore,
+            numDaysAfter: this.props.numDaysAfter != 0 ? this.props.numDaysAfter.toString() : this.props.numDaysAfter,
+            sendNotificationUntil: this.props.sendNotificationUntil,
             disabled: this.props.disabled,
         }
     },
@@ -628,31 +634,37 @@ const ProcessDefineDelayBar = React.createClass({
        return  this.getState();
     },
     setNotifiable(){
-        this.setState({ disabled: !this.state.disabled });
+        this.setState({ disabled: !this.state.disabled,
+                        active: !this.state.active});
         //If notifications is disable, clean variables
         if(!this.state.disabled)
             this.setState({ numDaysBefore: 0,
                             numDaysAfter: 0,
-                            numIntervalDays: 0});
+                            sendNotificationUntil: null});
+        //First parameter is false, because if it is ativated ou desativated, if it is the last thing that was done, there is no data related with notification
+        this.props.setNotification(false, 0, 0, null);
     },
     setNumDaysBefore(e){
         this.setState({ numDaysBefore: e });
+        this.props.setNotification(this.state.active, e, this.state.numDaysAfter, this.state.sendNotificationUntil);
     },
     setNumDaysAfter(e){
         this.setState({ numDaysAfter: e });
+        this.props.setNotification(this.state.active, this.state.numDaysBefore, e, this.state.sendNotificationUntil);
     },
     setNotificationsDeadline(e){
-        this.setState({ numIntervalDays: (moment(e).diff(moment(), 'days')+1) });
+        this.setState({ sendNotificationUntil: moment(e).format('YYYY-MM-DDTHH:mm') });
+        this.props.setNotification(this.state.active, this.state.numDaysBefore, this.state.numDaysAfter,  moment(e).format('YYYY-MM-DDTHH:mm'));
     },
     render(){
         var optionsBeforeDeadline = [
-            { value: '1', label: '1 day' },
-            { value: '2', label: '2 days' },
-            { value: '3', label: '3 days' },
-            { value: '4', label: '4 days' },
-            { value: '5', label: '5 days' },
-            { value: '6', label: '6 days' },
-            { value: '7', label: '7 days' }
+            { value: "1", label: '1 day' },
+            { value: "2", label: '2 days' },
+            { value: "3", label: '3 days' },
+            { value: "4", label: '4 days' },
+            { value: "5", label: '5 days' },
+            { value: "6", label: '6 days' },
+            { value: "7", label: '7 days' }
         ];
         //I did it that way because in the future I can change the options more easily
         var optionsAfterDeadline = optionsBeforeDeadline;
@@ -663,14 +675,14 @@ const ProcessDefineDelayBar = React.createClass({
 
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Delay notifications</strong></span>
-                                
+                                <span className="input-group-addon" id="study-title"><strong>Send remainder</strong></span>
+
                                 <div className="form-control">
                                     <span className="selectBox">
                                         <Toggle id="public"
                                                 defaultChecked={this.state.active}
                                                 onChange={this.setNotifiable}
-                                                disabled={this.props.disabled}/>
+                                                disabled={this.props.toggleDisabled}/>
                                         <span className="selectLabel">&nbsp;Active</span>
                                     </span>
                                 </div>
@@ -691,7 +703,6 @@ const ProcessDefineDelayBar = React.createClass({
                                             disabled={this.state.disabled}/>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -699,9 +710,9 @@ const ProcessDefineDelayBar = React.createClass({
                     <div className="col-md-6">
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Send until</strong></span>
+                                <span className="input-group-addon" id="study-title"><strong>Repeat up to</strong></span>
                                 <DateTimePicker onChange={this.setNotificationsDeadline}
-                                                defaultValue={this.props.deadLine}
+                                                defaultValue={this.props.defaultDate}
                                                 format={"yyyy-MM-dd"}
                                                 time={false}
                                                 disabled={this.state.disabled}/>
@@ -712,13 +723,14 @@ const ProcessDefineDelayBar = React.createClass({
                     <div className="col-md-6">
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Send every</strong></span>
+                                <span className="input-group-addon" id="study-title"><strong>Every</strong></span>
                                     <Select placeholder="Nº of days"
                                             name="form-field-name"
                                             value={this.state.numDaysAfter}
                                             options={optionsAfterDeadline}
                                             onChange={this.setNumDaysAfter}
-                                            disabled={this.state.disabled}/>
+                                            disabled={this.state.disabled}
+                                            selectValue={this.state.numDaysAfter}/>
                             </div>
                         </div>
 

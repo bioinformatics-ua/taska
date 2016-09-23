@@ -173,12 +173,12 @@ const ModalDetail = React.createClass({
 
 let StateMachineComponent = React.createClass({
     mixins: [Reflux.listenTo(StateMachineStore, 'update'), hotkey.Mixin('handleHotkey')],
-    getNotificationsDetail(){
+    getDefaultNotificationsDetail(){
         return{
             active: false,
             numDaysBefore: 0,
             numDaysAfter: 0,
-            numIntervalDays: 0,
+            sendNotificationUntil: null,
         }
     },
     getState(){
@@ -190,7 +190,7 @@ let StateMachineComponent = React.createClass({
             canRedo: StateMachineStore.canRedo(),
             detailVisible: StateMachineStore.getDetailVisible(),
             detailExtended: StateMachineStore.getDetailExtended(),
-            notificationsDetail: this.getNotificationsDetail()
+            notificationsDetail: this.getDefaultNotificationsDetail()
         }
     },
     getInitialState(){

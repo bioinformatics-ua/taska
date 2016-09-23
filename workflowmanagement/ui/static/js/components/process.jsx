@@ -5,6 +5,7 @@ import Reflux from 'reflux';
 import React from 'react';
 import Router from 'react-router';
 import {Link} from 'react-router';
+import moment from 'moment';
 
 import {Authentication} from '../mixins/component.jsx';
 
@@ -126,6 +127,8 @@ export default React.createClass({
         }
         i++;
         console.log('RENDER PROCESS ');
+        console.log(this.state);
+        console.log(moment(this.state.process['send_notification_until']).toDate());
         let params = this.context.router.getCurrentParams();
 
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'showOnly'))
@@ -177,7 +180,11 @@ export default React.createClass({
                             {this.state.process['notifications'] ?
                                 <ProcessDefineDelayBar
                                     active={true}
-                                    disabled={true}/>: ''}
+                                    disabled={true}
+                                    toggleDisabled={true}
+                                    numDaysBefore={this.state.process['days_before_delay']}
+                                    numDaysAfter={this.state.process['days_after_delay']}
+                                    defaultDate={moment(this.state.process['send_notification_until']).toDate()}/>: ''}
 
                             <ProcessDetailBar
                                 startDate={this.state.process['start_date']}
