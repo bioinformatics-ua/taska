@@ -390,7 +390,10 @@ table {
     margin-right: 5px;
 }
 
-.react-statemachine .input-group-addon, .profileform .input-group-addon{
+.react-statemachine .delay-notification, .status-detail .delay-notification{
+    min-width:250px !important;
+}
+.react-statemachine .input-group-addon, .profileform .input-group-addon, .status-detail .input-group-addon{
     min-width:160px;
     text-align:left;
 }

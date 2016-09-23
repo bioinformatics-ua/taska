@@ -15,6 +15,8 @@ import ProcessActions from '../actions/ProcessActions.jsx';
 import UserActions from '../actions/UserActions.jsx';
 import StatusDetailActions from '../actions/StatusDetailActions.jsx';
 
+import moment from 'moment';
+
 import {Authentication} from '../mixins/component.jsx';
 import Select from 'react-select';
 
@@ -124,7 +126,7 @@ export default React.createClass({
     let params = this.context.router.getCurrentParams();
     let alreadyusers = this.state.alreadyusers;
       
-    return (<span>
+    return (<div className="status-detail">
         <div>
             <div className="form-group">
                 <div className="input-group">
@@ -150,10 +152,17 @@ export default React.createClass({
 
 
         <ProcessDetailBar
+            active={true}
+            disabled={true}
+            toggleDisabled={true}
+            numDaysBefore={this.state.process['days_before_delay']}
+            numDaysAfter={this.state.process['days_after_delay']}
+            defaultDate={moment(this.state.process['send_notification_until']).toDate()}
+
             startDate={this.state.process['start_date']}
             endDate={this.state.process['end_date'] || '---'}
             status={this.state.process.status}
-            progress={this.state.process.progress} />
+            progress={this.state.process.progress}/>
 
             <ProcessLabel />
             <hr />
@@ -186,6 +195,6 @@ export default React.createClass({
                                       </span>
                 </div>
             </div> : ''}
-      </span>);
+      </div>);
   }
 });

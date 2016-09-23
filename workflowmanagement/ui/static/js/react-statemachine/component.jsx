@@ -175,7 +175,6 @@ let StateMachineComponent = React.createClass({
     mixins: [Reflux.listenTo(StateMachineStore, 'update'), hotkey.Mixin('handleHotkey')],
     getDefaultNotificationsDetail(){
         return{
-            active: false,
             numDaysBefore: 0,
             numDaysAfter: 0,
             sendNotificationUntil: null,

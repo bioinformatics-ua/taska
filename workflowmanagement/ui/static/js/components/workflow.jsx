@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessDefineDelayBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import StateActions from '../actions/StateActions.jsx';
@@ -114,7 +114,6 @@ export default React.createClass({
     },
     getDefaultNotificationsDetail(){
         return{
-            active: false,
             numDaysBefore: 0,
             numDaysAfter: 0,
             sendNotificationUntil: null,
@@ -223,9 +222,8 @@ export default React.createClass({
         this.changeData(data);
         WorkflowActions.checkAvailability(data);
     },
-    setNotification(active, numDaysBefore, numDaysAfter, sendNotificationUntil){
+    setNotification(numDaysBefore, numDaysAfter, sendNotificationUntil){
         let tmpState = {
-            active: active,
             numDaysBefore: numDaysBefore,
             numDaysAfter: numDaysAfter,
             sendNotificationUntil: sendNotificationUntil};
@@ -302,12 +300,12 @@ export default React.createClass({
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
-
-                            {params.mode === 'run'?
-                                <ProcessDefineDelayBar
-                                    active={false}
-                                    disabled={true}
-                                    setNotification={this.setNotification}/>:''}
+                                    
+                            {params.mode === 'run'?        
+                                <ProcessDetailBar
+                                    disabled={false}
+                                    setNotification={this.setNotification}
+                                    createProcess={true}/>:''}
 
 
                             {params.mode === 'run'? <RunLabel />:''}

@@ -53,7 +53,7 @@ class Process(models.Model):
     end_date        = models.DateTimeField(null=True)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     removed         = models.BooleanField(default=False)
-    notifications   = models.BooleanField(default=False)
+
     days_after_delay        = models.IntegerField(default=0)
     send_notification_until = models.DateTimeField(null=True)
     days_before_delay       = models.IntegerField(default=0)

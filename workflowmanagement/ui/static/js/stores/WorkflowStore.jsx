@@ -204,7 +204,7 @@ const WorkflowStore = Reflux.createStore({
             tasks: [],
             title: data.title,
             status: 1,
-            notifications: data.notificationsDetail.active,
+
             days_after_delay: data.notificationsDetail.numDaysAfter,
             days_before_delay: data.notificationsDetail.numDaysBefore,
             send_notification_until: data.notificationsDetail.sendNotificationUntil

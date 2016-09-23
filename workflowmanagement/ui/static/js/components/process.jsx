@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, ProcessDefineDelayBar, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -177,21 +177,20 @@ export default React.createClass({
                                 showRun={false}
                                 object={params.object}
                                 {...this.state.workflow.permissions} />}
-                            {this.state.process['notifications'] ?
-                                <ProcessDefineDelayBar
-                                    active={true}
-                                    disabled={true}
-                                    toggleDisabled={true}
-                                    numDaysBefore={this.state.process['days_before_delay']}
-                                    numDaysAfter={this.state.process['days_after_delay']}
-                                    defaultDate={moment(this.state.process['send_notification_until']).toDate()}/>: ''}
 
                             <ProcessDetailBar
+                                active={true}
+                                disabled={true}
+                                toggleDisabled={true}
+                                numDaysBefore={this.state.process['days_before_delay']}
+                                numDaysAfter={this.state.process['days_after_delay']}
+                                defaultDate={moment(this.state.process['send_notification_until']).toDate()}
+                                
                                 startDate={this.state.process['start_date']}
                                 endDate={this.state.process['end_date'] || '---'}
                                 status={this.state.process.status}
-                                progress={this.state.process.progress}
-                            />
+                                progress={this.state.process.progress}/>
+                            
                             <ProcessLabel 
                                 linkStatusDetails={<small><Link to="StatusDetail" params={{object: params.object}}>Show assignees</Link></small>}
                             />

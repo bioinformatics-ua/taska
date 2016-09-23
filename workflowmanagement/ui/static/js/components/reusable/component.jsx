@@ -556,60 +556,8 @@ const ProcessLabel = React.createClass({
 });
 
 const ProcessDetailBar = React.createClass({
-    getInitialState(){
-       return {
-           startDate: this.props.startDate,
-           endDate: this.props.endDate,
-           status: this.props.status,
-           progress: this.props.progress
-        }
-    },
-    render(){
-        return(<div>
-                             <div className="row">
-                                <div className="col-md-5">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <span className="input-group-addon" id="startdate">
-                                                <strong>Start Date</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.startDate} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-5">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <span className="input-group-addon" id="enddate">
-                                                <strong>End Date</strong>
-                                            </span>
-                                            <input className="form-control" readOnly value={this.state.endDate} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-2">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <ProcessStatus label="True" rowData={{status: this.state.status}} />
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
-                            <div title={`${this.state.progress}% completed`} style={{backgroundColor: '#19AB27', width: `${this.state.progress}%`, height: '10px'}}></div>
-                            &nbsp;</div>
-            </div>
-        )
-    }
-});
-
-
-const ProcessDefineDelayBar = React.createClass({
     getDefaultProps() {
         return {
-            active: true,
             disabled: false,
             toggleDisabled: false,
             setNotifiable: function(){},
@@ -617,44 +565,41 @@ const ProcessDefineDelayBar = React.createClass({
             numDaysAfter: 0,
             sendNotificationUntil: null,
             defaultDate: null,
-
+            createProcess: false,
         };
     },
     getState(){
         console.log(this.props.numDaysAfter);
         return {
-            active: this.props.active,
             numDaysBefore: this.props.numDaysBefore != 0 ? this.props.numDaysBefore.toString() : this.props.numDaysBefore,
             numDaysAfter: this.props.numDaysAfter != 0 ? this.props.numDaysAfter.toString() : this.props.numDaysAfter,
             sendNotificationUntil: this.props.sendNotificationUntil,
             disabled: this.props.disabled,
+
+            startDate: this.props.startDate,
+            endDate: this.props.endDate,
+            status: this.props.status,
+            progress: this.props.progress
         }
     },
     getInitialState(){
        return  this.getState();
     },
-    setNotifiable(){
-        this.setState({ disabled: !this.state.disabled,
-                        active: !this.state.active});
-        //If notifications is disable, clean variables
-        if(!this.state.disabled)
-            this.setState({ numDaysBefore: 0,
-                            numDaysAfter: 0,
-                            sendNotificationUntil: null});
-        //First parameter is false, because if it is ativated ou desativated, if it is the last thing that was done, there is no data related with notification
-        this.props.setNotification(false, 0, 0, null);
-    },
     setNumDaysBefore(e){
+        if(e.length==0)
+            e=0;
         this.setState({ numDaysBefore: e });
-        this.props.setNotification(this.state.active, e, this.state.numDaysAfter, this.state.sendNotificationUntil);
+        this.props.setNotification(e, this.state.numDaysAfter, this.state.sendNotificationUntil);
     },
     setNumDaysAfter(e){
+        if(e.length==0)
+            e=0;
         this.setState({ numDaysAfter: e });
-        this.props.setNotification(this.state.active, this.state.numDaysBefore, e, this.state.sendNotificationUntil);
+        this.props.setNotification(this.state.numDaysBefore, e, this.state.sendNotificationUntil);
     },
     setNotificationsDeadline(e){
-        this.setState({ sendNotificationUntil: moment(e).format('YYYY-MM-DDTHH:mm') });
-        this.props.setNotification(this.state.active, this.state.numDaysBefore, this.state.numDaysAfter,  moment(e).format('YYYY-MM-DDTHH:mm'));
+        this.setState({ sendNotificationUntil: e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm') });
+        this.props.setNotification(this.state.numDaysBefore, this.state.numDaysAfter, e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm'));
     },
     render(){
         var optionsBeforeDeadline = [
@@ -672,74 +617,119 @@ const ProcessDefineDelayBar = React.createClass({
         return(<div>
                 <div className="row">
                     <div className="col-md-6">
-
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Send remainder</strong></span>
-
-                                <div className="form-control">
-                                    <span className="selectBox">
-                                        <Toggle id="public"
-                                                defaultChecked={this.state.active}
-                                                onChange={this.setNotifiable}
-                                                disabled={this.props.toggleDisabled}/>
-                                        <span className="selectLabel">&nbsp;Active</span>
-                                    </span>
-                                </div>
-
+                                            <span className="input-group-addon" id="startdate">
+                                                <strong>Start Date</strong>
+                                            </span>
+                                <input className="form-control" readOnly value={this.state.startDate}/>
                             </div>
                         </div>
-
                     </div>
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Before deadline</strong></span>
+                </div>
+                {this.state.numDaysBefore != 0 || this.props.createProcess ?
+                    <div className="row">
+                        <div className="col-md-2"></div>
+                        <div className="col-md-8">
+                            <div className="form-group">
+                                <div className="input-group">
+                                    <span className="delay-notification input-group-addon"
+                                          id="remainder-before"><strong>Remainder before deadline</strong></span>
                                     <Select placeholder="Nº of days"
                                             name="form-field-name"
                                             value={this.state.numDaysBefore}
                                             options={optionsBeforeDeadline}
                                             onChange={this.setNumDaysBefore}
                                             disabled={this.state.disabled}/>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div> : ''}
 
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Repeat up to</strong></span>
-                                <DateTimePicker onChange={this.setNotificationsDeadline}
-                                                defaultValue={this.props.defaultDate}
-                                                format={"yyyy-MM-dd"}
-                                                time={false}
-                                                disabled={this.state.disabled}/>
+                                <span className="input-group-addon" id="enddate"><strong>End Date</strong></span>
+                                <input className="form-control" readOnly value={this.state.endDate}/>
                             </div>
                         </div>
-
                     </div>
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <div className="input-group">
-                                <span className="input-group-addon" id="study-title"><strong>Every</strong></span>
-                                    <Select placeholder="Nº of days"
-                                            name="form-field-name"
-                                            value={this.state.numDaysAfter}
-                                            options={optionsAfterDeadline}
-                                            onChange={this.setNumDaysAfter}
-                                            disabled={this.state.disabled}
-                                            selectValue={this.state.numDaysAfter}/>
+                    <div className="col-md-4"></div>
+                    {this.state.numDaysAfter == 0 ?
+                        <div className="col-md-2">
+                            <div className="form-group">
+                                <div className="input-group">
+                                    {!this.props.createProcess ?
+                                        <ProcessStatus label="True" rowData={{status: this.state.status}}/> : ''}
+
+                                </div>
                             </div>
-                        </div>
+                        </div> : ''}
 
-                    </div>
                 </div>
+
+                {this.state.numDaysAfter != 0 || this.props.createProcess ?
+                    <div>
+                        <div className="row">
+                            <div className="col-md-2"></div>
+                            <div className="col-md-8">
+                                <div className="form-group">
+                                    <div className="input-group">
+                                        <span className="delay-notification input-group-addon"
+                                              id="remainder-after"><strong>Remainder after deadline every</strong></span>
+                                        <Select placeholder="Nº of days"
+                                                name="form-field-name"
+                                                value={this.state.numDaysAfter}
+                                                options={optionsAfterDeadline}
+                                                onChange={this.setNumDaysAfter}
+                                                disabled={this.state.disabled}
+                                                selectValue={this.state.numDaysAfter}/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-md-2"></div>
+                            <div className="col-md-8">
+                                <div className="form-group">
+                                    <div className="input-group">
+                                <span className="delay-notification input-group-addon"
+                                      id="remainder-until"><strong>Repeat up to</strong></span>
+                                        <DateTimePicker onChange={this.setNotificationsDeadline}
+                                                        defaultValue={this.props.defaultDate}
+                                                        format={"yyyy-MM-dd"}
+                                                        time={false}
+                                                        disabled={this.state.disabled}/>
+                                    </div>
+                                </div>
+                            </div>
+                            {!this.props.createProcess ?
+                                <div className="col-md-2">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <ProcessStatus label="True" rowData={{status: this.state.status}}/>
+
+                                        </div>
+                                    </div>
+                                </div> : ''}
+                        </div>
+                    </div> : ''}
+
+
+                {!this.props.createProcess ?
+                    <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                        <div title={`${this.state.progress}% completed`}
+                             style={{backgroundColor: '#19AB27', width: `${this.state.progress}%`, height: '10px'}}></div>
+                        &nbsp;</div> : ''}
             </div>
         )
     }
 });
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ProcessDefineDelayBar, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
+
+
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
 
 
