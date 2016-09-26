@@ -127,8 +127,7 @@ export default React.createClass({
         }
         i++;
         console.log('RENDER PROCESS ');
-        console.log(this.state);
-        console.log(moment(this.state.process['send_notification_until']).toDate());
+
         let params = this.context.router.getCurrentParams();
 
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'showOnly'))

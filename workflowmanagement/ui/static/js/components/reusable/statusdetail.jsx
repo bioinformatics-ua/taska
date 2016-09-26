@@ -49,33 +49,57 @@ const ReassigningTask  = React.createClass({
   },
   render: function(){
     const row = this.props.rowData;
-    return <a data-assignee={row.user} data-ptuhash={row.processtask.hash} data-pthash={row.processtask.task} data-cancel="true" onClick={this.showReassignSelect}>Reassigning  </a>;
+    return !row.finished ? <a data-assignee={row.user} data-ptuhash={row.processtask.hash} data-pthash={row.processtask.task} data-cancel="true" onClick={this.showReassignSelect}>Reassigning  </a>
+        : <span></span>;
   }
 });
 
 const TaskStatus = React.createClass({
-  getIcon(row){
+  getStatus(row){
+    if(row.finished)
+        return 'Finished';
+
+    //some combinations are never used
     switch(row.processtask.status){
-      case 1: //Waitting
-        return 'fa fa-pause';
-      case 2: //Running
-        return 'fa fa-play';
+      case 1: //Waitting fa fa-pause
+        return 'Waitting';
+      case 2: //Running fa fa-play
+        return 'Running';
+      case 3:
+        return 'Finished';
+      case 4:
+        return 'Canceled';
+      case 5:
+        return 'Overdue';
+      case 6:
+        return 'Improving';
       case 7:
           switch(row.status){
-            case 1: //Waitting
-              return 'fa fa-question';
-            case 2: //Accepted
-              return 'fa fa-check';
-            case 3: //Rejected
-              return 'fa fa-times';
+            case 1: //Waitting fa fa-question
+              return 'Waitting';
+            case 2: //Accepted fa fa-check
+              return 'Accepted';
+            case 3: //Rejected fa fa-times
+              return 'Rejected';
+            case 4:
+              return 'Running';
+            case 5:
+              return 'Finished';
+            case 6:
+              return 'Canceled';
+            case 7:
+              return 'Overdue';
+            case 8:
+              return 'Improving';
           }
     }
 
-    return 'fa fa-exclamation-triangle';
+    return 'ERROR';
   },
   render: function(){
     const row = this.props.rowData;
-    return <span><i className={`fa fa-2x ${this.getIcon(row)}`}></i></span>;
+    //<span><i className={`fa fa-2x ${this.getIcon(row)}`}></i></span>;
+    return <span>{this.getStatus(row)}</span>;
   }
 });
 

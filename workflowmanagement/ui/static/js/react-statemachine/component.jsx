@@ -793,8 +793,8 @@ let StateMachineComponent = React.createClass({
             if(!state.is_valid())
                 return false;
         }
-
-        return true;
+        return this.props.validateNotification();
+        //return true;
     },
     percentage(){
         let states = this.state.sm.getStates();

@@ -146,7 +146,9 @@ class RequestReassignAnswerTemplate(MailTemplate):
 
 
 
-
+class ProcessTaskUserRemainderTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_remainder_subject.html"
+    template="mail/processtaskuser_remainder.html"
 
 class ProcessTaskUserLateTemplate(MailTemplate):
     subjecttemplate="mail/processtaskuser_late_subject.html"

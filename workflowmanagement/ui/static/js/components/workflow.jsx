@@ -229,6 +229,12 @@ export default React.createClass({
             sendNotificationUntil: sendNotificationUntil};
         this.setState({notificationsDetail: tmpState});
     },
+    getNotification(){
+        if((this.state.notificationsDetail.numDaysAfter != 0 && this.state.notificationsDetail.sendNotificationUntil == null) ||
+            (this.state.notificationsDetail.numDaysAfter == 0 && this.state.notificationsDetail.sendNotificationUntil != null))
+            return false;
+        return true;
+    },
     changeData(data){
         data.notificationsDetail= this.state.notificationsDetail;
     },
@@ -336,6 +342,7 @@ export default React.createClass({
                     globalHelp={this.helpMap(params.mode).global}
 
                     validate = {params.mode === 'run'}
+                    validateNotification={this.getNotification}
                     identifier={`workflow_${params.mode}page`}
 
                     endDetail={undefined}

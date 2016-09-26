@@ -13,6 +13,8 @@ from django.db import transaction
 
 from history.models import History
 
+import datetime
+
 from material.models import File
 
 class Process(models.Model):
@@ -178,6 +180,21 @@ class Process(models.Model):
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Processes"
+
+    @staticmethod
+    def allWithDelay():
+        tmp = Process.objects.filter(Q(removed=False) &
+                                     Q(Q(status=Process.RUNNING) | Q(status=Process.WAITING)))\
+            .exclude(days_after_delay = 0)\
+            .filter(send_notification_until__gte=timezone.now())
+        return tmp
+
+    @staticmethod
+    def allWithNotificationBeforeDelay():
+        tmp = Process.objects.filter(Q(removed=False) &
+                                     Q(Q(status=Process.RUNNING) | Q(status=Process.WAITING))) \
+            .exclude(days_before_delay=0)
+        return tmp
 
     @staticmethod
     def all(workflow=None, executioner=None):

@@ -787,7 +787,7 @@ class StatusDetail(mixins.CreateModelMixin,
             Retrieves a list of user assigned process tasks
         """
 
-        ptasks = ProcessTaskUser.all(finished=False).filter(processtask__process__hash=self.kwargs['phash'])\
+        ptasks = ProcessTaskUser.all().filter(processtask__process__hash=self.kwargs['phash'])\
             .order_by('processtask__deadline')
 
         return ptasks
