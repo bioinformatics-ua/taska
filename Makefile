@@ -10,7 +10,7 @@ run:
 
 run-dev:
 #	sh bin/clean_container_dev.sh && 
-	docker-compose -f docker-compose-dev.yml -p taskadev up
+	docker-compose -f docker-compose-dev.yml -p taskadev up -d
 
 stop:
 	docker-compose stop
