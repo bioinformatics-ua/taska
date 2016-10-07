@@ -36,6 +36,14 @@ module.exports = (
         <Route name="help" handler={require('./components/help.jsx')} />
 
         <Route name="about" handler={require('./components/about.jsx')} />
+       
+        <Route name="MyStudies" handler={require('./components/MyStudies.jsx')} />
+            
+        <Route name="StudieManagement" handler={require('./components/StudieManagement.jsx')} />
+            
+        <Route name="StudieTemplates" handler={require('./components/StudieTemplates.jsx')} />    
+            
+        <Route name="Forms" handler={require('./components/StudieForms.jsx')} />
 
         <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} >
             <Route name="WorkflowEdit" path=":mode" handler={Label} />

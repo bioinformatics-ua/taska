@@ -214,6 +214,7 @@ export default React.createClass({
         ResultActions.setAnswer(prop, val);
     },
     submitAnswer(e){
+        console.log("Clicked");
         if(this.validate())
             ResultActions.submitAnswer();
     },
@@ -278,6 +279,7 @@ export default React.createClass({
         TaskActions.preliminary(hash);
     },
     render() {
+        console.log(this.state.answer);
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;

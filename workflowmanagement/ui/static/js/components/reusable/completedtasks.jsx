@@ -39,7 +39,7 @@ const TaskType = React.createClass({
   },
   render: function(){
     const row = this.props.rowData.processtask;
-    return <span><i className={`fa fa-2x ${this.getIcon(row.type)}`}></i></span>;
+    return <span><i className={`fa ${this.getIcon(row.type)}`}></i></span>;
   }
 });
 
@@ -80,7 +80,7 @@ const CompletedTaskTable = React.createClass({
       "order": 3,
       "locked": false,
       "visible": true,
-      "displayName": "Process"
+      "displayName": "Studie"
       }
     ];
     return <Griddle

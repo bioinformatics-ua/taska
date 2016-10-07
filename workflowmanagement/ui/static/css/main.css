@@ -202,7 +202,19 @@ table {
 .status-td{
   width: 260px;
 }
+.task-repr-td{
+   width: 260px;
+}
+.process-repr-td{
+   width: 260px;
+}
+.process-executioner-td{
+  width: 130px;
+}
 .deadline-td{
+  width: 130px;
+}
+.start-date-td{
   width: 130px;
 }
 .table-prev{

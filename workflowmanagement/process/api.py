@@ -39,6 +39,8 @@ from wkhtmltopdf.views import PDFTemplateView, PDFTemplateResponse
 
 from django.conf import settings
 
+from itertools import chain
+
 
 @api_view(('GET',))
 def root(request, format=None):
@@ -739,12 +741,14 @@ class MyTasks(generics.ListAPIView):
             Retrieves a list of user assigned process tasks
         """
         ptasks = ProcessTaskUser.all(finished=False).filter(
-                Q(processtask__status=ProcessTask.RUNNING),
-                user=self.request.user,
-            ).order_by('processtask__deadline') #.values_list('processtask')
+            Q(processtask__status=ProcessTask.RUNNING),
+            user=self.request.user,
+        ).order_by('processtask__deadline')  # .values_list('processtask')
 
-        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        # return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+
         return ptasks
+
 
     @detail_route(methods=['get'])
     def getTaskName(self, request, hash=None):
@@ -757,6 +761,7 @@ class MyTasks(generics.ListAPIView):
             raise Http404
 
         return Response({"TaskName": "Not Found"})
+
 
 class StatusDetail(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
@@ -819,7 +824,8 @@ class StatusDetail(mixins.CreateModelMixin,
                 raise Http404
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class MyWaitingTasks(mixins.CreateModelMixin,
+
+class MyAllTasks(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
                      mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
@@ -848,12 +854,28 @@ class MyWaitingTasks(mixins.CreateModelMixin,
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=False).filter(
-                Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
-                user=self.request.user,
-            ).order_by('processtask__deadline') #.values_list('processtask')
+        #First get all that are waiting for anwser
+        ptasksWaiting = ProcessTaskUser.all(finished=False).filter(
+            Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
+            user=self.request.user,
+        ).order_by('processtask__deadline')
 
-        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
+        #Them get all that are running
+        ptasksRunning = ProcessTaskUser.all(finished=False).filter(
+            processtask__status=ProcessTask.RUNNING,
+            user=self.request.user,
+        ).order_by('processtask__deadline')
+
+        #Finally get all that are scheduled
+        ptasksFuture = ProcessTaskUser.all(finished=False).filter(
+            ~Q(status=ProcessTaskUser.REJECTED) &
+            Q(Q(
+                Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
+                Q(processtask__status=ProcessTask.WAITING)),
+            user=self.request.user,
+        ).order_by('processtask__deadline')
+
+        ptasks = list(chain(ptasksWaiting,ptasksRunning,ptasksFuture))
         return ptasks
 
     @list_route(methods=['post'])
@@ -988,9 +1010,8 @@ class MyFutureTasks(generics.ListAPIView):
                 Q(Q(Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
                   Q(processtask__status=ProcessTask.WAITING)),
                 user=self.request.user,
-            ).order_by('processtask__deadline') #.values_list('processtask')
+            ).order_by('processtask__deadline')
 
-        #return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
         return ptasks
 
 class MyTask(generics.RetrieveAPIView):

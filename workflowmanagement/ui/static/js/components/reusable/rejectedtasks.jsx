@@ -13,32 +13,6 @@ import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import moment from 'moment';
 
-const TaskDateEst = React.createClass({
-
-  renderMessage(deadline){
-    const now = moment()
-    const due = moment(deadline)
-
-    if(due.isBefore(now))
-      return <small className="pull-right text-danger">
-    <span className="warnicon">Waiting dep. </span>
-    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
-    </small>;
-
-    const diff = moment.duration(now.diff(due)).asDays();
-
-    if(diff < 7)
-      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
-
-    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
-  },
-  render(){
-    const row = this.props.rowData;
-
-    return this.renderMessage(row['start_date'])
-  }
-});
-
 const TaskDate = React.createClass({
 
   renderMessage(deadline){
@@ -46,17 +20,9 @@ const TaskDate = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <small className="pull-right text-danger">
-    <span className="warnicon">Waiting dep. </span>
-    <i title="You had accepted to complete this task, but the products you need to use for your task have not been completed yet. We are sorry for this. We are trying to solve this and will let you know as soon as you can start working on this task" className="task-overdue fa fa-2x fa-clock-o"></i>
-    </small>;
+      return <small className="pull-left text-danger"><span className="warnicon">{moment(deadline).fromNow()}<i className="task-overdue fa fa-exclamation-triangle animated infinite flash"></i></span> </small>;
 
-    const diff = moment.duration(now.diff(due)).asDays();
-
-    if(diff < 7)
-      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
-
-    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
+    return <small className="pull-left">{moment(deadline).fromNow()}</small>;
   },
   render(){
     const row = this.props.rowData;
@@ -91,7 +57,7 @@ const TaskType = React.createClass({
   },
   render: function(){
     const row = this.props.rowData.processtask;
-    return <span><i className={`fa fa-2x ${this.getIcon(row.type)}`}></i></span>;
+    return <span><i className={`fa ${this.getIcon(row.type)}`}></i></span>;
   }
 });
 
@@ -132,7 +98,7 @@ const RejectedTaskTable = React.createClass({
       "order": 3,
       "locked": false,
       "visible": true,
-      "displayName": "Process"
+      "displayName": "Studie"
       },
       {
       "columnName": "deadline",

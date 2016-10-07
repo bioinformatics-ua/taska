@@ -3,12 +3,12 @@ import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
-import TaskActions from '../../actions/TaskActions.jsx';
-import TaskStore from '../../stores/TaskStore.jsx';
+import AllTaskActions from '../../actions/AllTaskActions.jsx';
+import AllTaskStore from '../../stores/AllTaskStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton} from './component.jsx'
+import {Loading, AcceptButton, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import moment from 'moment';
@@ -23,15 +23,7 @@ const TaskDateEst = React.createClass({
     const now = moment()
     const due = moment(deadline)
 
-    if(due.isBefore(now))
-      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
-
-    const diff = moment.duration(now.diff(due)).asDays();
-
-    if(diff < 7)
-      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
-
-    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
+    return <small className="pull-left">{moment(deadline).fromNow()}</small>;
   },
   render(){
     const row = this.props.rowData;
@@ -47,14 +39,9 @@ const TaskDate = React.createClass({
     const due = moment(deadline)
 
     if(due.isBefore(now))
-      return <small className="pull-right text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="task-overdue fa fa-2x fa-exclamation-triangle animated infinite flash"></i></small>;
+      return <small className="pull-left text-danger"><span className="warnicon">{moment(deadline).fromNow()}<i className="task-overdue fa fa-exclamation-triangle animated infinite flash"></i></span> </small>;
 
-    const diff = moment.duration(now.diff(due)).asDays();
-
-    if(diff < 7)
-      return <small className="pull-right task-warning"><span className="warnicon">{moment(deadline).fromNow()}</span> <i className="fa fa-2x fa-exclamation-triangle"></i></small>;
-
-    return <small className="pull-right">{moment(deadline).fromNow()}</small>;
+    return <small className="pull-left">{moment(deadline).fromNow()}</small>;
   },
   render(){
     const row = this.props.rowData;
@@ -83,8 +70,11 @@ const TaskLink = React.createClass({
 });
 
 const TaskType = React.createClass({
-  getIcon(type){
-    switch(type){
+  getIcon(row){
+    if(row.processtask.status == 1 || (row.processtask.status == 7 && row.status == 2))
+        return 'glyphicon glyphicon-hourglass';//I dont know way fa-hourglass dont work, so i used this
+
+    switch(row.processtask.type){
       case 'tasks.SimpleTask':
         return 'fa-cube';
       case 'form.FormTask':
@@ -94,17 +84,42 @@ const TaskType = React.createClass({
     return 'fa-times-circle-o';
   },
   render: function(){
-    const row = this.props.rowData.processtask;
-    return <span><i className={`fa fa-2x ${this.getIcon(row.type)}`}></i></span>;
+    const row = this.props.rowData;
+    return <span><i className={`fa ${this.getIcon(row)}`}></i></span>;
+  }
+});
+
+const TaskAvailability = React.createClass({
+  accept(row){
+    AllTaskActions.accept(row.hash);
+  },
+  reject(row){
+    AllTaskActions.reject(row.hash);
+  },
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return ((row.processtask.status == 7 && row.status == 1) ?
+          <div className="btn-group" role="group" >
+            <AcceptButton
+              success={this.accept}
+              identificator = {row}
+              label={"Accept"}
+              extraCss={"btn-xs btn-success"} />
+            <AcceptButton
+              success={this.reject}
+              identificator = {row}
+              label={"Reject"}
+              extraCss={"btn-xs btn-danger"} />
+            </div>:<span></span>);
   }
 });
 
 
-
 const CurrentTaskTable = React.createClass({
-    tableAction: TaskActions.load,
-    tableStore: TaskStore,
-    mixins: [Reflux.listenTo(TaskStore, 'update'), TableComponentMixin],
+    tableAction: AllTaskActions.load,
+    tableStore: AllTaskStore,
+    mixins: [Reflux.listenTo(AllTaskStore, 'update'), TableComponentMixin],
     getInitialState: function() {
         return {};
     },
@@ -127,6 +142,7 @@ const CurrentTaskTable = React.createClass({
       "order": 2,
       "locked": false,
       "visible": true,
+      "cssClassName": 'task-repr-td',
       "customComponent": TaskLink,
       "displayName": "Title"
       },
@@ -135,32 +151,52 @@ const CurrentTaskTable = React.createClass({
       "order": 3,
       "locked": false,
       "visible": true,
-      "displayName": "Process"
+      "cssClassName": 'process-repr-td',
+      "displayName": "Studie"
       },
       {
-      "columnName": "start_date",
+      "columnName": "user_repr",
       "order": 4,
       "locked": true,
       "visible": true,
-      "cssClassName": 'start_date-td',
+      "cssClassName": 'process-executioner-td',
+      "displayName": "Manager"
+      },
+      {
+      "columnName": "start_date",
+      "order": 5,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'start-date-td',
       "customComponent": TaskDateEst,
-      "displayName": "Est. Start"
+      "displayName": "Start"
       },
       {
       "columnName": "deadline",
-      "order": 5,
+      "order": 6,
       "locked": true,
       "visible": true,
       "cssClassName": 'deadline-td',
       "customComponent": TaskDate,
       "displayName": "Deadline"
+      },
+      {
+      "columnName": "availability",
+      "order": 7,
+      "locked": true,
+      "visible": true,
+      "cssClassName": 'availability-td',
+      "customComponent": TaskAvailability,
+      "displayName": "Availability"
       }
     ];
     return <Griddle
                       noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
                       {...this.commonTableSettings()}
-                      columns={["type", "task_repr", "process_repr", "start_date", "deadline"]}
-                      columnMetadata={columnMeta} />
+                      enableInfiniteScroll={true}
+                      useFixedHeader={true}
+                      columns={["type", "task_repr", "process_repr", "start_date", "deadline", "availability"]}
+                      columnMetadata={columnMeta} />;
   }
 
 });

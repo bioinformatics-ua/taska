@@ -12,7 +12,7 @@ import api
 router = routers.DefaultRouter()
 router.register(r'/requests', api.RequestsViewSet)
 router.register(r'', api.ProcessViewSet)
-router.register(r'/my/waitingtasks', api.MyWaitingTasks)
+router.register(r'/my/alltasks', api.MyAllTasks)
 router.register(r'/my/statusdetail/(?P<phash>[^/.]+)', api.StatusDetail)
 
 # trick to add root to the router generated urls
@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     url(r'^/my/tasks/', api.MyTasks.as_view()),
 
     url(r'^/my/rejectedtasks/', api.MyRejectedTasks.as_view()),
-    url(r'^/my/waitingtasks/', api.MyWaitingTasks.as_view({'get': 'list'})),
+    url(r'^/my/alltasks/', api.MyAllTasks.as_view({'get': 'list'})),
     url(r'^/my/completedtasks/', api.MyCompletedTasks.as_view()),
     url(r'^/my/futuretasks/', api.MyFutureTasks.as_view()),
 

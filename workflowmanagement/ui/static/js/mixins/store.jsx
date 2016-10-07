@@ -67,6 +67,7 @@ class ListStoreMixin{
                 return this.__simplelistfailed;
             },
             onLoadSimpleList(page_size) {
+
                 if(page_size){
                     this.__page_size = page_size;
                 }

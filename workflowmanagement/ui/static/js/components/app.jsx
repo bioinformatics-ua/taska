@@ -219,16 +219,18 @@ export default React.createClass({
               </nav>
           </header>
           }
-          <div className="container">
+    <div className="container">
+            {/*
+            Descoment if you want site path visible on top of the page
             <AlertQueue />
             <Affix className={'breadbar'} offset={36}>
               <div className="row">
                   <div className="col-md-10 pull-left">
-                     <Breadcrumbs separator='' {...this.props} />
+                      <Breadcrumbs separator='' {...this.props} />
                   </div>
                   <LoadingBar />
               </div>
-            </Affix>
+            </Affix>*/}
             <RouteHandler key={name} headless={headless != undefined} {...this.props} />
           </div>
           <div className="container">

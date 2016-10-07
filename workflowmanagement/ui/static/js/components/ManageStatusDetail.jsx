@@ -4,7 +4,6 @@ import React from 'react/addons';
 import Reflux from 'reflux';
 
 import {StatusDetailTable} from './reusable/statusdetail.jsx';
-import {WaitingTaskTable} from './reusable/waitingtasks.jsx';
 import {ReassigningButton, ProcessLabel, ProcessDetailBar, PermissionsBar} from './reusable/component.jsx';
 
 import ProcessStore from '../stores/ProcessStore.jsx';

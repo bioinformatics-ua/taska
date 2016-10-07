@@ -2,6 +2,7 @@ import React from 'react';
 import UserStore from '../stores/UserStore.jsx';
 import {Login} from '../actions/api.jsx'
 import UserActions from '../actions/UserActions.jsx';
+import {getContentTableSize} from '../page_settings.jsx';
 
 import StateActions from '../actions/StateActions.jsx';
 import StateStore from '../stores/StateStore.jsx';
@@ -90,6 +91,8 @@ const TableComponentMixin = {
     },
     //what page is currently viewed
     setPage: function(index){
+        //console.log($('div:last').height($(window).height() - $('div:last').offset().top - 30));
+
       console.log(`Set page ${index}`);
       this.tableAction($.extend(this.getState(), {currentPage: index}), this.state.hash);
     },
@@ -135,7 +138,7 @@ const TableComponentMixin = {
             resultsPerPage:this.state.externalResultsPerPage,
             externalSortColumn:this.state.externalSortColumn,
             externalSortAscending:this.state.externalSortAscending,
-            bodyHeight:375,
+            bodyHeight:getContentTableSize(),
             tableClassName: "table table-striped",
             results: this.state.entries,
             useGriddleStyles: false,

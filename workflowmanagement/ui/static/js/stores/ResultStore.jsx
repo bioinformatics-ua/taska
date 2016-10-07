@@ -62,7 +62,6 @@ export default Reflux.createStore({
         return this.__rfinished || false;
     },
     onSubmitAnswer(){
-
         StateActions.alert(
         {
             'title':'Submit Answer',
