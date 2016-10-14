@@ -86,6 +86,8 @@ const CompletedTaskTable = React.createClass({
     return <Griddle
                       noDataMessage={<center>You currently have no completed tasks yet. This tasks are all the tasks that you have completed.</center>}
                       {...this.commonTableSettings()}
+                      enableInfiniteScroll={true}
+                      useFixedHeader={true}
                       columns={["type", "task_repr", "process_repr"]}
                       columnMetadata={columnMeta} />
   }

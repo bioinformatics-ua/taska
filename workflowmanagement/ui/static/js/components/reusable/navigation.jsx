@@ -49,8 +49,6 @@ var UserDropdown = React.createClass({
       return <span key="loggedout"></span>;
     }
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
-
-                    {/* DESCOMENTAR ISTO DEPOIS
                     <li className="dropdown">
                         <a href="#" className="dropdown-toggle boldit" data-toggle="dropdown" role="button" aria-expanded="false">
                             <i className="fa fa-list-alt"></i> VIEW <span className="caret"></span>
@@ -64,13 +62,7 @@ var UserDropdown = React.createClass({
                             </li>
                         </ul>
 
-                    </li>*/}
-
-                    {/* Delete this in the next version*/}
-                    <li>
-                        <Tab to='default' className="boldit"><i className="fa fa-home"></i> HOME</Tab>
                     </li>
-
         
                     <li className="dropdown">
                         <a href="#" className="dropdown-toggle boldit" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -89,7 +81,7 @@ var UserDropdown = React.createClass({
 
                             {/* Delete this in the next version*/}
                             <li>
-                                <Tab to='MyStudies' className="boldit">Study Requests</Tab>
+                                <Tab to='StudyRequests' className="boldit">Study Requests</Tab>
                             </li>
 
                         </ul>

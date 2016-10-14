@@ -11,8 +11,7 @@ const AllTaskActions = Reflux.createActions(
     'load': {},
     'preliminary': {},
     'accept':{},
-    'reject':{},
-    'calibrate':{}
+    'reject':{}
     }, DetailActionsMixin));
 
 export default AllTaskActions;

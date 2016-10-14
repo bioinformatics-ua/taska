@@ -11,13 +11,14 @@ import {depmap} from '../map.jsx';
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 import {ListLoader, DetailLoader} from '../actions/api.jsx'
 
-let loader = new ListLoader({model: 'process/my/rejectedtasks'});
+let loader = new ListLoader({model: 'process/my/rejectedtasks', dontrepeat: true});
 
 export default Reflux.createStore({
     statics: {
         DETAIL: 0,
         LIST: 1
     },
+    merge: true,
     mixins: [TableStoreMixin, Reflux.connect(ResultStore, "dummy"),
         DetailStoreMixin.factory(
             new DetailLoader({model: 'process/my/rejectedtask'}),
@@ -27,11 +28,19 @@ export default Reflux.createStore({
     ],
     listenables: [RejectedTaskActions],
     load: function (state) {
+        if(state.currentPage == 0 )
+            this.reload(state);
+
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);
             RejectedTaskActions.loadSuccess(data);
         }, state);
+    },
+    reload(state){
+        this.__list = [];
+        state.currentPage = 0;
+        state.reload = true;
     },
     dummy(s){},
     init(){

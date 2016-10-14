@@ -62,11 +62,10 @@ class ListLoader extends Loader{
         this.__loaded = {};
         this.model = options.model;
         this.dontrepeat = options.dontrepeat || false;
-
     }
 
     load(callback, state){
-        if(!this.dontrepeat || this.__loaded[state.currentPage] === undefined){
+        if(!this.dontrepeat || this.__loaded[state.currentPage] === undefined || (this.dontrepeat && !(state.reload === undefined))){
                 this.__loaded[state.currentPage] = true;
 
                 let order = (state.externalSortAscending)? '':'-';

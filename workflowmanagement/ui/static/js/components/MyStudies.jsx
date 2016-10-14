@@ -3,12 +3,7 @@ import Router from 'react-router';
 import React from 'react/addons';
 import Reflux from 'reflux';
 
-import {GeneralHistoryTable} from './reusable/history.jsx';
-import {WorkflowTable} from './reusable/workflow.jsx';
-import {ProcessTable} from './reusable/process.jsx';
-import {RequestTable} from './reusable/request.jsx';
-import {TaskTabber} from './reusable/task.jsx';
-import {FormTable} from './reusable/form.jsx';
+import {MyStudiesTable} from './reusable/mystudies.jsx';
 
 import UserStore from '../stores/UserStore.jsx';
 
@@ -32,14 +27,11 @@ const LoggedInHome = React.createClass({
     return this.__getState();
   },
   render: function(){
-
-      //THIS IS ALL TEMPORARY
     return (<span>
           <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
-                <RequestTable />
+                <MyStudiesTable />
               </div>
-
           </div>
 
       </span>);

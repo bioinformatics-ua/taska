@@ -502,6 +502,8 @@ class ProcessTaskUser(models.Model):
         else:
             tmp = ProcessTaskUser.objects.all()
 
+        tmp = tmp.filter(processtask__process__removed=False)
+
         if reassigned != None:
             tmp = tmp.filter(reassigned=reassigned)
 

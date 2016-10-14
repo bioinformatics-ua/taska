@@ -7,36 +7,51 @@ from django.conf.urls import patterns, include, url
 from rest_framework import routers
 
 
-import api
+from views.RequestsViewSet import RequestsViewSet
+from views.ProcessViewSet import ProcessViewSet
+from views.MyAllTasks import MyAllTasks
+from views.StatusDetail import StatusDetail
+from views.MyTasks import MyTasks
+from views.MyRejectedTasks import MyRejectedTasks
+from views.MyAllTasks import MyAllTasks
+from views.MyCompletedTasks import MyCompletedTasks
+from views.MyFutureTasks  import MyFutureTasks
+from views.MyTaskDependencies import MyTaskDependencies
+from views.MyTaskPreliminary import MyTaskPreliminary
+from views.MyTask import MyTask
+from views.ResultsPDF import ResultsPDF
+from views.ProcessTaskResultExport import ProcessTaskResultExport
+from views.MyStudies import MyStudies
 
 router = routers.DefaultRouter()
-router.register(r'/requests', api.RequestsViewSet)
-router.register(r'', api.ProcessViewSet)
-router.register(r'/my/alltasks', api.MyAllTasks)
-router.register(r'/my/statusdetail/(?P<phash>[^/.]+)', api.StatusDetail)
+router.register(r'/requests',RequestsViewSet)
+router.register(r'', ProcessViewSet)
+router.register(r'/my/alltasks', MyAllTasks)
+router.register(r'/my/statusdetail/(?P<phash>[^/.]+)', StatusDetail)
 
 # trick to add root to the router generated urls
 router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
-    url(r'^/my/tasks/', api.MyTasks.as_view()),
+    url(r'^/my/tasks/', MyTasks.as_view()),
 
-    url(r'^/my/rejectedtasks/', api.MyRejectedTasks.as_view()),
-    url(r'^/my/alltasks/', api.MyAllTasks.as_view({'get': 'list'})),
-    url(r'^/my/completedtasks/', api.MyCompletedTasks.as_view()),
-    url(r'^/my/futuretasks/', api.MyFutureTasks.as_view()),
+    url(r'^/my/rejectedtasks/', MyRejectedTasks.as_view()),
+    url(r'^/my/alltasks/', MyAllTasks.as_view({'get': 'list'})),
+    url(r'^/my/completedtasks/', MyCompletedTasks.as_view()),
+    url(r'^/my/studies/', MyStudies.as_view()),
+    url(r'^/my/futuretasks/', MyFutureTasks.as_view()),
 
     #url(r'^/my/statusdetail/(?P<hash>[^/.]+)/', api.StatusDetail.as_view({'get': 'list'})),
 
-    url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', api.MyTaskDependencies.as_view()),
-    url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', api.MyTaskPreliminary.as_view()),
-    url(r'^/my/task/(?P<hash>[^/.]+)/', api.MyTask.as_view()),
+    url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', MyTaskDependencies.as_view()),
+    url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', MyTaskPreliminary.as_view()),
+    url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view()),
 
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/pdf?$'
-        , api.ResultsPDF.as_view(), name='resultspdf'),
+        , ResultsPDF.as_view(), name='resultspdf'),
 
-    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', api.ProcessTaskResultExport.as_view()),
+    url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/(?P<mode>[0-9a-zA-Z]+)?$', ProcessTaskResultExport.as_view()),
 
     #url(r'^/ptu/(?P<hash>[0-9a-zA-Z]+)/redo$', api.ProcessTaskUserRedo.as_view()),
 

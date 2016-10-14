@@ -15,7 +15,7 @@ import moment from 'moment';
 
 import Tabs from 'react-simpletabs';
 
-import {getTableSize} from '../../page_settings.jsx';
+import {getTableSizeWithTabs} from '../../page_settings.jsx';
 
 import {CurrentTaskTable} from './currenttasks.jsx';
 import {CompletedTaskTable} from './completedtasks.jsx';
@@ -29,7 +29,7 @@ const TaskTabber = React.createClass({
         this.setState(this.getState());
     },
   render: function () {
-      let pageSize = getTableSize()+'px';
+      let pageSize = getTableSizeWithTabs()+'px';
     return  <div  style={{height: pageSize}} className="panel panel-default panel-overflow">
               <div className="panel-heading">
                 <i className="fa fa-tasks pull-left"></i>

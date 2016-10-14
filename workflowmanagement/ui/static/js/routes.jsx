@@ -39,6 +39,8 @@ module.exports = (
        
         <Route name="MyStudies" handler={require('./components/MyStudies.jsx')} />
             
+        <Route name="StudyRequests" handler={require('./components/StudyRequests.jsx')} />
+            
         <Route name="StudieManagement" handler={require('./components/StudieManagement.jsx')} />
             
         <Route name="StudieTemplates" handler={require('./components/StudieTemplates.jsx')} />    

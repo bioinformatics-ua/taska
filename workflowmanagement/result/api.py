@@ -22,8 +22,6 @@ from django.apps import apps
 
 from material.api import GenericResourceSerializer
 
-from process.api import MyProcessTaskUserDetailSerializer
-
 class GenericResultSerializer(serializers.ModelSerializer):
     type = serializers.CharField(write_only=True)
 
@@ -65,7 +63,7 @@ class GenericResultSerializer(serializers.ModelSerializer):
         model = Result
 
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class ResultSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     process = serializers.CharField(max_length=50)

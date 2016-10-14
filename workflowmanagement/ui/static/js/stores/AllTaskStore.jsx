@@ -29,9 +29,8 @@ export default Reflux.createStore({
     ],
     listenables: [AllTaskActions],
     load: function (state) {
-        console.log("load waiting");
-        console.log(state);
-        console.log(this);
+        if(state.currentPage == 0 )
+            this.reload(state);
 
         let self = this;
         loader.load(function(data){
@@ -40,12 +39,15 @@ export default Reflux.createStore({
         }, state);
     },
     dummy(s){},
-    onCalibrate(){
-    },
     init(){
         this.answer = {};
         this.dversion = 0;
         this.v=1;
+    },
+    reload(state){
+        this.__list = [];
+        state.currentPage = 0;
+        state.reload = true;
     },
     onAccept(ptuhash){
         this.onMethodDetail('accept',
@@ -57,8 +59,8 @@ export default Reflux.createStore({
             (data) => {
                 this.__detaildata = data;
                 this.__v++;
-                console.log("Current");
-                console.log(this.__current);
+
+                this.reload(this.__current);
                 this.load(this.__current);
                 this.trigger(this.DETAIL);
             }
@@ -75,6 +77,7 @@ export default Reflux.createStore({
                 this.__detaildata = data;
                 this.__v++;
 
+                this.reload(this.__current);
                 this.load(this.__current);
                 this.trigger(this.DETAIL);
             }

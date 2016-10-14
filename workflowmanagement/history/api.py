@@ -39,7 +39,7 @@ class GenericObjectField(serializers.RelatedField):
             except:
                 return "DUMMY"
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class HistorySerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`history.models.History` objects serialization/deserialization.
 
