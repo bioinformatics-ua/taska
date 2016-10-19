@@ -79,6 +79,38 @@ export default Reflux.createStore({
 
         return this.task_repr;
     },
+    onAccept(ptuhash){
+        this.onMethodDetail('accept',
+                            null,
+                            'POST', {
+                                ptuhash: ptuhash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.load(this.__current);
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onReject(ptuhash){
+        this.onMethodDetail('reject',
+                            null,
+                            'POST', {
+                                ptuhash: ptuhash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.load(this.__current);
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
     getDepVersion(){
         return this.dversion;
     }

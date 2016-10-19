@@ -166,7 +166,7 @@ const StatusDetailTable = React.createClass({
         <div>
           <Griddle
                       noDataMessage={<center>Something is wrong with this study! Please contact the administrator</center>}
-                      {...this.commonTableSettings()}
+                      {...this.commonTableSettings(false)}
                       columns={["type", "task_repr", "user_repr", "status","reassigning"]}
                       columnMetadata={columnMeta} />
         </div>

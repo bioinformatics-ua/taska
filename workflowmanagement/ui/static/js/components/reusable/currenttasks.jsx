@@ -8,7 +8,7 @@ import AllTaskStore from '../../stores/AllTaskStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, AcceptButton, DeleteButton} from './component.jsx'
+import {Loading, AcceptRejectButton, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 import moment from 'moment';
@@ -101,16 +101,18 @@ const TaskAvailability = React.createClass({
     const object = {object: row.hash}
     return ((row.processtask.status == 7 && row.status == 1) ?
           <div className="btn-group" role="group" >
-            <AcceptButton
+            <AcceptRejectButton
               success={this.accept}
               identificator = {row}
               label={"Accept"}
               extraCss={"btn-xs btn-success"} />
-            <AcceptButton
+            <AcceptRejectButton
               success={this.reject}
               identificator = {row}
               label={"Reject"}
-              extraCss={"btn-xs btn-danger"} />
+              extraCss={"btn-xs btn-danger"} 
+              title={`Reject '${row["task_repr"]}'`}
+              message={`Are you sure you want to reject the task '${row["task_repr"]}' ?'`}/>
             </div>:<span></span>);
   }
 });
@@ -192,7 +194,7 @@ const CurrentTaskTable = React.createClass({
     ];
     return <Griddle
                       noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
-                      {...this.commonTableSettings()}
+                      {...this.commonTableSettings(true)}
                       enableInfiniteScroll={true}
                       useFixedHeader={true}
                       columns={["type", "task_repr", "process_repr", "start_date", "deadline", "availability"]}

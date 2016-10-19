@@ -217,6 +217,19 @@ table {
 .start-date-td{
   width: 130px;
 }
+.mystudies-process-title-td{
+    width: 800px;
+}
+.mystudies-start-date-td{
+    width: 130px;
+}
+.mystudies-progress-td{
+    text-align: center;
+}
+.mystudies-status-td{
+
+}
+
 .table-prev{
     display: inline-block;
 }

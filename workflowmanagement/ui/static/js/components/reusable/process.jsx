@@ -8,7 +8,7 @@ import ProcessStore from '../../stores/ProcessStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton, AcceptButton, PermissionsBar, ProcessStatus} from './component.jsx'
+import {Loading, DeleteButton, PermissionsBar, ProcessStatus} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const ProcessManage = React.createClass({
@@ -136,13 +136,14 @@ const ProcessTable = React.createClass({
       "displayName": " "
       }
     ];
+
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies</h3></center>
+                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies (which I own) </h3></center>
               </div>
               <Griddle
                   noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
-                  {...this.commonTableSettings()}
+                  {...this.commonTableSettings(false)}
                   columns={["object_repr","start_date", 'progress', 'status', "link_status", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;

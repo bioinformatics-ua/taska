@@ -242,7 +242,7 @@ const DeleteButton = React.createClass({
   // }}}
 });
 
-const AcceptButton = React.createClass({
+const AcceptRejectButton = React.createClass({
   mixins: [LayeredComponentMixin],
     success(e){
       this.props.success(this.props.identificator);
@@ -254,11 +254,13 @@ const AcceptButton = React.createClass({
       };
     },
     render: function() {
-        return <button className={`btn ${this.props.extraCss}`} onClick={this.success}>{this.props.label}</button>;
+        return <button style={this.props.extraStyle} className={`btn ${this.props.extraCss}`} onClick={this.props.message != undefined ? this.handleClick: this.success}>{this.props.label}</button>;
     },
     renderLayer: function() {
+        if (this.state.clicked && this.props.message != undefined)
+            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        else
             return <span />;
-
     },
     // {{{
     handleClose: function() {
@@ -730,6 +732,6 @@ const ProcessDetailBar = React.createClass({
 });
 
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptRejectButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
 
 

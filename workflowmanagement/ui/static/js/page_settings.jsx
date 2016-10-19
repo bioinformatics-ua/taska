@@ -7,8 +7,12 @@ const getTableSizeWithTabs = function () {
     return height;
 }
 
-const getContentTableSize = function () {
+const getContentTableSizeWithTabs = function () {
     return getTableSizeWithTabs()-125; //Try to change this 125 for variables
 }
 
-export default {getTableSizeWithTabs, getContentTableSize};
+const getContentTableSize = function () {
+    return getTableSizeWithTabs()-80; //Try to change this 125 for variables
+}
+
+export default {getTableSizeWithTabs, getContentTableSizeWithTabs, getContentTableSize};

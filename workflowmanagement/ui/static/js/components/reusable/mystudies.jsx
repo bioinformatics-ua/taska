@@ -3,52 +3,59 @@ import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
-import CompletedTaskActions from '../../actions/CompletedTaskActions.jsx';
-import CompletedTaskStore from '../../stores/CompletedTaskStore.jsx';
+import MyStudiesActions from '../../actions/MyStudiesActions.jsx';
+import MyStudiesStore from '../../stores/MyStudiesStore.jsx';
 
 import Griddle from 'griddle-react';
 
-import {Loading, DeleteButton} from './component.jsx'
+import {ProcessStatus} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
+
+import {getTableSizeWithTabs} from '../../page_settings.jsx';
+
+import Tabs from 'react-simpletabs';
 
 import moment from 'moment';
 
-const TaskLink = React.createClass({
+
+const ProcessProgress = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    return <center><div className="progress progressbar-process">
+              <div className="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                aria-valuenow={row.progress} aria-valuemin="0"
+                aria-valuemax="100" style={{width: `${row.progress}%`}}>
+                <span className="sr-only">{row.progress}% Complete</span>
+              </div>
+            </div></center>;
+  }
+});
+
+const ProcessStatusDetail = React.createClass({
   render: function(){
     const row = this.props.rowData;
     const object = {object: row.hash}
-    return <small title={row.process}>
-            <Link id={`task_${row.hash}`}
-              key={row.hash} to={this.props.rowData.type}
-               params={object}>{this.props.rowData.task_repr}</Link><br />
 
+      return(<small>
+                <ProcessStatus rowData={this.props.rowData} />
+                </small>);
+  }
+});
+
+const ProcessLink = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash + '/showOnly'}
+    return <small>
+            <Link to="Process" params={object}>{row.title || row.object_repr}</Link>
            </small>;
   }
 });
 
-const TaskType = React.createClass({
-  getIcon(type){
-    switch(type){
-      case 'tasks.SimpleTask':
-        return 'fa-cube';
-      case 'form.FormTask':
-        return 'fa-list-ul';
-    }
-
-    return 'fa-times-circle-o';
-  },
-  render: function(){
-    const row = this.props.rowData.processtask;
-    return <span><i className={`fa ${this.getIcon(row.type)}`}></i></span>;
-  }
-});
-
-
-
 const MyStudiesTable = React.createClass({
-    tableAction: CompletedTaskActions.load,
-    tableStore: CompletedTaskStore,
-    mixins: [Reflux.listenTo(CompletedTaskStore, 'update'), TableComponentMixin],
+    tableAction: MyStudiesActions.load,
+    tableStore: MyStudiesStore,
+    mixins: [Reflux.listenTo(MyStudiesStore, 'update'), TableComponentMixin],
     getInitialState: function() {
         return {};
     },
@@ -59,45 +66,49 @@ const MyStudiesTable = React.createClass({
 
     const columnMeta = [
       {
-      "columnName": "type",
+      "columnName": "object_repr",
       "order": 1,
       "locked": false,
       "visible": true,
-      "customComponent": TaskType,
-      "displayName": "Type",
-      "cssClassName": 'type-td',
-      },
-      {
-      "columnName": "task_repr",
-      "order": 2,
-      "locked": false,
-      "visible": true,
-      "customComponent": TaskLink,
+      "customComponent": ProcessLink,
+      "cssClassName": "mystudies-process-title-td",
       "displayName": "Title"
       },
       {
-      "columnName": "process_repr",
-      "order": 3,
+      "columnName": "start_date",
+      "order": 2,
       "locked": false,
       "visible": true,
-      "displayName": "Studie"
+      "cssClassName": "mystudies-start-date-td",
+      "displayName": "Start Date"
+      },
+      {
+      "columnName": "progress",
+      "order": 3,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessProgress,
+      "cssClassName": "mystudies-progress-td",
+      "displayName": "Progress"
+      },
+      {
+      "columnName": "status",
+      "order": 4,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessStatusDetail,
+      "cssClassName": "mystudies-status-td",
+      "displayName": "Status"
       }
     ];
-    return <div className="panel panel-default panel-overflow">
-                <div className="panel-heading">
-                  <center>
-                    <i className="fa fa-cogs pull-left"></i>
-                    <h3 className="panel-title"> Studies that I participate</h3>
-                  </center>
-                </div>
-                <Griddle
-                      noDataMessage={<center>You currently have no studies assignee to you yet. This studies are all the studies that you are envolved.</center>}
-                      {...this.commonTableSettings()}
-                      enableInfiniteScroll={true}
-                      useFixedHeader={true}
-                      columns={["type", "task_repr", "process_repr"]}
-                      columnMetadata={columnMeta} />
-              </div>;
+
+      return <Griddle
+          noDataMessage={<center>You currently have no studies assignee to you yet. This studies are all the studies that you are envolved.</center>}
+          {...this.commonTableSettings(true)}
+          enableInfiniteScroll={true}
+          useFixedHeader={true}
+          columns={["object_repr","start_date", 'progress', 'status']}
+          columnMetadata={columnMeta}/>;
 
   }
 

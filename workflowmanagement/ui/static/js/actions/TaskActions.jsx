@@ -9,7 +9,9 @@ const TaskActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
     'load': {},
-    'preliminary': {}
+    'preliminary': {},
+    'accept':{},
+    'reject':{}
     }, DetailActionsMixin));
 
 export default TaskActions;

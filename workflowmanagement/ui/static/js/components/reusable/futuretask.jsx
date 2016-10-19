@@ -156,7 +156,7 @@ const FutureTaskTable = React.createClass({
     ];
     return <Griddle
                       noDataMessage={<center>You currently have no future tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
-                      {...this.commonTableSettings()}
+                      {...this.commonTableSettings(true)}
                       columns={["type", "task_repr", "process_repr", "start_date", "deadline"]}
                       columnMetadata={columnMeta} />
   }

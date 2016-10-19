@@ -2,7 +2,7 @@ const TableStoreMixin = {
     init: function () {
         this.__list = [];
         this.__page = 0;
-        this.__page_size = 20;
+        this.__page_size = 13;
         this.__max_page = 0;
         this.__count = 0;
         this.__sortcolumn = null;

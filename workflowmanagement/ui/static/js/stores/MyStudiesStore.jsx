@@ -25,7 +25,7 @@ export default Reflux.createStore({
             MyStudiesActions
         )
     ],
-    listenables: [AllTaskActions],
+    listenables: [MyStudiesActions],
     load: function (state) {
         if(state.currentPage == 0 )
             this.reload(state);

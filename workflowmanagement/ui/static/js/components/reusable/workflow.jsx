@@ -115,7 +115,7 @@ const WorkflowTable = React.createClass({
               </div>
               <Griddle
                   noDataMessage={<center>You have not created any study templates yet, click on the plus icon above to create a new study template.</center>}
-                  {...this.commonTableSettings()}
+                  {...this.commonTableSettings(false)}
                   columns={["title", "owner_repr", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;

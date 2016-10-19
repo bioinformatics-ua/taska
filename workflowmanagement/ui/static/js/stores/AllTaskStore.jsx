@@ -31,7 +31,7 @@ export default Reflux.createStore({
     load: function (state) {
         if(state.currentPage == 0 )
             this.reload(state);
-
+        
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);

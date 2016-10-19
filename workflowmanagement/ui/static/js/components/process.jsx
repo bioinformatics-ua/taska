@@ -134,7 +134,6 @@ export default React.createClass({
             this.context.router.replaceWith('/404');
 
         let [sm, checksum] = this.state.workflowrepr;
-
         return (
             <span>
                 <StateMachineComponent key={'process'+params.mode+checksum}
@@ -190,8 +189,8 @@ export default React.createClass({
                                 status={this.state.process.status}
                                 progress={this.state.process.progress}/>
                             
-                            <ProcessLabel 
-                                linkStatusDetails={<small><Link to="StatusDetail" params={{object: params.object}}>Show assignees</Link></small>}
+                            <ProcessLabel
+                                linkStatusDetails={params.mode === 'showOnly' ? '':<small><Link to="StatusDetail" params={{object: params.object}}>Show assignees</Link></small>}
                             />
 
                         </span>

@@ -65,6 +65,9 @@ class ListLoader extends Loader{
     }
 
     load(callback, state){
+        if(state.reload == true)
+            this.__loaded = {};
+
         if(!this.dontrepeat || this.__loaded[state.currentPage] === undefined || (this.dontrepeat && !(state.reload === undefined))){
                 this.__loaded[state.currentPage] = true;
 

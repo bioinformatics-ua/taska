@@ -38,7 +38,9 @@ class ProcessViewSet(mixins.CreateModelMixin,
     }
 
     ordering_fields = ('workflow', 'hash', 'start_date', 'end_date', 'status', 'executioner', 'object_repr')
-
+    #paginate_by = 5
+    #paginate_by_param = 'page_size'
+    #max_paginate_by = 100
 
     def get_queryset(self):
         return Process.all(executioner=self.request.user)
@@ -94,6 +96,24 @@ class ProcessViewSet(mixins.CreateModelMixin,
         History.new(event=History.ACCESS, actor=request.user, object=instance)
 
         return Response(ProcessSerializer(instance).data)
+
+    def get_object(self):
+        """
+        Overrided
+        """
+        obj = None
+        try:
+            obj = Process.objects.get(
+                hash=self.kwargs['hash']
+            )
+        except Process.DoesNotExist:
+            pass
+        print obj
+        if obj == None:
+            raise Http404('No object')
+
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
     @transaction.atomic

@@ -72,16 +72,12 @@ class MyAllTasks(mixins.CreateModelMixin,
         hashField = request.data['ptuhash']
 
         obj = None
-        process =None
         try:
             obj = ProcessTaskUser.all().get(
                 hash=hashField,
                 user=self.request.user
             )
             obj.accept()
-            process = Process.all().get(
-                processtask__processtaskuser__hash=hashField
-            )
         except ProcessTaskUser.DoesNotExist:
             raise Http404
 
@@ -92,16 +88,12 @@ class MyAllTasks(mixins.CreateModelMixin,
         hashField = request.data['ptuhash']
 
         obj = None
-        process = None
         try:
             obj = ProcessTaskUser.all().get(
                 hash=hashField,
                 user=self.request.user
             )
             obj.reject()
-            process = Process.all().get(
-                processtask__processtaskuser__hash=hashField
-            )
         except ProcessTaskUser.DoesNotExist:
             raise Http404
 
