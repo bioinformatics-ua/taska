@@ -87,11 +87,8 @@ export default Reflux.createStore({
                             })
             .then(
             (data) => {
-                this.__detaildata = data;
-                this.__v++;
-
-                this.load(this.__current);
-                this.trigger(this.DETAIL);
+                this.dversion++;
+                this.trigger(this.DETAIL, true);
             }
         );
     },
@@ -103,11 +100,8 @@ export default Reflux.createStore({
                             })
             .then(
             (data) => {
-                this.__detaildata = data;
-                this.__v++;
-
-                this.load(this.__current);
-                this.trigger(this.DETAIL);
+                this.dversion++;
+                this.trigger(this.DETAIL, true);
             }
         );
     },

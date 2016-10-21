@@ -6,12 +6,18 @@ from process.serializers.MyProcessTaskUserDetailSerializer import  MyProcessTask
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status, filters, views
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from django.http import Http404
 
 
-class MyTask(generics.RetrieveAPIView):
+class MyTask(mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin,
+                     viewsets.GenericViewSet):
+
+    #generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()
     serializer_class = MyProcessTaskUserDetailSerializer
     filter_backends = (filters.DjangoFilterBackend,)
@@ -27,8 +33,8 @@ class MyTask(generics.RetrieveAPIView):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    @list_route(methods=['post'])
-    def accept(self, request):
+    @detail_route(methods=['post'])
+    def accept(self, request, hash=None):
         hashField = request.data['ptuhash']
 
         obj = None
@@ -43,8 +49,8 @@ class MyTask(generics.RetrieveAPIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @list_route(methods=['post'])
-    def reject(self, request):
+    @detail_route(methods=['post'])
+    def reject(self, request, hash=None):
         hashField = request.data['ptuhash']
 
         obj = None

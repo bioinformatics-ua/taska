@@ -49,7 +49,7 @@ urlpatterns = patterns('',
 
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', MyTaskDependencies.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', MyTaskPreliminary.as_view()),
-    url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view()),
+    url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view({'get':'retrieve', 'post':'accept', 'post':'reject'})),
     #url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view()),
 
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/pdf?$'
