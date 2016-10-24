@@ -133,7 +133,8 @@ export default React.createClass({
             saved: ResultStore.answerSaved(),
             user: UserStore.getUser(),
             task: TaskStore.getDetail(),
-            dversion: TaskStore.getDepVersion()
+            dversion: TaskStore.getDepVersion(),
+            comment: ""
         };
         return tmp;
     },
@@ -284,10 +285,12 @@ export default React.createClass({
     },
     reject(){
       let hash = this.context.router.getCurrentParams().object;
-      TaskActions.reject(hash);
+      TaskActions.reject(hash, this.state.comment);
+    },
+    handleFieldChange: function(value) {
+        this.setState({comment: value});
     },
     render() {
-        console.log(this.state);
         if(this.props.failed){
             let Failed = this.props.failed;
             return <Failed />;
@@ -412,7 +415,9 @@ export default React.createClass({
                                                       extraCss={"btn-danger "}
                                                       extraStyle={{width:'50%'}}
                                                       title={`Reject '${this.state.task["task_repr"]}'`}
-                                                      message={`Are you sure you want to reject the task '${this.state.task["task_repr"]}' ?'`}/>
+                                                      message={`Are you sure you want to reject the task '${this.state.task["task_repr"]}' ?'`}
+                                                      onChange={this.handleFieldChange}
+                                                      comment={this.state.comment} />
                                                     </div> :''}</span>
                                         <Link to="RequestAdd" params={{
                                             object: 'add',

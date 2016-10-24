@@ -59,7 +59,7 @@ class MyTask(mixins.CreateModelMixin,
                 hash=hashField,
                 user=self.request.user
             )
-            obj.reject()
+            obj.reject(request.data['comment'])
         except ProcessTaskUser.DoesNotExist:
             raise Http404
 

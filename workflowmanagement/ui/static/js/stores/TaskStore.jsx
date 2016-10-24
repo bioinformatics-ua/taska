@@ -92,11 +92,12 @@ export default Reflux.createStore({
             }
         );
     },
-    onReject(ptuhash){
+    onReject(ptuhash, comment){
         this.onMethodDetail('reject',
                             null,
                             'POST', {
-                                ptuhash: ptuhash
+                                ptuhash: ptuhash,
+                                comment: comment
                             })
             .then(
             (data) => {

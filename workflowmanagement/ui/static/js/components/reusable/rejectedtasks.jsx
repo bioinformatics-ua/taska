@@ -91,6 +91,7 @@ const RejectedTaskTable = React.createClass({
       "locked": false,
       "visible": true,
       "customComponent": TaskLink,
+      "cssClassName": 'task-repr-td',
       "displayName": "Title"
       },
       {
@@ -98,14 +99,15 @@ const RejectedTaskTable = React.createClass({
       "order": 3,
       "locked": false,
       "visible": true,
+      "cssClassName": 'process-repr-td',
       "displayName": "Studie"
       },
       {
       "columnName": "deadline",
-      "order": 5,
+      "order": 4,
       "locked": true,
       "visible": true,
-      "cssClassName": 'deadline-td',
+      "cssClassName": 'rejecteddeadline-td',
       "customComponent": TaskDate,
       "displayName": "Deadline"
       }

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from utils import mailing
 from tasks import sendEmail
 
-from process.models import Process, ProcessTask, Request
+from process.models import Process, ProcessTask, Request, ProcessTaskUser
 
 #@receiver(History.before_send)
 #def newHistoryBeforeNotifications(sender, instance, **kwargs):
@@ -57,9 +57,13 @@ def newHistoryNotifications(sender, instance, **kwargs):
                 elif(instance.actor == instance.object.processtaskuser.processtask.process.executioner):
                     tci = tc(instance, [instance.object.processtaskuser.user])
 
+            # When is a processtaskuser instance
+            if isinstance(instance.object, ProcessTaskUser):
+                if (instance.event == History.REJECT):
+                    tci = tc(instance, [instance.object.processtask.process.executioner])
 
-            sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
-            #sendEmail(tci) #Comentar esta
+            #sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
+            sendEmail(tci) #Comentar esta
 
         except AttributeError as e:
             # Silently ignore, when the template is not defined we just don't send the notification

@@ -72,6 +72,7 @@ const CompletedTaskTable = React.createClass({
       "order": 2,
       "locked": false,
       "visible": true,
+      "cssClassName": 'complete-process-repr-td',
       "customComponent": TaskLink,
       "displayName": "Title"
       },
@@ -80,6 +81,7 @@ const CompletedTaskTable = React.createClass({
       "order": 3,
       "locked": false,
       "visible": true,
+      "cssClassName": 'complete-process-repr-td',
       "displayName": "Studie"
       }
     ];

@@ -52,6 +52,7 @@ class History(models.Model):
     LATE            = 10
     RUN             = 11
     REMAINDER       = 12
+    REJECT          = 13
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -65,12 +66,14 @@ class History(models.Model):
             (RECOVER,   'Recover'),
             (LATE,      'Late'),
             (RUN,       'Run'),
-            (REMAINDER, 'Remainder')
+            (REMAINDER, 'Remainder'),
+            (REJECT,    'Reject')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
     actor           = models.ForeignKey(User)
     date            = models.DateTimeField(auto_now_add=True)
+    observations    = models.CharField(max_length=2000, default="")
 
     # generic foreign key that refers to the object related to this action
     object_type     = models.ForeignKey(ContentType)
@@ -118,11 +121,14 @@ class History(models.Model):
 
 
     @classmethod
-    def new(self, event, actor, object, authorized=None, related=None):
+    def new(self, event, actor, object, observations=None, authorized=None, related=None):
         """
         Generates a new generic history object
         """
-        action = History(event=event, actor=actor, object=object)
+        if(observations!= None):
+            action = History(event=event, actor=actor, object=object, observations=observations)
+        else:
+            action = History(event=event, actor=actor, object=object, observations="")
 
         action.save()
 

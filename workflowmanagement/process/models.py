@@ -483,9 +483,10 @@ class ProcessTaskUser(models.Model):
         self.processtask.refreshState()
         self.processtask.move()
 
-    def reject(self):
+    def reject(self, comment):
         self.status=ProcessTaskUser.REJECTED
         self.save()
+        History.new(event=History.REJECT, actor=self.user, object=self, observations=comment)
 
         self.processtask.refreshState()
         self.processtask.move()

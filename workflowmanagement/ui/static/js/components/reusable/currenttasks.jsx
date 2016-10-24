@@ -94,11 +94,18 @@ const TaskAvailability = React.createClass({
     AllTaskActions.accept(row.hash);
   },
   reject(row){
-    AllTaskActions.reject(row.hash);
+    AllTaskActions.reject(this.props.rowData.hash, this.state.comment);
+  },
+  getInitialState: function() {
+    return {
+      comment: ""
+    };
+  },
+  handleFieldChange: function(value) {
+    this.setState({comment: value});
   },
   render: function(){
     const row = this.props.rowData;
-    const object = {object: row.hash}
     return ((row.processtask.status == 7 && row.status == 1) ?
           <div className="btn-group" role="group" >
             <AcceptRejectButton
@@ -112,7 +119,9 @@ const TaskAvailability = React.createClass({
               label={"Reject"}
               extraCss={"btn-xs btn-danger"} 
               title={`Reject '${row["task_repr"]}'`}
-              message={`Are you sure you want to reject the task '${row["task_repr"]}' ?'`}/>
+              message={`Are you sure you want to reject the task '${row["task_repr"]}' ?'`}
+              onChange={this.handleFieldChange}
+              comment={this.state.comment} />
             </div>:<span></span>);
   }
 });

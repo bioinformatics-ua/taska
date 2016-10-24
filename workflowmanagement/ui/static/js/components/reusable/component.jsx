@@ -150,6 +150,9 @@ const Modal = React.createClass({
   newAssignee(){
 
   },
+  setComment(e){
+      this.props.onChange(e.target.value);
+  },
   render(){
     if(this.props.visible)
       return <div className="modal modalback show">
@@ -161,6 +164,12 @@ const Modal = React.createClass({
                           </div>
                           <div style={{overflow: this.props.overflow}} className="modal-body">
                             {this.props.message}
+                              {this.props.showCommentArea ?<span> <br/><br/>
+                              <textarea rows="4"
+                                        placeholder="Leave a comment upon task rejection (optional)"
+                                        className="form-control"
+                                        onChange={this.setComment}
+                                        defaultValue={this.props.comment} /></span>:''}
                           </div>
                           {this.props.showConfirm?
                           <div className="modal-footer">
@@ -243,36 +252,44 @@ const DeleteButton = React.createClass({
 });
 
 const AcceptRejectButton = React.createClass({
-  mixins: [LayeredComponentMixin],
+    mixins: [LayeredComponentMixin],
     success(e){
-      this.props.success(this.props.identificator);
+        console.log(this.props.label === "Reject");
+        /*if (this.props.label === "Reject") {
+            console.log(this.props);
+            this.props.success(this.props.identificator, this.props.comment);
+        }
+        else*/
+            this.props.success(this.props.identificator);
     },
     getDefaultProps(){
-      return {
-        deleteLabel: <i className="fa fa-times"></i>,
-        extraCss: ''
-      };
+        return {
+            deleteLabel: <i className="fa fa-times"></i>,
+            extraCss: ''
+        };
     },
-    render: function() {
-        return <button style={this.props.extraStyle} className={`btn ${this.props.extraCss}`} onClick={this.props.message != undefined ? this.handleClick: this.success}>{this.props.label}</button>;
+    render: function () {
+        return <button style={this.props.extraStyle} className={`btn ${this.props.extraCss}`}
+                       onClick={this.props.message != undefined ? this.handleClick: this.success}>{this.props.label}</button>;
     },
-    renderLayer: function() {
+    renderLayer: function () {
         if (this.state.clicked && this.props.message != undefined)
-            return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+            return <Modal title={this.props.title} message={this.props.message} success={this.success}
+                          close={this.handleClose} showCommentArea={true} {...this.props}/>
         else
             return <span />;
     },
-    // {{{
-    handleClose: function() {
-        this.setState({ clicked: false });
+    handleClose: function () {
+        this.setState({clicked: false});
     },
-  handleClick: function() {
-    this.setState({ clicked: !this.state.clicked });
-  },
-  getInitialState: function() {
-    return { clicked: false };
-  }
-  // }}}
+    handleClick: function () {
+        this.setState({clicked: !this.state.clicked});
+    },
+    getInitialState: function () {
+        return {
+            clicked: false
+        };
+    }
 });
 
 const RunButton = React.createClass({

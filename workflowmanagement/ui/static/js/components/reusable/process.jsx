@@ -116,6 +116,7 @@ const ProcessTable = React.createClass({
       "locked": true,
       "visible": true,
       "customComponent": ProcessStatusDetail,
+      "cssClassName": "process-status-td",
       "displayName": "Status"
       },
       {

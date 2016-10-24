@@ -5,7 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import html2text
 
-from process.models import Process, Request
+from process.models import Process, Request, ProcessTaskUser
+from history.models import *
 
 class MailTemplate:
     def __init__(self, instance, destinies):
@@ -42,6 +43,15 @@ class MailTemplate:
         else:
             user = interested
 
+        #When is a processtaskuser instance
+        if isinstance(self.instance.object, ProcessTaskUser):
+            if(self.instance.event == History.REJECT):
+                executioner = self.instance.object.processtask.process.executioner
+                if len(self.instance.object.user.first_name) > 0:
+                    user = self.instance.object.user.first_name + " " + self.instance.object.user.last_name
+                else:
+                    user = self.instance.object.user
+
         #When is a process instance
         if isinstance(self.instance.object, Process):
             if(self.instance.object.status == Process.WAITING):
@@ -77,7 +87,8 @@ class MailTemplate:
                                        'link_open_plataform': link_open_plataform,
                                        'startDate': start_date,
                                        'leaderName': executioner,
-                                       'task':task
+                                       'task':task,
+                                       'observations': self.instance.observations
                                    })
 
         return (subject, message)
@@ -126,7 +137,9 @@ class ProcessWaitingAddTemplate(MailTemplate):
     subjecttemplate="mail/process_confirmation_subject.html"
     template="mail/process_confirmation.html"
 
-
+class ProcessTaskUserRejectTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_reject_subject.html"
+    template="mail/processtaskuser_reject.html"
 
 class RequestClarificationAskTemplate(MailTemplate):
     subjecttemplate="mail/request_clarification_add_subject.html"
