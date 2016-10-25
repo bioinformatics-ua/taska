@@ -62,8 +62,8 @@ def newHistoryNotifications(sender, instance, **kwargs):
                 if (instance.event == History.REJECT):
                     tci = tc(instance, [instance.object.processtask.process.executioner])
 
-            #sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
-            sendEmail(tci) #Comentar esta
+            sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
+            #sendEmail(tci) #Comentar esta
 
         except AttributeError as e:
             # Silently ignore, when the template is not defined we just don't send the notification
