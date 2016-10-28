@@ -1,0 +1,21 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object.processtask}} was rejected
+{% endblock %}
+
+{% block body %}
+Hello {{ leaderName }},<br /><br />
+
+This email is meant to inform you that the task {{object.processtask}} was rejected by user {{ user }}.
+
+{% if observations|length > 0 %}
+<br /><br />
+The user made the following observation:<br />
+{{ observations }}
+{% endif %}
+
+<br /><br />
+Best Regards,<br />
+Taska
+{% endblock %}

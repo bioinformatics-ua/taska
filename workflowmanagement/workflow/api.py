@@ -34,7 +34,7 @@ class WorkflowPermissionSerializer(serializers.ModelSerializer):
         exclude = ('id', 'workflow')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class WorkflowSerializer(serializers.ModelSerializer):
     permissions = WorkflowPermissionSerializer()
     tasks = GenericTaskSerializer(many=True, required=False)

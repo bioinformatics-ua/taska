@@ -11,6 +11,7 @@ import Griddle from 'griddle-react';
 import {Loading, DeleteButton} from './component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
+
 import moment from 'moment';
 
 const TaskDateEst = React.createClass({
@@ -91,7 +92,7 @@ const TaskType = React.createClass({
   },
   render: function(){
     const row = this.props.rowData.processtask;
-    return <span><i className={`fa fa-2x ${this.getIcon(row.type)}`}></i></span>;
+    return <span><i className={`fa ${this.getIcon(row.type)}`}></i></span>;
   }
 });
 
@@ -155,7 +156,7 @@ const FutureTaskTable = React.createClass({
     ];
     return <Griddle
                       noDataMessage={<center>You currently have no future tasks assigned to you at this moment. This tasks are assigned through the running of studies.</center>}
-                      {...this.commonTableSettings()}
+                      {...this.commonTableSettings(true)}
                       columns={["type", "task_repr", "process_repr", "start_date", "deadline"]}
                       columnMetadata={columnMeta} />
   }

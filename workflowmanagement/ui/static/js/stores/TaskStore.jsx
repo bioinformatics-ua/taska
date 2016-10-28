@@ -37,6 +37,7 @@ export default Reflux.createStore({
     init(){
         this.answer = {};
         this.dversion = 0;
+        this.task_repr = "";
 
     },
     onPreliminary(hash){
@@ -66,6 +67,44 @@ export default Reflux.createStore({
                 );
             }
         });
+    },
+    getTask(hash){
+        this.onMethodDetail('getTaskName', hash).then(
+            (result) => {
+                this.task_repr = result.task_repr;
+
+                this.trigger();
+            }
+        );
+
+        return this.task_repr;
+    },
+    onAccept(ptuhash){
+        this.onMethodDetail('accept',
+                            null,
+                            'POST', {
+                                ptuhash: ptuhash
+                            })
+            .then(
+            (data) => {
+                this.dversion++;
+                this.trigger(this.DETAIL, true);
+            }
+        );
+    },
+    onReject(ptuhash, comment){
+        this.onMethodDetail('reject',
+                            null,
+                            'POST', {
+                                ptuhash: ptuhash,
+                                comment: comment
+                            })
+            .then(
+            (data) => {
+                this.dversion++;
+                this.trigger(this.DETAIL, true);
+            }
+        );
     },
     getDepVersion(){
         return this.dversion;

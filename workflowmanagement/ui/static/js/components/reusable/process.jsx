@@ -29,6 +29,17 @@ const ProcessManage = React.createClass({
   }
 });
 
+const ProcessStatusDetail = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+
+      return(<small>
+                <ProcessStatus rowData={this.props.rowData} />
+                </small>);
+  }
+});
+
 const ProcessProgress = React.createClass({
   render: function(){
     const row = this.props.rowData;
@@ -39,6 +50,16 @@ const ProcessProgress = React.createClass({
                 <span className="sr-only">{row.progress}% Complete</span>
               </div>
             </div></center>;
+  }
+});
+
+const ProcessLinkDetail = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <small>
+            <Link to="StatusDetail" params={object}>Show assignees</Link>
+           </small>;
   }
 });
 
@@ -61,6 +82,7 @@ const ProcessTable = React.createClass({
     },
     update: function(data){
         this.setState(this.getState());
+        console.log("set state process");
     },
   render: function () {
     const columnMeta = [
@@ -93,13 +115,21 @@ const ProcessTable = React.createClass({
       "order": 4,
       "locked": true,
       "visible": true,
-      "customComponent": ProcessStatus,
-      "cssClassName": "process-td",
+      "customComponent": ProcessStatusDetail,
+      "cssClassName": "process-status-td",
       "displayName": "Status"
       },
       {
-      "columnName": "hash",
+      "columnName": "link_status",
       "order": 5,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessLinkDetail,
+      "displayName": " "
+      },
+      {
+      "columnName": "hash",
+      "order": 6,
       "locked": true,
       "visible": true,
       "customComponent": ProcessManage,
@@ -107,14 +137,15 @@ const ProcessTable = React.createClass({
       "displayName": " "
       }
     ];
+
     return  <div className="panel panel-default panel-overflow  griddle-pad">
               <div className="panel-heading">
-                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies</h3></center>
+                <center><i className="fa fa-cogs pull-left"></i><h3 className="panel-title">Studies (which I own) </h3></center>
               </div>
               <Griddle
                   noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
-                  {...this.commonTableSettings()}
-                  columns={["object_repr","start_date", 'progress', 'status', "hash"]}
+                  {...this.commonTableSettings(false)}
+                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }

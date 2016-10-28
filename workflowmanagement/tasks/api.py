@@ -77,7 +77,7 @@ class GenericTaskSerializer(serializers.ModelSerializer):
         model = Task
 
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class TaskSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     dependencies = TaskDepSerializer(many=True, required=False)

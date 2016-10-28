@@ -33,6 +33,7 @@ export default Reflux.createStore({
     ],
     listenables: [ProcessActions],
     load: function (state) {
+        console.log("load process");
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);
@@ -40,6 +41,7 @@ export default Reflux.createStore({
         }, state);
     },
     init(){
+        this.__validation = [];
         this.__missing=[];
         this.__v=1;
     },
@@ -134,12 +136,58 @@ export default Reflux.createStore({
         );
 
     },
+    getValidation(hash){
+        return this.__validation[hash];
+    },
+    onValidateAcceptions(hash){
+        this.onMethodDetail('validateAcceptions', hash).then(
+            (result) => {
+                console.log(hash);
+                console.log(result.valid);
+                this.__validation[hash] = result.valid;
+                this.trigger();
+            }
+        );
+    },
     onChangeDeadline(ptask, deadline){
         this.onMethodDetail('changedeadline',
                             this.__detaildata.hash,
                             'POST', {
                                 ptask: ptask,
                                 deadline: deadline
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onStartProcess(hash){
+        this.onMethodDetail('startProcess',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onReassignRejectedUser(hash, oldUser, newUser, allTasks){
+        this.onMethodDetail('reassignRejectedUser',
+                            this.__detaildata.hash,
+                            'POST', {
+                                hash: hash,
+                                oldUser: oldUser,
+                                newUser: newUser,
+                                allTasks: allTasks
                             })
             .then(
             (data) => {

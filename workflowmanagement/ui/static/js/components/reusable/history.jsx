@@ -189,7 +189,7 @@ const GeneralHistoryTable = React.createClass({
                     <h3 className="panel-title"> History</h3>
                   </center>
                 </div>
-                <HistoryTable commonTableSettings={this.commonTableSettings()} />
+                <HistoryTable commonTableSettings={this.commonTableSettings(false)} />
               </div>;
   }
 });
@@ -212,7 +212,7 @@ const DetailHistoryTable = React.createClass({
     },
     render: function () {
       return  <div>
-                <HistoryTable commonTableSettings={this.commonTableSettings()} enableInfiniteScroll={false} />
+                <HistoryTable commonTableSettings={this.commonTableSettings(false)} enableInfiniteScroll={false} />
               </div>;
   }
 });

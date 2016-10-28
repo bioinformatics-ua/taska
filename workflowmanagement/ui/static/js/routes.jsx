@@ -20,8 +20,10 @@ module.exports = (
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
         <Route name="register" path="register" handler={require('./components/register.jsx')}/>
-
+            
         <Route name="activate" path="activate/:email" handler={require('./components/activate.jsx')}/>
+            
+        <Route name="ConfirmeTasks" path="askForAvailability/:hash" handler={require('./components/ConfirmeTasks.jsx')}/>
 
         <Route name="forgotten" path="forgotten" handler={require('./components/forgotten.jsx')}/>
 
@@ -34,6 +36,16 @@ module.exports = (
         <Route name="help" handler={require('./components/help.jsx')} />
 
         <Route name="about" handler={require('./components/about.jsx')} />
+       
+        <Route name="MyStudies" handler={require('./components/MyStudies.jsx')} />
+            
+        <Route name="StudyRequests" handler={require('./components/StudyRequests.jsx')} />
+            
+        <Route name="StudieManagement" handler={require('./components/StudieManagement.jsx')} />
+            
+        <Route name="StudieTemplates" handler={require('./components/StudieTemplates.jsx')} />    
+            
+        <Route name="Forms" handler={require('./components/StudieForms.jsx')} />
 
         <Route name="Workflow" path="workflow/:object" handler={require('./components/workflow.jsx')} >
             <Route name="WorkflowEdit" path=":mode" handler={Label} />
@@ -64,7 +76,7 @@ module.exports = (
         <Route name="form.FormTask" path="formtask/:object" handler={require('./components/task/form.jsx')} />
         <Route name="FormTask" path="formresult/:object" handler={require('./components/task/form.jsx')} />
 
-
+        <Route name="StatusDetail" path="statusDetail/:object" handler={require('./components/ManageStatusDetail.jsx')} />
 
         <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>
         <Route name="InternalError" path="/500" handler={require('./components/500.jsx')}/>

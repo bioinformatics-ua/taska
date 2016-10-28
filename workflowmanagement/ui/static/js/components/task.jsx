@@ -8,11 +8,12 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
+import {Modal, PermissionsBar, AcceptRejectButton, Affix} from './reusable/component.jsx';
 
 import StateActions from '../actions/StateActions.jsx';
 
 import TaskActions from '../actions/TaskActions.jsx';
+import AllTaskActions from '../actions/AllTaskActions.jsx';
 
 import TaskStore from '../stores/TaskStore.jsx';
 
@@ -132,7 +133,8 @@ export default React.createClass({
             saved: ResultStore.answerSaved(),
             user: UserStore.getUser(),
             task: TaskStore.getDetail(),
-            dversion: TaskStore.getDepVersion()
+            dversion: TaskStore.getDepVersion(),
+            comment: ""
         };
         return tmp;
     },
@@ -143,13 +145,19 @@ export default React.createClass({
         return false;
     },
     didWrite(){
-        if(!this.state.answer.hash)
+        if(!this.state.answer.hash) {
             return true;
+        }
 
         if(this.state.user.id === this.state.answer.user)
             return true;
 
         return false;
+    },
+    waitingTask(){
+        if(this.state.task.processtask.status == 7)//Waiting availability
+            return false;
+        return this.didWrite();
     },
     getInitialState(){
         try {
@@ -207,12 +215,16 @@ export default React.createClass({
         ResultActions.setAnswer(prop, val);
     },
     submitAnswer(e){
+        console.log("Clicked");
         if(this.validate())
             ResultActions.submitAnswer();
     },
     saveAnswer(e){
         if(this.validate())
             ResultActions.saveAnswer();
+    },
+    showWorkflow(){
+        console.log("show");
     },
     __createMap(own, deps){
         let linkmap = {};
@@ -266,6 +278,17 @@ export default React.createClass({
         let hash = this.context.router.getCurrentParams().object;
 
         TaskActions.preliminary(hash);
+    },
+    accept(){
+      let hash = this.context.router.getCurrentParams().object;
+      TaskActions.accept(hash);
+    },
+    reject(){
+      let hash = this.context.router.getCurrentParams().object;
+      TaskActions.reject(hash, this.state.comment);
+    },
+    handleFieldChange: function(value) {
+        this.setState({comment: value});
     },
     render() {
         if(this.props.failed){
@@ -331,6 +354,7 @@ export default React.createClass({
             detail = Object.keys(this.props.detail)[0];
         } catch(err){
         };
+
         return (
             <div className="task-detail row">
                 <div className="col-md-12">
@@ -375,7 +399,26 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3 reassignments">
                                     {this.didWrite()?
-                                    (<div className="btn-group-vertical btn-block" role="group">
+                                    (<div className="btn-group-vertical  btn-block" role="group">
+                                           <span> {this.state.task.status == 1 && this.state.task.processtask.status == 7 ?
+                                                <div className="btn-group btn-block" role="group2" >
+                                                    <AcceptRejectButton
+                                                      success={this.accept}
+                                                      identificator = {this.state.task}
+                                                      label={"Accept"}
+                                                      extraCss={"btn-success "}
+                                                      extraStyle={{width:'50%'}} />
+                                                    <AcceptRejectButton
+                                                      success={this.reject}
+                                                      identificator = {this.state.task}
+                                                      label={"Reject"}
+                                                      extraCss={"btn-danger "}
+                                                      extraStyle={{width:'50%'}}
+                                                      title={`Reject '${this.state.task["task_repr"]}'`}
+                                                      message={`Are you sure you want to reject the task '${this.state.task["task_repr"]}' ?'`}
+                                                      onChange={this.handleFieldChange}
+                                                      comment={this.state.comment} />
+                                                    </div> :''}</span>
                                         <Link to="RequestAdd" params={{
                                             object: 'add',
                                             process: this.state.task.processtask.process,
@@ -457,11 +500,17 @@ export default React.createClass({
   <div className="tab-content">
     <div role="tabpanel" className="tab-pane active" id="answer">
         <div className="form-group row">
-            <div className="col-md-9"></div>
-                <div className="col-md-3">
-                    {this.didWrite() ?
-                            <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
+            <div className="col-md-8"></div>
+                <div className="col-md-4">
 
+
+                    <Link to="Process" params={{object: this.state.task.processtask.process  + '/showOnly'}}>
+                        <button style={{marginLeft: '4px'}} onClick={this.showWorkflow} className="btn btn-info pull-right">
+                            <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
+                        </button>
+                    </Link>
+                    {this.waitingTask() ?
+                        <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
                                 <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">
                                     <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save
                                 </button>
@@ -477,7 +526,7 @@ export default React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <DetailRender key={this.state.task.processtask.hash} />
+                       {this.waitingTask() ? <DetailRender key={this.state.task.processtask.hash} /> :''}
                 </div>
         </div>
     </div>

@@ -194,7 +194,7 @@ table {
     width: 160px;
 }
 .type-td{
-  width: 60px;
+  width: 4%;
 }
 .date-td{
   width: 120px;
@@ -202,9 +202,43 @@ table {
 .status-td{
   width: 260px;
 }
+.task-repr-td{
+   width: 260px;
+}
+.process-repr-td{
+   width: 260px;
+}
+.complete-process-repr-td{
+   width: 48%;
+}
+.process-executioner-td{
+  width: 130px;
+}
 .deadline-td{
   width: 130px;
 }
+.start-date-td{
+  width: 130px;
+}
+.rejecteddeadline-td{
+  width: 64px;
+}
+.mystudies-process-title-td{
+    width: 800px;
+}
+.mystudies-start-date-td{
+    width: 130px;
+}
+.mystudies-progress-td{
+    text-align: center;
+}
+.mystudies-status-td{
+
+}
+.process-status-td{
+    text-align: center;
+}
+
 .table-prev{
     display: inline-block;
 }
@@ -390,7 +424,10 @@ table {
     margin-right: 5px;
 }
 
-.react-statemachine .input-group-addon, .profileform .input-group-addon{
+.react-statemachine .delay-notification, .status-detail .delay-notification{
+    min-width:250px !important;
+}
+.react-statemachine .input-group-addon, .profileform .input-group-addon, .status-detail .input-group-addon{
     min-width:160px;
     text-align:left;
 }

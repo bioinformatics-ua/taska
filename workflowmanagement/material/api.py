@@ -103,7 +103,7 @@ class ResourceCommentSerializer(serializers.ModelSerializer):
         model = ResourceComment
         exclude = ('id', 'removed')
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class ResourceSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`material.models.Resource` objects serialization/deserialization.
 

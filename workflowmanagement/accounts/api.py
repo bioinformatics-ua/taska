@@ -29,7 +29,7 @@ def root(request, format=None):
         #'User Listing   ': reverse('user-list', request=request, format=format),
     })
 
-# Serializers user profile
+# serializers user profile
 class ProfileSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`accounts.models.Profile` objects serialization/deserialization.
 
@@ -53,7 +53,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude = ['id', 'user']
 
 
-# Serializers define the API representation.
+# serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`django.contrib.auth.models.User` objects serialization/deserialization.
 

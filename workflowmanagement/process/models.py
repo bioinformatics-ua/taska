@@ -13,6 +13,8 @@ from django.db import transaction
 
 from history.models import History
 
+import datetime
+
 from material.models import File
 
 class Process(models.Model):
@@ -36,12 +38,14 @@ class Process(models.Model):
     FINISHED        = 2
     CANCELED        = 3
     OVERDUE         = 4
+    WAITING         = 5
 
     STATUS          = (
             (RUNNING,   'Process is running'),
             (FINISHED,  'Process has ended successfully'),
             (CANCELED,  'Process was canceled'),
-            (OVERDUE,   'Process has gone over end_date')
+            (OVERDUE,   'Process has gone over end_date'),
+            (WAITING,   'Process is waiting for users availability')
         )
     workflow        = models.ForeignKey(Workflow)
     title           = models.CharField(max_length=200, null=True)
@@ -51,6 +55,10 @@ class Process(models.Model):
     end_date        = models.DateTimeField(null=True)
     status          = models.PositiveSmallIntegerField(choices=STATUS, default=RUNNING)
     removed         = models.BooleanField(default=False)
+
+    days_after_delay        = models.IntegerField(default=0)
+    send_notification_until = models.DateTimeField(null=True)
+    days_before_delay       = models.IntegerField(default=0)
 
     @staticmethod
     def statusCode(interpret_code):
@@ -66,6 +74,15 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
+    def getAllUsersEnvolved(self):
+        tmp = []
+        tasks = self.tasks()
+        for task in tasks:
+            for taskUser in ProcessTaskUser.all(processtask=task):
+                if taskUser.getUser() not in tmp:
+                    tmp += [taskUser.getUser()]
+        return tmp
+
     @transaction.atomic
     def cancel(self):
         ''' Cancels a process, also canceling all pending tasks in it
@@ -73,7 +90,10 @@ class Process(models.Model):
         ptasks = self.tasks()
 
         for ptask in ptasks:
-            if ptask.status == ProcessTask.WAITING or ptask.status == ProcessTask.RUNNING:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY  or\
+                    ptask.status == ProcessTask.REJECTED or\
+                    ptask.status == ProcessTask.WAITING or\
+                    ptask.status == ProcessTask.RUNNING:
                 ptask.status = ProcessTask.CANCELED
                 ptask.save()
 
@@ -87,34 +107,37 @@ class Process(models.Model):
             Reaccess tasks status (so we can move the state machine forward)
         '''
         ptasks = self.tasks()
+        if self.status != Process.WAITING:
+            wlist = ptasks.filter(status=ProcessTask.WAITING)
 
-        wlist = ptasks.filter(status=ProcessTask.WAITING)
+            for ptask in wlist:
+                move = True
+                deps = ptask.task.dependencies()
 
-        for ptask in wlist:
-            move = True
-            deps = ptask.task.dependencies()
+                for dep in deps:
+                    pdep = ptasks.get(task=dep.dependency)
 
-            for dep in deps:
-                pdep = ptasks.get(task=dep.dependency)
+                    if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
+                        move=False
 
-                if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
-                    move=False
+                if move:
+                    ptask.status = ProcessTask.RUNNING
+                    ptus = ProcessTaskUser.all(processtask=ptask)
+                    for ptu in ptus:
+                        ptu.status = ProcessTaskUser.RUNNING
+                    ptask.save()
 
-            if move:
-                ptask.status = ProcessTask.RUNNING
-                ptask.save()
+                    pusers = ptask.users()
+                    for puser in pusers:
+                        History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
 
-                pusers = ptask.users()
-                for puser in pusers:
-                    History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
+            if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
+                self.status = Process.FINISHED
+                self.end_date = timezone.now()
 
-        if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
-            self.status = Process.FINISHED
-            self.end_date = timezone.now()
+                History.new(event=History.DONE, actor=self.executioner, object=self)
 
-            History.new(event=History.DONE, actor=self.executioner, object=self)
-
-            self.save()
+                self.save()
 
     def progress(self):
         all = ProcessTask.all(process=self).count()
@@ -125,9 +148,53 @@ class Process(models.Model):
         except ZeroDivisionError:
             return 0
 
+    def start(self):
+        ptasks = self.tasks()
+
+        for ptask in ptasks:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY or \
+                            ptask.status == ProcessTask.REJECTED:
+                ptask.status = ProcessTask.WAITING
+                ptask.save()
+
+        self.status = Process.RUNNING
+        self.save()
+        self.move()
+
+    def validateAcceptions(self):
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            for ptasksUser in ProcessTaskUser.all(processtask=ptask):
+                if(ptasksUser.status == ProcessTaskUser.WAITING or \
+                               ptasksUser.status == ProcessTaskUser.REJECTED ):
+                    return False
+        return True
+
+    def resignRejectedUser(self, oldUser, newUser):
+        #Resign all tasks that the old user belongs
+        ptasks = self.tasks()
+        for ptask in ptasks:
+            ptask.resignRejectedUser(oldUser, newUser)
+        self.save()
+
     class Meta:
         ordering = ["-id"]
         verbose_name_plural = "Processes"
+
+    @staticmethod
+    def allWithDelay():
+        tmp = Process.objects.filter(Q(removed=False) &
+                                     Q(Q(status=Process.RUNNING) | Q(status=Process.WAITING)))\
+            .exclude(days_after_delay = 0)\
+            .filter(send_notification_until__gte=timezone.now())
+        return tmp
+
+    @staticmethod
+    def allWithNotificationBeforeDelay():
+        tmp = Process.objects.filter(Q(removed=False) &
+                                     Q(Q(status=Process.RUNNING) | Q(status=Process.WAITING))) \
+            .exclude(days_before_delay=0)
+        return tmp
 
     @staticmethod
     def all(workflow=None, executioner=None):
@@ -169,6 +236,8 @@ class ProcessTask(models.Model):
     CANCELED        = 4
     OVERDUE         = 5
     IMPROVING       = 6
+    WAITING_AVAILABILITY = 7
+    REJECTED        = 8
 
     STATUS          = (
             (WAITING,   'Task is waiting execution'),
@@ -176,7 +245,9 @@ class ProcessTask(models.Model):
             (FINISHED,  'Task has ended successfully'),
             (CANCELED,  'Task was canceled'),
             (OVERDUE,   'Task has gone over end_date'),
-            (IMPROVING,   'Task is running again to be improved')
+            (IMPROVING,   'Task is running again to be improved'),
+            (WAITING_AVAILABILITY, 'Task is waiting for users availability'),
+            (REJECTED, 'Task has some users that rejected this task')
         )
     process         = models.ForeignKey(Process)
     task            = models.ForeignKey(Task)
@@ -204,6 +275,40 @@ class ProcessTask(models.Model):
 
     def user(self, user):
         return ProcessTaskUser.all(processtask=self).get(user=user)
+
+    def refreshState(self):
+        #translate
+        #Verificar se todos aceitaram
+        #   Se sim, mudar estado para waiting
+        #   Se nao, manter estado de waitingavailability
+        #   Se alguem recusou, mudar estado para rejected
+
+        allUser = ProcessTaskUser \
+            .all(processtask=self, reassigned=False)
+        allAccepted = True
+
+        for usr in allUser:
+            if usr.status ==  ProcessTaskUser.REJECTED:
+                self.status = ProcessTask.REJECTED
+            elif usr.status == ProcessTaskUser.WAITING:
+                allAccepted = False
+
+        if allAccepted:
+            self.status = ProcessTask.WAITING
+
+    def resignRejectedUser(self, oldUser, newUser):
+        tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
+        exists = ProcessTaskUser.all(processtask=self).filter(user=newUser).count()
+        if exists == 0:
+            for task in tasks:
+                task.changeUser(newUser)
+
+                History.new(event=History.ADD, actor=task.processtask.process.executioner, object=task.processtask.process,
+                            authorized=[newUser], related=[task.processtask.process])
+        else:
+            for task in tasks:
+                task.delete()
+        self.save()
 
     def move(self, force=False):
 
@@ -287,7 +392,29 @@ class ProcessTaskUser(models.Model):
         :processtask (ProcessTask): class:`ProcessTask` related with this instance
         :reassigned (boolean): Indicates if this user was reassignment in the middle of a task
         :reassign_date (datetime): Timestamp of this user reassignment (if any)
+        ...
+        :status (smallint): Indicator of the status of the user decision
     '''
+    # Status literals, representing the translation to the statuses the process task can be in
+    WAITING         = 1
+    ACCEPTED        = 2
+    REJECTED        = 3
+    RUNNING         = 4
+    FINISHED        = 5
+    CANCELED        = 6
+    OVERDUE         = 7
+    IMPROVING       = 8
+
+    STATUS          = (
+            (WAITING,   'Task is waiting confirmation from user'),
+            (ACCEPTED,  'Task was accepted'),
+            (REJECTED,  'Task was rejected'),
+            (RUNNING, 'Task is running'),
+            (FINISHED, 'Task has ended successfully'),
+            (CANCELED, 'Task was canceled'),
+            (OVERDUE, 'Task has gone over end_date'),
+            (IMPROVING, 'Task is running again to be improved')
+        )
 
     user            = models.ForeignKey(User)
     processtask     = models.ForeignKey(ProcessTask)
@@ -295,6 +422,7 @@ class ProcessTaskUser(models.Model):
     reassign_date   = models.DateTimeField(null=True, blank=True)
     finished        = models.BooleanField(default=False)
     hash            = models.CharField(max_length=50)
+    status          = models.PositiveSmallIntegerField(choices=STATUS, default=WAITING)
 
     class Meta:
         ordering = ['-processtask__deadline']
@@ -307,6 +435,8 @@ class ProcessTaskUser(models.Model):
             Q(processtaskuser=self)
             | Q(processtaskuser__processtask=self.processtask, public=True)
             )
+    def getUser(self):
+        return self.user
 
     def getResult(self):
         from result.models import Result
@@ -317,6 +447,11 @@ class ProcessTaskUser(models.Model):
             pass
 
         return None
+
+    def changeUser(self, newUser):
+        self.user=User.objects.get(id=newUser)
+        self.status=ProcessTaskUser.WAITING
+        self.save()
 
     def reassign(self):
         self.reassigned=True
@@ -334,8 +469,26 @@ class ProcessTaskUser(models.Model):
 
     def finish(self):
         self.finished=True
+        self.status=ProcessTaskUser.FINISHED
         self.save()
 
+        self.processtask.move()
+
+    def accept(self):
+        self.status=ProcessTaskUser.ACCEPTED
+        if (self.processtask.status == ProcessTask.RUNNING):
+            self.status=ProcessTaskUser.RUNNING
+        self.save()
+
+        self.processtask.refreshState()
+        self.processtask.move()
+
+    def reject(self, comment):
+        self.status=ProcessTaskUser.REJECTED
+        self.save()
+        History.new(event=History.REJECT, actor=self.user, object=self, observations=comment)
+
+        self.processtask.refreshState()
         self.processtask.move()
 
     @staticmethod
@@ -343,11 +496,14 @@ class ProcessTaskUser(models.Model):
         ''' Returns all valid processtask instances
 
         '''
+
         tmp = None
         if related:
             tmp = ProcessTaskUser.objects.select_related('processtask').all()
         else:
             tmp = ProcessTaskUser.objects.all()
+
+        tmp = tmp.filter(processtask__process__removed=False)
 
         if reassigned != None:
             tmp = tmp.filter(reassigned=reassigned)

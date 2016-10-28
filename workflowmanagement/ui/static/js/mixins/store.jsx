@@ -2,7 +2,7 @@ const TableStoreMixin = {
     init: function () {
         this.__list = [];
         this.__page = 0;
-        this.__page_size = 5;
+        this.__page_size = 13;
         this.__max_page = 0;
         this.__count = 0;
         this.__sortcolumn = null;
@@ -67,6 +67,7 @@ class ListStoreMixin{
                 return this.__simplelistfailed;
             },
             onLoadSimpleList(page_size) {
+
                 if(page_size){
                     this.__page_size = page_size;
                 }

@@ -97,7 +97,7 @@ const FormTable = React.createClass({
               </div>
               <Griddle
                   noDataMessage={<center>You currently have no form templates, to create a new form template please click the plus button above.</center>}
-                  {...this.commonTableSettings()}
+                  {...this.commonTableSettings(false)}
                   columns={["title", "latest_update", "created_date"]}
                   columnMetadata={columnMeta} />
             </div>;

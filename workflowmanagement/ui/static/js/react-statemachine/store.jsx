@@ -135,7 +135,6 @@ const StateMachineStore = Reflux.createStore({
     getPrevious(){
         if(this.__selected){
             let selected = Number.parseInt(this.__selected);
-            console.log(selected);
             if(selected && !isNaN(selected)){
                 let state = this.__sm.getState(selected);
 

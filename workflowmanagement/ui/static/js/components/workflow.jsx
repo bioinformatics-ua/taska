@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar} from './reusable/component.jsx';
+import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import StateActions from '../actions/StateActions.jsx';
@@ -108,7 +108,15 @@ export default React.createClass({
             addedWorkflow: WorkflowStore.getWorkflowAddFinished(),
             ***REMOVED*** WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing(),
-            user: UserStore.getUser()
+            user: UserStore.getUser(),
+            notificationsDetail: this.getDefaultNotificationsDetail(),
+        }
+    },
+    getDefaultNotificationsDetail(){
+        return{
+            numDaysBefore: 0,
+            numDaysAfter: 0,
+            sendNotificationUntil: null,
         }
     },
     getInitialState(){
@@ -203,7 +211,32 @@ export default React.createClass({
         WorkflowActions.fork();
     },
     runProcess(data){
+        this.changeData(data);
+        
+        console.log("Working in WorkflowStore.runProcess()2");
+        console.log(data);
+
         WorkflowActions.runProcess(data);
+    },
+    checkAvailability(data){
+        this.changeData(data);
+        WorkflowActions.checkAvailability(data);
+    },
+    setNotification(numDaysBefore, numDaysAfter, sendNotificationUntil){
+        let tmpState = {
+            numDaysBefore: numDaysBefore,
+            numDaysAfter: numDaysAfter,
+            sendNotificationUntil: sendNotificationUntil};
+        this.setState({notificationsDetail: tmpState});
+    },
+    getNotification(){
+        if((this.state.notificationsDetail.numDaysAfter != 0 && this.state.notificationsDetail.sendNotificationUntil == null) ||
+            (this.state.notificationsDetail.numDaysAfter == 0 && this.state.notificationsDetail.sendNotificationUntil != null))
+            return false;
+        return true;
+    },
+    changeData(data){
+        data.notificationsDetail= this.state.notificationsDetail;
     },
     closePopup(){
         WorkflowActions.calibrate();
@@ -234,7 +267,7 @@ export default React.createClass({
         if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
             this.context.router.replaceWith('/404');
 
-        let sm = this.load(params.mode === 'run');
+        let sm = this.load(params.mode === 'run' );
 
         return (
             <span>
@@ -273,31 +306,49 @@ export default React.createClass({
                                 runProcess={this.runProcess}
                                 listProcesses={this.state.workflow['assoc_processes']}
                                 {...this.state.workflow.permissions} />
-                            {params.mode === 'run' ?
-                                    <RunLabel />:''}
+                                    
+                            {params.mode === 'run'?        
+                                <ProcessDetailBar
+                                    disabled={false}
+                                    setNotification={this.setNotification}
+                                    createProcess={true}/>:''}
+
+
+                            {params.mode === 'run'? <RunLabel />:''}
                             </span>
                     }
                     title={this.getWorkflow().title}
                     editable={params.mode === 'edit'}
                     editTitle={params.mode === 'run'}
                     blockSchema={this.state.workflow['assoc_processes'] && this.state.workflow['assoc_processes'].length > 0}
-                    save={params.mode === 'run'? this.runProcess:this.save}
+                    save={params.mode === 'run'? '': this.save}
+                    runProcess={this.runProcess}
+                    checkAvailability = {this.checkAvailability}
                     onUpdate={this.unsaved}
-                    saveLabel={params.mode !== 'run'?
-                    <span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
-                    : <span><i className="fa fa-play"></i> Run</span>}
+                    mode = {params.mode}
+                    saveLabel={params.mode === 'run'?
+                        <div>
+                        </div>
+                        :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }
+/*
+                    saveLabel={params.mode === 'run'?
+                        <span><i className="fa fa-play"></i> Run</span>
+                            :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
+                    }*/
                     initialSm={sm}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}
                     globalHelp={this.helpMap(params.mode).global}
 
                     validate = {params.mode === 'run'}
+                    validateNotification={this.getNotification}
                     identifier={`workflow_${params.mode}page`}
 
                     endDetail={undefined}
                     savebar={!params.mode || params.mode === 'view'? false: true}
 
-                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run'? true: false}
+                    selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run' ? true: false}
 
 
                     {...this.props}/>

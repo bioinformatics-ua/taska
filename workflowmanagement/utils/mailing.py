@@ -5,6 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import html2text
 
+from process.models import Process, Request, ProcessTaskUser
+from history.models import *
+
 class MailTemplate:
     def __init__(self, instance, destinies):
         self.instance = instance
@@ -23,30 +26,78 @@ class MailTemplate:
     def render(self, interested):
         self.is_valid()
 
+        #Variables
         link_delegate = settings.MAIL_LINKS.get(self.__class__.__name__, None)
+        link_open_plataform = settings.BASE_URL
+        list_tasks = None
+        title = None
+        start_date = None
+        executioner = None
+        task = None
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
 
-        subject = render_to_string(self.subjecttemplate, {
-                            'object': self.instance.object,
-                            'history': self.instance,
-                            'settings': settings,
-                            'user': interested
-                        }).replace('\n', '')
-        message = render_to_string(self.template,
-            {
-                'object': self.instance.object,
-                'history': self.instance,
-                'settings': settings,
-                'link_delegate': link_delegate,
-                'user': interested
-            })
+        if len(interested.first_name) > 0:
+            user = interested.first_name + " " + interested.last_name
+        else:
+            user = interested
 
+        #When is a processtaskuser instance
+        if isinstance(self.instance.object, ProcessTaskUser):
+            if(self.instance.event == History.REJECT):
+                executioner = self.instance.object.processtask.process.executioner
+                if len(self.instance.object.user.first_name) > 0:
+                    user = self.instance.object.user.first_name + " " + self.instance.object.user.last_name
+                else:
+                    user = self.instance.object.user
+
+        #When is a process instance
+        if isinstance(self.instance.object, Process):
+            if(self.instance.object.status == Process.WAITING):
+                list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
+            title = self.instance.object.title
+            start_date = self.instance.object.start_date
+            executioner = self.instance.object.executioner
+
+        # When is a request instance
+        if isinstance(self.instance.object, Request):
+            task = self.instance.object.processtaskuser.processtask.task.title
+            executioner = self.instance.object.processtaskuser.processtask.process.executioner
+            user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
+            link_open_plataform += "request/"+ self.instance.object.hash
+
+        #Links on mails don't work because the url ends with a /
+        if link_open_plataform.endswith('/'):
+            link_open_plataform = link_open_plataform[:-1]
+
+        subject = render_to_string(self.subjecttemplate, {
+            'object': self.instance.object,
+            'studyName': title,
+            'taskName': task,
+            'history': self.instance,
+            'settings': settings,
+            'user': user
+        }).replace('\n', '')
+        message = render_to_string(self.template,
+                                   {
+                                       'object': self.instance.object,
+                                       'studyName': title,
+                                       'history': self.instance,
+                                       'settings': settings,
+                                       'link_delegate': link_delegate,
+                                       'user': user,
+                                       'list_tasks': list_tasks,
+                                       'link_open_plataform': link_open_plataform,
+                                       'startDate': start_date,
+                                       'leaderName': executioner,
+                                       'task':task,
+                                       'observations': self.instance.observations
+                                   })
         return (subject, message)
 
     def send_mail(self):
-
+        
         if not self.working:
             raise Exception('Must call is_valid() method, before sending mail')
 
@@ -56,8 +107,8 @@ class MailTemplate:
         print self.destinies
 
         for interested in self.destinies:
-            print interested
-            print interested.is_staff
+            #print interested
+            #print interested.is_staff
             (subject, message) = self.render(interested)
 
             msg = EmailMultiAlternatives(
@@ -84,6 +135,36 @@ class ProcessDoneTemplate(MailTemplate):
 class ProcessTaskAddTemplate(MailTemplate):
     subjecttemplate="mail/processtask_add_subject.html"
     template="mail/processtask_add.html"
+
+class ProcessWaitingAddTemplate(MailTemplate):
+    subjecttemplate="mail/process_confirmation_subject.html"
+    template="mail/process_confirmation.html"
+
+class ProcessTaskUserRejectTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_reject_subject.html"
+    template="mail/processtaskuser_reject.html"
+
+class RequestClarificationAskTemplate(MailTemplate):
+    subjecttemplate="mail/request_clarification_add_subject.html"
+    template="mail/request_clarification_add.html"
+
+class RequestReassignAskTemplate(MailTemplate):
+    subjecttemplate="mail/request_reassign_add_subject.html"
+    template="mail/request_reassign_add.html"
+
+class RequestClarificationAnswerTemplate(MailTemplate):
+    subjecttemplate="mail/request_clarification_edit_subject.html"
+    template="mail/request_clarification_edit.html"
+
+class RequestReassignAnswerTemplate(MailTemplate):
+    subjecttemplate="mail/request_reassign_edit_subject.html"
+    template="mail/request_reassign_edit.html"
+
+
+
+class ProcessTaskUserRemainderTemplate(MailTemplate):
+    subjecttemplate="mail/processtaskuser_remainder_subject.html"
+    template="mail/processtaskuser_remainder.html"
 
 class ProcessTaskUserLateTemplate(MailTemplate):
     subjecttemplate="mail/processtaskuser_late_subject.html"

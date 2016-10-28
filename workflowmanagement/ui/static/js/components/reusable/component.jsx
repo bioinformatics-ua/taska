@@ -8,7 +8,13 @@ import {LayeredComponentMixin} from '../../mixins/component.jsx';
 
 import Toggle from 'react-toggle';
 
+import Select from 'react-select';
+
+import moment from 'moment';
+
+import ProcessActions from '../../actions/ProcessActions.jsx';
 import WorkflowActions from '../../actions/WorkflowActions.jsx';
+import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
 const Loading = React.createClass({
   render: function(){
@@ -137,8 +143,15 @@ const Modal = React.createClass({
       message: 'Undefined Message',
       showConfirm: true,
       visible: true,
-      overflow: 'auto'
+      overflow: 'auto',
+      withReassigning: false
     }
+  },
+  newAssignee(){
+
+  },
+  setComment(e){
+      this.props.onChange(e.target.value);
   },
   render(){
     if(this.props.visible)
@@ -151,17 +164,31 @@ const Modal = React.createClass({
                           </div>
                           <div style={{overflow: this.props.overflow}} className="modal-body">
                             {this.props.message}
+                              {this.props.showCommentArea ?<span> <br/><br/>
+                              <textarea rows="4"
+                                        placeholder="Leave a comment upon task rejection (optional)"
+                                        className="form-control"
+                                        onChange={this.setComment}
+                                        defaultValue={this.props.comment} /></span>:''}
                           </div>
                           {this.props.showConfirm?
                           <div className="modal-footer">
-                              <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                              <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                              {(this.props.withReassigning) ?
+                              <div>
+                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">This task</button>
+                                <button type="button" onClick={this.props.allTasks} className="btn btn-primary">All tasks</button>
+                              </div>
+                                :
+                              <div>
+                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                              </div>}
                           </div>
                           :''}
                         </div>
                       </div>
                     </div>;
-
     return undefined;
   }
 });
@@ -223,6 +250,132 @@ const DeleteButton = React.createClass({
   }
   // }}}
 });
+
+const AcceptRejectButton = React.createClass({
+    mixins: [LayeredComponentMixin],
+    success(e){
+        this.props.success(this.props.identificator);
+    },
+    getDefaultProps(){
+        return {
+            deleteLabel: <i className="fa fa-times"></i>,
+            extraCss: ''
+        };
+    },
+    render: function () {
+        return <button style={this.props.extraStyle} className={`btn ${this.props.extraCss}`}
+                       onClick={this.props.message != undefined ? this.handleClick: this.success}>{this.props.label}</button>;
+    },
+    renderLayer: function () {
+        if (this.state.clicked && this.props.message != undefined)
+            return <Modal title={this.props.title} message={this.props.message} success={this.success}
+                          close={this.handleClose} showCommentArea={true} {...this.props}/>
+        else
+            return <span />;
+    },
+    handleClose: function () {
+        this.setState({clicked: false});
+    },
+    handleClick: function () {
+        this.setState({clicked: !this.state.clicked});
+    },
+    getInitialState: function () {
+        return {
+            clicked: false
+        };
+    }
+});
+
+const RunButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(e){
+        this.props.success(this.props.identificator);
+    },
+    getDefaultProps(){
+      return {
+        runLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
+      };
+    },
+    render: function() {
+        return <button className={`btn ${this.props.extraCss} btn-sm btn-primary`} onClick={this.handleClick}>{this.props.runLabel}</button>;
+    },
+    renderLayer: function() {
+        if (this.state.clicked)
+        {
+            if (this.state.validate)
+            {
+                this.success(true);
+                return <span />;
+            }
+            else
+                return <Modal title={this.props.title} message={this.props.message} success={this.success} close={this.handleClose} />
+        } else {
+            return <span />;
+        }
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    ProcessActions.validateAcceptions(this.props.hash);
+    this.setState({
+        clicked: !this.state.clicked,
+        validate: this.props.getValidation()
+    });
+  },
+  getInitialState: function() {
+    ProcessActions.validateAcceptions(this.props.hash);
+    return {
+        clicked: false,
+        validate: this.props.getValidation()
+    };
+  }
+  // }}}
+});
+
+const ReassigningButton = React.createClass({
+  mixins: [LayeredComponentMixin],
+    success(){
+      this.props.success();
+    },
+    allTasks(){
+      this.props.allTasks();
+    },
+    getDefaultProps(){
+      return {
+        runLabel: <i className="fa fa-times"></i>,
+        extraCss: ''
+      };
+    },
+    render: function() {
+        return (<button className="btn btn-success" onClick={this.handleClick}>{this.props.runLabel}</button>);
+    },
+    renderLayer: function() {
+        if (this.state.clicked)
+        {
+            return <Modal title={this.props.title} message={this.props.message} allTasks={this.allTasks} success={this.success} close={this.handleClose}  withReassigning={true} />
+        }
+            return <span />;
+
+    },
+    // {{{
+    handleClose: function() {
+        this.setState({ clicked: false });
+    },
+  handleClick: function() {
+    this.setState({ clicked: !this.state.clicked });
+  },
+  getInitialState: function() {
+    return { clicked: false };
+  }
+  // }}}
+});
+
+
+
+
 
 const PermissionsBar = React.createClass({
     getDefaultProps() {
@@ -303,7 +456,7 @@ const PermissionsBar = React.createClass({
       this.context.router.transitionTo('home');
     },
     render(){
-        let canedit = !this.props.editable && !this.props.runnable && this.props.showEdit;
+        let canedit = !this.props.editable && !this.props.runnable && !this.props.confirmable && this.props.showEdit;
         return (<span>
                 {this.props.owner ?
                 <div className="row">
@@ -323,19 +476,19 @@ const PermissionsBar = React.createClass({
                 this.renderPermissions()
                 }
 
-                    {!this.props.editable && !this.props.runnable && this.props.showEdit ?
+                    {!this.props.editable && !this.props.runnable && !this.props.confirmable && this.props.showEdit ?
                         <div style={{zIndex: 200, position: 'absolute', left: '15px', bottom: '-40px'}}>
                             <small><strong>Associated Processes: </strong> {this.props.listProcesses.length}</small>
                         </div>
                     :''}
                     <div  style={{width: '100%', textAlign: 'right', zIndex: 200, position: 'absolute', right: '15px', bottom: '-40px'}}>
                     <div className="btn btn-group">
-                      {!this.props.runnable && !this.props.editable && this.props.showRun && this.props.forkable ?
+                      {!this.props.runnable && !this.props.confirmable && !this.props.editable && this.props.showRun && this.props.forkable ?
                             <button style={{border: '1px solid #95a5a6'}} onClick={this.setFork} className="btn btn-sm btn-default">
                               <i className="fa fa-code-fork"></i> &nbsp;Duplicate
                             </button>
                       :''}
-                      {!this.props.runnable && !this.props.editable && this.props.showRun?
+                      {!this.props.runnable && !this.props.confirmable && !this.props.editable && this.props.showRun?
                           <Link title="Configure study template as a study" className="btn btn-sm btn-primary" to={this.props.link}
                           params={{object: this.props.object, mode:'run'}}>
                           <i className="fa fa-play"></i>
@@ -378,6 +531,8 @@ const ProcessStatus = React.createClass({
         extra+=' circle-grey'; label='Canceled'; break;
       case 4:
         extra+=' circle-warning'; label='Overdue'; break;
+      case 5:
+        extra+=' circle-default'; label='Waiting'; break;
     }
     return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label> </span>;
   },
@@ -390,6 +545,204 @@ const ProcessStatus = React.createClass({
   }
 });
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, PermissionsBar, ProcessStatus, Affix}
+const ProcessLabel = React.createClass({
+    render(){
+        return <table className="process-label" align="right">
+                    <tr>
+                        <td><div className="circle circle-sm circle-default"></div></td>
+                        <td><small>&nbsp;Waiting&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-primary"></div></td>
+                        <td><small>&nbsp;Running&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-success"></div></td>
+                        <td><small>&nbsp;Finished&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm circle-warning"></div></td>
+                        <td><small>&nbsp;Overdue&nbsp;&nbsp;</small></td>
+                        <td><div className="circle circle-sm"></div></td>
+                        <td><small>&nbsp;Canceled&nbsp;&nbsp;</small></td>
+                    </tr>
+                    <div className="pull-right">
+                        {this.props.linkStatusDetails === undefined ? '' : this.props.linkStatusDetails}
+                    </div>
+                </table>
+
+    }
+});
+
+const ProcessDetailBar = React.createClass({
+    getDefaultProps() {
+        return {
+            disabled: false,
+            toggleDisabled: false,
+            setNotifiable: function(){},
+            numDaysBefore: 0,
+            numDaysAfter: 0,
+            sendNotificationUntil: null,
+            defaultDate: null,
+            createProcess: false,
+        };
+    },
+    getState(){
+        console.log(this.props.numDaysAfter);
+        return {
+            numDaysBefore: this.props.numDaysBefore != 0 ? this.props.numDaysBefore.toString() : this.props.numDaysBefore,
+            numDaysAfter: this.props.numDaysAfter != 0 ? this.props.numDaysAfter.toString() : this.props.numDaysAfter,
+            sendNotificationUntil: this.props.sendNotificationUntil,
+            disabled: this.props.disabled,
+
+            startDate: this.props.startDate,
+            endDate: this.props.endDate,
+            status: this.props.status,
+            progress: this.props.progress
+        }
+    },
+    getInitialState(){
+       return  this.getState();
+    },
+    setNumDaysBefore(e){
+        if(e.length==0)
+            e=0;
+        this.setState({ numDaysBefore: e });
+        this.props.setNotification(e, this.state.numDaysAfter, this.state.sendNotificationUntil);
+    },
+    setNumDaysAfter(e){
+        if(e.length==0)
+            e=0;
+        this.setState({ numDaysAfter: e });
+        this.props.setNotification(this.state.numDaysBefore, e, this.state.sendNotificationUntil);
+    },
+    setNotificationsDeadline(e){
+        this.setState({ sendNotificationUntil: e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm') });
+        this.props.setNotification(this.state.numDaysBefore, this.state.numDaysAfter, e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm'));
+    },
+    render(){
+        var optionsBeforeDeadline = [
+            { value: "1", label: '1 day' },
+            { value: "2", label: '2 days' },
+            { value: "3", label: '3 days' },
+            { value: "4", label: '4 days' },
+            { value: "5", label: '5 days' },
+            { value: "6", label: '6 days' },
+            { value: "7", label: '7 days' }
+        ];
+        //I did it that way because in the future I can change the options more easily
+        var optionsAfterDeadline = optionsBeforeDeadline;
+
+        return(<div>
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                            <span className="input-group-addon" id="startdate">
+                                                <strong>Start Date</strong>
+                                            </span>
+                                <input className="form-control" readOnly value={this.state.startDate}/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {this.state.numDaysBefore != 0 || this.props.createProcess ?
+                    <div className="row">
+                        <div className="col-md-2"></div>
+                        <div className="col-md-8">
+                            <div className="form-group">
+                                <div className="input-group">
+                                    <span className="delay-notification input-group-addon"
+                                          id="remainder-before"><strong>Remainder before deadline</strong></span>
+                                    <Select placeholder="Nº of days"
+                                            name="form-field-name"
+                                            value={this.state.numDaysBefore}
+                                            options={optionsBeforeDeadline}
+                                            onChange={this.setNumDaysBefore}
+                                            disabled={this.state.disabled}/>
+                                </div>
+                            </div>
+                        </div>
+                    </div> : ''}
+
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="enddate"><strong>End Date</strong></span>
+                                <input className="form-control" readOnly value={this.state.endDate}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-4"></div>
+                    {this.state.numDaysAfter == 0 ?
+                        <div className="col-md-2">
+                            <div className="form-group">
+                                <div className="input-group">
+                                    {!this.props.createProcess ?
+                                        <ProcessStatus label="True" rowData={{status: this.state.status}}/> : ''}
+
+                                </div>
+                            </div>
+                        </div> : ''}
+
+                </div>
+
+                {this.state.numDaysAfter != 0 || this.props.createProcess ?
+                    <div>
+                        <div className="row">
+                            <div className="col-md-2"></div>
+                            <div className="col-md-8">
+                                <div className="form-group">
+                                    <div className="input-group">
+                                        <span className="delay-notification input-group-addon"
+                                              id="remainder-after"><strong>Remainder after deadline every</strong></span>
+                                        <Select placeholder="Nº of days"
+                                                name="form-field-name"
+                                                value={this.state.numDaysAfter}
+                                                options={optionsAfterDeadline}
+                                                onChange={this.setNumDaysAfter}
+                                                disabled={this.state.disabled}
+                                                selectValue={this.state.numDaysAfter}/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-md-2"></div>
+                            <div className="col-md-8">
+                                <div className="form-group">
+                                    <div className="input-group">
+                                <span className="delay-notification input-group-addon"
+                                      id="remainder-until"><strong>Repeat up to</strong></span>
+                                        <DateTimePicker onChange={this.setNotificationsDeadline}
+                                                        defaultValue={this.props.defaultDate}
+                                                        format={"yyyy-MM-dd"}
+                                                        time={false}
+                                                        disabled={this.state.disabled}/>
+                                    </div>
+                                </div>
+                            </div>
+                            {!this.props.createProcess ?
+                                <div className="col-md-2">
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <ProcessStatus label="True" rowData={{status: this.state.status}}/>
+
+                                        </div>
+                                    </div>
+                                </div> : ''}
+                        </div>
+                    </div> : ''}
+
+
+                {!this.props.createProcess ?
+                    <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
+                        <div title={`${this.state.progress}% completed`}
+                             style={{backgroundColor: '#19AB27', width: `${this.state.progress}%`, height: '10px'}}></div>
+                        &nbsp;</div> : ''}
+            </div>
+        )
+    }
+});
+
+
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptRejectButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
 
 

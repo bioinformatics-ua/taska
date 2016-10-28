@@ -9,8 +9,8 @@ run:
 	docker-compose up --no-recreate -d
 
 run-dev:
-	sh bin/clean_container_dev.sh && \
-	docker-compose -f docker-compose-dev.yml -p taskadev up
+#	sh bin/clean_container_dev.sh && 
+	docker-compose -f docker-compose-dev.yml -p taskadev up -d
 
 stop:
 	docker-compose stop

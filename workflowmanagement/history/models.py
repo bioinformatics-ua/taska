@@ -51,6 +51,8 @@ class History(models.Model):
     RECOVER         = 9
     LATE            = 10
     RUN             = 11
+    REMAINDER       = 12
+    REJECT          = 13
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -63,12 +65,15 @@ class History(models.Model):
             (COMMENT,   'Comment'),
             (RECOVER,   'Recover'),
             (LATE,      'Late'),
-            (RUN,       'Run')
+            (RUN,       'Run'),
+            (REMAINDER, 'Remainder'),
+            (REJECT,    'Reject')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)
     actor           = models.ForeignKey(User)
     date            = models.DateTimeField(auto_now_add=True)
+    observations    = models.CharField(max_length=2000, default="")
 
     # generic foreign key that refers to the object related to this action
     object_type     = models.ForeignKey(ContentType)
@@ -116,11 +121,14 @@ class History(models.Model):
 
 
     @classmethod
-    def new(self, event, actor, object, authorized=None, related=None):
+    def new(self, event, actor, object, observations=None, authorized=None, related=None):
         """
         Generates a new generic history object
         """
-        action = History(event=event, actor=actor, object=object)
+        if(observations!= None):
+            action = History(event=event, actor=actor, object=object, observations=observations)
+        else:
+            action = History(event=event, actor=actor, object=object, observations="")
 
         action.save()
 
@@ -137,6 +145,7 @@ class History(models.Model):
                 action.related.add(hr)
 
         print 'NEW HISTORY'
+        #self.before_send.send(sender=self.__class__, instance=action)
         self.post_new.send(sender=self.__class__, instance=action)
 
         return action
@@ -168,3 +177,4 @@ class History(models.Model):
 
     # Signals
     post_new = django.dispatch.Signal(providing_args=["instance"])
+    #before_send = django.dispatch.Signal(providing_args=["instance"])

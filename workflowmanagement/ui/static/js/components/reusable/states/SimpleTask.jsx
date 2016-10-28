@@ -14,19 +14,23 @@ import ProcessActions from '../../../actions/ProcessActions.jsx';
 
 import UserStore from '../../../stores/UserStore.jsx';
 
+import {ReassigningButton} from '../component.jsx';
+
 import moment from 'moment';
 
 import checksum from 'json-checksum';
 
 import Uploader from '../uploader.jsx';
 
-import {stateColor} from '../../../map.jsx';
+import {stateColor, singleStateColor} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
 import Toggle from 'react-toggle';
 
 const dummy = React.createClass({render(){return <span></span>; }});
+
+
 
 class SimpleTask extends SimpleState {
     constructor(options){
@@ -270,10 +274,15 @@ class SimpleTaskRun extends SimpleTask{
             task: this.getData().hash
         }
     }
-    stateStyle(){
-        if(this.getData().ptask)
-            return stateColor(this.getData().ptask);
-
+    stateStyle(user){
+        if (this.getData().ptask)
+        //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
+            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8)
+                return stateColor(this.getData().ptask);
+            else if (user != undefined)
+                return singleStateColor(user.status);
+            else
+                return stateColor(this.getData().ptask); //This line is because there are new status (7 and 8, maybe more in the future), so to fill the statemachine i need this condition
         return {};
     }
     stateDesc(){
@@ -296,6 +305,13 @@ class SimpleTaskRun extends SimpleTask{
                     return 'Canceled';
                 case 5:
                     return 'Overdue';
+                case 7:
+                    return 'Waiting for answer';
+                case 8:
+                    return "Rejected";
+                default:
+                    console.log("Task status: ");
+                    console.log(this.getData().ptask.status);
             }
 
 
@@ -309,8 +325,10 @@ class SimpleTaskRun extends SimpleTask{
                 return {
                     parent: this.props.main,
                     users: [],
-                    new_assignee: undefined
-
+                    new_assignee: undefined,
+                    new_reassigning: undefined,
+                    oldUser: undefined,
+                    showReassign: false
                 };
             },
             getInitialState(){
@@ -350,6 +368,11 @@ class SimpleTaskRun extends SimpleTask{
                     new_assignee: e
                 })
             },
+            newReassigning(e){
+                this.setState({
+                    new_reassigning: e
+                })
+            },
             refineAnswer(e){
                 let answer_hash = $(e.target).data('answer');
 
@@ -358,11 +381,42 @@ class SimpleTaskRun extends SimpleTask{
                     action(answer_hash);
                 }
             },
+            showReassignSelect(e){
+                this.setState({
+                    showReassign: true,
+                    oldUser: Number.parseInt($(e.target).data('assignee'))
+                })
+
+            },
+            reassign(){
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, false);
+                }
+
+                this.setState({
+                    showReassign: false
+                })
+            },
+            reassignAll(){
+                let action = this.state.parent.props.reassignRejectedUser;
+
+                if(action){
+                    action(this.parent().ptask.hash, this.state.oldUser, this.state.new_reassigning, true);
+                }
+
+                this.setState({
+                    showReassign: false
+                })
+            },
+
             results(){
                 let me=this;
 
                 let users;
                 let status;
+
                 if(!this.parent().assignee)
                     return;
 
@@ -374,10 +428,33 @@ class SimpleTaskRun extends SimpleTask{
                 } catch(ex){
                     users = [];
                 }
+
                 let desc = self.stateDesc();
                 let stillOn = desc === 'Running' || desc === 'Waiting';
+                let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
 
                 let renderStatus = function(user){
+                    if (forAvailability)
+                        switch(user.status)
+                        {
+                            case 1:
+                                desc = 'Waiting for answer';
+                                break;
+                            case 2:
+                                desc = 'Accepted';
+                                break;
+                            case 3:
+                                desc = 'Rejected';
+                                break;
+                        }
+
                     if(user.finished){
                         return (
                             <span>
@@ -398,19 +475,23 @@ class SimpleTaskRun extends SimpleTask{
                             <span style={{fontSize: '100%'}} className="label label-warning">
                                 Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
                             </span>&nbsp;&nbsp;&nbsp;
-                            {stillOn ?
+                            {stillOn || forAvailability ?
                             <a data-assignee={user.user} data-cancel="false" onClick={me.cancelUser}>Uncancel ?</a> :''}
                             </span>
                         );
                     } else {
-
                         return (
                             <span>
-                            <span className="label" style={self.stateStyle()}>
+                            <span className="label" style={self.stateStyle(user)}>
                                 {desc}
                             </span> &nbsp;&nbsp;&nbsp;
-                            {stillOn ?
-                           <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> :''}
+                            {onlyShow ? (stillOn || forAvailability ?
+                            (forAvailability ?
+                            <span>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
+                                <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
+                            </span>:
+                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''):''}
                             </span>
                         );
                     }
@@ -449,7 +530,7 @@ class SimpleTaskRun extends SimpleTask{
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="userTable">
                                 {users.map(
                                     (user, index) => {
                                             return (
@@ -462,7 +543,7 @@ class SimpleTaskRun extends SimpleTask{
                                 }
                             </tbody>
                         </table>
-                        { stillOn ?<span className="clearfix">
+                        {onlyShow ? (stillOn || forAvailability ?<span className="clearfix">
                         <div className="row">
 
                             <div className="col-md-12">
@@ -475,13 +556,32 @@ class SimpleTaskRun extends SimpleTask{
                                     <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
                                   </span>
                                 </div>
+                                <br />
+                                {this.state.showReassign ?
+                                <div className="input-group reassign">
+                                        <Select placeholder="Search for users to reassigning" onChange={this.newReassigning}
+                                            value={this.state.new_reassigning} name="form-field-name"
+                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                        } />
+                                  <span className="input-group-btn">
+                                    <ReassigningButton
+                                      success={me.reassign}
+                                      allTasks={me.reassignAll}
+                                      identificator = {false}
+                                      runLabel= {<span><i className="fa fa-plus"></i></span>}
+                                      title={'Reassigning'}
+                                      message={'You can reassign only this task or all tasks that this user are envolved!'}  />
+
+                                  </span>
+                                </div>:''}
                             </div>
                         </div><br />
-                        </span>: ''}
+                        </span>: ''):''}
                     </span>);
                 }
 
                 return false;
+
             },
             componentWillMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
@@ -537,24 +637,30 @@ class SimpleTaskRun extends SimpleTask{
                 } catch(ex){
                     users = [];
                 }
+                let onlyShow = true;
+                try{
+                    onlyShow = !this.state.parent.props.showOnly;
+                }
+                catch(ex){
+
+                }
 
                 return <span>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-
                             {this.state.users.length > 0?
-                            <Select onChange={this.setAssignee} placeholder="Search for assignees"
-                            value={this.parent().assignee} name="form-field-name"
-                            multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                                    value={this.parent().assignee} name="form-field-name"
+                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">
                         <label for="state-deadline">Deadline <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                        {users.length > 0 ?
+                        {onlyShow ?(users.length > 0 ?
                             <button className="pull-right btn btn-xs btn-primary" onClick={this.extendDeadline}>
                                 <i title="Change this task deadline" className="fa fa-plus" /> Change deadline
                             </button>
-                        :''}
+                        :''):''}
 
                         <DateTimePicker key={moment(this.parent().deadline).toDate()} onChange={this.setDeadline} disabled={this.parent().disabled}
                             defaultValue={moment(this.parent().deadline).toDate()} format={"yyyy-MM-dd HH:mm"} />
