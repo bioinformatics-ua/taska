@@ -254,13 +254,7 @@ const DeleteButton = React.createClass({
 const AcceptRejectButton = React.createClass({
     mixins: [LayeredComponentMixin],
     success(e){
-        console.log(this.props.label === "Reject");
-        /*if (this.props.label === "Reject") {
-            console.log(this.props);
-            this.props.success(this.props.identificator, this.props.comment);
-        }
-        else*/
-            this.props.success(this.props.identificator);
+        this.props.success(this.props.identificator);
     },
     getDefaultProps(){
         return {

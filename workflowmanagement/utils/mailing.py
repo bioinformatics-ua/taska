@@ -67,6 +67,10 @@ class MailTemplate:
             user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
             link_open_plataform += "request/"+ self.instance.object.hash
 
+        #Links on mails don't work because the url ends with a /
+        if link_open_plataform.endswith('/'):
+            link_open_plataform = link_open_plataform[:-1]
+
         subject = render_to_string(self.subjecttemplate, {
             'object': self.instance.object,
             'studyName': title,
@@ -90,7 +94,6 @@ class MailTemplate:
                                        'task':task,
                                        'observations': self.instance.observations
                                    })
-
         return (subject, message)
 
     def send_mail(self):

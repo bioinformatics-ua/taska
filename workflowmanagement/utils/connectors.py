@@ -7,6 +7,7 @@ from utils import mailing
 from tasks import sendEmail
 
 from process.models import Process, ProcessTask, Request, ProcessTaskUser
+from result.models import Result
 
 @receiver(History.post_new)
 def newHistoryNotifications(sender, instance, **kwargs):
@@ -44,6 +45,10 @@ def defineTci(instance, tc):
         if (instance.object.status == Process.WAITING):
             # Use all users envolved in the process
             tci = tc(instance, instance.object.getAllUsersEnvolved())
+
+    #if isinstance(instance.object, Result):
+     #   if(instance.event == History.ADD):
+      #      tci = tc(instance, instance.object.process.executioner)
 
     if isinstance(instance.object, Request):
         # ADD

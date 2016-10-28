@@ -522,12 +522,11 @@ export default React.createClass({
 
                             </Affix>
                             : ''}
-
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <DetailRender key={this.state.task.processtask.hash} />
+                       {this.waitingTask() ? <DetailRender key={this.state.task.processtask.hash} /> :''}
                 </div>
         </div>
     </div>

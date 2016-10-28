@@ -242,9 +242,11 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3">
                                         {this.didWrite()?
-                                            <button onClick={this.setRequest} className="btn btn-primary btn-block btn-default">
-                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Request
-                                            </button>
+                                            <div>
+                                                <button onClick={this.setRequest} className="btn btn-primary btn-block btn-default">
+                                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Request
+                                                </button>
+                                            </div>
                                         :''}
                                 </div>
                             </div>
