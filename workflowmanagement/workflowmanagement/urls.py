@@ -50,8 +50,7 @@ urlpatterns = patterns('',
     # extra task/result types
     url(r'^api/form', include('form.urls')),
 
-    url(r'^', include('ui.urls')),
-    url(r'^/', include('ui.urls'))
+    url(r'^', include('ui.urls'))
 )
 
 if settings.DEBUG:
