@@ -561,7 +561,7 @@ const ProcessLabel = React.createClass({
                         <td><small>&nbsp;Canceled&nbsp;&nbsp;</small></td>
                     </tr>
                     <div className="pull-right">
-                        {this.props.linkStatusDetails === undefined ? '' : this.props.linkStatusDetails}
+                        {this.props.links === undefined ? '' : this.props.links}
                     </div>
                 </table>
 

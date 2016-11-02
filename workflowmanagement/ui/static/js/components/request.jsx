@@ -110,6 +110,9 @@ export default React.createClass({
     setRequest(){
         RequestActions.submitRequest();
     },
+    goBackAndClean(){
+        this.goBack();
+    },
     setReqTitle(e){
         RequestActions.setReqTitle(e.target.value);
     },
@@ -242,9 +245,12 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-3">
                                         {this.didWrite()?
-                                            <div>
-                                                <button onClick={this.setRequest} className="btn btn-primary btn-block btn-default">
-                                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save Request
+                                            <div className="btn-group" role="group">
+                                                <button  type="button" onClick={this.goBackAndClean} className="btn btn-danger btn-default">
+                                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-ban"></i> Cancel
+                                                </button>
+                                                <button  type="button" onClick={this.setRequest} className="btn btn-primary btn-default">
+                                                    <i style={{marginTop: '3px'}} className="pull-left fa fa-envelope"></i> Send Request
                                                 </button>
                                             </div>
                                         :''}

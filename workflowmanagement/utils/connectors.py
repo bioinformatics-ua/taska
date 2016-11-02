@@ -8,6 +8,7 @@ from tasks import sendEmail
 
 from process.models import Process, ProcessTask, Request, ProcessTaskUser
 from result.models import Result
+import time
 
 @receiver(History.post_new)
 def newHistoryNotifications(sender, instance, **kwargs):

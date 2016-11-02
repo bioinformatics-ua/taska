@@ -85,7 +85,7 @@ class Process(models.Model):
 
     @transaction.atomic
     def cancel(self):
-        ''' Cancels a process, also canceling all pending tasks in it
+        ''' Cancels a process, also canceling all pending tasks in it and requests related with it too
         '''
         ptasks = self.tasks()
 
@@ -97,6 +97,10 @@ class Process(models.Model):
                 ptask.status = ProcessTask.CANCELED
                 ptask.save()
 
+        requests = Request.all(process=self.hash)
+
+        for request in requests:
+            request.remove()
 
         self.status = Process.CANCELED
         self.save()
@@ -574,8 +578,13 @@ class Request(models.Model):
 
         self.save()
 
+    def remove(self):
+        self.removed = True
+
+        self.save()
+
     @staticmethod
-    def all(executioner=None, requester=None):
+    def all(executioner=None, requester=None, process=None):
         tmp = Request.objects.filter(removed=False)
 
         if executioner != None:
@@ -583,6 +592,9 @@ class Request(models.Model):
 
         if requester != None:
             tmp = tmp.filter(processtaskuser__user=requester)
+
+        if process != None:
+            tmp = tmp.filter(processtaskuser__processtask__process__hash=process)
 
         return tmp
 

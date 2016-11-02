@@ -54,13 +54,23 @@ const ProcessProgress = React.createClass({
 });
 
 const ProcessLinkDetail = React.createClass({
-  render: function(){
-    const row = this.props.rowData;
-    const object = {object: row.hash}
-    return <small>
-            <Link to="StatusDetail" params={object}>Show assignees</Link>
-           </small>;
-  }
+    render: function () {
+        const row = this.props.rowData;
+        const object = {object: row.hash}
+        return <small>
+                    <Link to="StatusDetail" params={object}>Show assignees</Link>
+                </small>;
+    }
+});
+
+const ProcessLinkRequests = React.createClass({
+    render: function () {
+        const row = this.props.rowData;
+        const object = {object: row.hash}
+        return <small>
+                    <Link to="StudyRequests" params={object}>Show requests</Link>
+                </small>;
+    }
 });
 
 const ProcessLink = React.createClass({
@@ -125,11 +135,19 @@ const ProcessTable = React.createClass({
       "locked": true,
       "visible": true,
       "customComponent": ProcessLinkDetail,
-      "displayName": " "
+      "displayName": "Assignees"
+      },
+      {
+      "columnName": "link_requests",
+      "order": 6,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessLinkRequests,
+      "displayName": "Requests"
       },
       {
       "columnName": "hash",
-      "order": 6,
+      "order": 7,
       "locked": true,
       "visible": true,
       "customComponent": ProcessManage,
@@ -145,7 +163,7 @@ const ProcessTable = React.createClass({
               <Griddle
                   noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
                   {...this.commonTableSettings(false)}
-                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "hash"]}
+                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "link_requests", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }

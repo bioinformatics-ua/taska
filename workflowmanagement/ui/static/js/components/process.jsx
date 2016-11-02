@@ -154,22 +154,22 @@ export default React.createClass({
                                       title={`Cancel ${this.state.process['object_repr']}`}
                                       message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
                                       : this.state.process.status === 5 ?
-                                    <span>
-                                    <DeleteButton
-                                      success={this.cancel}
-                                      identificator = {false}
-                                      deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
-                                      title={`Cancel ${this.state.process['object_repr']}`}
-                                      message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
-                                    <RunButton
-                                      success={this.runProcess}
-                                      getValidation={this.getValidation}
-                                      hash={this.state.process['hash']}
-                                      identificator = {false}
-                                      runLabel= {<span><i className="fa fa-play"></i> Run</span>}
-                                      title={`Run ${this.state.process['object_repr']}`}
-                                      message={`Some of the users have not confirmed their availability! Are you sure you want to run  ${this.state.process['object_repr']} ?`}  />
-                                    </span>
+                                    <div className="btn-group" role="group">
+                                        <DeleteButton
+                                          success={this.cancel}
+                                          identificator = {false}
+                                          deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
+                                          title={`Cancel ${this.state.process['object_repr']}`}
+                                          message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
+                                        <RunButton
+                                          success={this.runProcess}
+                                          getValidation={this.getValidation}
+                                          hash={this.state.process['hash']}
+                                          identificator = {false}
+                                          runLabel= {<span><i className="fa fa-play"></i> Run</span>}
+                                          title={`Run ${this.state.process['object_repr']}`}
+                                          message={`Some of the users have not confirmed their availability! Are you sure you want to run  ${this.state.process['object_repr']} ?`}  />
+                                    </div>
                                       :''
                                 }
                                 showRun={false}
@@ -190,7 +190,15 @@ export default React.createClass({
                                 progress={this.state.process.progress}/>
                             
                             <ProcessLabel
-                                linkStatusDetails={params.mode === 'showOnly' ? '':<small><Link to="StatusDetail" params={{object: params.object}}>Show assignees</Link></small>}
+                                links={params.mode === 'showOnly' ? '':
+                                    <span>
+                                        <small>
+                                            <Link to="StatusDetail" params={{object: params.object}}>Show assignees &nbsp;</Link>
+                                        </small>
+                                        <small>
+                                            <Link to="StudyRequests" params={{object: params.object}}>Show requests</Link>
+                                        </small>
+                                    </span>}
                             />
 
                         </span>
