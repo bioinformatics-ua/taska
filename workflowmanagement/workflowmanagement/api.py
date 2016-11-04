@@ -7,6 +7,7 @@ import workflow
 import process
 import history
 import accounts
+import messagesystem
 
 @api_view(('GET',))
 def root(request, format=None):

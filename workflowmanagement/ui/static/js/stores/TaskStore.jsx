@@ -71,7 +71,7 @@ export default Reflux.createStore({
     getTask(hash){
         this.onMethodDetail('getTaskName', hash).then(
             (result) => {
-                this.task_repr = result.task_repr;
+                this.task_repr = result.TaskName;
 
                 this.trigger();
             }
@@ -81,10 +81,8 @@ export default Reflux.createStore({
     },
     onAccept(ptuhash){
         this.onMethodDetail('accept',
-                            null,
-                            'POST', {
-                                ptuhash: ptuhash
-                            })
+                            ptuhash,
+                            'POST', {})
             .then(
             (data) => {
                 this.dversion++;
@@ -94,9 +92,8 @@ export default Reflux.createStore({
     },
     onReject(ptuhash, comment){
         this.onMethodDetail('reject',
-                            null,
+                            ptuhash,
                             'POST', {
-                                ptuhash: ptuhash,
                                 comment: comment
                             })
             .then(

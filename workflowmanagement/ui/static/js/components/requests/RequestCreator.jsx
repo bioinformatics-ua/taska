@@ -15,11 +15,24 @@ export default React.createClass({
     __getState(){
         return {
             request: RequestByProcessStore.getDetail(),
+            response: RequestByProcessStore.getResponse(),
+            addedRequest: RequestByProcessStore.getRequestAddFinished(),
             recipient: "All users (CHANGE THIS)"
         };
     },
     getInitialState(){
         return this.__getState();
+    },
+    componentWillMount(){
+        RequestByProcessActions.calibrate();
+    },
+    componentDidUpdate(){
+        if(this.state.addedRequest){
+            this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
+        }
+    },
+    update(status){
+        this.setState(this.__getState());
     },
     setReqMessage(e){
         RequestByProcessActions.setReqMessage(e.target.value);

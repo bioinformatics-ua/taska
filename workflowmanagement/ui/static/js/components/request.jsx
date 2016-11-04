@@ -56,7 +56,14 @@ export default React.createClass({
     },
     __getState(){
         let detail = RequestStore.getDetail();
-        let task = TaskStore.getTask(detail.task);
+        console.log(detail);
+        let task;
+        try {
+            task = TaskStore.getTask(detail.processtaskuser.hash);
+        }
+        catch(err) {
+            /* In this case it was not a problem, but in the future this way could not be the best
+        because when i create a request, i don't have the processtaskuser*/}
 
         return {
             request:detail ,
@@ -132,8 +139,6 @@ export default React.createClass({
             let Failed = this.props.failed;
             return <Failed />;
         }
-        console.log(this.state.request);
-        console.log(this.state.request.processtaskuser);
         return (
             <div className="request-detail row">
                 <div className="col-md-12">
