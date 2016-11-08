@@ -96,12 +96,12 @@ const RequestTable = React.createClass({
                     <div className="panel-heading">
                         <i className="fa fa-life-ring pull-left"></i>
                         <h3 className="text-center panel-title">Received Requests</h3>
-                        <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}
+                        {/*<Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}
                               to="RequestCreator"
                               params={{object: 'add', mode: 'edit'}}
                               className="pull-right btn btn-xs btn-success">
-                            <i className="fa fa-envelope"></i> Send mail to all users
-                        </Link>
+                             <i className="fa fa-envelope"></i> Send mail to all users
+                        </Link>*/}
                       </div>
                     <Griddle
                         noDataMessage={<center>You currently have no requests made by assignees, relating to this study process.</center>}

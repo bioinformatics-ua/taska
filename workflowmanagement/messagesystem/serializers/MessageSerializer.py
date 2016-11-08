@@ -10,17 +10,13 @@ class MessageSerializer(serializers.ModelSerializer):
 
     '''
 
-    #EM CONSTRUCAO AINDA
-
-    #event = serializers.SerializerMethodField()
-    #object_type = serializers.SerializerMethodField()
-    #object_repr = serializers.SerializerMethodField()
-    #actor_repr = serializers.SerializerMethodField()
-
     class Meta:
         model = Message
-        fields = ('id', 'title')
-
-        #exclude = ['object_id', 'authorized']
-        #permission_classes = [permissions.IsAuthenticated, TokenHasScope]
-        #extra_kwargs = {'hash': {'required': False}}
+        fields = [
+            'title',
+            'message',
+            'object_id',
+            'object_type',
+        ]
+        #exclude = ['sender','receiver']
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]

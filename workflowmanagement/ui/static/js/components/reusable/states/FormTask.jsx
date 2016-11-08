@@ -386,13 +386,14 @@ class FormTaskRun extends FormTask{
                                     Finished on {moment(user.result.date).format('YYYY-MM-DD HH:mm')}
                                 </span>
                                  &nbsp;&nbsp;&nbsp;
+                                {onlyShow ? 
                                  <div className="btn btn-group">
 
                                  <button data-answer={user.hash} onClick={me.refineAnswer} className="btn btn-xs btn-warning">Ask for refinement</button>
                                  <Link className="btn btn-xs btn-info" to={user.result.type}
                                  params={{object: user.result.hash}}>
                                  See result</Link>
-                                 </div>
+                                 </div>:''}
                             </span>
                         );
                     } else if(user.reassigned){

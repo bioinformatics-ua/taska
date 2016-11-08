@@ -12,7 +12,7 @@ class Message(models.Model):
 
     '''
 
-    hash            = models.CharField(max_length=50, default="ERROR")
+    #hash            = models.CharField(max_length=50, default="ERROR")
     title           = models.CharField(max_length=100, null=True)
     message         = models.TextField(null=True)
     date            = models.DateTimeField(auto_now_add=True)
@@ -26,6 +26,18 @@ class Message(models.Model):
 
     def __str__(self):
         return self.title + ' sended by ' + self.sender.name
+
+    def sender_repr(self):
+        """
+            Returns textual representation of the sender,
+            preferably a full name, but an email if no name is available.
+        """
+        tmp = self.sender.get_full_name()
+
+        if tmp != None:
+            return tmp
+
+        return self.sender.email
 
     @classmethod
     def new(self, title, message, sender, receiver, object):
