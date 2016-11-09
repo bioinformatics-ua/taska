@@ -82,7 +82,7 @@ const CompletedTaskTable = React.createClass({
       "locked": false,
       "visible": true,
       "cssClassName": 'complete-process-repr-td',
-      "displayName": "Studie"
+      "displayName": "Study"
       }
     ];
     return <Griddle

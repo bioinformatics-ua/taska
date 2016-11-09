@@ -39,11 +39,15 @@ module.exports = (
        
         <Route name="MyStudies" handler={require('./components/MyStudies.jsx')} />
             
-        <Route name="StudyRequests" handler={require('./components/StudyRequests.jsx')} />
+        <Route name="StudyRequests" path="studyRequests/:object" handler={require('./components/requests/StudyRequests.jsx')} />
+
+        <Route name="RequestCreator" handler={require('./components/requests/RequestCreator.jsx')} />
+
+        <Route name="MyRequests" handler={require('./components/requests/MyRequests.jsx')} />
             
-        <Route name="StudieManagement" handler={require('./components/StudieManagement.jsx')} />
+        <Route name="StudyManagement" handler={require('./components/StudyManagement.jsx')} />
             
-        <Route name="StudieTemplates" handler={require('./components/StudieTemplates.jsx')} />    
+        <Route name="StudyTemplates" handler={require('./components/StudyTemplates.jsx')} />    
             
         <Route name="Forms" handler={require('./components/StudieForms.jsx')} />
 
@@ -78,9 +82,9 @@ module.exports = (
 
         <Route name="StatusDetail" path="statusDetail/:object" handler={require('./components/ManageStatusDetail.jsx')} />
 
-        <Route name="ConnectionRefused" path="/0" handler={require('./components/0.jsx')}/>
-        <Route name="InternalError" path="/500" handler={require('./components/500.jsx')}/>
+        <Route name="ConnectionRefused" path="/0" handler={require('./components/statuscodes/0.jsx')}/>
+        <Route name="InternalError" path="/500" handler={require('./components/statuscodes/500.jsx')}/>
 
-        <NotFoundRoute name="NotFound" handler={require('./components/404.jsx')}/>
+        <NotFoundRoute name="NotFound" handler={require('./components/statuscodes/404.jsx')}/>
     </Route>
 );

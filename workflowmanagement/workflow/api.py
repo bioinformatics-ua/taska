@@ -9,6 +9,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
+from django.http import Http404
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
@@ -314,6 +315,24 @@ class WorkflowViewSet(  mixins.CreateModelMixin,
 
         return Response(WorkflowDetailSerializer(self.get_object()).data)
         #return super(WorkflowViewSet, self).retrieve(request, args, kwargs)
+
+    def get_object(self):
+        """
+        Overrided
+        """
+        obj = None
+        try:
+            obj = Workflow.objects.get(
+                hash=self.kwargs['hash']
+            )
+        except Workflow.DoesNotExist:
+            pass
+        print obj
+        if obj == None:
+            raise Http404('No object')
+
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):

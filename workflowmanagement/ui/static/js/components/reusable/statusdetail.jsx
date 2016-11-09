@@ -61,8 +61,8 @@ const TaskStatus = React.createClass({
 
     //some combinations are never used
     switch(row.processtask.status){
-      case 1: //Waitting fa fa-pause
-        return 'Waitting';
+      case 1: //Waiting fa fa-pause
+        return 'Waiting';
       case 2: //Running fa fa-play
         return 'Running';
       case 3:
@@ -75,8 +75,8 @@ const TaskStatus = React.createClass({
         return 'Improving';
       case 7:
           switch(row.status){
-            case 1: //Waitting fa fa-question
-              return 'Waitting';
+            case 1: //Waiting fa fa-question
+              return 'Waiting';
             case 2: //Accepted fa fa-check
               return 'Accepted';
             case 3: //Rejected fa fa-times

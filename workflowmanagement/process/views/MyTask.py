@@ -6,16 +6,12 @@ from process.serializers.MyProcessTaskUserDetailSerializer import  MyProcessTask
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status, filters, views
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import list_route, detail_route, api_view
 from rest_framework.response import Response
 from django.http import Http404
+from rest_framework import renderers
 
-
-class MyTask(mixins.CreateModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.DestroyModelMixin,
-                     viewsets.GenericViewSet):
+class MyTask(viewsets.ModelViewSet):
 
     #generics.RetrieveAPIView):
     queryset = ProcessTaskUser.all()
@@ -33,14 +29,16 @@ class MyTask(mixins.CreateModelMixin,
         self.check_object_permissions(self.request, obj)
         return obj
 
+    @detail_route(methods=['get'])
+    def getTaskName(self, request, hash=None):
+        return Response({"TaskName": self.get_object().processtask.task.title})
+
     @detail_route(methods=['post'])
     def accept(self, request, hash=None):
-        hashField = request.data['ptuhash']
-
         obj = None
         try:
             obj = ProcessTaskUser.all().get(
-                hash=hashField,
+                hash=hash,
                 user=self.request.user
             )
             obj.accept()
@@ -51,12 +49,10 @@ class MyTask(mixins.CreateModelMixin,
 
     @detail_route(methods=['post'])
     def reject(self, request, hash=None):
-        hashField = request.data['ptuhash']
-
         obj = None
         try:
             obj = ProcessTaskUser.all().get(
-                hash=hashField,
+                hash=hash,
                 user=self.request.user
             )
             obj.reject(request.data['comment'])

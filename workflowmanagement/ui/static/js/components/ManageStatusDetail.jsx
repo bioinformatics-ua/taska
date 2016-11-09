@@ -1,5 +1,6 @@
 'use strict';
 import Router from 'react-router';
+import {Link} from 'react-router';
 import React from 'react/addons';
 import Reflux from 'reflux';
 
@@ -163,7 +164,7 @@ export default React.createClass({
             status={this.state.process.status}
             progress={this.state.process.progress}/>
 
-            <ProcessLabel />
+            <ProcessLabel links={<small><Link to="StudyRequests" params={{object: params.object}}>Show requests</Link></small>}/>
             <hr />
 
             <div className="panel panel-default panel-overflow  griddle-pad">

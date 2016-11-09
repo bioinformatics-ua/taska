@@ -44,16 +44,3 @@ class MyTasks(generics.ListAPIView):
         # return ProcessTask.all().filter(id__in=ptasks).order_by('deadline')
 
         return ptasks
-
-
-    @detail_route(methods=['get'])
-    def getTaskName(self, request, hash=None):
-        try:
-            obj = Task.all().filter(
-                hash=hash
-            )
-            return Response({"TaskName": obj[0].title})
-        except ProcessTaskUser.DoesNotExist:
-            raise Http404
-
-        return Response({"TaskName": "Not Found"})

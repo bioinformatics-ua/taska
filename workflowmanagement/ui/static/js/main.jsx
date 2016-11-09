@@ -27,10 +27,10 @@ import {Login} from './actions/api.jsx';
 
 import StateActions from './actions/StateActions.jsx';
 
-import Http404 from './components/404.jsx';
-import Http500 from './components/500.jsx';
+import Http404 from './components/statuscodes/404.jsx';
+import Http500 from './components/statuscodes/500.jsx';
 
-import Http0 from './components/0.jsx';
+import Http0 from './components/statuscodes/0.jsx';
 
 const content = document.getElementById('playground');
 

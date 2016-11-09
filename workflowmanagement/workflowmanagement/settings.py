@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'accounts',
     'djangojs',
     'ui',
+    'messagesystem',
 
     # Extra types of task/result
     'form',

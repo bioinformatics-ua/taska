@@ -6,7 +6,6 @@ import Reflux from 'reflux';
 import {GeneralHistoryTable} from './reusable/history.jsx';
 import {WorkflowTable} from './reusable/workflow.jsx';
 import {ProcessTable} from './reusable/process.jsx';
-import {RequestTable} from './reusable/request.jsx';
 import {TaskTabber} from './reusable/task.jsx';
 import {FormTable} from './reusable/form.jsx';
 

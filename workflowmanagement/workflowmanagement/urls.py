@@ -7,6 +7,7 @@ import api
 import workflow
 import process
 import history
+import messagesystem
 
 from tasks.api import TaskDependenciesView
 
@@ -33,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^api/history', include('history.urls')),
     url(r'^api/account', include('accounts.urls')),
     url(r'^api/result', include('result.urls')),
+    url(r'^api/message', include('messagesystem.urls')),
 
     # For some ridiculous reason the rest routers remove my ability to set post methods... after the ones defined by it on the same domain
     # Since i will have different kinds of authentication in this and the router, i cant add it as a list_route

@@ -23,16 +23,25 @@ from views.ResultsPDF import ResultsPDF
 from views.ProcessTaskResultExport import ProcessTaskResultExport
 from views.MyStudies import MyStudies
 from views.MyFinishedStudies import MyFinishedStudies
+from views.RequestsByProcessViewSet import RequestsByProcessViewSet
+
+from rest_framework import renderers
 
 router = routers.DefaultRouter()
 router.register(r'/requests',RequestsViewSet)
+router.register(r'/requestsbyprocess/(?P<phash>[^/.]+)',RequestsByProcessViewSet)
 router.register(r'', ProcessViewSet)
 router.register(r'/my/alltasks', MyAllTasks)
 router.register(r'/my/statusdetail/(?P<phash>[^/.]+)', StatusDetail)
-#router.register(r'/my/task/(?P<thash>[^/.]+)', MyTask)
 
 # trick to add root to the router generated urls
 router_tricks = router.urls #+ [url(r'^', api.root)]
+
+accept_task = MyTask.as_view({'post':'accept'})
+reject_task = MyTask.as_view({'post':'reject'})
+task_name = MyTask.as_view({'get':'getTaskName'})
+get_task = MyTask.as_view({'get':'retrieve'})
+
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
@@ -45,11 +54,13 @@ urlpatterns = patterns('',
     url(r'^/my/studies/', MyStudies.as_view()),
     url(r'^/my/futuretasks/', MyFutureTasks.as_view()),
 
-    #url(r'^/my/statusdetail/(?P<hash>[^/.]+)/', api.StatusDetail.as_view({'get': 'list'})),
-
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', MyTaskDependencies.as_view()),
     url(r'^/my/task/(?P<hash>[^/.]+)/preliminary_outputs/', MyTaskPreliminary.as_view()),
-    url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view({'get':'retrieve', 'post':'reject', 'post':'accept'})),
+    url(r'^/my/task/(?P<hash>[^/.]+)/getTaskName/$', task_name),
+    url(r'^/my/task/(?P<hash>[^/.]+)/$', get_task),
+    url(r'^/my/task/(?P<hash>[^/.]+)/accept/$', accept_task),
+    url(r'^/my/task/(?P<hash>[^/.]+)/reject/$', reject_task),
+
     #url(r'^/my/task/(?P<hash>[^/.]+)/', MyTask.as_view()),
 
     url(r'^/processtask/(?P<hash>[0-9a-zA-Z]+)/export/pdf?$'

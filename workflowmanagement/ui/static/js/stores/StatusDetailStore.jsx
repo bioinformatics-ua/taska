@@ -27,7 +27,7 @@ export default Reflux.createStore({
     ],
     listenables: [StatusDetailActions],
     load: function (state) {
-        console.log(state.hash);
+        console.log(state);
         loader = new ListLoader({model: 'process/my/statusdetail/'+state.hash});//+state.hash
         console.log(loader);
         let self = this;

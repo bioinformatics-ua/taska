@@ -100,7 +100,7 @@ const RejectedTaskTable = React.createClass({
       "locked": false,
       "visible": true,
       "cssClassName": 'process-repr-td',
-      "displayName": "Studie"
+      "displayName": "Study"
       },
       {
       "columnName": "deadline",

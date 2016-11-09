@@ -163,7 +163,7 @@ const CurrentTaskTable = React.createClass({
       "locked": false,
       "visible": true,
       "cssClassName": 'process-repr-td',
-      "displayName": "Studie"
+      "displayName": "Study"
       },
       {
       "columnName": "user_repr",

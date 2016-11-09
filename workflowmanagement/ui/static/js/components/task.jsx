@@ -4,7 +4,7 @@ import Reflux from 'reflux';
 
 import React from 'react';
 import Router from 'react-router';
-import {Link} from 'react-router';
+import {Link, browserHistory} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
