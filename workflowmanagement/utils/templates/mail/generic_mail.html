@@ -1,0 +1,18 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{ title }}
+{% endblock %}
+
+{% block body %}
+Hello dear {{ user }},<br /><br />
+
+    {% for row in message %}
+        {{ row }} <br />
+    {% endfor %}
+
+
+<br /><br />
+Best Regards,<br />
+Taska (on behalf of {{ sender }})
+{% endblock %}

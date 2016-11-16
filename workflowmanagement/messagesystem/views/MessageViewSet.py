@@ -6,6 +6,8 @@ from rest_framework.reverse import reverse
 from messagesystem.models import Message
 from messagesystem.serializers.MessageSerializer import MessageSerializer
 
+from process.models import Process, ProcessTask
+
 
 class MessageViewSet(CreateAPIView):
     queryset = Message.objects.none()
@@ -13,15 +15,36 @@ class MessageViewSet(CreateAPIView):
     lookup_field = 'hash'
 
     def perform_create(self, serializer):
-        #send mail and so on
         objType = ContentType.objects.get_for_id(self.request.data['object_type'])
 
-        try:
-            print self.kwargs['hash']
+        #obj = objType.model_class().all().filter(hash=self.request.data['hash']).first()
 
-            #Look for id of object using hash
-            #serializer.save(sender=self.request.user, object_id=id)
+        try:
+            obj = objType.model_class().all().filter(hash=self.kwargs['hash']).first()
         except:
             pass
-            #Use the id in the serializer only
-            #serializer.save(sender=self.request.user)
+
+        if(obj != None):
+            receivers = self.getReceivers(receiver=self.request.data['receiver'], object=obj, sender=self.request.user)
+            # do a models.message.new that it will create and send a email too
+            message = serializer.save(title=self.request.data['title'], message=self.request.data['message'], sender=self.request.user,
+                        receiver=[receivers], object=obj)
+            Message.sendMessage(message)
+
+
+    #Refactor this method
+    def getReceivers(self, receiver=None, object=None, sender=None):
+        #if receiver != None:
+        #    return receiver
+        print receiver
+        if len(receiver) == 1 and receiver[0] == str(sender.id) and object != None:
+            #Decide how are the receivers in base with object type
+            if(isinstance(object, Process)):
+                for user in object.getAllUsersEnvolved():
+                    receiver.add(user)
+                return receiver
+
+            else:
+                print "SOMETHING WRONG! DEFAULT RECEIVERS ARE NOT DEFINED!!!!"
+        else:
+            return receiver

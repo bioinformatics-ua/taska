@@ -5,18 +5,17 @@ import Reflux from 'reflux';
 
 import {Authentication} from '../../mixins/component.jsx';
 
-import RequestByProcessActions from '../../actions/RequestByProcessActions.jsx';
-import RequestByProcessStore from '../../stores/RequestByProcessStore.jsx';
+import MessageActions from '../../actions/MessageActions.jsx';
+import MessageStore from '../../stores/MessageStore.jsx';
 
 export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
-                Reflux.listenTo(RequestByProcessStore, 'update')],
+                Reflux.listenTo(MessageStore, 'update')],
     __getState(){
         return {
-            request: RequestByProcessStore.getDetail(),
-            response: RequestByProcessStore.getResponse(),
-            addedRequest: RequestByProcessStore.getRequestAddFinished(),
+            message: MessageStore.getDetail(),
+            sended: MessageStore.getRequestAddFinished(),
             recipient: "All users (CHANGE THIS)"
         };
     },
@@ -24,27 +23,27 @@ export default React.createClass({
         return this.__getState();
     },
     componentWillMount(){
-        RequestByProcessActions.calibrate();
+        //MessageActions.calibrate();
     },
     componentDidUpdate(){
-        if(this.state.addedRequest){
-            this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
+        if(this.state.sended){
+            this.goBack();
         }
     },
     update(status){
         this.setState(this.__getState());
     },
     setReqMessage(e){
-        RequestByProcessActions.setReqMessage(e.target.value);
+        MessageActions.setMessage(e.target.value);
     },
     setReqTitle(e){
-        RequestByProcessActions.setReqTitle(e.target.value);
+        MessageActions.setTitle(e.target.value);
     },
     goBackAndClean(){
         this.goBack();
     },
     setRequest(){
-        RequestByProcessActions.submitRequest();
+        MessageActions.send();
     },
     render(){
         return (
@@ -75,7 +74,7 @@ export default React.createClass({
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Title</strong></span>
                                             <input onChange={this.setReqTitle} className="form-control"
-                                                   value={this.state.request.title}/>
+                                                   value={this.state.message.title}/>
                                         </div>
                                     </div>
                                 </div>
@@ -86,7 +85,7 @@ export default React.createClass({
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Message</strong></span>
                                                 <textarea onChange={this.setReqMessage} rows="7"
-                                                          className="form-control" value={this.state.request.message}/>
+                                                          className="form-control" value={this.state.message.message}/>
                                         </div>
                                     </div>
                                 </div>

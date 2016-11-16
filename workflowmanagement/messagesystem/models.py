@@ -17,7 +17,7 @@ class Message(models.Model):
     message         = models.TextField(null=True)
     date            = models.DateTimeField(auto_now_add=True)
     sender          = models.ForeignKey(User)
-    receiver        = models.ManyToManyField(User, related_name='receiver')
+    receiver        = models.ManyToManyField(User, related_name='receiver', blank=True)
 
     # generic foreign key that refers to the object related to this action
     object_type     = models.ForeignKey(ContentType)
@@ -25,7 +25,7 @@ class Message(models.Model):
     object          = GenericForeignKey('object_type', 'object_id')
 
     def __str__(self):
-        return self.title + ' sended by ' + self.sender.name
+        return self.title + ' sended by ' + self.sender.get_full_name()
 
     def sender_repr(self):
         """
@@ -39,24 +39,18 @@ class Message(models.Model):
 
         return self.sender.email
 
+    def obj_repr(self):
+        """
+            Returns a representation of the generic object
+        """
+        return self.object.__unicode__()
+
     @classmethod
-    def new(self, title, message, sender, receiver, object):
+    def sendMessage(self, obj):
         """
-        Generates a new generic history object
+        Send the message
         """
-        action = Message(title=title, message=message, sender=sender, object=object)
-
-        action.save()
-
-        if receiver != None:
-            for elem in receiver:
-                action.receiver.add(elem)
-
-        print 'NEW MESSAGE'
-
-        self.post_new.send(sender=self.__class__, instance=action)
-
-        return action
+        self.post_new.send(sender=self.__class__, instance=obj)
 
     # Signals
     post_new = django.dispatch.Signal(providing_args=["instance"])

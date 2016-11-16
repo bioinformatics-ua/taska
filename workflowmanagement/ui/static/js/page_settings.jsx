@@ -12,7 +12,11 @@ const getContentTableSizeWithTabs = function () {
 }
 
 const getContentTableSize = function () {
-    return getTableSizeWithTabs()-80; //Try to change this 125 for variables
+    return getTableSizeWithTabs()-80; //Try to change this 80 for variables
 }
 
-export default {getTableSizeWithTabs, getContentTableSizeWithTabs, getContentTableSize};
+const getTASKAVersion = function () {
+    return "v2.0.1"
+}
+
+export default {getTableSizeWithTabs, getContentTableSizeWithTabs, getContentTableSize, getTASKAVersion};

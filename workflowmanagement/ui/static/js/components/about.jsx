@@ -4,6 +4,8 @@ import React from 'react';
 
 import {Authentication} from '../mixins/component.jsx';
 
+import {getTASKAVersion} from '../page_settings.jsx'
+
 export default React.createClass({
     displayName: "About",
     mixins: [Authentication],
@@ -11,7 +13,7 @@ export default React.createClass({
         return (
           <div>
             <h1>Version</h1>
-            Taska - v0.1alpha
+            Taska - {getTASKAVersion()}
             <h1>About Taska</h1>
             <p>Taska is an on-going work for the creation of a modular and easily extendable workflow-oriented system designed to manage
             processes of data extraction and data handling.</p>

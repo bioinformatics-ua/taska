@@ -269,7 +269,7 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-6">
                                         {this.isMe()?
-                                            <div className="pull-right">
+                                            <div className="pull-right btn-group" role="group">
                                             <button onClick={this.setResponsePublic} className="btn btn-warning">
                                                 <i style={{marginTop: '3px'}} className="fa fa-floppy-o"></i> Reply & Make Visible for all executers
                                             </button>&nbsp;

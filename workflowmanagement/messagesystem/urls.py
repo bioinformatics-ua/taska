@@ -12,5 +12,5 @@ router_tricks = router.urls
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
     url(r'^/create/(?P<hash>[^/.]+)/$', MessageViewSet.as_view()), #(?P<hash>[^/.]+)/
-    url(r'^/create/$', MessageViewSet.as_view()),
+    #url(r'^/create/$', MessageViewSet.as_view()),
 )

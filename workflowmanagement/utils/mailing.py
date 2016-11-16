@@ -7,6 +7,7 @@ import html2text
 
 from process.models import Process, Request, ProcessTaskUser
 from history.models import *
+from messagesystem.models import Message
 
 class MailTemplate:
     def __init__(self, instance, destinies):
@@ -34,6 +35,8 @@ class MailTemplate:
         start_date = None
         executioner = None
         task = None
+        message_content = None
+        observations = None
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
@@ -43,29 +46,40 @@ class MailTemplate:
         else:
             user = interested
 
-        #When is a processtaskuser instance
-        if isinstance(self.instance.object, ProcessTaskUser):
-            if(self.instance.event == History.REJECT):
-                executioner = self.instance.object.processtask.process.executioner
-                if len(self.instance.object.user.first_name) > 0:
-                    user = self.instance.object.user.first_name + " " + self.instance.object.user.last_name
-                else:
-                    user = self.instance.object.user
+        if not isinstance(self.instance, Message):
+            try:
+                observations = self.instance.observations
+            except AttributeError as e:
+                print e
+                # pass
 
-        #When is a process instance
-        if isinstance(self.instance.object, Process):
-            if(self.instance.object.status == Process.WAITING):
-                list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
-            title = self.instance.object.title
-            start_date = self.instance.object.start_date
-            executioner = self.instance.object.executioner
+            #When is a processtaskuser instance
+            if isinstance(self.instance.object, ProcessTaskUser):
+                if(self.instance.event == History.REJECT):
+                    executioner = self.instance.object.processtask.process.executioner
+                    if len(self.instance.object.user.first_name) > 0:
+                        user = self.instance.object.user.first_name + " " + self.instance.object.user.last_name
+                    else:
+                        user = self.instance.object.user
 
-        # When is a request instance
-        if isinstance(self.instance.object, Request):
-            task = self.instance.object.processtaskuser.processtask.task.title
-            executioner = self.instance.object.processtaskuser.processtask.process.executioner
-            user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
-            link_open_plataform += "request/"+ self.instance.object.hash
+            #When is a process instance
+            if isinstance(self.instance.object, Process):
+                if(self.instance.object.status == Process.WAITING):
+                    list_tasks = self.instance.object.tasks().filter(processtaskuser__user=interested)
+                title = self.instance.object.title
+                start_date = self.instance.object.start_date
+                executioner = self.instance.object.executioner
+
+            # When is a request instance
+            if isinstance(self.instance.object, Request):
+                task = self.instance.object.processtaskuser.processtask.task.title
+                executioner = self.instance.object.processtaskuser.processtask.process.executioner
+                user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
+                link_open_plataform += "request/"+ self.instance.object.hash
+
+        if isinstance(self.instance, Message):
+            title = self.instance.title
+            message_content = self.instance.message.split("\n")
 
         #Links on mails don't work because the url ends with a /
         if link_open_plataform.endswith('/'):
@@ -77,7 +91,8 @@ class MailTemplate:
             'taskName': task,
             'history': self.instance,
             'settings': settings,
-            'user': user
+            'user': user,
+            'title': title
         }).replace('\n', '')
         message = render_to_string(self.template,
                                    {
@@ -92,7 +107,10 @@ class MailTemplate:
                                        'startDate': start_date,
                                        'leaderName': executioner,
                                        'task':task,
-                                       'observations': self.instance.observations
+                                       'observations': observations,
+                                       'sender':executioner, #it is the same tha leaderName but I want do a refactor in the future so i decide create this new field and deleted the other
+                                       'message': message_content,
+                                       'title': title
                                    })
         return (subject, message)
 
@@ -122,6 +140,11 @@ class MailTemplate:
             msg.send()
 
         return True
+
+
+class MessageTemplate(MailTemplate):
+    subjecttemplate="mail/generic_mail_subject.html"
+    template="mail/generic_mail.html"
 
 
 class ProcessCancelTemplate(MailTemplate):

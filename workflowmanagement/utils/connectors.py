@@ -8,12 +8,33 @@ from tasks import sendEmail
 
 from process.models import Process, ProcessTask, Request, ProcessTaskUser
 from result.models import Result
+from messagesystem.models import Message
 import time
+
+@receiver(Message.post_new)
+def newMessageNotifications(sender, instance, **kwargs):
+    try:
+        tcn = 'Message'
+        tcn += 'Template'
+        tcn = tcn.replace(' ', '')
+        print tcn
+        try:
+            tc = getattr(mailing, tcn)
+            tci = tc(instance, instance.receiver.all())
+
+            sendEmail.apply_async([tci], countdown=5) #Descomentar esta linha
+            #sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
+        except AttributeError as e:
+            #print e
+            pass
+    except:
+        raise
 
 @receiver(History.post_new)
 def newHistoryNotifications(sender, instance, **kwargs):
     try:
         tcn = buildTemplate(instance)
+
         print tcn
         try:
             tc = getattr(mailing, tcn)
@@ -31,10 +52,9 @@ def newHistoryNotifications(sender, instance, **kwargs):
         raise
         #raise Exception('Error discovering Class template name for %s' % instance.__class__)
 
-
-
 def defineTci(instance, tc):
     tci = None
+    print type(instance)
 
     if isinstance(instance.object, User):
         # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
