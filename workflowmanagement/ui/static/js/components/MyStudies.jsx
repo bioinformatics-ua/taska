@@ -41,7 +41,7 @@ const LoggedInHome = React.createClass({
                     <div className="panel-heading">
                           <center>
                             <i className="fa fa-cogs pull-left"></i>
-                            <h3 className="panel-title"> Studies (which I participate) </h3>
+                            <h3 className="panel-title"> Studies that I participate </h3>
                           </center>
                         </div>
                       <div className="panel-body tasktab-container">

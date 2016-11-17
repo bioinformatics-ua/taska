@@ -34,17 +34,6 @@ class MessageViewSet(CreateAPIView):
 
     #Refactor this method
     def getReceivers(self, receiver=None, object=None, sender=None):
-        #if receiver != None:
-        #    return receiver
-        print receiver
-        if len(receiver) == 1 and receiver[0] == str(sender.id) and object != None:
-            #Decide how are the receivers in base with object type
-            if(isinstance(object, Process)):
-                for user in object.getAllUsersEnvolved():
-                    receiver.add(user)
-                return receiver
+        print "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        return receiver
 
-            else:
-                print "SOMETHING WRONG! DEFAULT RECEIVERS ARE NOT DEFINED!!!!"
-        else:
-            return receiver

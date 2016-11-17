@@ -3,6 +3,14 @@ from oauth2_provider.ext.rest_framework import TokenHasScope
 from messagesystem.models import Message
 from django.contrib.auth.models import User
 
+class ReceiverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id']
+        permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
+
+
 class MessageSerializer(serializers.ModelSerializer):
     '''Serializer to handle :class:`messagesystem.models.Message` objects serialization/deserialization.
 
@@ -12,6 +20,7 @@ class MessageSerializer(serializers.ModelSerializer):
     '''
     #object_id = serializers.IntegerField(allow_null=True)
     #hash = serializers.CharField()
+    receiver = ReceiverSerializer( read_only=True)
 
     class Meta:
         model = Message
