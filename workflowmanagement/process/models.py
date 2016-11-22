@@ -303,7 +303,7 @@ class ProcessTask(models.Model):
     def resignRejectedUser(self, oldUser, newUser):
         tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
         exists = ProcessTaskUser.all(processtask=self).filter(user=newUser).count()
-        if exists == 0:
+        if exists == 0 or int(oldUser) == int(newUser):
             for task in tasks:
                 task.changeUser(newUser)
 

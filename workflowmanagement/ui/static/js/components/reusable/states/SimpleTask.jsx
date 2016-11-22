@@ -322,13 +322,25 @@ class SimpleTaskRun extends SimpleTask{
         let self = this;
         const SimpleRun = React.createClass({
             getState(){
+                let alreadyusers;
+                try
+                {
+                    alreadyusers = this.props.main.state.assignee.split(',');
+                }
+                catch(err)
+                {
+                    alreadyusers = [];
+                }
+
                 return {
                     parent: this.props.main,
                     users: [],
                     new_assignee: undefined,
                     new_reassigning: undefined,
                     oldUser: undefined,
-                    showReassign: false
+                    showReassign: false,
+                    alreadyusers : alreadyusers,
+                    tempAlreadyUsers: []
                 };
             },
             getInitialState(){
@@ -382,10 +394,25 @@ class SimpleTaskRun extends SimpleTask{
                 }
             },
             showReassignSelect(e){
+                let alreadyusers = []
+
+                let taskUser = this.state.parent.state.ptask.users;
+
+                //add all in already user except the selected
+                for(var index = 0; index < this.state.alreadyusers.length; index++ )
+                    if (this.state.alreadyusers[index] != Number.parseInt($(e.target).data('assignee')) )
+                        alreadyusers += this.state.alreadyusers[index];
+
+                //Verify if the selected was rejected the task, if no add too
+                for(var index = 0; index < taskUser.length; index++ )
+                    if(taskUser[index].user == Number.parseInt($(e.target).data('assignee')) && taskUser[index].status != 3)
+                        alreadyusers += taskUser[index].user;
+
                 this.setState({
                     showReassign: true,
-                    oldUser: Number.parseInt($(e.target).data('assignee'))
-                })
+                    oldUser: Number.parseInt($(e.target).data('assignee')),
+                    tempAlreadyUsers: alreadyusers
+                });
 
             },
             reassign(){
@@ -419,8 +446,6 @@ class SimpleTaskRun extends SimpleTask{
 
                 if(!this.parent().assignee)
                     return;
-
-                let alreadyusers = this.parent().assignee.split(',');
 
                 try{
                     users = this.parent().ptask.users;
@@ -551,7 +576,7 @@ class SimpleTaskRun extends SimpleTask{
                                 <div className="input-group">
                                         <Select placeholder="Search for assignee" onChange={this.newAssignee}
                                             value={this.state.new_assignee} name="form-field-name"
-                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                            options={this.state.users.filter(user => (this.state.alreadyusers.indexOf(user.value) === -1))
                                         } />
                                   <span className="input-group-btn">
                                     <button onClick={me.addNew} className="btn btn-success"><i className="fa fa-plus"></i></button>
@@ -562,7 +587,7 @@ class SimpleTaskRun extends SimpleTask{
                                 <div className="input-group reassign">
                                         <Select placeholder="Search for users to reassigning" onChange={this.newReassigning}
                                             value={this.state.new_reassigning} name="form-field-name"
-                                            options={this.state.users.filter(user => (alreadyusers.indexOf(user.value) === -1))
+                                            options={this.state.users.filter(user => (this.state.tempAlreadyUsers.indexOf(user.value) === -1))
                                         } />
                                   <span className="input-group-btn">
                                     <ReassigningButton
