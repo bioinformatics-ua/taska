@@ -243,8 +243,23 @@ def ptask_path(obj, interested):
 
     return None
 
+def ptuask_path(obj, interested):
+
+    task = obj.processtask.task.subclass()
+
+    if(task.type() == 'tasks.SimpleTask'):
+        return BASE_URL+'simpletask/'+obj.hash
+
+    if(task.type() == 'form.FormTask'):
+        return BASE_URL+'formtask/'+obj.hash
+
+    return None
+
 MAIL_LINKS = {
-    "ProcessTaskAddTemplate":  ptask_path
+    "ProcessTaskAddTemplate":  ptask_path,
+    "ProcessTaskUserRunTemplate":  ptuask_path,
+    "ProcessTaskUserLateTemplate":  ptuask_path,
+    "ProcessTaskUserRemainderTemplate":  ptuask_path,
 }
 
 
