@@ -46,11 +46,22 @@ class Message(models.Model):
         return self.object.__unicode__()
 
     @classmethod
-    def sendMessage(self, obj):
+    def new(self, title, message, sender, receiver, object):
         """
-        Send the message
+        Generates a new generic history object
         """
-        self.post_new.send(sender=self.__class__, instance=obj)
+        action = Message(title=title, message=message, sender=sender, object=object)
+        action.save()
+
+        if receiver != None:
+            for elem in receiver:
+                action.receiver.add(elem)
+
+        print 'NEW MESSAGE'
+
+        self.post_new.send(sender=self.__class__, instance=action)
+
+        return action
 
     # Signals
     post_new = django.dispatch.Signal(providing_args=["instance"])

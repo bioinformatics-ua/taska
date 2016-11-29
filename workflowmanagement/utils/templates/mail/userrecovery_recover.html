@@ -1,11 +1,11 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{%if history.actor.first_name %}{{history.actor.get_full_name}}{% else %}{{history.actor.email}}{%endif%} password recovery
+{%if instance.actor.first_name %}{{instance.actor.get_full_name}}{% else %}{{instance.actor.email}}{%endif%} password recovery
 {% endblock %}
 
 {% block body %}
-Hello dear {%if history.actor.first_name %}{{history.actor.get_full_name}}{% else %}{{history.actor.email}}{%endif%},<br /><br />
+Hello dear {%if instance.actor.first_name %}{{instance.actor.get_full_name}}{% else %}{{instance.actor.email}}{%endif%},<br /><br />
 
 This message is meant to inform you that you(or someone pretending to be you) has asked for a password recovery. If you did not made this request, please ignore this message.
 <br /><br />

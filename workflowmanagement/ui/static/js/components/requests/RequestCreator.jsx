@@ -2,6 +2,7 @@
 import React from 'react';
 import Router from 'react-router';
 import Reflux from 'reflux';
+import Select from 'react-select';
 
 import {Authentication} from '../../mixins/component.jsx';
 
@@ -12,26 +13,51 @@ export default React.createClass({
     mixins: [   Router.Navigation,
                 Authentication,
                 Reflux.listenTo(MessageStore, 'update')],
-    __getState(){
+    statics: {
+        fetch(params) {
+            return new Promise(function (fulfill, reject){
+                MessageStore.init();
+                fulfill({});
+            });
+        }
+    },
+    getState(){
         return {
-            message: MessageStore.getDetail(),
-            sended: MessageStore.getRequestAddFinished(),
-            recipient: "All users (CHANGE THIS)"
+            message: MessageStore.getMessage(),
+            users: MessageStore.getUsers(),
+            sended: false
         };
     },
     getInitialState(){
-        return this.__getState();
+        return this.getState();
     },
     componentWillMount(){
-        //MessageActions.calibrate();
+        let params = this.context.router.getCurrentParams();
+
+        MessageActions.calibrate(params.object, params.hash);
+
+        switch (params.object){
+            case 'process':
+                this.setState({
+                    objectType: 15,
+                    usersSelectPlaceholder: "Leave empty to send message to all users involved in this study",
+                });
+                break;
+            case 'processTask':
+                this.setState({
+                    objectType: 16,
+                    usersSelectPlaceholder: "Leave empty to send message to all users involved in this task",
+                });
+                break;
+        }
     },
     componentDidUpdate(){
         if(this.state.sended){
-            this.goBack();
+            this.goBackAndClean();
         }
     },
     update(status){
-        this.setState(this.__getState());
+        this.setState(this.getState());
     },
     setReqMessage(e){
         MessageActions.setMessage(e.target.value);
@@ -42,8 +68,19 @@ export default React.createClass({
     goBackAndClean(){
         this.goBack();
     },
-    setRequest(){
+    setRequest(e){
+        let hash = this.context.router.getCurrentParams().hash;
+        MessageActions.setObjectType(this.state.objectType, hash);
         MessageActions.send();
+        this.setState({sended: true});
+
+    },
+    setReceivers(val){
+        let receivers = [];
+        let users = val.split(",");
+        for( var index = 0; index < users.length ;  index++)
+            receivers += users[index];
+        MessageActions.setReceivers(receivers);
     },
     render(){
         return (
@@ -62,8 +99,10 @@ export default React.createClass({
                                     <div className="form-group">
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Recipient</strong></span>
-                                            <input disabled={true} className="form-control"
-                                                   value={this.state.recipient}/>
+                                            <Select onChange={this.setReceivers} placeholder={this.state.usersSelectPlaceholder}
+                                                defaultValue={this.state.message.receivers} name="form-field-name"
+                                                multi={true} 
+                                                options={this.state.users}/>
                                         </div>
                                     </div>
                                 </div>
@@ -74,7 +113,7 @@ export default React.createClass({
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Title</strong></span>
                                             <input onChange={this.setReqTitle} className="form-control"
-                                                   value={this.state.message.title}/>
+                                                   defaultValue={this.state.message.title}/>
                                         </div>
                                     </div>
                                 </div>
@@ -85,7 +124,7 @@ export default React.createClass({
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Message</strong></span>
                                                 <textarea onChange={this.setReqMessage} rows="7"
-                                                          className="form-control" value={this.state.message.message}/>
+                                                          className="form-control" defaultValue={this.state.message.message}/>
                                         </div>
                                     </div>
                                 </div>

@@ -3,14 +3,14 @@ from history.models import History
 
 from django.contrib.auth.models import User
 
-from utils import mailing
+from messagesystem import mailing
 from tasks import sendEmail
 
 from process.models import Process, ProcessTask, Request, ProcessTaskUser
 from result.models import Result
 from messagesystem.models import Message
 import time
-
+'''
 @receiver(Message.post_new)
 def newMessageNotifications(sender, instance, **kwargs):
     try:
@@ -126,3 +126,5 @@ def buildTemplate(instance):
     tcn = tcn.replace(' ', '')
 
     return tcn;
+
+'''

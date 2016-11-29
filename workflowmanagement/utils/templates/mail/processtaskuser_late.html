@@ -5,11 +5,14 @@
 {% endblock %}
 
 {% block body %}
-Hello dear user,<br /><br />
+Hello dear {{ user }},<br /><br />
 
 This email is meant to inform you that the task {{object.processtask}} you have been assigned, is behind schedule.
 
-Please visit your Taska account to complete this task.
+{% if settings.INCLUDE_EMAIL_LINKS and link_delegate %}
+<br /> <br />
+You can complete this task <a href="{{link_delegate}}">here</a>
+{% endif %}
 
 <br /><br />
 Best Regards,<br />

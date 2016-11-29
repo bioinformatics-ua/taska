@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{{ title }}
+{{ instance.title }}
 {% endblock %}
 
 {% block body %}
@@ -14,5 +14,5 @@ Hello dear {{ user }},<br /><br />
 
 <br /><br />
 Best Regards,<br />
-Taska (on behalf of {{ sender }})
+Taska (on behalf of {{ instance.sender.get_full_name }})
 {% endblock %}

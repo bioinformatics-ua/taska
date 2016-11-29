@@ -88,8 +88,6 @@ export default React.createClass({
         let pthash = $(e.target).data('pthash');
         let selectedUser = Number.parseInt($(e.target).data('assignee'));
 
-        console.log(this.state.process);
-
         //add all in already user except the selected and verify if the selected user was rejected the task, if no add too
         for (var i = 0; i < this.state.process.tasks.length; i++)
             if (this.state.process.tasks[i].task === pthash)

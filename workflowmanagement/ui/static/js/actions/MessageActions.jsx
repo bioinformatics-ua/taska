@@ -9,9 +9,12 @@ const MessageActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
     'load': {},
+    'calibrate': {},
     'setTitle': {},
     'send': {},
-    'setMessage': {}
+    'setMessage': {},
+    'setObjectType': {},
+    'setReceivers': {}
     }, DetailActionsMixin));
 
 export default MessageActions;

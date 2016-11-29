@@ -196,7 +196,15 @@ export default React.createClass({
                                             <Link to="StatusDetail" params={{object: params.object}}>Show assignees &nbsp;</Link>
                                         </small>
                                         <small>
-                                            <Link to="StudyRequests" params={{object: params.object}}>Show requests</Link>
+                                            <Link to="StudyRequests" params={{object: params.object}}>Show requests &nbsp;</Link>
+                                        </small>
+                                        <small>
+                                            <Link
+                                                  to="MessageSender"
+                                                  params={{hash: params.object, object: 'process'}}
+                                                  className="pull-right btn btn-xs btn-success">
+                                                 <i className="fa fa-envelope"></i> Send mail to all users
+                                            </Link>
                                         </small>
                                     </span>}
                             />

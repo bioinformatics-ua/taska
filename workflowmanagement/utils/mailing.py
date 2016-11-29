@@ -8,7 +8,7 @@ import html2text
 from process.models import Process, Request, ProcessTaskUser
 from history.models import *
 from messagesystem.models import Message
-
+'''
 class MailTemplate:
     def __init__(self, instance, destinies):
         self.instance = instance
@@ -219,3 +219,4 @@ class UserRecoveryRecoverTemplate(MailTemplate):
     subjecttemplate="mail/userrecovery_recover_subject.html"
     template="mail/userrecovery_recover.html"
 
+'''

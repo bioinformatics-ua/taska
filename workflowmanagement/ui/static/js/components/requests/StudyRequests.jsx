@@ -97,8 +97,8 @@ const RequestTable = React.createClass({
                         <i className="fa fa-life-ring pull-left"></i>
                         <h3 className="text-center panel-title">Received Requests</h3>
                         <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}
-                              to="RequestCreator"
-                              params={{object: 'add', mode: 'edit'}}
+                              to="MessageSender"
+                              params={{hash: this.props.hash, object: 'process'}}
                               className="pull-right btn btn-xs btn-success">
                              <i className="fa fa-envelope"></i> Send mail to all users
                         </Link>

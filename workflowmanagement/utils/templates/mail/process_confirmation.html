@@ -1,14 +1,14 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-[TASKA] Confirm your participation to {{ studyName }} (REQUIRES FEEDBACK)
+[TASKA] Confirm your participation to {{ object }} (REQUIRES FEEDBACK)
 {% endblock %}
 
 {% block body %}
 
-Dear {{ user }},<br /> <br />
+Hello dear {{ user }},<br /> <br />
 
-The study {{ studyName }} has started on {{ startDate }}, under the leadership of {{ leaderName }}.
+The study {{ object.title }} has started on {{ object.start_date }}, under the leadership of {{ object.executioner.get_full_name }}.
 <br /><br />
 With this email you are asked to confirm your participation in the study.
 <br /><br />
@@ -20,6 +20,6 @@ In case of doubts, please contact me.
 
 <br /><br />
 Best Regards,<br />
-Taska (on behalf of {{ leaderName }})
+Taska (on behalf of {{ object.executioner.get_full_name }})
 
 {% endblock %}

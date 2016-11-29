@@ -8,4 +8,4 @@ class UtilsConfig(AppConfig):
 
     def ready(self):
         # import signal handlers
-        import utils.connectors
+        import messagesystem.connectors
