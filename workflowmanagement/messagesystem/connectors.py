@@ -54,7 +54,6 @@ def newHistoryNotifications(sender, instance, **kwargs):
 
 def defineTci(instance, tc):
     tci = None
-    print type(instance)
 
     if isinstance(instance.object, User):
         # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
@@ -62,11 +61,20 @@ def defineTci(instance, tc):
     else:
         tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
+
+
+    #####################################################################################################
+    #Verifify again if i need this conditions
+
     if isinstance(instance.object, Process):
         if (instance.object.status == Process.WAITING):
             # Use all users envolved in the process
             tci = tc(instance, instance.object.getAllUsersEnvolved())
 
+    if isinstance(instance.object, ProcessTask):
+        tci = tc(instance, instance.object.getAllUsersEnvolved())
+
+    #Refactor this code
     if isinstance(instance.object, Request):
         # ADD
         # if autor=user --> receiver=executioner
@@ -104,14 +112,13 @@ def buildTemplate(instance):
             tcn += 'Reassign'
         elif (instance.object.type == 2):  #CLARIFICATION
             tcn += 'Clarification'
-        else:
-            print("Not implemented yet...")
 
         if(instance.event == 1 or instance.event == 2): #Only send mails when ADD or EDIT
             if (instance.event == 1 or instance.actor == instance.object.processtaskuser.user):
                 tcn += 'Ask'
             elif (instance.actor == instance.object.processtaskuser.processtask.process.executioner):
                 tcn += 'Answer'
+
         tcn += 'Template'
         tcn = tcn.replace(' ', '')
 

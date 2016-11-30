@@ -81,7 +81,7 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.addedRequest){
-            this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
+            //this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
         }
     },
     update(status){
@@ -110,12 +110,15 @@ export default React.createClass({
     },
     setResponse(){
         RequestActions.submitResponse();
+        this.goBack();
     },
     setResponsePublic(){
         RequestActions.submitResponse(true);
+        this.goBack();
     },
     setRequest(){
         RequestActions.submitRequest();
+        this.goBack();
     },
     goBackAndClean(){
         this.goBack();

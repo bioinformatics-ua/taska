@@ -247,6 +247,7 @@ class ProcessViewSet(mixins.CreateModelMixin,
         """
             Reverts a specific user task on a process task.
         """
+
         ptu = get_object_or_404(ProcessTaskUser, hash=request.data['ptu'])
 
         ptu.finished = False
