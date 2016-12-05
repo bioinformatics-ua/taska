@@ -98,7 +98,7 @@ export default React.createClass({
                                 <div className="col-md-12">
                                     <div className="form-group">
                                         <div className="input-group">
-                                            <span className="input-group-addon"><strong>Recipient</strong></span>
+                                            <span className="input-group-addon"><strong>To</strong></span>
                                             <Select onChange={this.setReceivers} placeholder={this.state.usersSelectPlaceholder}
                                                 defaultValue={this.state.message.receivers} name="form-field-name"
                                                 multi={true} 
@@ -111,7 +111,7 @@ export default React.createClass({
                                 <div className="col-md-12">
                                     <div className="form-group">
                                         <div className="input-group">
-                                            <span className="input-group-addon"><strong>Title</strong></span>
+                                            <span className="input-group-addon"><strong>Subject</strong></span>
                                             <input onChange={this.setReqTitle} className="form-control"
                                                    defaultValue={this.state.message.title}/>
                                         </div>

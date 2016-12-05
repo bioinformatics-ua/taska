@@ -1,0 +1,18 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+[TASKA] You have a reassign request to {{ task }}
+{% endblock %}
+
+{% block body %}
+
+Hello dear {{ user }},<br /> <br />
+
+
+{{ leaderName }} has already answered to your reassign request obout the task {{ task }}.
+
+<br /><br />
+Best Regards,<br />
+Taska (on behalf of {{ leaderName }})
+
+{% endblock %}

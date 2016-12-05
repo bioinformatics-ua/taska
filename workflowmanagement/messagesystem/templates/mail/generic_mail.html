@@ -1,0 +1,14 @@
+
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+
+    {% for row in message %}
+        {{ row }} <br />
+    {% endfor %}
+
+    <br /> <br />
+Please don't reply to this message. It was sent from an address that doesn't accept incoming email.
+{% endblock %}

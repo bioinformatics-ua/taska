@@ -73,6 +73,17 @@ const ProcessLinkRequests = React.createClass({
     }
 });
 
+const ProcessLinkSendMessage = React.createClass({
+    render: function () {
+        const row = this.props.rowData;
+        return <small>
+                    <Link to="MessageSender" params={{hash: row.hash, object: 'process'}}>
+                        <i className="fa fa-envelope"></i> Send message
+                    </Link>
+                </small>;
+    }
+});
+
 const ProcessLink = React.createClass({
   render: function(){
     const row = this.props.rowData;
@@ -146,8 +157,16 @@ const ProcessTable = React.createClass({
       "displayName": "Requests"
       },
       {
-      "columnName": "hash",
+      "columnName": "link_send_message",
       "order": 7,
+      "locked": true,
+      "visible": true,
+      "customComponent": ProcessLinkSendMessage,
+      "displayName": " "
+      },
+      {
+      "columnName": "hash",
+      "order": 8,
       "locked": true,
       "visible": true,
       "customComponent": ProcessManage,
@@ -163,7 +182,7 @@ const ProcessTable = React.createClass({
               <Griddle
                   noDataMessage={<center>You have not ran any studies yet, to run a new study you must first create a protocol and then run it.</center>}
                   {...this.commonTableSettings(false)}
-                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "link_requests", "hash"]}
+                  columns={["object_repr","start_date", 'progress', 'status', "link_status", "link_requests", "link_send_message", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }

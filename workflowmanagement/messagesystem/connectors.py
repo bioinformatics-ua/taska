@@ -55,24 +55,29 @@ def newHistoryNotifications(sender, instance, **kwargs):
 def defineTci(instance, tc):
     tci = None
 
+    # USER
     if isinstance(instance.object, User):
         # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
         tci = tc(instance, instance.authorized.all())
     else:
         tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
-
-
     #####################################################################################################
-    #Verifify again if i need this conditions
-
+    # PROCESS
     if isinstance(instance.object, Process):
         if (instance.object.status == Process.WAITING):
             # Use all users envolved in the process
             tci = tc(instance, instance.object.getAllUsersEnvolved())
 
+    # PROCESSTASK
     if isinstance(instance.object, ProcessTask):
         tci = tc(instance, instance.object.getAllUsersEnvolved())
+
+        # PROCESSTASKUSER
+        # REQUEST
+        # RESULT
+
+        # USER RECOVERY
 
     #Refactor this code
     if isinstance(instance.object, Request):
@@ -92,6 +97,8 @@ def defineTci(instance, tc):
             tci = tc(instance, [instance.object.processtask.process.executioner])
 
     return tci
+
+
 
 
 def buildTemplate(instance):

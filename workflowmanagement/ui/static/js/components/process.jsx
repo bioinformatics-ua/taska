@@ -193,17 +193,18 @@ export default React.createClass({
                                 links={params.mode === 'showOnly' ? '':
                                     <span>
                                         <small>
-                                            <Link to="StatusDetail" params={{object: params.object}}>Show assignees &nbsp;</Link>
+                                            <Link to="StatusDetail" params={{object: params.object}}>
+                                                <i className="fa fa-users"></i> Show assignees &nbsp;
+                                            </Link>
                                         </small>
                                         <small>
-                                            <Link to="StudyRequests" params={{object: params.object}}>Show requests &nbsp;</Link>
+                                            <Link to="StudyRequests" params={{object: params.object}}>
+                                                <i className="fa fa-question"></i> Show requests &nbsp;
+                                            </Link>
                                         </small>
                                         <small>
-                                            <Link
-                                                  to="MessageSender"
-                                                  params={{hash: params.object, object: 'process'}}
-                                                  className="pull-right btn btn-xs btn-success">
-                                                 <i className="fa fa-envelope"></i> Send mail to all users
+                                            <Link to="MessageSender" params={{hash: params.object, object: 'process'}}>
+                                                 <i className="fa fa-envelope"></i> Send message
                                             </Link>
                                         </small>
                                     </span>}

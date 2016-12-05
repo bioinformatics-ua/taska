@@ -166,7 +166,18 @@ export default React.createClass({
                     progress={this.state.process.progress}/>
 
                 <ProcessLabel
-                    links={<small><Link to="StudyRequests" params={{object: params.object}}>Show requests</Link></small>}/>
+                    links={<span>
+                                <small>
+                                        <Link to="StudyRequests" params={{object: params.object}}>
+                                            <i className="fa fa-question"></i> Show requests &nbsp;
+                                        </Link>
+                                </small>
+                                <small>
+                                    <Link to="MessageSender" params={{hash: params.object, object: 'process'}}>
+                                        <i className="fa fa-envelope"></i> Send message
+                                    </Link>
+                                </small>
+                            </span>}/>
                 <hr />
 
                 <div className="panel panel-default panel-overflow  griddle-pad">

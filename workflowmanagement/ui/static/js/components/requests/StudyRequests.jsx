@@ -100,7 +100,7 @@ const RequestTable = React.createClass({
                               to="MessageSender"
                               params={{hash: this.props.hash, object: 'process'}}
                               className="pull-right btn btn-xs btn-success">
-                             <i className="fa fa-envelope"></i> Send mail to all users
+                             <i className="fa fa-envelope"></i> Send message
                         </Link>
                       </div>
                     <Griddle

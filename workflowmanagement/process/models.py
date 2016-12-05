@@ -74,11 +74,11 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
-    def getAllUsersEnvolved(self):
+    def getAllUsersEnvolved(self, notification=True):
         tmp = []
         tasks = self.tasks()
         for task in tasks:
-            tmp += task.getAllUsersEnvolved()
+            tmp += task.getAllUsersEnvolved(notification)
         return tmp
 
     @transaction.atomic
@@ -333,13 +333,12 @@ class ProcessTask(models.Model):
             if force:
                 self.__exportForm(Task.objects.get_subclass(id=self.task.id))
 
-    def getAllUsersEnvolved(self):
+    def getAllUsersEnvolved(self, notification=True):
         tmp = []
         for taskUser in ProcessTaskUser.all(processtask=self):
-            print type(taskUser.getUser().profile)
-            print dir(taskUser.getUser().profile)
-            if taskUser.getUser() not in tmp and taskUser.getUser().profile.notification == True:
-                tmp += [taskUser.getUser()]
+            if taskUser.getUser() not in tmp:
+                if (notification and taskUser.getUser().profile.notification == True) or notification==False:
+                    tmp += [taskUser.getUser()]
         return tmp
 
     def __exportForm(self, task):

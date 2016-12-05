@@ -31,7 +31,7 @@ class MessageListUsersView(ListAPIView):
         # ADD there the condition if I want defined receivers through the object instance
         # If there is no receivers in the service
         if (isinstance(object, Process)):
-            for user in object.getAllUsersEnvolved():
+            for user in object.getAllUsersEnvolved(notification=False):
                 receiver += [user]
             return receiver
         else:

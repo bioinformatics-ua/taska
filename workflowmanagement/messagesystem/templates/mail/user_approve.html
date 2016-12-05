@@ -1,0 +1,15 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object.email}} approved
+{% endblock %}
+
+{% block body %}
+Hello dear {{ user }},<br /><br />
+
+This email is meant to inform you that the user {{object.email}} has just been approved by {%if instance.actor.first_name %}{{instance.actor.get_full_name}}{% else %}{{instance.actor.email}}{%endif%}.
+<br /><br />
+
+Best Regards,<br />
+Taska
+{% endblock %}
