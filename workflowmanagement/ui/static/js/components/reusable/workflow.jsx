@@ -110,7 +110,7 @@ const WorkflowTable = React.createClass({
     return  <div className="panel panel-default panel-overflow griddle-pad">
               <div className="panel-heading">
                 <i className="fa fa-sitemap pull-left"></i>
-                <h3 className="text-center panel-title"> Workflow Templates</h3>
+                <h3 className="text-center panel-title"> Study Templates</h3>
                 <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}} to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle

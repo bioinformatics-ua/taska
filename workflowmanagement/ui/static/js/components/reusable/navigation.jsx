@@ -65,7 +65,7 @@ var UserDropdown = React.createClass({
                                 <Tab to='Forms' className="boldit">Forms</Tab>
                             </li>
                             <li>
-                                <Tab to='StudyTemplates' className="boldit">Workflow Templates</Tab>
+                                <Tab to='StudyTemplates' className="boldit">Study Templates</Tab>
                             </li>
                             <li>
                                 <Tab to='StudyManagement' className="boldit">Studies</Tab>
