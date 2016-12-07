@@ -87,7 +87,7 @@ cd /workflow-management/workflowmanagement
 
 echo "------------------------------------------"
 echo "---- Starting celery ------ "
-C_FORCE_ROOT=True celery -A workflowmanagement worker -l info &
+C_FORCE_ROOT=True celery -A workflowmanagement worker -l info -B &
 
 echo "------------------------------------------"
 echo "---- Starting uwsgi ------ "

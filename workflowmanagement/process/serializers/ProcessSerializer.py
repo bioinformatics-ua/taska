@@ -57,7 +57,6 @@ class ProcessSerializer(serializers.ModelSerializer):
             Returns the created Process object
         '''
         tasks_data = None
-
         try:
             tasks_data = validated_data.pop('tasks')
         except KeyError:

@@ -81,7 +81,7 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.addedRequest){
-            this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
+            //this.context.router.transitionTo('Request', {object: this.state.addedRequest.hash})
         }
     },
     update(status){
@@ -110,12 +110,15 @@ export default React.createClass({
     },
     setResponse(){
         RequestActions.submitResponse();
+        this.goBack();
     },
     setResponsePublic(){
         RequestActions.submitResponse(true);
+        this.goBack();
     },
     setRequest(){
         RequestActions.submitRequest();
+        this.goBack();
     },
     goBackAndClean(){
         this.goBack();
@@ -269,7 +272,7 @@ export default React.createClass({
                                 </div>
                                 <div className="col-md-6">
                                         {this.isMe()?
-                                            <div className="pull-right">
+                                            <div className="pull-right btn-group" role="group">
                                             <button onClick={this.setResponsePublic} className="btn btn-warning">
                                                 <i style={{marginTop: '3px'}} className="fa fa-floppy-o"></i> Reply & Make Visible for all executers
                                             </button>&nbsp;

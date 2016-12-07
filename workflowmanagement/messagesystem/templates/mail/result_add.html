@@ -1,0 +1,16 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object}} has been solved
+{% endblock %}
+
+{% block body %}
+
+Hello dear {{ user }},<br /> <br />
+
+This email is meant to inform you that the task {{object}} has been solved by user {{object.processtaskuser.user.get_full_name}}.
+<br /><br />
+<br /><br />
+Best Regards,<br />
+Taska (on behalf of {{object.processtaskuser.user.get_full_name}} )
+{% endblock %}

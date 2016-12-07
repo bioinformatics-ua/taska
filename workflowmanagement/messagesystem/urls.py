@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from rest_framework import routers
 
 from messagesystem.views.MessageViewSet import MessageViewSet
+from messagesystem.views.MessageListUsersView import MessageListUsersView
 
 router = routers.DefaultRouter()
 #router.register(r'', MessageViewSet)
@@ -11,6 +12,6 @@ router_tricks = router.urls
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
-    url(r'^/create/(?P<hash>[^/.]+)/$', MessageViewSet.as_view()), #(?P<hash>[^/.]+)/
-    url(r'^/create/$', MessageViewSet.as_view()),
+    url(r'^/$', MessageViewSet.as_view()),
+    url(r'^/getUsers/$', MessageListUsersView.as_view()),
 )

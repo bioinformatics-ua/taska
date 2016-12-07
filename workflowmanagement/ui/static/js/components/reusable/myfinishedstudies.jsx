@@ -103,7 +103,7 @@ const MyFinishedStudiesTable = React.createClass({
     ];
     
     return <Griddle
-                              noDataMessage={<center>You currently have no studies assignee to you yet. This studies are all the studies that you are envolved.</center>}
+                              noDataMessage={<center></center>}
                               {...this.commonTableSettings(true)}
                               enableInfiniteScroll={true}
                               useFixedHeader={true}

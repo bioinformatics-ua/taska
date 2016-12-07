@@ -74,13 +74,11 @@ class Process(models.Model):
     def tasks(self):
         return ProcessTask.all(process=self)
 
-    def getAllUsersEnvolved(self):
+    def getAllUsersEnvolved(self, notification=True):
         tmp = []
         tasks = self.tasks()
         for task in tasks:
-            for taskUser in ProcessTaskUser.all(processtask=task):
-                if taskUser.getUser() not in tmp:
-                    tmp += [taskUser.getUser()]
+            tmp += task.getAllUsersEnvolved(notification)
         return tmp
 
     @transaction.atomic
@@ -303,7 +301,7 @@ class ProcessTask(models.Model):
     def resignRejectedUser(self, oldUser, newUser):
         tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
         exists = ProcessTaskUser.all(processtask=self).filter(user=newUser).count()
-        if exists == 0:
+        if exists == 0 or int(oldUser) == int(newUser):
             for task in tasks:
                 task.changeUser(newUser)
 
@@ -334,6 +332,14 @@ class ProcessTask(models.Model):
         else:
             if force:
                 self.__exportForm(Task.objects.get_subclass(id=self.task.id))
+
+    def getAllUsersEnvolved(self, notification=True):
+        tmp = []
+        for taskUser in ProcessTaskUser.all(processtask=self):
+            if taskUser.getUser() not in tmp:
+                if (notification and taskUser.getUser().profile.notification == True) or notification==False:
+                    tmp += [taskUser.getUser()]
+        return tmp
 
     def __exportForm(self, task):
         if task.type() == 'form.FormTask' and task.output_resources:

@@ -1,0 +1,25 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+[TASKA] Confirm your participation to {{ object }} (REQUIRES FEEDBACK)
+{% endblock %}
+
+{% block body %}
+
+Hello dear {{ user }},<br /> <br />
+
+The study {{ object.title }} has started on {{ object.start_date }}, under the leadership of {{ object.executioner.get_full_name }}.
+<br /><br />
+With this email you are asked to confirm your participation in the study.
+<br /><br />
+Please access your TASKA account from this <a href="{{link_open_plataform}}">link</a> to see the list of your tasks.
+<br /><br />
+If you want to ask for reassignement of the deadline, please click on the task title and use the "Ask for reassignement" button.
+<br /><br />
+In case of doubts, please contact me.
+
+<br /><br />
+Best Regards,<br />
+Taska (on behalf of {{ object.executioner.get_full_name }})
+
+{% endblock %}

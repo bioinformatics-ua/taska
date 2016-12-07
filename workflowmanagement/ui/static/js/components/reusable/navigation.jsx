@@ -49,19 +49,11 @@ var UserDropdown = React.createClass({
       return <span key="loggedout"></span>;
     }
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
-                    <li className="dropdown">
-                        <a href="#" className="dropdown-toggle boldit" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <i className="fa fa-list-alt"></i> VIEW <span className="caret"></span>
-                        </a>
-                        <ul className="dropdown-menu user-login" role="menu">
-                            <li>
-                                <Tab to='default' className="boldit">My tasks</Tab>
-                            </li>
-                            <li>
-                                <Tab to='MyStudies' className="boldit">Workflows</Tab>
-                            </li>
-                        </ul>
-
+                    <li>
+                        <Tab to='default' className="boldit"><i className="fa fa-tasks"></i> MY TASKS</Tab>
+                    </li>
+                    <li>
+                        <Tab to='MyStudies' className="boldit"><i className="fa fa-sitemap"></i> MY STUDIES</Tab>
                     </li>
         
                     <li className="dropdown">
@@ -73,7 +65,7 @@ var UserDropdown = React.createClass({
                                 <Tab to='Forms' className="boldit">Forms</Tab>
                             </li>
                             <li>
-                                <Tab to='StudyTemplates' className="boldit">Templates</Tab>
+                                <Tab to='StudyTemplates' className="boldit">Study Templates</Tab>
                             </li>
                             <li>
                                 <Tab to='StudyManagement' className="boldit">Studies</Tab>
