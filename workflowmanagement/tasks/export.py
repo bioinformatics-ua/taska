@@ -201,6 +201,7 @@ class XLSXMixin(object):
             dfile = DjangoFile(tempFile)
 
             f = File(creator=task.workflow.owner, file=dfile, filename='%s_result.xlsx' % task.title.lower(), linked=True)
+
             f.save()
 
             return f

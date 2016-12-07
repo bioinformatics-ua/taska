@@ -75,12 +75,12 @@ export default Reflux.createStore({
                     ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
                             (answer) => {
 
-                                StateActions.save()
+                                StateActions.save();
 
                                 self.onMethodDetail('submit', answer.hash).then(
                                         (answer) => {
                                             StateActions.loadingEnd();
-                                            StateActions.save()
+                                            StateActions.save();
                                             StateActions.dismissAlert();
                                             this.__rsubmitted = true;
 
@@ -100,11 +100,13 @@ export default Reflux.createStore({
     onSaveAnswer(){
         StateActions.loadingStart();
 
+        this.__rsubmitted = false;
+
         if(this.__detaildata.hash){
             ResultActions.postDetail.triggerPromise(this.__detaildata.hash, this.__detaildata).then(
                     (answer) => {
                         StateActions.loadingEnd();
-                        StateActions.save()
+                        StateActions.save();
                         this.trigger();
                     }
             );
@@ -112,7 +114,7 @@ export default Reflux.createStore({
             ResultActions.addDetail.triggerPromise(this.__detaildata).then(
                 (answer) => {
                     StateActions.loadingEnd();
-                    StateActions.save()
+                    StateActions.save();
                     StateActions.save(true, ()=>{
                         this.__rfinished = answer;
                         this.trigger();
