@@ -278,7 +278,6 @@ class ResultViewSet(    mixins.CreateModelMixin,
         result = self.get_object()
         this_ptu = result.processtaskuser
         process = this_ptu.processtask.process
-
         this_ptu.finish()
 
         users = []

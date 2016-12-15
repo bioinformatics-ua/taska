@@ -151,7 +151,7 @@ def fileHash(instance, filename):
     ''' Callable to be called by the FileField, this renames the file to the generic hash
         so we avoid collisions
     '''
-    return 'file/{0}/{1}'.format(instance.creator.id, instance.hash)
+    return 'file/{0}{1}'.format(instance.creator.id, instance.hash)
 
 class File(Resource):
     ''' A type of resource that represents a file.

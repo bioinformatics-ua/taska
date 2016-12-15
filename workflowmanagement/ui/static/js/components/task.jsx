@@ -220,6 +220,8 @@ export default React.createClass({
             ResultActions.submitAnswer();
     },
     saveAnswer(e){
+        console.log("Saved");
+        console.log(this.validate());
         if(this.validate())
             ResultActions.saveAnswer();
     },
