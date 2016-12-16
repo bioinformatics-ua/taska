@@ -17,9 +17,9 @@ import Tabs from 'react-simpletabs';
 
 import {getTableSizeWithTabs} from '../../page_settings.jsx';
 
-import {CurrentTaskTable} from './currenttasks.jsx';
-import {CompletedTaskTable} from './completedtasks.jsx';
-import {RejectedTaskTable} from './rejectedtasks.jsx';
+import {CurrentTaskTable} from '../tasks/currenttasks.jsx';
+import {CompletedTaskTable} from '../tasks/completedtasks.jsx';
+import {RejectedTaskTable} from '../tasks/rejectedtasks.jsx';
 
 const TaskTabber = React.createClass({
     getInitialState: function() {

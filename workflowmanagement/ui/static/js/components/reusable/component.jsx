@@ -514,6 +514,10 @@ const PermissionsBar = React.createClass({
         );
     }
 });
+/*
+const Tooltip = React.createClass({
+
+});*/
 
 const ProcessStatus = React.createClass({
   getDefaultProps(){
@@ -534,7 +538,7 @@ const ProcessStatus = React.createClass({
       case 5:
         extra+=' circle-default'; label='Waiting'; break;
     }
-    return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label> </span>;
+    return <span><div className={extra}>&nbsp;</div> <label style={{verticalAlign: 'sub'}}>{this.props.label? ` ${label}`: ''}</label>  </span>;
   },
   render: function(){
     const row = this.props.rowData;

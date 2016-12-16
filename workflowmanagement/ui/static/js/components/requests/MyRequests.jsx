@@ -12,7 +12,7 @@ import RequestStore from '../../stores/RequestStore.jsx';
 import UserStore from '../../stores/UserStore.jsx';
 
 import {Loading} from '../reusable/component.jsx'
-import {RequestDate, RequestUser, RequestLink, RequestStatus} from './reusable/request.jsx'
+import {RequestDate, RequestProcess, RequestUser, RequestLink, RequestStatus} from './reusable/request.jsx'
 
 export default React.createClass({
     displayName: "My Requests",
@@ -41,64 +41,74 @@ const LoggedInHome = React.createClass({
 
       </span>);
     }
-})
+});
 
 const RequestTable = React.createClass({
     tableAction: RequestActions.load,
     tableStore: RequestStore,
     mixins: [Reflux.listenTo(RequestStore, 'update'), TableComponentMixin],
-    getInitialState: function() {
+    getInitialState: function () {
         return {};
     },
-    update: function(data){
+    update: function (data) {
         this.setState(this.getState());
     },
-  render: function () {
-    const columnMeta = [
-      {
-      "columnName": "title",
-      "order": 1,
-      "locked": true,
-      "visible": true,
-      "customComponent": RequestLink,
-      "displayName": "Title"
-      },
-      {
-      "columnName": "processtaskuser",
-      "order": 2,
-      "locked": true,
-      "visible": true,
-      "customComponent": RequestUser,
-      "displayName": "User"
-      },
-      {
-      "columnName": "date",
-      "order": 3,
-      "locked": true,
-      "visible": true,
-      "displayName": "Date",
-      "customComponent": RequestDate
-      },
-      {
-      "columnName": "type",
-      "order": 4,
-      "locked": true,
-      "visible": true,
-      "customComponent": RequestStatus,
-      "cssClassName": "request-td",
-      "displayName": "Type"
-      }
-    ];
-    return  <div className="panel panel-default panel-overflow  griddle-pad">
-              <div className="panel-heading">
-                <center><i className="fa fa-life-ring pull-left"></i><h3 className="panel-title">All Received Requests</h3></center>
-              </div>
-              <Griddle
-                  noDataMessage={<center>You currently have no requests made by assignees, relating to your study processes.</center>}
-                  {...this.commonTableSettings(false)}
-                  columns={["title", "processtaskuser",  "date","type"]}
-                  columnMetadata={columnMeta} />
-            </div>;
-  }
+    render: function () {
+        const columnMeta = [
+            {
+                "columnName": "title",
+                "order": 1,
+                "locked": true,
+                "visible": true,
+                "customComponent": RequestLink,
+                "displayName": "Title"
+            },
+            {
+                "columnName": "processtaskuser",
+                "order": 2,
+                "locked": true,
+                "visible": true,
+                "customComponent": RequestUser,
+                "displayName": "User"
+            },
+            {
+                "columnName": "process",
+                "order": 3,
+                "locked": true,
+                "visible": true,
+                "customComponent": RequestProcess,
+                "displayName": "Study"
+            },
+            {
+                "columnName": "date",
+                "order": 4,
+                "locked": true,
+                "visible": true,
+                "displayName": "Date",
+                "customComponent": RequestDate
+            },
+            {
+                "columnName": "type",
+                "order": 5,
+                "locked": true,
+                "visible": true,
+                "customComponent": RequestStatus,
+                "cssClassName": "request-td",
+                "displayName": "Type"
+            }
+        ];
+        return <div className="panel panel-default panel-overflow  griddle-pad">
+            <div className="panel-heading">
+                <center><i className="fa fa-life-ring pull-left"></i><h3 className="panel-title">All Received
+                    Requests</h3></center>
+            </div>
+            <Griddle
+                noDataMessage={<center>You currently have no requests made by assignees, relating to your study
+                    processes.</center>}
+                {...this.commonTableSettings(false)}
+                columns={["title", "process", "processtaskuser", "date", "type"]}
+                columnMetadata={columnMeta}/>
+        </div>;
+    }
 
 });

@@ -313,7 +313,6 @@ class ProcessTask(models.Model):
         self.save()
 
     def move(self, force=False):
-        #O ERROD DAS SUBMISSOES NAO DAREM ESTa AQUI POR ALGUM MOTIVO
         missing = ProcessTaskUser\
             .all(processtask=self, reassigned=False) \
             .filter(finished=False).count()

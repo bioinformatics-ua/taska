@@ -47,6 +47,13 @@ const RequestUser = React.createClass({
   }
 });
 
+const RequestProcess = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    return <small>{row.process_repr}</small>;
+  }
+});
+
 
 const RequestDate = React.createClass({
   render: function(){
@@ -55,4 +62,4 @@ const RequestDate = React.createClass({
 });
 
 
-export {RequestDate, RequestUser, RequestLink, RequestStatus}
+export {RequestDate, RequestProcess, RequestUser, RequestLink, RequestStatus}
