@@ -232,7 +232,7 @@ class ProcessViewSet(mixins.CreateModelMixin,
                      )
 
             if request.data['val'] == True:
-                ptask.reassign()
+                ptask.reassign(request.data['cancelTask'])
             else:
                 ptask.assign()
 
@@ -241,6 +241,24 @@ class ProcessViewSet(mixins.CreateModelMixin,
 
         return Response(ProcessSerializer(self.get_object()).data)
 
+    @detail_route(methods=['post'])
+    def canceltask(self, request, hash=None):
+        """
+        Cancel all users task on a process task.
+        """
+        try:
+            ptusers = ProcessTaskUser.all().filter(processtask__hash=request.data['ptask'])
+            #Cancel all users
+            for ptuser in ptusers:
+                ptuser.reassign()
+
+            #Cancel again the first with the incidation to cancel the task too
+            ptusers[0].reassign(True)
+
+        except ProcessTaskUser.DoesNotExist, KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(ProcessSerializer(self.get_object()).data)
 
     @detail_route(methods=['post'])
     def refine(self, request, hash=None):

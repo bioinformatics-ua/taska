@@ -105,9 +105,13 @@ export default React.createClass({
     getValidation(){
         return ProcessStore.getValidation(this.state.process['hash']);
     },
-    cancelUser(task, user, val){
+    cancelUser(task, user, val, cancelTask){
         console.log(`CANCEL USER ${user} on process task ${task}`);
-        ProcessActions.cancelUser(task, user, val);
+        ProcessActions.cancelUser(task, user, val, cancelTask);
+    },
+    cancelTask(task){
+        console.log(`CANCEL process task ${task}`);
+        ProcessActions.cancelTask(task);
     },
     reassignRejectedUser(hash, oldUser, newUser, all){
         ProcessActions.reassignRejectedUser(hash, oldUser, newUser, all);
@@ -222,6 +226,7 @@ export default React.createClass({
                     reassignRejectedUser={this.reassignRejectedUser}
                     refineAnswer={this.refineAnswer}
                     cancelUser={this.cancelUser}
+                    cancelTask={this.cancelTask}
                     endDetail={ProcessResume}
                     detailMode={this.state.user.profile['detail_mode']}
                     showOnly={params.mode === 'showOnly'}

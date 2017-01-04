@@ -181,8 +181,8 @@ const Modal = React.createClass({
                               </div>
                                 :
                               <div>
-                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" onClick={this.props.success} className="btn btn-primary">Ok</button>
+                                <button type="button" onClick={this.props.close} className="btn btn-default" data-dismiss="modal">{this.props.cancelButtonMessage ? this.props.cancelButtonMessage : 'Cancel'}</button>
+                                <button type="button" onClick={this.props.success} className="btn btn-primary">{this.props.successButtonMessage ? this.props.successButtonMessage : 'Ok'}</button>
                               </div>}
                           </div>
                           :''}
@@ -216,6 +216,80 @@ const Label = React.createClass({
                 return <span>a</span>;
             }
     });
+
+const LinkToCancelAssignees= React.createClass({
+    mixins: [LayeredComponentMixin],
+    success(e){
+        this.props.success(this.props.user, this.props.dataCancel, true);
+    },
+    getDefaultProps(){
+        return {};
+    },
+    render: function () {
+        return <a data-assignee={this.props.user} data-cancel={this.props.dataCancel}
+                  onClick={this.handleClick}>{this.props.label}</a>;
+    },
+    renderLayer: function () {
+        let verification;
+        try{
+            verification = this.props.verificationFunc();
+        }catch(err){
+            verification = false;
+        }
+        if (this.state.clicked && verification) {
+            return <Modal title={this.props.title} message={this.props.message} success={this.success}
+                          close={this.handleClose} successButtonMessage={"Yes"} cancelButtonMessage={"No"}/>
+        } else {
+            if(this.state.clicked && !verification)
+                this.props.success(this.props.user,this.props.dataCancel, false);
+            return <span />;
+        }
+    },
+    handleClose: function () {
+        this.setState({clicked: false});
+        this.props.success(this.props.user,this.props.dataCancel, false);
+    },
+    handleClick: function () {
+        this.setState({clicked: !this.state.clicked});
+    },
+    getInitialState: function () {
+        return {clicked: false};
+    }
+});
+
+const CancelAssigneesButton = React.createClass({
+    mixins: [LayeredComponentMixin],
+    success(e){
+        this.props.success();
+    },
+    getDefaultProps(){
+        return {};
+    },
+    render: function () {
+        return <button type="button" className="pull-right btn  btn-xs btn-danger" onClick={this.handleClick}>
+            <i className="fa fa-ban"></i>
+            <small> Cancel Task</small>
+        </button>;
+    },
+    renderLayer: function () {
+
+        if (this.state.clicked) {
+            return <Modal title={this.props.title} message={this.props.message} success={this.success}
+                          close={this.handleClose} successButtonMessage={"Yes"} cancelButtonMessage={"No"}/>
+        } else {
+            return <span />;
+        }
+    },
+    handleClose: function () {
+        this.setState({clicked: false});
+    },
+    handleClick: function () {
+        this.setState({clicked: !this.state.clicked});
+    },
+    getInitialState: function () {
+        return {clicked: false};
+    }
+});
 
 const DeleteButton = React.createClass({
   mixins: [LayeredComponentMixin],
@@ -747,6 +821,6 @@ const ProcessDetailBar = React.createClass({
 });
 
 
-export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptRejectButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar}
+export {Loading, Modal, DjangoCSRFToken, Label, DeleteButton, AcceptRejectButton, RunButton, ReassigningButton, PermissionsBar, ProcessStatus, Affix, ProcessLabel, ProcessDetailBar, LinkToCancelAssignees, CancelAssigneesButton}
 
 
