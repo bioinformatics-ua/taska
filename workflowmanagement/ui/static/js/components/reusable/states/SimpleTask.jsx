@@ -595,12 +595,12 @@ class SimpleTaskRun extends SimpleTask{
                                 </tr>
                                 <tr>
                                     <th style={{width: '40%'}}>User</th>
-                                    <th>Status
+                                    <th>Status {onlyShow ?
                                         <CancelAssigneesButton
                                             success={me.cancelTask}
                                             title={"Cancel task"}
                                             message={`Do you want to cancel this task?`}
-                                        />
+                                        />:''}
                                     </th>
 
                                 </tr>
@@ -706,6 +706,7 @@ class SimpleTaskRun extends SimpleTask{
                 });
             },
             render(){
+                console.log("aaaaaaaaaaaaaaaa");
                 let users;
                 try{
                     users = this.parent().ptask.users;
