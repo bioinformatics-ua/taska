@@ -29,7 +29,7 @@ class MyFutureTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=False).filter(
+        ptasks = ProcessTaskUser.all(finished=False, reassigned=False).filter(
                 ~Q(status=ProcessTaskUser.REJECTED) &
                 Q(Q(Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
                   Q(processtask__status=ProcessTask.WAITING)),

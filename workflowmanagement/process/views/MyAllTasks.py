@@ -44,19 +44,19 @@ class MyAllTasks(mixins.CreateModelMixin,
             Retrieves a list of user assigned process tasks
         """
         #First get all that are waiting for anwser
-        ptasksWaiting = ProcessTaskUser.all(finished=False).filter(
+        ptasksWaiting = ProcessTaskUser.all(finished=False, reassigned=False).filter(
             Q(status=ProcessTaskUser.WAITING) & Q(processtask__status=ProcessTask.WAITING_AVAILABILITY),
             user=self.request.user,
         ).order_by('processtask__deadline')
 
         #Them get all that are running
-        ptasksRunning = ProcessTaskUser.all(finished=False).filter(
+        ptasksRunning = ProcessTaskUser.all(finished=False, reassigned=False).filter(
             processtask__status=ProcessTask.RUNNING,
             user=self.request.user,
         ).order_by('processtask__deadline')
 
         #Finally get all that are scheduled
-        ptasksFuture = ProcessTaskUser.all(finished=False).filter(
+        ptasksFuture = ProcessTaskUser.all(finished=False, reassigned=False).filter(
             ~Q(status=ProcessTaskUser.REJECTED) &
             Q(Q(
                 Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
