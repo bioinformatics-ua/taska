@@ -361,7 +361,7 @@ class SimpleTaskRun extends SimpleTask{
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, true);
             },
-            verifyIfAllUsersCancel(){
+            verifyIfLastUserToCancel(){
                 var count = 0;
                 let users = this.state.parent.state.ptask.users;
 
@@ -373,6 +373,17 @@ class SimpleTaskRun extends SimpleTask{
                 //If the countage == 1, means that it is the last user
                 if(count == 1)
                     return true;
+                return false;
+            },
+            showCancelButton(){
+                try{
+                    var status = this.state.parent.state.ptask.status;
+
+                    if(status == 3 || status == 4)
+                        return true;
+                }
+                catch(ex){/*Ingore because this exception only occours when I create a study, so the status does not exist yey*/}
+
                 return false;
             },
             cancelUser(assignee, cancelUser, cancelTask){
@@ -462,6 +473,8 @@ class SimpleTaskRun extends SimpleTask{
             results(){
                 let me=this;
 
+                let canceledTask = this.showCancelButton();
+
                 let users;
                 let status;
 
@@ -548,7 +561,7 @@ class SimpleTaskRun extends SimpleTask{
                                     label={"Cancel "}
                                     title={"Cancel assignee"}
                                     message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
-                                    verificationFunc={me.verifyIfAllUsersCancel}/>
+                                    verificationFunc={me.verifyIfLastUserToCancel}/>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
                             </span>:
                                 <LinkToCancelAssignees
@@ -558,7 +571,7 @@ class SimpleTaskRun extends SimpleTask{
                                     label={"Cancel "}
                                     title={"Cancel assignee"}
                                     message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
-                                    verificationFunc={me.verifyIfAllUsersCancel}/>):''):''}
+                                    verificationFunc={me.verifyIfLastUserToCancel}/>):''):''}
                             </span>
                         );
                     }
@@ -595,7 +608,7 @@ class SimpleTaskRun extends SimpleTask{
                                 </tr>
                                 <tr>
                                     <th style={{width: '40%'}}>User</th>
-                                    <th>Status {onlyShow ?
+                                    <th>Status {onlyShow && !canceledTask ?
                                         <CancelAssigneesButton
                                             success={me.cancelTask}
                                             title={"Cancel task"}

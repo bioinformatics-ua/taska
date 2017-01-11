@@ -226,8 +226,8 @@ const LinkToCancelAssignees= React.createClass({
         return {};
     },
     render: function () {
-        return <a data-assignee={this.props.user} data-cancel={this.props.dataCancel}
-                  onClick={this.handleClick}>{this.props.label}</a>;
+        return <button className="btn btn-xs btn-link" data-assignee={this.props.user} data-cancel={this.props.dataCancel}
+                  onClick={this.handleClick}>{this.props.label}</button>;
     },
     renderLayer: function () {
         let verification;
