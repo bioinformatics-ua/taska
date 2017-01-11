@@ -10,9 +10,23 @@ import Griddle from 'griddle-react';
 
 import {Loading, DeleteButton} from '../reusable/component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
-import {TaskType, TaskLink} from './reusable/tablecomponents.jsx'
+import {TaskType} from './reusable/tablecomponents.jsx' //, TaskLink
 
 import moment from 'moment';
+
+const TaskLink = React.createClass({
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+    return <small title={row.process}>
+            <Link id={`task_${row.hash}`}
+              key={row.hash} to={this.props.rowData.type}
+               params={object}>{this.props.rowData.task_repr}</Link><br />
+
+           </small>;
+  }
+});
+
 
 const CompletedTaskTable = React.createClass({
     tableAction: CompletedTaskActions.load,
