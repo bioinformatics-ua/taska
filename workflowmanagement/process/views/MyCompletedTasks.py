@@ -32,7 +32,7 @@ class MyCompletedTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=True).filter(
+        ptasks = ProcessTaskUser.all(finished=True, reassigned=False).filter(
             Q(status=ProcessTaskUser.FINISHED),
             user=self.request.user,
         ).order_by('processtask__deadline')

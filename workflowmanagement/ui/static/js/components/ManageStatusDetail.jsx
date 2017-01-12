@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import React from 'react/addons';
 import Reflux from 'reflux';
 
-import {StatusDetailTable} from './reusable/statusdetail.jsx';
+import {StatusDetailTable} from './tasks/statusdetail.jsx';
 import {ReassigningButton, ProcessLabel, ProcessDetailBar, PermissionsBar} from './reusable/component.jsx';
 
 import ProcessStore from '../stores/ProcessStore.jsx';

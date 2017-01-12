@@ -14,7 +14,7 @@ import ProcessActions from '../../../actions/ProcessActions.jsx';
 
 import UserStore from '../../../stores/UserStore.jsx';
 
-import {ReassigningButton} from '../component.jsx';
+import {ReassigningButton, LinkToCancelAssignees, CancelAssigneesButton} from '../component.jsx';
 
 import moment from 'moment';
 
@@ -361,12 +361,44 @@ class SimpleTaskRun extends SimpleTask{
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, true);
             },
-            cancelUser(e){
+            verifyIfLastUserToCancel(){
+                var count = 0;
+                let users = this.state.parent.state.ptask.users;
+
+                for(var index = 0; index < users.length; index++ )
+                    //If reassinged == false, count
+                    if(!users[index].reassigned)
+                        count++;
+
+                //If the countage == 1, means that it is the last user
+                if(count == 1)
+                    return true;
+                return false;
+            },
+            showCancelButton(){
+                try{
+                    var status = this.state.parent.state.ptask.status;
+
+                    if(status == 3 || status == 4)
+                        return true;
+                }
+                catch(ex){/*Ingore because this exception only occours when I create a study, so the status does not exist yey*/}
+
+                return false;
+            },
+            cancelUser(assignee, cancelUser, cancelTask){
                 let action = this.state.parent.props.cancelUser;
                 if(action){
                     action(self.getData().ptask.hash,
-                        Number.parseInt($(e.target).data('assignee')),
-                        $(e.target).data('cancel'));
+                            assignee,
+                            cancelUser,
+                            cancelTask);
+                }
+            },
+            cancelTask(){
+                let action = this.state.parent.props.cancelTask;
+                if(action){
+                    action(self.getData().ptask.hash);
                 }
             },
             addNew(e){
@@ -441,6 +473,8 @@ class SimpleTaskRun extends SimpleTask{
             results(){
                 let me=this;
 
+                let canceledTask = this.showCancelButton();
+
                 let users;
                 let status;
 
@@ -502,7 +536,13 @@ class SimpleTaskRun extends SimpleTask{
                                 Canceled on {moment(user.reassigned_date).format('YYYY-MM-DD HH:mm')}
                             </span>&nbsp;&nbsp;&nbsp;
                             {stillOn || forAvailability ?
-                            <a data-assignee={user.user} data-cancel="false" onClick={me.cancelUser}>Uncancel ?</a> :''}
+                            <LinkToCancelAssignees
+                                    success={me.cancelUser}
+                                    user={user.user}
+                                    dataCancel={false}
+                                    label={"Uncancel "}
+                                    title={"Cancel assignee"}
+                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}/> :''}
                             </span>
                         );
                     } else {
@@ -514,10 +554,24 @@ class SimpleTaskRun extends SimpleTask{
                             {onlyShow ? (stillOn || forAvailability ?
                             (forAvailability ?
                             <span>
-                                <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel  </a>
+                                <LinkToCancelAssignees
+                                    success={me.cancelUser}
+                                    user={user.user}
+                                    dataCancel={true}
+                                    label={"Cancel "}
+                                    title={"Cancel assignee"}
+                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
+                                    verificationFunc={me.verifyIfLastUserToCancel}/>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
                             </span>:
-                            <a data-assignee={user.user} data-cancel="true" onClick={me.cancelUser}>Cancel ?</a> ):''):''}
+                                <LinkToCancelAssignees
+                                    success={me.cancelUser}
+                                    user={user.user}
+                                    dataCancel={true}
+                                    label={"Cancel "}
+                                    title={"Cancel assignee"}
+                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
+                                    verificationFunc={me.verifyIfLastUserToCancel}/>):''):''}
                             </span>
                         );
                     }
@@ -548,12 +602,20 @@ class SimpleTaskRun extends SimpleTask{
                                             <i className="fa fa-file-pdf-o"></i> As PDF</a>
                                         </li>
                                       </ul>
+
                                     </div>
                                     </th>
                                 </tr>
                                 <tr>
                                     <th style={{width: '40%'}}>User</th>
-                                    <th>Status</th>
+                                    <th>Status {onlyShow && !canceledTask ?
+                                        <CancelAssigneesButton
+                                            success={me.cancelTask}
+                                            title={"Cancel task"}
+                                            message={`Do you want to cancel this task?`}
+                                        />:''}
+                                    </th>
+
                                 </tr>
                             </thead>
                             <tbody id="userTable">
@@ -657,6 +719,7 @@ class SimpleTaskRun extends SimpleTask{
                 });
             },
             render(){
+                console.log("aaaaaaaaaaaaaaaa");
                 let users;
                 try{
                     users = this.parent().ptask.users;

@@ -79,7 +79,7 @@ export default React.createClass({
         let receivers = [];
         let users = val.split(",");
         for( var index = 0; index < users.length ;  index++)
-            receivers += users[index];
+            receivers[index] = parseInt(users[index]);
         MessageActions.setReceivers(receivers);
     },
     render(){

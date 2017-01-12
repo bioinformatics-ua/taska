@@ -312,14 +312,14 @@ class ProcessTask(models.Model):
                 task.delete()
         self.save()
 
-    def move(self, force=False):
-        #O ERROD DAS SUBMISSOES NAO DAREM ESTa AQUI POR ALGUM MOTIVO
+    def move(self, force=False, finishTask=True):
         missing = ProcessTaskUser\
             .all(processtask=self, reassigned=False) \
             .filter(finished=False).count()
 
         if missing == 0:
-            self.status=ProcessTask.FINISHED
+            if(finishTask):
+                self.status=ProcessTask.FINISHED
             self.save()
 
             # IF WE ARE BEFORE A FORM TASK, UPLOAD THE EXPORT RESULTS PASSING THEM BELOW, bit of a hack
@@ -463,12 +463,12 @@ class ProcessTaskUser(models.Model):
         self.status=ProcessTaskUser.WAITING
         self.save()
 
-    def reassign(self):
+    def reassign(self, finishTask=True):
         self.reassigned=True
         self.reassign_date = timezone.now()
         self.save()
 
-        self.processtask.move()
+        self.processtask.move(finishTask=finishTask)
 
     def assign(self):
         self.reassigned=False

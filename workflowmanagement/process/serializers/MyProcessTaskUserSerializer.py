@@ -4,6 +4,7 @@ from process.models import *
 from rest_framework import serializers
 from ProcessTaskUserSerializer import  ProcessTaskUserSerializer
 from MyProcessTaskSerializer import  MyProcessTaskSerializer
+from RequestSerializer import  SimpleRequestSerializer
 
 
 class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
@@ -13,7 +14,7 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
     deadline = serializers.SerializerMethodField()
     result = serializers.SerializerMethodField()
     process_repr = serializers.SerializerMethodField()
-
+    requests = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()
 
     def get_start_date(self, obj):
@@ -39,3 +40,6 @@ class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):
             return obj.result.hash
         except:
             return None
+
+    def get_requests(self, obj):
+        return SimpleRequestSerializer(obj.requests() ,many=True).data

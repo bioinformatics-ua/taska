@@ -73,13 +73,29 @@ export default Reflux.createStore({
             }
         );
     },
-    onCancelUser(ptask, user, val){
+    onCancelUser(ptask, user, val, cancelTask){
         this.onMethodDetail('canceluser',
                             this.__detaildata.hash,
                             'POST', {
                                 ptask: ptask,
                                 user: user,
-                                val: val
+                                val: val,
+                                cancelTask: cancelTask
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
+    onCancelTask(ptask){
+        this.onMethodDetail('canceltask',
+                            this.__detaildata.hash,
+                            'POST', {
+                                ptask: ptask
                             })
             .then(
             (data) => {

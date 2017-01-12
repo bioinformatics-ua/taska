@@ -98,6 +98,7 @@ class FormTask extends Task{
                         </div>
                     </div>
                     <h3>File outputs</h3>
+
                     <Uploader editable={editable} uploads={context.translateResources()} done={context.setResources} />
 
                     <form data-formrenderer></form>

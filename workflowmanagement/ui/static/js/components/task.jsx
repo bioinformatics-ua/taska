@@ -144,7 +144,11 @@ export default React.createClass({
 
         return false;
     },
-    didWrite(){
+    //finished condition is used to hide save and submit buttons when the task is completed
+    didWrite(finished){
+        if(this.state.task.finished && finished==true)
+            return false;
+
         if(!this.state.answer.hash) {
             return true;
         }
@@ -154,10 +158,10 @@ export default React.createClass({
 
         return false;
     },
-    waitingTask(){
+    waitingTask(finished){
         if(this.state.task.processtask.status == 7)//Waiting availability
             return false;
-        return this.didWrite();
+        return this.didWrite(finished);
     },
     getInitialState(){
         try {
@@ -191,6 +195,7 @@ export default React.createClass({
         ResultActions.unloadAnswer();
     },
     componentDidUpdate(){
+        console.log(this.state.saved.type);
         let detail = Object.keys(this.props.detail)[0];
         if(this.state.saved && !this.props.detail[detail].result){
             this.context.router.transitionTo(this.state.saved.type, {object: this.state.saved.hash});
@@ -363,7 +368,7 @@ export default React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-body">
                             <div className="row">
-                                <div className={this.didWrite()? "col-md-9": "col-md-12"}>
+                                <div className={this.didWrite(false)? "col-md-9": "col-md-12"}>
                                       <div className="form-group">
                                         <div className="input-group">
                                           <span className="input-group-addon"><strong>Task</strong></span>
@@ -400,7 +405,7 @@ export default React.createClass({
 
                                 </div>
                                 <div className="col-md-3 reassignments">
-                                    {this.didWrite()?
+                                    {this.didWrite(false)?
                                     (<div className="btn-group-vertical  btn-block" role="group">
                                            <span> {this.state.task.status == 1 && this.state.task.processtask.status == 7 ?
                                                 <div className="btn-group btn-block" role="group2" >
@@ -511,7 +516,7 @@ export default React.createClass({
                             <i style={{marginTop: '3px'}} className="pull-left fa fa-sitemap"></i> Workflow
                         </button>
                     </Link>
-                    {this.waitingTask() ?
+                    {this.waitingTask(true) ?
                         <Affix key={'task_savebar'} className={'savebar'} clamp={'.reassignments'} fill={false} offset={240}>
                                 <button style={{marginLeft: '4px'}} onClick={this.saveAnswer} className="btn btn-primary pull-right">
                                     <i style={{marginTop: '3px'}} className="pull-left fa fa-floppy-o"></i> Save
@@ -528,7 +533,7 @@ export default React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                       {this.waitingTask() ? <DetailRender key={this.state.task.processtask.hash} /> :''}
+                       {this.waitingTask(false) ? <DetailRender key={this.state.task.processtask.hash} /> :''}
                 </div>
         </div>
     </div>

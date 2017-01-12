@@ -234,6 +234,7 @@ export default React.createClass({
             (this.state.notificationsDetail.numDaysAfter == 0 && this.state.notificationsDetail.sendNotificationUntil != null))
             return false;
         return true;
+        return true;
     },
     changeData(data){
         data.notificationsDetail= this.state.notificationsDetail;

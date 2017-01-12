@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import React from 'react';
+import Router from 'react-router';
 
 import {StateMachine} from './classes.jsx';
 import StateMachineStore from './store.jsx';
@@ -432,8 +433,9 @@ let StateMachineComponent = React.createClass({
     },
     saveWorkflow(){
         console.log('SAVED WORKFLOW');
-        if(this.props.save)
+        if(this.props.save) {
             this.props.save(this.getState());
+        }
     },
     deleteState(event){
         StateMachineActions.deleteState();

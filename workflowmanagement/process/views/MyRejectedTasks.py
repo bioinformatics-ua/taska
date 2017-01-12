@@ -33,7 +33,7 @@ class MyRejectedTasks(generics.ListAPIView):
         """
             Retrieves a list of user assigned process tasks
         """
-        ptasks = ProcessTaskUser.all(finished=False).filter(
+        ptasks = ProcessTaskUser.all(finished=False, reassigned=False).filter(
             Q(status=ProcessTaskUser.REJECTED),
             user=self.request.user,
         ).order_by('processtask__deadline')

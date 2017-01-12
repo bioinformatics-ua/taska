@@ -12,7 +12,7 @@ import RequestByProcessStore from '../../stores/RequestByProcessStore.jsx';
 import UserStore from '../../stores/UserStore.jsx';
 
 import {Loading} from '../reusable/component.jsx'
-import {RequestDate, RequestUser, RequestLink, RequestStatus} from './reusable/request.jsx'
+import {RequestDate, RequestProcess, RequestUser, RequestLink, RequestStatus} from './reusable/request.jsx'
 
 export default React.createClass({
     displayName: "My Studies",
@@ -44,7 +44,7 @@ const LoggedInHome = React.createClass({
                       </div>
                   </span>);
     }
-})
+});
 
 const RequestTable = React.createClass({
     tableAction: RequestByProcessActions.load,
@@ -75,8 +75,16 @@ const RequestTable = React.createClass({
                 "displayName": "User"
             },
             {
-                "columnName": "date",
+                "columnName": "process",
                 "order": 3,
+                "locked": true,
+                "visible": true,
+                "customComponent": RequestProcess,
+                "displayName": "Study"
+            },
+            {
+                "columnName": "date",
+                "order": 4,
                 "locked": true,
                 "visible": true,
                 "displayName": "Date",
@@ -84,7 +92,7 @@ const RequestTable = React.createClass({
             },
             {
                 "columnName": "type",
-                "order": 4,
+                "order": 5,
                 "locked": true,
                 "visible": true,
                 "customComponent": RequestStatus,
@@ -106,7 +114,7 @@ const RequestTable = React.createClass({
                     <Griddle
                         noDataMessage={<center>You currently have no requests made by assignees, relating to this study process.</center>}
                         {...this.commonTableSettings(false)}
-                        columns={["title", "processtaskuser",  "date","type"]}
+                        columns={["title", "process", "processtaskuser",  "date","type"]}
                         columnMetadata={columnMeta}/>
                 </div>;
     }

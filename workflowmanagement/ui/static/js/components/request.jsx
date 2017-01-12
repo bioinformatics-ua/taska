@@ -70,7 +70,8 @@ export default React.createClass({
             user: UserStore.getUser(),
             response: RequestStore.getResponse(),
             addedRequest: RequestStore.getRequestAddFinished(),
-            task: task
+            task: task,
+            showErrorMessage: false
         };
     },
     getInitialState(){
@@ -117,8 +118,24 @@ export default React.createClass({
         this.goBack();
     },
     setRequest(){
-        RequestActions.submitRequest();
-        this.goBack();
+        let title = this.state.request.title;
+
+        if(title == undefined)
+            title = "";
+
+        if(title.length > 0) {
+            RequestActions.submitRequest();
+            this.goBack();
+        }
+        else
+        {
+            console.log("ERROR Title missing");
+            //show error message
+            this.setState({showErrorMessage: true});
+        }
+    },
+    closeErrorMessage(){
+        this.setState({showErrorMessage: false});
     },
     goBackAndClean(){
         this.goBack();
@@ -262,6 +279,17 @@ export default React.createClass({
                                                 </button>
                                             </div>
                                         :''}
+                                </div>
+                            </div>
+                            <div className="row">
+
+                                <div className="col-md-12">
+                                { this.state.showErrorMessage ?
+                                    <div className="smalert alert alert-danger alert-dismissible fade in" role="alert">
+                                        <button type="button" onClick={this.closeErrorMessage}  className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        <strong>Error: </strong>Please insert a title to this request!
+                                    </div>
+                                :''}
                                 </div>
                             </div>
                             <hr style={{marginTop:0}} />
