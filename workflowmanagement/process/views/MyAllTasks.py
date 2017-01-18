@@ -52,6 +52,7 @@ class MyAllTasks(mixins.CreateModelMixin,
         #Them get all that are running
         ptasksRunning = ProcessTaskUser.all(finished=False, reassigned=False).filter(
             processtask__status=ProcessTask.RUNNING,
+            status=ProcessTaskUser.RUNNING,
             user=self.request.user,
         ).order_by('processtask__deadline')
 
@@ -60,7 +61,8 @@ class MyAllTasks(mixins.CreateModelMixin,
             ~Q(status=ProcessTaskUser.REJECTED) &
             Q(Q(
                 Q(processtask__status=ProcessTask.WAITING_AVAILABILITY) & ~Q(status=ProcessTaskUser.WAITING)) |
-                Q(processtask__status=ProcessTask.WAITING)),
+                Q(processtask__status=ProcessTask.WAITING)) |
+            Q(Q(processtask__status=ProcessTask.RUNNING) & Q(status=ProcessTaskUser.WAITING)),
             user=self.request.user,
         ).order_by('processtask__deadline')
 
