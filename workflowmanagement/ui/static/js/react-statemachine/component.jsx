@@ -660,7 +660,7 @@ let StateMachineComponent = React.createClass({
 
         return list;
     },
-    __renderLine(elem1, elem2, variate=true){
+    __renderLine(elem1, elem2, allow_sbe, variate=true){
 
         let offset1 = elem1.offset();
         let offset2 = elem2.offset();
@@ -668,6 +668,7 @@ let StateMachineComponent = React.createClass({
         let width2 = elem2.outerWidth()/2;
         let height1 = elem1.outerHeight()/2;
         let height2 = elem2.outerHeight()/2;
+
 
         if(offset1 && offset2){
             let maximum_referential = ($('#state_machine_chart').width()/2);
@@ -681,6 +682,8 @@ let StateMachineComponent = React.createClass({
 
             let conn = `${elem1.attr('id')}-${elem2.attr('id')}`;
 
+            let lineColor = allow_sbe ? "#007500" : "#2C3E50";
+
             let selected = (this.state.selected == conn)? 'state_line_selected': '';
 
             // Altough we represent level 0 relations(in relation to start point), they dont actually exist, so can't be deleted
@@ -693,7 +696,7 @@ let StateMachineComponent = React.createClass({
                 {x:Math.round(offset2.left+width2), y:offset2.top+height2},
                 {
                     lineWidth: 5,
-                    lineColor: "#2C3E50",
+                    lineColor: `${lineColor}`,
                     className: `${conn} state_line ${selected}`,
                     title: (exists)? `${elem1.attr('id')} depends upon ${elem2.attr('id')} `: undefined,
                     id: (exists)? `${conn}`: undefined,
@@ -726,13 +729,18 @@ let StateMachineComponent = React.createClass({
 
         for(let state of this.state.sm.getStates()){
             for(let dependency of state.__dependencies){
-                this.__renderLine($(`#${state.getIdentificator()}`), $(`#${dependency.getIdentificator()}`));
+                let allow_sbe = false;
+                try{
+                    allow_sbe = dependency.__data.ptask.allow_sbe;
+                }
+                catch(ex){}
+                this.__renderLine($(`#${state.getIdentificator()}`), $(`#${dependency.getIdentificator()}`), allow_sbe);
             }
             if(state.getLevel() == 1)
-                this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'));
+                this.__renderLine($(`#${state.getIdentificator()}`), $('.state-start'), false);
 
             if(state.getLevel() == (this.state.sm.getNextLevel() -1))
-                this.__renderLine($('.state-end'), $(`#${state.getIdentificator()}`))
+                this.__renderLine($('.state-end'), $(`#${state.getIdentificator()}`), false);
         }
 
         $('.state_line').click(event =>{
