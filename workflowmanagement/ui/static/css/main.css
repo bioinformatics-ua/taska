@@ -224,7 +224,7 @@ table {
   width: 64px;
 }
 .mystudies-process-title-td{
-    width: 800px;
+    width: 250px;
 }
 .mystudies-start-date-td{
     width: 130px;
@@ -380,6 +380,53 @@ table {
     height: 100%;
     margin-bottom: 20px;
 
+}
+
+.home-arrow{
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.home-helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.home-taskbar{
+    background-color: #ecf0f1;
+    /*border-right: 1px solid rgb(205, 205, 205);*/
+    height: 100%;
+    margin-bottom: 20px;
+}
+
+.home-row-sbs {
+  display: flex; /* equal height of the children */
+}
+
+.home-col-sbs {
+  flex: 1; /* additionally, equal width */
+  padding: 1em;
+}
+
+.home-titles-sbs
+{
+    height: 70px;
+}
+
+.home-button{
+    padding: 8px 45px;
+}
+
+.home-img
+{
+    height: 180px;
+}
+
+.home-text-sbs
+{
+    text-align: justify;
+    height: 200px;
 }
 
 @media screen and (max-width: 992px) {

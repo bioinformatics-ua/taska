@@ -62,7 +62,7 @@ export default Reflux.createStore({
        let callback = data.callback;
        let success = function(data){
             UserActions.loginSuccess(data);
-            callback();
+            callback(data.have_tasks);
         };
 
         log.authenticate(success, UserActions.loginFailed);

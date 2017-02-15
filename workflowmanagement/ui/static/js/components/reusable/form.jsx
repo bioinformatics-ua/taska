@@ -96,7 +96,7 @@ const FormTable = React.createClass({
                 <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}  to="Form" params={{object: 'add'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
               </div>
               <Griddle
-                  noDataMessage={<center>You currently have no form templates, to create a new form template please click the plus button above.</center>}
+                  noDataMessage={<center>You have no form templates.</center>}
                   {...this.commonTableSettings(false)}
                   columns={["title", "latest_update", "created_date"]}
                   columnMetadata={columnMeta} />

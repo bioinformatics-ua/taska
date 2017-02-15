@@ -150,7 +150,7 @@ class SimpleTask extends SimpleState {
                     </div>
 
                     <span>
-                        <label title="Choose if the answers for all tasks, when running inside a study context, should be passed down to this tasks dependants.">Forward Answers</label>
+                        <label title="Choose if the answers for this task, when running inside a study context, should be passed down to its dependant tasks.">Forward Answers</label>
                         <div className="form-group">
                             <Toggle id="output_resources"
                                     defaultChecked={this.parent()['output_resources']}
@@ -704,7 +704,7 @@ class SimpleTaskRun extends SimpleTask{
                 }
 
                 return <span>
-                    <label title="Choose if the task can run without all the users needed to terminate the dependecies.">Start independently</label>
+                    <label title="Choose if the task can run without all the users having finished their dependent tasks.">Users can start tasks independently</label>
                         <div className="form-group">
                             <Toggle id="allow_start"
                                     defaultChecked={allow_sbe}

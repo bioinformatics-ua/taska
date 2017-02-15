@@ -15,7 +15,11 @@ console.log(baseurl)
 
 module.exports = (
     <Route name='app' path={baseurl} handler={require('./components/app.jsx')}>
-        <Route name="default" path={baseurl} handler={require('./components/home.jsx')}/>
+        <Route name="default" path={baseurl} handler={require('./components/home.jsx').HomeWithRedirect}/>
+
+        <Route name="home" path="home" handler={require('./components/home.jsx').Home}/>
+
+        <Route name="MyTasks" handler={require('./components/MyTasks.jsx')}/>
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
@@ -31,8 +35,6 @@ module.exports = (
 
         <Route name="profile" path="profile" handler={require('./components/profile.jsx')}/>
 
-        <Route name="home" path={baseurl} handler={require('./components/home.jsx')}/>
-
         <Route name="help" handler={require('./components/help.jsx')} />
 
         <Route name="about" handler={require('./components/about.jsx')} />
@@ -44,8 +46,6 @@ module.exports = (
         <Route name="MessageSender" path="messageSender/:hash/:object" handler={require('./components/requests/RequestCreator.jsx')} />
 
         <Route name="MyRequests" handler={require('./components/requests/MyRequests.jsx')} />
-            
-        <Route name="StudyManagement" handler={require('./components/StudyManagement.jsx')} />
             
         <Route name="StudyTemplates" handler={require('./components/StudyTemplates.jsx')} />    
             

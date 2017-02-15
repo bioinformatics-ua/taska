@@ -37,13 +37,13 @@ const TaskTabber = React.createClass({
               </div>
               <div className="panel-body tasktab-container">
               <Tabs>
-                <Tabs.Panel title={<span><i className="fa fa-play"></i> &nbsp;Current Tasks</span>}>
+                <Tabs.Panel title={<span><i className="fa fa-play"></i> &nbsp;Current tasks</span>}>
                   <CurrentTaskTable />
                 </Tabs.Panel>
-                  <Tabs.Panel title={<span><i className="fa fa-check"></i> &nbsp;Completed Tasks</span>}>
+                  <Tabs.Panel title={<span><i className="fa fa-check"></i> &nbsp;Completed tasks</span>}>
                   <CompletedTaskTable />
                 </Tabs.Panel>
-                <Tabs.Panel title={<span><i className="fa fa-times"></i> &nbsp;Rejected Tasks</span>}>
+                <Tabs.Panel title={<span><i className="fa fa-times"></i> &nbsp;Rejected tasks</span>}>
                   <RejectedTaskTable />
                 </Tabs.Panel>
               </Tabs>

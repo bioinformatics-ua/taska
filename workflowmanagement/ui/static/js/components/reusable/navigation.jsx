@@ -50,10 +50,10 @@ var UserDropdown = React.createClass({
     }
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
                     <li>
-                        <Tab to='default' className="boldit"><i className="fa fa-tasks"></i> MY TASKS</Tab>
+                        <Tab to='MyTasks' className="boldit"><i className="fa fa-tasks"></i> TASKS</Tab>
                     </li>
                     <li>
-                        <Tab to='MyStudies' className="boldit"><i className="fa fa-sitemap"></i> MY STUDIES</Tab>
+                        <Tab to='MyStudies' className="boldit"><i className="fa fa-sitemap"></i> STUDIES</Tab>
                     </li>
         
                     <li className="dropdown">
@@ -68,16 +68,10 @@ var UserDropdown = React.createClass({
                                 <Tab to='StudyTemplates' className="boldit">Study Templates</Tab>
                             </li>
                             <li>
-                                <Tab to='StudyManagement' className="boldit">Studies</Tab>
-                            </li>
-                            <li>
                                 <Tab to='MyRequests' className="boldit">Requests</Tab>
                             </li>
                         </ul>
 
-                    </li>
-                    <li>
-                        <Tab to='help' className="boldit"><i className="fa fa-question-circle"></i> HELP</Tab>
                     </li>
 
                     <li className="dropdown">
@@ -96,6 +90,9 @@ var UserDropdown = React.createClass({
                         </li>
                         <li>
                             <Link to='about'><i className="fa fa-info-circle"></i> About Taska</Link>
+                        </li>
+                        <li>
+                            <Link to='help'><i className="fa fa-question-circle"></i> Help</Link>
                         </li>
                         <li className="divider"></li>
                         <li><a href="javascript:void(0)" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</a></li>

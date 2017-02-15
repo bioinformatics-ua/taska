@@ -38,12 +38,15 @@ export default React.createClass({
               username: this.refs.usr.getDOMNode().value.trim(),
               password: this.refs.pwd.getDOMNode().value.trim(),
               remember: this.refs.rmb.getDOMNode().checked,
-              callback: function(){
+              callback: function(have_tasks){
                     console.log('LOGIN CALLBACK');
                     if (nextPath) {
                         self.context.router.transitionTo(nextPath);
                     } else {
-                        self.context.router.replaceWith('app');
+                        if(have_tasks)
+                            self.context.router.replaceWith('MyTasks');
+                        else
+                            self.context.router.replaceWith('app');
                     }
               }
             });

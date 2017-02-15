@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate, login, logout
 from models import Profile, UserRecovery
 
 from history.models import History
+from process.models import ProcessTaskUser
 
 from django.utils import timezone
 
@@ -63,12 +64,13 @@ class UserSerializer(serializers.ModelSerializer):
     '''
     fullname = serializers.SerializerMethodField(required=False)
     last_login = serializers.SerializerMethodField(required=False)
+    have_tasks = serializers.SerializerMethodField(required=False)
     profile = ProfileSerializer()
 
     class Meta:
         permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser, TokenHasScope]
         model = User
-        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id', 'profile')
+        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'last_login', 'fullname', 'id', 'profile', 'have_tasks')
 
     def get_fullname(self, obj):
         '''This method serializes the user name as a textual representation, falling back to the email when not available.
@@ -89,6 +91,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 
         return None
+
+    def get_have_tasks(self, obj):
+        try:
+            ptasks = ProcessTaskUser.all(finished=False, reassigned=False).filter(user=obj)
+            if len(ptasks) > 0:
+                return True
+        except:
+            pass #Ignore because I will return false bellow
+        return False
 
     @transaction.atomic
     def create(self, validated_data):

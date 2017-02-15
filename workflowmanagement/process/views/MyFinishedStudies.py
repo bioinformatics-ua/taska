@@ -28,7 +28,7 @@ class MyFinishedStudies(generics.ListAPIView):
     def get_queryset(self):
         allProcess = Process.all().filter(
             Q(status=Process.FINISHED) | Q(status=Process.CANCELED),
-            processtask__processtaskuser__user=self.request.user,
+            Q(processtask__processtaskuser__user=self.request.user) | Q(executioner=self.request.user),
             processtask__processtaskuser__reassigned = False
         ).distinct().order_by('end_date')
 
