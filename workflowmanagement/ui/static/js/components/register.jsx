@@ -84,9 +84,9 @@ export default React.createClass({
                 <form onSubmit={this.register}>
                 <div className="row">
                     <div className="profileform col-md-8 col-md-offset-2">
-                        <h3>Register Account</h3>
-                        <p>To register, please apply with the form below.</p>
-                        <p>At this time, registry is manually approved by the administrator. You will receive an email with the veredict of your approval status.</p>
+                        <h3>Registration</h3>
+                        <p>To register, please apply by filling in the form below.</p>
+                        <p>At this time, registration is manually approved by the administrator. You will receive an email with your approval status.</p>
 
                         <div className="form-group">
                             <div className="input-group">
