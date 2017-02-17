@@ -231,10 +231,25 @@ table {
 }
 .mystudies-progress-td{
     text-align: center;
+    width: 110px;
 }
 .mystudies-status-td{
+    text-align: center;
+    width: 70px;
+}
+
+.mystudies-link-status-td{
+    width: 130px;
+}
+
+.mystudies-link-requests-td{
+    width: 130px;
+}
+
+.mystudies-link-message-td{
 
 }
+
 .process-status-td{
     text-align: center;
 }

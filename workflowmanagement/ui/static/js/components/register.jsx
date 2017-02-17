@@ -87,14 +87,7 @@ export default React.createClass({
                         <h3>Register Account</h3>
                         <p>To register, please apply with the form below.</p>
                         <p>At this time, registry is manually approved by the administrator. You will receive an email with the veredict of your approval status.</p>
-                        <div className="form-group">
-                            <div className="input-group">
-                                <span className="input-group-addon" id="startdate">
-                                    <strong>Email</strong>
-                                </span>
-                                <input className="form-control" onChange={this.setEmail} defaultValue={this.state.user.email} />
-                            </div>
-                        </div>
+
                         <div className="form-group">
                             <div className="input-group">
                                 <span className="input-group-addon" id="startdate">
@@ -109,6 +102,14 @@ export default React.createClass({
                                     <strong>Last Name</strong>
                                 </span>
                                 <input className="form-control" onChange={this.setLast} defaultValue={this.state.user['last_name']} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>Email</strong>
+                                </span>
+                                <input className="form-control" onChange={this.setEmail} defaultValue={this.state.user.email} />
                             </div>
                         </div>
                         <div className="form-group">
