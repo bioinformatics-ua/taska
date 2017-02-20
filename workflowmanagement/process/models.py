@@ -122,11 +122,24 @@ class Process(models.Model):
                     if not (pdep.status == ProcessTask.FINISHED or pdep.status == ProcessTask.CANCELED):
                         move=False
 
+                    if ptask.allow_sbe:
+                        ptus = ProcessTaskUser.all(processtask=pdep)
+                        for ptu in ptus:
+                            if ptu.status == ProcessTaskUser.FINISHED or ptu.status == ProcessTaskUser.CANCELED or ptu.finished:
+                                ptask.status = ProcessTask.RUNNING
+                                ptus2 = ProcessTaskUser.all(processtask=ptask)
+                                for ptu2 in ptus2:
+                                    if(ptu.user == ptu2.user):
+                                        ptu2.status = ProcessTaskUser.RUNNING
+                                        ptu2.save()
+                        ptask.save()
+
                 if move:
                     ptask.status = ProcessTask.RUNNING
                     ptus = ProcessTaskUser.all(processtask=ptask)
                     for ptu in ptus:
                         ptu.status = ProcessTaskUser.RUNNING
+                        ptu.save()
                     ptask.save()
 
                     pusers = ptask.users()
@@ -257,6 +270,7 @@ class ProcessTask(models.Model):
     deadline        = models.DateTimeField()
     hash            = models.CharField(max_length=50)
     removed         = models.BooleanField(default=False)
+    allow_sbe       = models.BooleanField(default=False)
 
     @staticmethod
     def statusCode(code):
@@ -327,11 +341,13 @@ class ProcessTask(models.Model):
 
             self.__exportForm(task)
 
-            self.process.move()
+            #self.process.move()
 
         else:
             if force:
                 self.__exportForm(Task.objects.get_subclass(id=self.task.id))
+
+        self.process.move()
 
     def getAllUsersEnvolved(self, notification=True):
         tmp = []

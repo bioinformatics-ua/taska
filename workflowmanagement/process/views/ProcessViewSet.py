@@ -43,7 +43,10 @@ class ProcessViewSet(mixins.CreateModelMixin,
     #max_paginate_by = 100
 
     def get_queryset(self):
-        return Process.all(executioner=self.request.user)
+        return Process.all().filter(
+            ~Q(status=Process.FINISHED) & ~Q(status=Process.CANCELED),
+            Q(processtask__processtaskuser__user=self.request.user) | Q(executioner=self.request.user),
+        ).distinct().order_by('start_date')
 
 
     def list(self, request, *args, **kwargs):

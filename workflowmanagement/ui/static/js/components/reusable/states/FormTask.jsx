@@ -20,7 +20,9 @@ import UserStore from '../../../stores/UserStore.jsx';
 
 import moment from 'moment';
 
-import {stateColor, singleStateColor} from '../../../map.jsx';
+import Toggle from 'react-toggle';
+
+import {stateColor, singleStateColor, stateTaskDesc, stateUserTaskDesc} from '../../../map.jsx';
 
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 
@@ -196,51 +198,18 @@ class FormTaskRun extends FormTask{
             users: users,
             deadline: this.getData().deadline,
             name: this.getData().name,
-            task: this.getData().hash
+            task: this.getData().hash,
+            allow_sbe: this.getData().allow_sbe,
         }
     }
     stateStyle(user){
         if (this.getData().ptask)
-        //This condition is because the state 7 and 8 is influenced by the state of ProcessTaskUser
-            if (this.getData().ptask.status != 7 && this.getData().ptask.status != 8)
-                return stateColor(this.getData().ptask);
-            else if (user != undefined)
-                return singleStateColor(user.status);
+            if (user != undefined)
+                return singleStateColor(this.getData().ptask, user.status);
             else
-                return stateColor(this.getData().ptask); //This line is because there are new status (7 and 8, maybe more in the future), so to fill the statemachine i need this condition
+                return stateColor(this.getData().ptask);//To fill the state machine
+
         return {};
-    }
-    stateDesc(){
-        if(this.getData().ptask)
-            switch(this.getData().ptask.status){
-                case 1:
-                    return 'Waiting';
-                case 2:
-                    let end = moment(this.getData().ptask.deadline);
-                    let now = moment();
-
-                    if(now.isBefore(end)){
-                        return 'Running';
-                    } else {
-                        return 'Overdue';
-                    }
-                case 3:
-                    return 'Finished';
-                case 4:
-                    return 'Canceled';
-                case 5:
-                    return 'Overdue';
-                case 7:
-                    return 'Waiting for answer';
-                case 8:
-                    return "Rejected";
-                default:
-                    console.log("Task status: ");
-                    console.log(this.getData().ptask.status);
-            }
-
-
-        return 'Waiting';
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -402,16 +371,18 @@ class FormTaskRun extends FormTask{
 
                 let users;
                 let status;
+                let task;
                 if(!this.parent().assignee)
                     return;
 
                 try{
                     users = this.parent().ptask.users;
                     status = this.parent().status;
+                    task = this.parent().ptask;
                 } catch(ex){
                     users = [];
                 }
-                let desc = self.stateDesc();
+                let desc = stateTaskDesc(this.parent().ptask);
                 let stillOn = desc === 'Running' || desc === 'Waiting';
                 let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
                 let onlyShow = true;
@@ -423,20 +394,6 @@ class FormTaskRun extends FormTask{
                 }
 
                 let renderStatus = function(user){
-                    if (forAvailability)
-                        switch(user.status)
-                        {
-                            case 1:
-                                desc = 'Waiting for answer';
-                                break;
-                            case 2:
-                                desc = 'Accepted';
-                                break;
-                            case 3:
-                                desc = 'Rejected';
-                                break;
-                        }
-
                     if(user.finished){
                         return (
                             <span>
@@ -466,7 +423,7 @@ class FormTaskRun extends FormTask{
                                     dataCancel={false}
                                     label={"Uncancel "}
                                     title={"Cancel assignee"}
-                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}/> :''}
+                                    message={`You canceled all the users assigned to this task. Do you want to finish this task?`}/> :''}
                             </span>
                         );
                     } else {
@@ -474,7 +431,7 @@ class FormTaskRun extends FormTask{
                         return (
                             <span>
                             <span className="label" style={self.stateStyle(user)}>
-                                {desc}
+                                {stateUserTaskDesc(task, user)}
                             </span> &nbsp;&nbsp;&nbsp;
                             {onlyShow ? (stillOn || forAvailability ?
                             (forAvailability ?
@@ -485,7 +442,7 @@ class FormTaskRun extends FormTask{
                                     dataCancel={true}
                                     label={"Cancel "}
                                     title={"Cancel assignee"}
-                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
+                                    message={`You canceled all the users assigned to this task. Do you want to finish this task?`}
                                     verificationFunc={me.verifyIfLastUserToCancel}/>
                                 <a data-assignee={user.user} data-cancel="true" onClick={me.showReassignSelect}>Reassigning  </a>
                             </span>:
@@ -495,7 +452,7 @@ class FormTaskRun extends FormTask{
                                     dataCancel={true}
                                     label={"Cancel "}
                                     title={"Cancel assignee"}
-                                    message={`You canceled all the users assigned to this task. Do you want to cancel this task too?`}
+                                    message={`You canceled all the users assigned to this task. Do you want to finish this task?`}
                                     verificationFunc={me.verifyIfLastUserToCancel}/> ):''):''}
                             </span>
                         );
@@ -537,8 +494,8 @@ class FormTaskRun extends FormTask{
                                     <th>Status {onlyShow && !canceledTask ?
                                         <CancelAssigneesButton
                                             success={me.cancelTask}
-                                            title={"Cancel task"}
-                                            message={`Do you want to cancel this task?`}
+                                            title={"Finish task"}
+                                            message={`Do you want to finish this task?`}
                                         />:''}
                                     </th>
                                 </tr>
@@ -644,6 +601,12 @@ class FormTaskRun extends FormTask{
                     'overflow': 'visible'
                 });
             },
+            allowStartIndependently(e){
+                let data = {allow_sbe:  e.target.checked};
+
+                this.state.parent.setState(data);
+                this.props.dataChange(self.getIdentificator(), data, true);
+            },
             render(){
                 let users;
                 try{
@@ -658,8 +621,22 @@ class FormTaskRun extends FormTask{
                 catch(ex){
 
                 }
+                let allow_sbe;
+                try{
+                    allow_sbe = this.parent().ptask.allow_sbe;
+                }
+                catch(ex){
+                    allow_sbe = false;
+                }
 
                 return <span>
+                    <label title="Choose if the task can run without all the users having finished their dependent tasks.">Users can start tasks independently</label>
+                        <div className="form-group">
+                            <Toggle id="allow_start"
+                                    defaultChecked={allow_sbe}
+                                    checked={this.state.parent.state.allow_sbe}
+                                    onChange={this.allowStartIndependently} disabled={this.parent().disabled} />
+                        </div>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
 

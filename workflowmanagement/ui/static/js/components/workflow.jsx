@@ -50,11 +50,11 @@ export default React.createClass({
         view: {
         },
         edit: {
-            detail: ': Drag and drop tasks from buttons below, and put them on the "plus" areas on the right. Another way to add a task to your study template, is to click in the "plus” areas on the right and add the tasks that you want.',
-            global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of other level.'
+            detail: 'Drag and drop tasks from the buttons below and place them on the "plus" areas on the right. Another way to add a task to your study template is to click in the "plus” areas on the right and add the tasks that you want.',
+            global: 'You can drag-and-drop existing tasks to move them between levels. Only drag the tasks to the "plus" area of another level.'
         },
         run: {
-            detail: 'Please fulfill assignee and deadlines before running the study template as a study.',
+            detail: 'Please fill in assignees and deadlines before running the study template as a study.',
             global: 'Click tasks to add assignees and deadlines, ready tasks will change color'
         }
     },

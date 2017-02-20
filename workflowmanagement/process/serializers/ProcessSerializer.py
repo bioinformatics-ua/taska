@@ -18,12 +18,21 @@ class ProcessSerializer(serializers.ModelSerializer):
     object_repr = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     status_repr = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
 
     class Meta:
         model = Process
         exclude = ('id', 'removed')
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
         extra_kwargs = {'hash': {'required': False}}
+
+    def get_owner(self, obj):
+        try:
+            if self.context['request'].user == obj.executioner:
+                return True
+        except:
+            pass #Not important to solve because sometimes the process don't have owner
+        return False
 
     def get_progress(self, obj):
         '''

@@ -266,9 +266,9 @@ const CancelAssigneesButton = React.createClass({
         return {};
     },
     render: function () {
-        return <button type="button" className="pull-right btn  btn-xs btn-danger" onClick={this.handleClick}>
-            <i className="fa fa-ban"></i>
-            <small> Cancel Task</small>
+        return <button type="button" className="pull-right btn  btn-xs btn-success" onClick={this.handleClick}>
+            <i className="fa fa-check"></i>
+            <small> Finish Task</small>
         </button>;
     },
     renderLayer: function () {

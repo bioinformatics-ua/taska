@@ -111,10 +111,10 @@ const WorkflowTable = React.createClass({
               <div className="panel-heading">
                 <i className="fa fa-sitemap pull-left"></i>
                 <h3 className="text-center panel-title"> Study Templates</h3>
-                <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}} to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i></Link>
+                <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}} to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className="pull-right btn btn-xs btn-success"><i className="fa fa-plus"></i> Create study template</Link>
               </div>
               <Griddle
-                  noDataMessage={<center>You have not created any study templates yet, click on the plus icon above to create a new study template.</center>}
+                  noDataMessage={<center>You don't have any study templates.</center>}
                   {...this.commonTableSettings(false)}
                   columns={["title", "owner_repr", "hash"]}
                   columnMetadata={columnMeta} />

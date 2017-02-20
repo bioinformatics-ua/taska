@@ -16,7 +16,7 @@ const getContentTableSize = function () {
 }
 
 const getTASKAVersion = function () {
-    return "v2.0.1"
+    return "v2.1.3"
 }
 
 export default {getTableSizeWithTabs, getContentTableSizeWithTabs, getContentTableSize, getTASKAVersion};

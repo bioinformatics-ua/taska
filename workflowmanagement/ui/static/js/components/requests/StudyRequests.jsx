@@ -112,7 +112,7 @@ const RequestTable = React.createClass({
                         </Link>
                       </div>
                     <Griddle
-                        noDataMessage={<center>You currently have no requests made by assignees, relating to this study process.</center>}
+                        noDataMessage={<center>You have no requests made by assignees.</center>}
                         {...this.commonTableSettings(false)}
                         columns={["title", "process", "processtaskuser",  "date","type"]}
                         columnMetadata={columnMeta}/>

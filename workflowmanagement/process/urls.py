@@ -21,7 +21,6 @@ from views.MyTaskPreliminary import MyTaskPreliminary
 from views.MyTask import MyTask
 from views.ResultsPDF import ResultsPDF
 from views.ProcessTaskResultExport import ProcessTaskResultExport
-from views.MyStudies import MyStudies
 from views.MyFinishedStudies import MyFinishedStudies
 from views.RequestsByProcessViewSet import RequestsByProcessViewSet
 
@@ -51,7 +50,6 @@ urlpatterns = patterns('',
     url(r'^/my/alltasks/', MyAllTasks.as_view({'get': 'list'})),
     url(r'^/my/completedtasks/', MyCompletedTasks.as_view()),
     url(r'^/my/finishedstudies/', MyFinishedStudies.as_view()),
-    url(r'^/my/studies/', MyStudies.as_view()),
     url(r'^/my/futuretasks/', MyFutureTasks.as_view()),
 
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', MyTaskDependencies.as_view()),

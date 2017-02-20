@@ -73,8 +73,7 @@ const RejectedTaskTable = React.createClass({
             }
         ];
         return <Griddle
-            noDataMessage={<center>You currently have no rejected tasks yet. This tasks are all the tasks that you have
-                rejected.</center>}
+            noDataMessage={<center>You have no rejected tasks.</center>}
             {...this.commonTableSettings(true)}
             enableInfiniteScroll={true}
             useFixedHeader={true}

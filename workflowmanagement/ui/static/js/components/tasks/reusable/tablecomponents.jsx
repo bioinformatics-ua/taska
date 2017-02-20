@@ -9,7 +9,7 @@ import moment from 'moment';
 
 const TaskType = React.createClass({
     getIcon(row){
-        if (row.processtask.status == 1 || (row.processtask.status == 7 && row.status == 2))
+        if (row.processtask.status == 1 || (row.processtask.status == 7 && row.status == 2) || (row.processtask.status == 2 && row.status == 1))
             return 'glyphicon glyphicon-hourglass';//I dont know way fa-hourglass dont work, so i used this
 
         switch (row.processtask.type) {
