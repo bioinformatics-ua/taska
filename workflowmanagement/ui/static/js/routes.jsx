@@ -15,8 +15,10 @@ console.log(baseurl)
 
 module.exports = (
     <Route name='app' path={baseurl} handler={require('./components/app.jsx')}>
-        <Route name="default" path={baseurl} handler={require('./components/home.jsx').HomeWithRedirect}/>
-
+        <Route name="default" path={baseurl+"/"} handler={require('./components/home.jsx').HomeWithRedirect}/>
+        
+	<Route name="default2" path={baseurl} handler={require('./components/home.jsx').HomeWithRedirect}/>
+	
         <Route name="home" path="home" handler={require('./components/home.jsx').Home}/>
 
         <Route name="MyTasks" handler={require('./components/MyTasks.jsx')}/>
