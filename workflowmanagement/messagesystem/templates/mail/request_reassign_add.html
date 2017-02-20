@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-[TASKA] You have a reassign request to {{ task }} (REQUIRES FEEDBACK)
+[TASKA] You have a reassign request for {{ task }} (REQUIRES FEEDBACK)
 {% endblock %}
 
 {% block body %}
@@ -9,10 +9,10 @@
 Hello dear {{ leaderName }},<br /> <br />
 
 
-{{ user }} requested for the reassignement of  the task: {{ task }}.
+{{ user }} requested for the reassignement of the task: {{ task }}.
 
 <br /><br />
-Please access your TASKA account from this <a href="{{link_open_plataform}}">link</a> to see the request.
+Please access your TASKA account from this <a href="{{link_open_plataform}}">link</a> to assess the request.
 
 <br /><br />
 Best Regards,<br />

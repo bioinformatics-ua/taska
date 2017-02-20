@@ -201,7 +201,7 @@ export default React.createClass({
             this.context.router.transitionTo(this.state.saved.type, {object: this.state.saved.hash});
         }
         if(this.state.submitted){
-            this.context.router.transitionTo('home');
+            this.context.router.transitionTo('MyTasks');
         }
     },
     update(status, force=false){

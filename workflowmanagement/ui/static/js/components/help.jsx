@@ -9,90 +9,147 @@ export default React.createClass({
     mixins: [Authentication],
     render() {
         return (
-          <div>
-            <h1>Getting Started</h1>
-            <p>
-                TASKA is an extensible task manager with structured workflow-oriented features.
-                This page contains a brief explanation of the system's main concepts and how they are interconnected.
-            </p>
-            <h2>Task</h2>
+            <div>
+                <div className=" row">
+                    <h1>Getting Started</h1>
+                    <p>
+                        TASKA is an extensible task manager with structured workflow-oriented features. This page
+                        contains
+                        a brief explanation of the main concepts of the system and how they are interconnected.
+                    </p>
+                    <h3>What can you do?</h3>
+                    <br />
+                </div>
 
-            <p>The Task is the basic unit on TASKA, everything is a composition or at least related with a task.</p>
-            <p>Tasks have inputs and outputs, descriptions and can be of several types, such as Simple Tasks or Form Tasks.</p>
-            <p>Tasks are the unitary block used to construct workflow template.</p>
+                <div className="home-row-sbs row">
 
-            <h2>Workflow template</h2>
+                    <div ref="taskbar" className="clearfix home-taskbar col-md-3 table-col">
+                        <center>
+                            <div className="home-titles-sbs">
+                                <h3>Create a study template</h3>
+                            </div>
 
-            <p>A workflow template is a composition of dependency related tasks, structured in a ordered way, to accomplish objectives or results.</p>
-            <p>The purpose of workflow template is specifying a straightforward structure, that mixes the tasks with a flow that guides them.</p>
-            <p>workflow template can be public or private. Public workflow template are available for all registered users.</p>
+                            <div className="home-img">
+                                <img src="static/images/workflow.png"/>
+                            </div>
 
-            <p>A workflow template works as a template for the study.</p>
+                            <div className="home-text-sbs">
+                                <p>A <b>study template</b> is a composition of inter-related tasks, structured in a
+                                    sequenced way to accomplish specific goals.</p>
+                                <p>The purpose of a study template is to define a schema that can be reused to create
+                                    studies (workflows).</p>
+                            </div>
+                        </center>
+                        <br />
+                    </div>
 
-            <h2>Study</h2>
+                    <div className="col-md-9">
+                        <div className="home-row-sbs row">
+                            <div className="col-md-2">
+                                <span className="home-helper"></span>
+                                <img src="static/images/arrow.jpeg" className="home-arrow"/>
+                            </div>
 
-            <p>A study is a workflow template's instance, with a specified group of users and deadlines for each of the tasks that composes the workflow template.</p>
-            <p>The main concept behind separating workflow template from the instances is to easily allow repeatability of tasks across time and intervenients.</p>
+                            <div ref="taskbar" className="clearfix home-taskbar col-md-4 table-col">
+                                <center>
+                                    <div className="home-titles-sbs">
+                                        <h3>Run a study</h3>
+                                    </div>
 
-            <h2>Request</h2>
+                                    <div className="home-img">
+                                        <img src="static/images/runStudy.png"/>
+                                    </div>
 
-            <p>A request is a communication vehicle that allows the user who is completing a task to interact with a study overseer. </p>
-            <p>Asking for reassignment, clarification or any other type of feedback can be made through requests.</p>
+                                    <div className="home-text-sbs">
+                                        <p>A <b>study</b> is a running instance of one study template, in which users
+                                            are assigned to tasks with specifc deadlines.</p>
+                                        <p>Each user that runs a study will assume the study manager role.</p>
+                                    </div>
+                                </center>
+                                <br />
+                            </div>
 
-            <h2>Form</h2>
+                            <div className="col-md-2">
+                                <span className="home-helper"></span>
+                                <img src="static/images/arrow.jpeg" className="home-arrow"/>
+                            </div>
 
-            <p>Forms are questionnaires with several types of questions such as Select dropdowns, multiple choice or checkboxes.</p>
-            <p>Forms are created to be used on Form Tasks, so study overseers can collect information in a uniformed template.</p>
-            <p>The reason they are separated from the task itself, is to allow the reusability of the same form in different tasks.</p>
+                            <div ref="taskbar" className="clearfix home-taskbar col-md-4 table-col">
+                                <center>
+                                    <div className="home-titles-sbs">
+                                        <h3>Complete tasks</h3>
+                                    </div>
 
-            <h2>History</h2>
+                                    <div className="home-img">
+                                        <img src="static/images/tasks.png"/>
+                                    </div>
 
-            <p>History is a detailed list of all performed actions in the system. It can be used to backtrack users activities.</p>
+                                    <div className="home-text-sbs">
+                                        <p>The <b>task</b> is the basic unit of the system. Everything is a composition
+                                            of at least one or more tasks.</p>
+                                        <p>Each user can find in this area, all the assigned tasks (pending and
+                                            completed).</p>
+                                    </div>
 
-            <h2>Usage Profiles</h2>
+                                </center>
+                                <br />
+                            </div>
 
-            <p>This system has two types of user roles: </p>
-            <ul>
-                <li>Study overseer - oversee study flows, analyse outcomes and perform all related study management tasks</li>
-                <li>Study responder - reply the overseer's tasks</li>
-            </ul>
+                        </div>
+                    </div>
+                </div>
 
-            <hr />
-              { /*<h1>The Main Dashboard</h1>
+                <div className=" row">
 
-            <p>Private and complete view of the system after login.</p>
+                    <h3>Study template</h3>
+                    <p>A study template is a workflow composed by tasks, in a structured and orderly way, that allows
+                        the user to have a better perception of an assignment that has to be completed.</p>
+                    <p>The main aim of a study template is to provide a base to create studies and that can be reused in
+                        other studies.</p>
+                    <p>There are two types of study templates: public study templates, that all registered users can use
+                        for their own studies, and private study templates, that only their creator can use for running
+                        studies.</p>
 
-            <p>This dashboard is divided into six areas evidencing all the system's available features and combines the two different user profiles into one single interface.</p>
+                    <h3>Study</h3>
+                    <p>A study is a running instance of a study template. To run a study, the manager needs to assign to
+                        each task an user or a group of users that will have to complete the given task or tasks..</p>
+                    <p>The main concept behind separating a study template from an instance is to easily allow
+                        repeatability of tasks across time and participants.</p>
 
-            <h2>Workflow template</h2>
+                    <h3>Task</h3>
+                    <p>The Task is the basic unit on TASKA, everything is a composition of or related to a Task. In
+                        other words, Tasks are unitary blocks used to construct workflow templates.</p>
+                    <p>A Task is characterised by an input and an output. Tasks can be of two types: Simple Tasks or
+                        Form Tasks.</p>
 
-            <p>In this section, user's workflow template and public workflow template are shown. User's workflow template can be edited through a rich visual editor and public workflow templates can be duplicated (to be modified), or simply used as they are.</p>
+                    <h3>Form</h3>
+                    <p>Forms are questionnaires with several types of questions such as: select dropdowns, multiple
+                        choice or checkboxes.</p>
+                    <p>Forms are created to be used on Form Tasks, so that study overseers can collect information in an
+                        uniformed template.</p>
+                    <p>Forms are separated from the tasks so as to allow the reusability of the same form in different
+                        tasks.</p>
 
-            <p>This area can be used to create, modify and delete workflow templates, but also to run workflow templates as studies, through the run feature. When we want to create a study from a workflow template, we must click run and choose the deadlines and assignee's.</p>
+                    <h3>Request</h3>
+                    <p>A request is a communication vehicle that allows the user who is completing a task to interact
+                        with a study overseer. </p>
+                    <p>Asking for reassignment, clarification or any other type of feedback can be made through
+                        requests.</p>
 
-            <h2>Studies</h2>
+                    <h3>Usage Profiles</h3>
 
-            <p>In this section users have access to finished or ongoing (still running) studies. It allows to manage and oversee the studies with an overview, but also analyse and obtain the results from the studies.</p>
+                    <p>This system has two types of user roles: </p>
+                    <ul>
+                        <li>Study overseer - supervises study flows, analyses outcomes and performs all related study
+                            management tasks
+                        </li>
+                        <li>Study responder - in charge of completing a task</li>
+                    </ul>
+                </div>
 
-            <p>Only the user running the study has access to this view.</p>
+                <hr />
 
-            <h2>Tasks</h2>
-
-            <p>In this section users can see and answer to tasks assigned to them by study overseers. They are ordered by default based on deadline, so users can prioritize tasks.</p>
-
-            <h2>Received Requests</h2>
-
-            <p>In this section, the user can see replied and still to reply requests made by users answering tasks in their studies.</p>
-
-            <h2>Forms</h2>
-
-            <p>In this section users can see forms they created and manage them using an rich visual editor.</p>
-
-            <h2>History</h2>
-
-            <p>In this section, users can see user-related history. This can range from all actions on the system, or by others in his studies.</p>*/}
-
-          </div>
+            </div>
         );
       }
 });

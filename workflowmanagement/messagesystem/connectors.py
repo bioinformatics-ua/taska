@@ -7,6 +7,7 @@ from messagesystem import templates
 from utils.tasks import sendEmail
 
 from process.models import Process, ProcessTask, Request, ProcessTaskUser
+from accounts.models import UserRecovery
 from result.models import Result
 from messagesystem.models import Message
 import time
@@ -56,7 +57,7 @@ def defineTci(instance, tc):
     tci = None
 
     # USER
-    if isinstance(instance.object, User):
+    if isinstance(instance.object, User) or isinstance(instance.object, UserRecovery):
         # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
         tci = tc(instance, instance.authorized.all())
     else:

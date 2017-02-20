@@ -131,12 +131,11 @@ const CurrentTaskTable = React.createClass({
                 "visible": true,
                 "cssClassName": 'availability-td',
                 "customComponent": TaskAvailability,
-                "displayName": "Availability"
+                "displayName": ""
             }
         ];
         return <Griddle
-            noDataMessage={<center>You currently have no current tasks assigned to you at this moment. This tasks are
-                assigned through the running of studies.</center>}
+            noDataMessage={<center>You have no assigned tasks.</center>}
             {...this.commonTableSettings(true)}
             enableInfiniteScroll={true}
             useFixedHeader={true}
