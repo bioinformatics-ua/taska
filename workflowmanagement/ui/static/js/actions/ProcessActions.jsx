@@ -9,6 +9,7 @@ const ProcessActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
     'load': {},
+    'preliminary': {},
     'deleteProcess': {},
     'calibrate': {},
     'cancel': {},
