@@ -9,7 +9,8 @@ const MyFinishedStudiesActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
     'load': {},
-    'preliminary': {}
+    'preliminary': {},
+    'deleteProcess': {},
     }, DetailActionsMixin));
 
 export default MyFinishedStudiesActions;

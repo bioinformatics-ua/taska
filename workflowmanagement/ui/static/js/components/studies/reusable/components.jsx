@@ -1,5 +1,5 @@
 'use strict';
-import {ProcessStatus, DeleteButton} from '../../reusable/component.jsx'
+import {ProcessStatus} from '../../reusable/component.jsx'
 import Reflux from 'reflux';
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
@@ -82,25 +82,9 @@ const ProcessLinkSendMessage = React.createClass({
     }
 });
 
-const ProcessManage = React.createClass({
-  delete(row){
-    ProcessActions.deleteProcess(row.hash);
-  },
-  render: function(){
-    const row = this.props.rowData;
-    const object = {object: row.hash}
-
-    return this.props.rowData.owner ? <div className="btn-group" role="group" aria-label="...">
-           <DeleteButton
-              success={this.delete}
-              identificator = {row}
-              title={`Delete '${row["title"] || row['object_repr']}'`}
-              message={`Are you sure you want to delete  '${row["title"] || row['object_repr']} ?'`}  />
-           </div>:<span></span>;
-  }
-});
 
 
 
 
-export default {ProcessLink, ProcessProgress, ProcessStatusDetail, ProcessLinkDetail, ProcessLinkRequests, ProcessLinkSendMessage,  ProcessManage}
+
+export default {ProcessLink, ProcessProgress, ProcessStatusDetail, ProcessLinkDetail, ProcessLinkRequests, ProcessLinkSendMessage}

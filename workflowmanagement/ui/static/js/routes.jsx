@@ -41,7 +41,7 @@ module.exports = (
 
         <Route name="about" handler={require('./components/about.jsx')} />
        
-        <Route name="MyStudies" handler={require('./components/MyStudies.jsx')} />
+        <Route name="MyStudies" handler={require('./components/studies/MyStudies.jsx')} />
             
         <Route name="StudyRequests" path="studyRequests/:object" handler={require('./components/requests/StudyRequests.jsx')} />
 

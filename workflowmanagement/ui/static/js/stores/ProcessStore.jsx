@@ -6,8 +6,9 @@ import StateActions from '../actions/StateActions.jsx';
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
 
 import {ListLoader, DetailLoader} from '../actions/api.jsx'
+import ResultStore from './ResultStore.jsx';
 
-let loader = new ListLoader({model: 'process'});
+let loader = new ListLoader({model: 'process', dontrepeat: true});
 
 import WorkflowStore from './WorkflowStore.jsx';
 import {StateMachineComponent} from '../react-statemachine/component.jsx';
@@ -24,6 +25,7 @@ export default Reflux.createStore({
         DETAIL: 0,
         LIST: 1
     },
+    merge: true,
     mixins: [TableStoreMixin,
         DetailStoreMixin.factory(
             new DetailLoader({model: 'process'}),
@@ -33,12 +35,19 @@ export default Reflux.createStore({
     ],
     listenables: [ProcessActions],
     load: function (state) {
-        console.log("load process");
+        if(state.currentPage == 0 )
+            this.reload(state);
+
         let self = this;
         loader.load(function(data){
             self.updatePaginator(state);
             ProcessActions.loadSuccess(data);
         }, state);
+    },
+    reload(state){
+        this.__list = [];
+        state.currentPage = 0;
+        state.reload = true;
     },
     init(){
         this.__validation = [];
@@ -48,7 +57,9 @@ export default Reflux.createStore({
     onDeleteProcess(hash){
         ProcessActions.deleteDetail.triggerPromise(hash).then(
             (result) => {
+                this.reload(this.__current);
                 this.load(this.__current);
+                this.trigger(this.DETAIL);
             }
         );
     },
