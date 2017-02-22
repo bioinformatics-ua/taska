@@ -14,9 +14,10 @@ import {
     ProcessStatusDetail,
     ProcessLinkDetail,
     ProcessLinkRequests,
-    ProcessLinkSendMessage,
-    ProcessManage
+    ProcessLinkSendMessage
 } from './reusable/components.jsx';
+
+import {DeleteButton} from '../reusable/component.jsx'
 
 import {ProcessStatus} from '../reusable/component.jsx'
 import {TableComponentMixin} from '../../mixins/component.jsx';
@@ -27,6 +28,23 @@ import Tabs from 'react-simpletabs';
 
 import moment from 'moment';
 
+const ProcessManage = React.createClass({
+  delete(row){
+    MyFinishedStudiesActions.deleteProcess(row.hash);
+  },
+  render: function(){
+    const row = this.props.rowData;
+    const object = {object: row.hash}
+
+    return this.props.rowData.owner ? <div className="btn-group" role="group" aria-label="...">
+           <DeleteButton
+              success={this.delete}
+              identificator = {row}
+              title={`Delete '${row["title"] || row['object_repr']}'`}
+              message={`Are you sure you want to delete  '${row["title"] || row['object_repr']} ?'`}  />
+           </div>:<span></span>;
+  }
+});
 
 const MyFinishedStudiesTable = React.createClass({
     tableAction: MyFinishedStudiesActions.load,

@@ -57,7 +57,9 @@ export default Reflux.createStore({
     onDeleteProcess(hash){
         ProcessActions.deleteDetail.triggerPromise(hash).then(
             (result) => {
+                this.reload(this.__current);
                 this.load(this.__current);
+                this.trigger(this.DETAIL);
             }
         );
     },

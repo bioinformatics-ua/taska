@@ -31,6 +31,7 @@ router.register(r'/requests',RequestsViewSet)
 router.register(r'/requestsbyprocess/(?P<phash>[^/.]+)',RequestsByProcessViewSet)
 router.register(r'', ProcessViewSet)
 router.register(r'/my/alltasks', MyAllTasks)
+router.register(r'/my/finishedstudies', MyFinishedStudies)
 router.register(r'/my/statusdetail/(?P<phash>[^/.]+)', StatusDetail)
 
 # trick to add root to the router generated urls
@@ -49,7 +50,7 @@ urlpatterns = patterns('',
     url(r'^/my/rejectedtasks/', MyRejectedTasks.as_view()),
     url(r'^/my/alltasks/', MyAllTasks.as_view({'get': 'list'})),
     url(r'^/my/completedtasks/', MyCompletedTasks.as_view()),
-    url(r'^/my/finishedstudies/', MyFinishedStudies.as_view()),
+    #url(r'^/my/finishedstudies/', MyFinishedStudies.as_view()),
     url(r'^/my/futuretasks/', MyFutureTasks.as_view()),
 
     url(r'^/my/task/(?P<hash>[^/.]+)/dependencies/', MyTaskDependencies.as_view()),

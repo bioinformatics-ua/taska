@@ -49,5 +49,14 @@ export default Reflux.createStore({
     },
     getDepVersion(){
         return this.dversion;
-    }
+    },
+    onDeleteProcess(hash){
+        MyFinishedStudiesActions.deleteDetail.triggerPromise(hash).then(
+            (result) => {
+                this.reload(this.__current);
+                this.load(this.__current);
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
 });
