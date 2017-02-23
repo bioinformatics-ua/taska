@@ -117,15 +117,15 @@ export default React.createClass({
                         repeatability of tasks across time and participants.</p>
 
                     <h3>Task</h3>
-                    <p>The Task is the basic unit on TASKA, everything is a composition of or related to a Task. In
-                        other words, Tasks are unitary blocks used to construct workflow templates.</p>
+                    <p>The task is the basic unit on TASKA, everything is a composition of or related to a Task. In
+                        other words, tasks are unitary blocks used to construct workflow templates.</p>
                     <p>A Task is characterised by an input and an output. Tasks can be of two types: Simple Tasks or
                         Form Tasks.</p>
 
                     <h3>Form</h3>
                     <p>Forms are questionnaires with several types of questions such as: select dropdowns, multiple
                         choice or checkboxes.</p>
-                    <p>Forms are created to be used on Form Tasks, so that study overseers can collect information in an
+                    <p>Forms are created to be used on form tasks, so that study overseers can collect information in an
                         uniformed template.</p>
                     <p>Forms are separated from the tasks so as to allow the reusability of the same form in different
                         tasks.</p>

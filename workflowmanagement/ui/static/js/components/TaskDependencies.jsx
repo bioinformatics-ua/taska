@@ -83,7 +83,7 @@ const TaskDependencies = React.createClass({
                 >
                 {resources.length == 0? (
                     <div className="panel-body">
-                        <center>There are no output resources for this task dependencies</center>
+                        <center>There are no output resources for dependencies of this task</center>
                     </div>
                 ):(
                 <div style={{marginBottom: '-20px'}}>
