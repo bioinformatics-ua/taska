@@ -6,7 +6,7 @@
 
 {% block body %}
 
-Hello dear {% if user.first_name %}{{ user.first_name}} {{ user.last_name}}{% else %}{{user.email}}{% endif %},<br /><br />
+Dear {% if user.first_name %}{{ user.first_name}} {{ user.last_name}}{% else %}{{user.email}}{% endif %},<br /><br />
 
 This email is meant to inform you that the user {{object.email}} has just registered and is waiting approval from one of the administrators.
 <br /><br />

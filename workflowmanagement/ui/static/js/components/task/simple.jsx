@@ -68,7 +68,7 @@ class SimpleTask extends Task{
                 return (<span>
                     <div className="form-group">
                         <div className="input-group">
-                          <span className="input-group-addon"><strong>Commentaries</strong></span>
+                          <span className="input-group-addon"><strong>Comments</strong></span>
                           <textarea disabled={!editable} rows="4" placeholder="Leave a comment upon task resolution (optional)"
                             defaultValue={context.state.answer.comment} onChange={context.changeComment} className="form-control" />
                         </div>

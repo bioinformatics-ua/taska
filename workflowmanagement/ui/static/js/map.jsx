@@ -50,7 +50,6 @@ const stateColor = function(ptask){
                 color: 'white',
                 fontSize: '100%'
             };
-
         case 7:
             return {
                 border: '1px solid #ccc',
@@ -135,7 +134,12 @@ const singleStateColor = function(ptask, taskStatus){
                 fontSize: '100%'
             };
         case 8://Improving
-            break;
+            return {
+                      backgroundColor: '#32b2b7',
+                      border: 0,
+                      color: 'white',
+                      fontSize: '100%'
+                };
     }
 
     return {};

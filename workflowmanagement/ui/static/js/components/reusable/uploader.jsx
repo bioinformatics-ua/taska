@@ -351,7 +351,7 @@ const Uploader = React.createClass({
     getDefaultProps(){
         return {
             tableSettings:
-                {   noDataMessage: <center>There are no associated resources currently.</center>,
+                {   noDataMessage: <center>There are currently no associated resources.</center>,
                     bodyHeight:375,
                     tableClassName: "table table-bordered table-striped",
                     useGriddleStyles: false,

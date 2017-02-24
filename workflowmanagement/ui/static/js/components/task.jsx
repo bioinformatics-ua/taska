@@ -552,7 +552,7 @@ export default React.createClass({
                                     :
                                     <div>
                                         <center><h4>
-                                        This task is scheduled to be executed by you, but is waiting that other intervenients finish their own tasks, which your task depends upon.
+                                        This task is scheduled to be executed by you, but is waiting for other assignees to finish their tasks, which your task depends upon.
                                         </h4><hr /><h2>Preliminary Inputs</h2></center>
 
                                         <button onClick={this.preliminary} className="pull-right btn btn-info"><i className="fa fa-refresh"></i> Update Preliminary Inputs</button>
