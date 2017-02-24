@@ -272,6 +272,7 @@ class ProcessViewSet(mixins.CreateModelMixin,
         ptu = get_object_or_404(ProcessTaskUser, hash=request.data['ptu'])
 
         ptu.finished = False
+        ptu.status = ProcessTaskUser.IMPROVING
         ptu.save()
 
         ptask = ptu.processtask
