@@ -54,8 +54,9 @@ class ProcessTaskUserRunTemplate(MailTemplate):
     template="mail/processtaskuser_run.html"
 
 class ResultAddTemplate(MailTemplate):
-    subjecttemplate="mail/result_add_subject.html"
-    template="mail/result_add.html"
+    pass #Comment because for now, we don't want to send emails when a user ends a task (only send for the manager but change this later)
+    #subjecttemplate="mail/result_add_subject.html"
+    #template="mail/result_add.html"
 
 class SimpleResultAddTemplate(ResultAddTemplate):
     pass
