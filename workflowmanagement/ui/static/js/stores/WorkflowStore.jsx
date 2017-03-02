@@ -41,6 +41,8 @@ const WorkflowStore = Reflux.createStore({
         this.__pfinished=false;
         this.__wfinished=false;
 
+        this.__weditfinished=false;
+
         this.trigger();
     },
     getMissing(){
@@ -51,6 +53,9 @@ const WorkflowStore = Reflux.createStore({
     },
     getWorkflowAddFinished(){
         return this.__wfinished || false;
+    },
+    getWorkflowEditFinished(){
+        return this.__weditfinished || false;
     },
     resetDetail(){
         this.__detaildata = {
@@ -143,8 +148,10 @@ const WorkflowStore = Reflux.createStore({
                 WorkflowActions.postDetail.triggerPromise(workflow.hash, workflow).then(
                         (workflow) => {
                             StateActions.loadingEnd();
-                            StateActions.save();
-                            this.trigger();
+                            StateActions.save(true, ()=>{
+                                this.__weditfinished = workflow;
+                                this.trigger();
+                            });
                         }
                 );
             else
