@@ -51,8 +51,8 @@ class MyAllTasks(mixins.CreateModelMixin,
 
         #Them get all that are running
         ptasksRunning = ProcessTaskUser.all(finished=False, reassigned=False).filter(
+            Q(status=ProcessTaskUser.RUNNING) |  Q(status=ProcessTaskUser.IMPROVING),
             processtask__status=ProcessTask.RUNNING,
-            status=ProcessTaskUser.RUNNING,
             user=self.request.user,
         ).order_by('processtask__deadline')
 
