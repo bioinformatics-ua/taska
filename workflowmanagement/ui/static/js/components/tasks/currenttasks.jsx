@@ -51,6 +51,20 @@ const TaskAvailability = React.createClass({
     }
 });
 
+const TaskDependents = React.createClass({
+    render: function () {
+        const row = this.props.rowData;
+        const deps = row.processtask.parent.dependencies;
+
+        var links = [];
+        if (row.processtask.status == 1 || (row.processtask.status == 7 && row.status == 2) || (row.processtask.status == 2 && row.status == 1))
+            for(let index  = 0; index < deps.length; index++)
+                links.push(<span>{deps[index].dependencyName}&nbsp;</span>);
+
+        return(<span>{links}</span>);
+    }
+});
+
 const CurrentTaskTable = React.createClass({
     tableAction: AllTaskActions.load,
     tableStore: AllTaskStore,
@@ -116,8 +130,17 @@ const CurrentTaskTable = React.createClass({
                 "displayName": "Deadline"
             },
             {
-                "columnName": "requests",
+                "columnName": "dependents",
                 "order": 7,
+                "locked": true,
+                "visible": true,
+                "cssClassName": 'dependents-td',
+                "customComponent": TaskDependents,
+                "displayName": "Dependents"
+            },
+            {
+                "columnName": "requests",
+                "order": 8,
                 "locked": true,
                 "visible": true,
                 "cssClassName": 'deadline-td',
@@ -126,7 +149,7 @@ const CurrentTaskTable = React.createClass({
             },
             {
                 "columnName": "availability",
-                "order": 8,
+                "order": 9,
                 "locked": true,
                 "visible": true,
                 "cssClassName": 'availability-td',
@@ -139,7 +162,7 @@ const CurrentTaskTable = React.createClass({
             {...this.commonTableSettings(true)}
             enableInfiniteScroll={true}
             useFixedHeader={true}
-            columns={["type", "task_repr", "process_repr", "start_date", "deadline", "requests", "availability"]}
+            columns={["type", "task_repr", "process_repr", "start_date", "deadline", "dependents", "requests", "availability"]}
             columnMetadata={columnMeta}/>;
     }
 

@@ -33,6 +33,10 @@ from material.api import GenericResourceSerializer
 #    })
 class TaskDepSerializer(serializers.ModelSerializer):
     dependency = serializers.SlugRelatedField(slug_field='hash', queryset=Task.objects)
+    dependencyName = serializers.SerializerMethodField()
+
+    def get_dependencyName(self, obj):
+        return obj.dependency.title
 
     class Meta:
         model = TaskDependency
