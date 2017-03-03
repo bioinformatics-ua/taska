@@ -110,7 +110,17 @@ class Process(models.Model):
             Reaccess tasks status (so we can move the state machine forward)
         '''
         ptasks = self.tasks()
-        if self.status != Process.WAITING:
+        if self.status == Process.WAITING:
+            watasks = ProcessTask.all(process=self).filter(
+                status=ProcessTask.WAITING_AVAILABILITY
+            ).count()
+
+            if watasks == 0:
+                self.status = Process.RUNNING
+                self.save()
+                History.new(event=History.RUN, actor=self.executioner, object=self)
+                self.move()
+        else:
             wlist = ptasks.filter(status=ProcessTask.WAITING)
 
             for ptask in wlist:
@@ -312,13 +322,19 @@ class ProcessTask(models.Model):
         allAccepted = True
 
         for usr in allUser:
-            if usr.status ==  ProcessTaskUser.REJECTED:
-                self.status = ProcessTask.REJECTED
-            elif usr.status == ProcessTaskUser.WAITING:
+            #if usr.status ==  ProcessTaskUser.REJECTED:
+                #self.status = ProcessTask.REJECTED
+            if usr.status == ProcessTaskUser.WAITING:
                 allAccepted = False
 
-        if allAccepted:
+        if allAccepted: #Refresh the status of all taskuser and the task too
             self.status = ProcessTask.WAITING
+            for usr in allUser:
+                if usr.status == ProcessTaskUser.ACCEPTED: #Only change the accepted because the reject we want to keep rejected
+                    usr.status = ProcessTaskUser.WAITING
+                    usr.save()
+
+        self.save()
 
     def resignRejectedUser(self, oldUser, newUser):
         tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
@@ -524,6 +540,7 @@ class ProcessTaskUser(models.Model):
 
         self.processtask.refreshState()
         self.processtask.move()
+
 
     @staticmethod
     def all(processtask=None, related=False, finished=None, reassigned=None):
