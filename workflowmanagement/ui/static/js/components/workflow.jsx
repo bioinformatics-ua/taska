@@ -110,6 +110,7 @@ export default React.createClass({
             missing: WorkflowStore.getMissing(),
             user: UserStore.getUser(),
             notificationsDetail: this.getDefaultNotificationsDetail(),
+            editedWorkflow: WorkflowStore.getWorkflowEditFinished(),
         }
     },
     getDefaultNotificationsDetail(){
@@ -130,13 +131,11 @@ export default React.createClass({
             this.context.router.transitionTo('Process', {object: this.state.addedProcess.hash});
         }
         if(this.state.addedWorkflow){
-            let mode = this.context.router.getCurrentParams().mode;
-            if(mode)
-                this.context.router.transitionTo('WorkflowEdit', {object: this.state.addedWorkflow.hash, mode: mode});
-            else
-                this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
-
+            this.context.router.transitionTo('Workflow', {object: this.state.addedWorkflow.hash});
         }
+        if (this.state.editedWorkflow)
+            this.context.router.transitionTo('Workflow', {object: this.state.editedWorkflow.hash});
+
         // hotfix to breadcrumbs on add
         $('a[href$="/workflow/add"]').hide();
     },

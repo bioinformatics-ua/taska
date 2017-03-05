@@ -69,7 +69,8 @@ class Process(models.Model):
         return "Unknown"
 
     def __unicode__(self):
-        return u'%s (started %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"))
+        #return u'%s (started %s)' % (self.title or self.workflow, self.start_date.strftime("%Y-%m-%d %H:%M"))
+        return u'%s' % (self.title or self.workflow)
 
     def tasks(self):
         return ProcessTask.all(process=self)
@@ -109,7 +110,17 @@ class Process(models.Model):
             Reaccess tasks status (so we can move the state machine forward)
         '''
         ptasks = self.tasks()
-        if self.status != Process.WAITING:
+        if self.status == Process.WAITING:
+            watasks = ProcessTask.all(process=self).filter(
+                status=ProcessTask.WAITING_AVAILABILITY
+            ).count()
+
+            if watasks == 0:
+                self.status = Process.RUNNING
+                self.save()
+                History.new(event=History.RUN, actor=self.executioner, object=self)
+                self.move()
+        else:
             wlist = ptasks.filter(status=ProcessTask.WAITING)
 
             for ptask in wlist:
@@ -132,14 +143,17 @@ class Process(models.Model):
                                     if(ptu.user == ptu2.user):
                                         ptu2.status = ProcessTaskUser.RUNNING
                                         ptu2.save()
+                                        History.new(event=History.RUN, actor=ptu.user, object=ptu,
+                                                    authorized=[ptu.user], related=[ptask.process])
                         ptask.save()
 
                 if move:
                     ptask.status = ProcessTask.RUNNING
                     ptus = ProcessTaskUser.all(processtask=ptask)
                     for ptu in ptus:
-                        ptu.status = ProcessTaskUser.RUNNING
-                        ptu.save()
+                        if ptu.status == ProcessTaskUser.ACCEPTED or ptu.status == ProcessTaskUser.WAITING:
+                            ptu.status = ProcessTaskUser.RUNNING
+                            ptu.save()
                     ptask.save()
 
                     pusers = ptask.users()
@@ -167,10 +181,14 @@ class Process(models.Model):
         ptasks = self.tasks()
 
         for ptask in ptasks:
-            if ptask.status == ProcessTask.WAITING_AVAILABILITY or \
-                            ptask.status == ProcessTask.REJECTED:
+            if ptask.status == ProcessTask.WAITING_AVAILABILITY: # or ptask.status == ProcessTask.REJECTED:
                 ptask.status = ProcessTask.WAITING
                 ptask.save()
+                ptu = ProcessTaskUser.all(processtask=ptask)
+                for ptuser in ptu:
+                    if ptuser.status == ProcessTaskUser.ACCEPTED:
+                        ptuser.status = ProcessTaskUser.WAITING
+                        ptuser.save()
 
         self.status = Process.RUNNING
         self.save()
@@ -304,13 +322,19 @@ class ProcessTask(models.Model):
         allAccepted = True
 
         for usr in allUser:
-            if usr.status ==  ProcessTaskUser.REJECTED:
-                self.status = ProcessTask.REJECTED
-            elif usr.status == ProcessTaskUser.WAITING:
+            #if usr.status ==  ProcessTaskUser.REJECTED:
+                #self.status = ProcessTask.REJECTED
+            if usr.status == ProcessTaskUser.WAITING:
                 allAccepted = False
 
-        if allAccepted:
+        if allAccepted: #Refresh the status of all taskuser and the task too
             self.status = ProcessTask.WAITING
+            for usr in allUser:
+                if usr.status == ProcessTaskUser.ACCEPTED: #Only change the accepted because the reject we want to keep rejected
+                    usr.status = ProcessTaskUser.WAITING
+                    usr.save()
+
+        self.save()
 
     def resignRejectedUser(self, oldUser, newUser):
         tasks = ProcessTaskUser.all(processtask=self).filter(user=oldUser)
@@ -329,7 +353,7 @@ class ProcessTask(models.Model):
     def move(self, force=False, finishTask=True):
         missing = ProcessTaskUser\
             .all(processtask=self, reassigned=False) \
-            .filter(finished=False).count()
+            .filter(~Q(status=ProcessTaskUser.REJECTED), finished=False).count()
 
         if missing == 0:
             if(finishTask):
@@ -516,6 +540,7 @@ class ProcessTaskUser(models.Model):
 
         self.processtask.refreshState()
         self.processtask.move()
+
 
     @staticmethod
     def all(processtask=None, related=False, finished=None, reassigned=None):

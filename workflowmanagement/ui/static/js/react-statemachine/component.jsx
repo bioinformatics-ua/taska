@@ -1041,7 +1041,7 @@ let StateMachineComponent = React.createClass({
                                                          <button onClick={this.runProcess} className="btn btn-primary savestate">
                                                             <i className="fa fa-play"></i> Run
                                                          </button>
-                                                         <button onClick={this.checkAvailability} className="btn btn-primary savestate">
+                                                         <button onClick={this.checkAvailability} className="btn btn-info savestate">
                                                             <i className="fa fa-chevron-circle-right"></i> Ask for availability
                                                          </button>
                                                      </div>

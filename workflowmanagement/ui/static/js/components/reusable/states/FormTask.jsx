@@ -383,7 +383,7 @@ class FormTaskRun extends FormTask{
                     users = [];
                 }
                 let desc = stateTaskDesc(this.parent().ptask);
-                let stillOn = desc === 'Running' || desc === 'Waiting';
+                let stillOn = desc === 'Running' || desc === 'Waiting' || desc === 'Overdue';
                 let forAvailability =  desc === 'Waiting for answer' || desc === 'Rejected';
                 let onlyShow = true;
                 try{

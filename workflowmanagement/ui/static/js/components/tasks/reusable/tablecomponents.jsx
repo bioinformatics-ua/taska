@@ -55,8 +55,7 @@ const TaskDate = React.createClass({
         const due = moment(deadline);
 
         if (due.isBefore(now))
-            return <small className="pull-left text-danger"><span className="warnicon">{moment(deadline).fromNow()}<i
-                className="task-overdue fa fa-exclamation-triangle animated infinite flash"></i></span></small>;
+            return <small className="pull-left text-danger"><span className="warnicon">{moment(deadline).fromNow()}</span></small>;
 
         return <small className="pull-left">{moment(deadline).fromNow()}</small>;
     },

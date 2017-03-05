@@ -5,6 +5,7 @@ from rest_framework import serializers
 from ProcessTaskUserSerializer import  ProcessTaskUserSerializer
 from MyProcessTaskSerializer import  MyProcessTaskSerializer
 from RequestSerializer import  SimpleRequestSerializer
+from tasks.models import TaskDependency
 
 
 class MyProcessTaskUserSerializer(ProcessTaskUserSerializer):

@@ -178,6 +178,7 @@ class ProcessViewSet(mixins.CreateModelMixin,
 
             except ProcessTaskUser.DoesNotExist:
                 ptaskuser = ProcessTaskUser(user=user, processtask=ptask)
+                ptaskuser.status = ProcessTaskUser.RUNNING
                 ptaskuser.save()
 
                 History.new(event=History.ADD, actor=ptask.process.executioner, object=ptask, authorized=[ptaskuser.user],
