@@ -3,7 +3,6 @@ var Node = Node || {
   ATTRIBUTE_NODE: 2,
   TEXT_NODE: 3
 };
-console.log($);
 
 $.scrollWindowTo = function(pos, duration, cb) {
   if (duration == null) {

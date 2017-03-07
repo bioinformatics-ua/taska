@@ -40,7 +40,7 @@
     "minifyify": "6.3.2",
     "watchify": "2.6.0",
     "browserify": "9.0.8",
-    "uglifyjs": "2.4.10",
+    "uglify-js": "2.8.8",
     "uglifycss": "0.0.13",
     "uglifyify": "3.0.1",
     "catw": "0.2.0",
