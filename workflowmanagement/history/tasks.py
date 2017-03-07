@@ -17,7 +17,7 @@ def warnLateDeadlines():
     for process in allProcess:
         ptasks = ProcessTask.all(process=process).filter(status=ProcessTask.RUNNING, deadline__lt=timezone.now())
         for ptask in ptasks:
-            if (((ptask.deadline - timezone.now()).days % process.days_after_delay) == 0):
+            if ((((ptask.deadline - timezone.now()).days+1) % process.days_after_delay) == 0):
                 pusers = ptask.users()
 
                 for puser in pusers:
@@ -30,7 +30,7 @@ def warnBeforeDeadlines():
     for process in allProcess:
         ptasks = ProcessTask.all(process=process).filter(status=ProcessTask.RUNNING)
         for ptask in ptasks:
-            if ((ptask.deadline - timezone.now()).days == process.days_before_delay):
+            if (((ptask.deadline - timezone.now()).days+1) == process.days_before_delay):
                 pusers = ptask.users()
 
                 for puser in pusers:
