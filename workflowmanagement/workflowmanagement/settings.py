@@ -53,7 +53,7 @@ MEDIA_URL = '/media/'
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 ADMINS = (
     ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
