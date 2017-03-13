@@ -101,10 +101,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'workflowmanagement.urls'
+
+X_FRAME_OPTIONS = 'DENY'
 
 WSGI_APPLICATION = 'workflowmanagement.wsgi.application'
 
