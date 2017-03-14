@@ -26,10 +26,10 @@ const LoggedInHome = React.createClass({
         return this.__getState();
     },
     setMessage(){
-
+        console.log("Define message!");
     },
     goToStudySetup(){
-
+        console.log("Go to the study");
     },
     render: function () {
         return (<span>

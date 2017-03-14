@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import *
+from workflow.models import *
 from tasks.models import Task
 from utils.admin import reverse_link
 
@@ -52,4 +52,4 @@ class WorkflowAdmin(admin.ModelAdmin):
 class WorkflowPermissionAdmin(admin.ModelAdmin):
     ''' Django-Admin page for listing, adding and editing :class:`workflow.models.WorkflowPermission` entries.
     '''
-    list_display = ('workflow', 'public', 'searchable', 'forkable')
+    list_display = ('workflow', 'public', 'searchable', 'forkable', 'visibility')

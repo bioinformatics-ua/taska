@@ -131,10 +131,20 @@ class WorkflowPermission(models.Model):
         :searchable (boolean): Indicates if the workflow instance is to be listed on searches
         :forkable (boolean): Indicates if the workflow instance can be forked by other users
     '''
+    INTERNAL    = 1
+    MONTRA      = 2
+    #... If we decide integrate TASKA with others systems, here we define which workflow belongs to it.
+
+    OPTIONS = (
+        (INTERNAL, 'Workflow to works in TASKA'),
+        (MONTRA, 'Workflow to works with MONTRA')
+    )
+
     workflow        = models.OneToOneField(Workflow)
     public          = models.BooleanField(default=True)
     searchable      = models.BooleanField(default=True)
     forkable        = models.BooleanField(default=True)
+    visibility      = models.PositiveSmallIntegerField(choices=OPTIONS, default=INTERNAL)
 
     def __unicode__(self):
         '''Returns a certain workflow permissions on a string

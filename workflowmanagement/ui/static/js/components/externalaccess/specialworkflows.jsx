@@ -26,8 +26,16 @@ const SpecialWorkflowTable = React.createClass({
   render: function () {
     const columnMeta = [
       {
-      "columnName": "title",
+      "columnName": "check",
       "order": 1,
+      "locked": false,
+      "visible": true,
+      "customComponent": WorkflowLink,
+      "displayName": ""
+      },
+      {
+      "columnName": "title",
+      "order": 2,
       "locked": false,
       "visible": true,
       "customComponent": WorkflowLink,
@@ -35,7 +43,7 @@ const SpecialWorkflowTable = React.createClass({
       },
       {
       "columnName": "owner_repr",
-      "order": 2,
+      "order": 3,
       "locked": true,
       "visible": true,
       "displayName": "Creator",
@@ -44,7 +52,7 @@ const SpecialWorkflowTable = React.createClass({
       },
       {
       "columnName": "hash",
-      "order": 3,
+      "order": 4,
       "locked": true,
       "visible": true,
       "customComponent": WorkflowManage,
@@ -62,7 +70,7 @@ const SpecialWorkflowTable = React.createClass({
               <Griddle
                   noDataMessage={<center>You don't have any study templates.</center>}
                   {...this.commonTableSettings(false)}
-                  columns={["title", "owner_repr", "hash"]}
+                  columns={["check", "title", "owner_repr", "hash"]}
                   columnMetadata={columnMeta} />
             </div>;
   }
