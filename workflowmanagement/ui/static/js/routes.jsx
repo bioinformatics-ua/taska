@@ -23,6 +23,8 @@ module.exports = (
 
         <Route name="MyTasks" handler={require('./components/MyTasks.jsx')}/>
 
+        <Route name="ExternalAccess" handler={require('./components/externalaccess/firstpage.jsx')}/>
+
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 
         <Route name="register" path="register" handler={require('./components/register.jsx')}/>
@@ -41,7 +43,7 @@ module.exports = (
 
         <Route name="about" handler={require('./components/about.jsx')} />
        
-        <Route name="MyStudies" handler={require('./components/studies/MyStudies.jsx')} />
+        <Route name="MyStudies" handler={require('./components/studies/grids/MyStudies.jsx')} />
             
         <Route name="StudyRequests" path="studyRequests/:object" handler={require('./components/requests/StudyRequests.jsx')} />
 
