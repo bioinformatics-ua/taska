@@ -1,19 +1,20 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{{object.processtask}} can be completed
+{{object.processtask}} can be executed
 {% endblock %}
 
 {% block body %}
 Dear {{ user }},<br /><br />
 
-This email is meant to inform you that the task {{object.processtask}} can now be completed.
+This email is meant to inform you that the task {{object.processtask}} of the study {{object.processtask.process}} can now be executed.
 
-{% if settings.INCLUDE_EMAIL_LINKS and link_delegate %}
 <br /> <br />
-You can complete this task <a href="{{link_delegate}}">here</a>
-{% endif %}
-
+You can access the task <a href="{{link_delegate}}">here</a>
+<br /><br />
+You agreed to complete the task by {{object.processtask.deadline}}. However, if you want to ask for reassignement of this task to another user,
+    or wish to negotiate the deadline, or need any other clarification with respect to this task, please click on link above and
+    use the "Ask for reassignement" or the "Ask for clarification" button. This will send a message to the study manager, who will address your request.
 <br /><br />
 Best Regards,<br />
 Taska

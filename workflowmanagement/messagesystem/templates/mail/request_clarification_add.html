@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-[TASKA] You have a clarification request for {{ task }} (REQUIRES FEEDBACK)
+You have a clarification request about task {{ task }} (FEEDBACK REQUIRED!)
 {% endblock %}
 
 {% block body %}
@@ -9,10 +9,10 @@
 Dear {{ leaderName }},<br /> <br />
 
 
-{{ user }} has requested for a clarification about the task: {{ task }}.
+{{ user }} requested a clarification about the task {{ task }}.
 
 <br /><br />
-Please use this <a href="{{link_open_plataform}}">link</a> to acess your TASKA account and answer the request.
+Please use this <a href="{{link_delegate}}">link</a> to check and answer the request.
 
 <br /><br />
 Best Regards,<br />

@@ -38,44 +38,52 @@ class MailTemplate:
         executioner = None
         task = None
         message_content = None
+        sender = None
+        user = interested
 
         if link_delegate != None:
             link_delegate = link_delegate(self.instance.object, interested)
 
-        if len(interested.first_name) > 0:
-            user = interested.first_name + " " + interested.last_name
-        else:
-            user = interested
-
+        #History
         if not isinstance(self.instance, Message):
+            # When a instance was some observations to add in the email
             try:
                 message_content = self.instance.observations
             except AttributeError as e:
-                print e
-                # pass
+                pass
 
-            # When is a processtaskuser instance
+            # Some adjustments for each template
+            # Process
+            if isinstance(self.instance.object, Process):
+                if self.instance.event == History.CANCEL: #process_cancel
+                    link_delegate = "MyStudies"
+                if self.instance.event == History.DONE: #process_done
+                    link_delegate = "MyStudies"
+
+                sender = self.instance.object.executioner
+
+            #ProcessTaskUser
             if isinstance(self.instance.object, ProcessTaskUser):
-                if (self.instance.event == History.REJECT):
-                    executioner = self.instance.object.processtask.process.executioner
-                    if len(self.instance.object.user.first_name) > 0:
-                        user = self.instance.object.user.first_name + " " + self.instance.object.user.last_name
-                    else:
-                        user = self.instance.object.user
+                executioner = self.instance.object.processtask.process.executioner
+                user = self.instance.object.user
 
-            # When is a process instance
-            #if isinstance(self.instance.object, Process):
-            #    title = self.instance.object.title
-             #   start_date = self.instance.object.start_date
-              #  executioner = self.instance.object.executioner
-
-            # When is a request instance
+            #Request
             if isinstance(self.instance.object, Request):
+
                 task = self.instance.object.processtaskuser.processtask.task.title
                 executioner = self.instance.object.processtaskuser.processtask.process.executioner
-                user = self.instance.object.processtaskuser.user.first_name + " " + self.instance.object.processtaskuser.user.last_name
-                link_open_plataform += "request/" + self.instance.object.hash
+                user = self.instance.object.processtaskuser.user
+                link_delegate = "request/" + self.instance.object.hash
 
+            # Define the first and last name of the send it it exists
+            if sender != None:
+                if len(sender.first_name) > 0:
+                    sender = sender.first_name + " " + sender.last_name
+
+            if len(user.first_name) > 0:
+                user = user.first_name + " " + user.last_name
+
+        #Message
         if isinstance(self.instance, Message):
             message_content = self.instance.message.split("\n")
 
@@ -101,7 +109,7 @@ class MailTemplate:
                                        'startDate': start_date,
                                        'task': task,
                                        'leaderName' : executioner,
-
+                                       'sender' : sender,
                                        'user': user,
                                        'title': title,
                                        'message': message_content

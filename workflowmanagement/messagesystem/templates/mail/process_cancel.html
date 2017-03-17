@@ -7,9 +7,12 @@
 {% block body %}
 Dear {{ user }},<br /><br />
 
-This email is meant to inform you that the study {{ object.title }}, that you were part of, has been canceled by {{ instance.actor.get_full_name }}. This study will no longer accept any collaboration.
+This email is meant to inform you that the study {{ object.title }}, that you were part of, has been canceled by {{ sender }}. This study will no longer accept any collaboration.
+
+<br /><br />
+If you want to check in TASKA the list of studies you are currently part of, please follow this <a href="{{link_delegate}}">link</a>
 
 <br /><br />
 Best Regards,<br />
-Taska (on behalf of {{ instance.actor.get_full_name }})
+Taska (on behalf of {{ sender }})
 {% endblock %}

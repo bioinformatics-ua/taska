@@ -21,10 +21,10 @@ def newNotification(tcn, sender, instance, **kwargs):
         if(isinstance(instance, Message)):
             tci = tc(instance, instance.receiver.all())
         else: #If it's not a message, is a history, so I need to deal with this differently
-            tci = defineTci(instance, tc)
+            tci = defineHistoryTci(instance, tc)
 
-        sendEmail.apply_async([tci], countdown=5)  # Descomentar esta linha
-        #sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
+        #sendEmail.apply_async([tci], countdown=5)  # Descomentar esta linha
+        sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
     except AttributeError as e:
         # print e #Used to help when I want to do debug
         # Silently ignore, when the template is not defined we just don't send the notification
@@ -53,7 +53,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
     except:
         raise
 
-def defineTci(instance, tc):
+def defineHistoryTci(instance, tc):
     tci = None
 
     # USER
@@ -63,40 +63,32 @@ def defineTci(instance, tc):
     else:
         tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
-    #####################################################################################################
+    # Set receivers based on template
     # PROCESS
     if isinstance(instance.object, Process):
-        if (instance.object.status == Process.WAITING):
-            # Use all users envolved in the process
-            tci = tc(instance, instance.object.getAllUsersEnvolved())
+        if instance.event == History.CANCEL \
+            or instance.event == History.DONE \
+            or instance.event == History.ADD \
+            or (instance.event == History.ADD and instance.object.status == Process.WAITING):#Needs to have the waiting because the event is ADD but the status of the process is relevant too.
+            return tc(instance, instance.object.getAllUsersEnvolved())
 
-    # PROCESSTASK
-    if isinstance(instance.object, ProcessTask):
-        tci = tc(instance, instance.object.getAllUsersEnvolved())
+    # PROCESSTASKUSER
+    if isinstance(instance.object, ProcessTaskUser):
+        if (instance.event == History.REJECT):
+            return tc(instance, [instance.object.processtask.process.executioner])
+        if instance.event == History.RUN \
+            or instance.event == History.REMAINDER \
+            or instance.event == History.LATE:
+            return tc(instance, [instance.object.getEnvolvedUser()])
 
-        # PROCESSTASKUSER
-        # REQUEST
-        # RESULT
 
-        # USER RECOVERY
-
+    # Old system, changing smoothly oh yeah!
     #Refactor this code
     if isinstance(instance.object, Request):
-        # ADD
-        # if autor=user --> receiver=executioner
-        # EDIT
-        # if autor=executioner --> receiver=user
-        # if autor=user --> receiver=executioner
         if (instance.event == 1 or instance.actor == instance.object.processtaskuser.user):
             tci = tc(instance, [instance.object.processtaskuser.processtask.process.executioner])
         elif (instance.actor == instance.object.processtaskuser.processtask.process.executioner):
             tci = tc(instance, [instance.object.processtaskuser.user])
-
-    # When is a processtaskuser instance
-    if isinstance(instance.object, ProcessTaskUser):
-        if (instance.event == History.REJECT):
-            tci = tc(instance, [instance.object.processtask.process.executioner])
-
     return tci
 
 

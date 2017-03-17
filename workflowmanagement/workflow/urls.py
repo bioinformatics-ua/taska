@@ -13,12 +13,11 @@ import api
 router = routers.DefaultRouter()
 
 router.register(r'', WorkflowViewSet)
-#router.register(r'/montra', MontraWorkflowViewSet)
 
 # trick to add root to the router generated urls
 router_tricks = router.urls #+ [url(r'^', api.root)]
 
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
-    url(r'^/montra', MontraWorkflowViewSet.as_view()),
+    url(r'^/external/montra/', MontraWorkflowViewSet.as_view()),
 )
