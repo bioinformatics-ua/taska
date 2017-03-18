@@ -65,6 +65,19 @@ const TaskDependents = React.createClass({
     }
 });
 
+const TaskStatus = React.createClass({
+    getLabel(row){
+        if (row.processtask.status == 1 || (row.processtask.status == 7 && row.status == 2) || (row.processtask.status == 2 && row.status == 1))
+            return 'waiting for dependencies';
+        return 'to be executed';
+    },
+    render: function () {
+        const row = this.props.rowData;
+
+        return <span>{this.getLabel(row)}</span>;
+    }
+});
+
 const CurrentTaskTable = React.createClass({
     tableAction: AllTaskActions.load,
     tableStore: AllTaskStore,
@@ -103,17 +116,26 @@ const CurrentTaskTable = React.createClass({
                 "cssClassName": 'process-repr-td',
                 "displayName": "Study"
             },
-            {
+          /*  {
                 "columnName": "user_repr",
                 "order": 4,
                 "locked": true,
                 "visible": true,
                 "cssClassName": 'process-executioner-td',
                 "displayName": "Manager"
+            },*/
+            {
+                "columnName": "status",
+                "order": 5,
+                "locked": true,
+                "visible": true,
+                "cssClassName": 'task-status-td',
+                "customComponent": TaskStatus,
+                "displayName": "Status"
             },
             {
                 "columnName": "start_date",
-                "order": 5,
+                "order": 6,
                 "locked": true,
                 "visible": true,
                 "cssClassName": 'start-date-td',
@@ -122,14 +144,15 @@ const CurrentTaskTable = React.createClass({
             },
             {
                 "columnName": "deadline",
-                "order": 6,
+                "order": 7,
                 "locked": true,
                 "visible": true,
                 "cssClassName": 'deadline-td',
                 "customComponent": TaskDate,
                 "displayName": "Deadline"
             },
-            {
+
+           /* {
                 "columnName": "dependents",
                 "order": 7,
                 "locked": true,
@@ -137,7 +160,7 @@ const CurrentTaskTable = React.createClass({
                 "cssClassName": 'dependents-td',
                 "customComponent": TaskDependents,
                 "displayName": "Dependents"
-            },
+            },*/
             {
                 "columnName": "requests",
                 "order": 8,
@@ -162,7 +185,7 @@ const CurrentTaskTable = React.createClass({
             {...this.commonTableSettings(true)}
             enableInfiniteScroll={true}
             useFixedHeader={true}
-            columns={["type", "task_repr", "process_repr", "start_date", "deadline", "dependents", "requests", "availability"]}
+            columns={["type", "task_repr", "process_repr", "status", "start_date", "deadline", "requests", "availability"]}
             columnMetadata={columnMeta}/>;
     }
 

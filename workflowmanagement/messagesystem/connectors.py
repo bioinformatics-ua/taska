@@ -23,8 +23,8 @@ def newNotification(tcn, sender, instance, **kwargs):
         else: #If it's not a message, is a history, so I need to deal with this differently
             tci = defineHistoryTci(instance, tc)
 
-        #sendEmail.apply_async([tci], countdown=5)  # Descomentar esta linha
-        sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
+        sendEmail.apply_async([tci], countdown=5)  # Descomentar esta linha
+        #sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
     except AttributeError as e:
         # print e #Used to help when I want to do debug
         # Silently ignore, when the template is not defined we just don't send the notification
