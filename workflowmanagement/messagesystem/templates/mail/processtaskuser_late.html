@@ -7,12 +7,14 @@
 {% block body %}
 Dear {{ user }},<br /><br />
 
-This email is meant to inform you that the task {{object.processtask}} that you have been assigned to, is behind schedule.
-
-{% if settings.INCLUDE_EMAIL_LINKS and link_delegate %}
-<br /> <br />
-You can complete this task <a href="{{link_delegate}}">here</a>
-{% endif %}
+This email is meant to inform you that the task {{object.processtask}} of the study {{object.processtask.process}} that you have been assigned to,
+ is behind schedule. The scheduled deadline was {{object.processtask.deadline}}.
+<br /><br />
+You can complete this task <a href="{{link_delegate}}">here</a>.
+<br /><br />
+If you wish to discuss the deadline, please access the task from the link above and use the "Ask for clarification" button. This will send a message to the study manager, who will address your request.
+<br /><br />
+Please be informed that in case you do not provide any feedback to this notification, your participation to the study {{object.processtask.process}} might be cancelled.
 
 <br /><br />
 Best Regards,<br />

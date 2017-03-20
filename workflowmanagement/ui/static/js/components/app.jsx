@@ -239,23 +239,20 @@ export default React.createClass({
           </div>
           {headless == 'true' ? '':
           <footer>
-            <a href="http://bioinformatics.ua.pt/">
-            © University of Aveiro
-            </a>
             <a href="http://www.ua.pt/">
-            <img style={{"margin-left":"20px"}} src="static/images/logo-ua2.png" />
+            <img style={{"marginLeft":"20px"}} src="static/images/logo-ua2.png" />
             </a>
             <a href="http://emif.eu">
-            <img style={{"margin-left":"20px", "height": "30px"}} src="static/images/emif.png" />
+            <img style={{"marginLeft":"20px", "height": "30px"}} src="static/images/emif.png" />
             </a>
             <a href="http://www.efpia.eu">
-            <img style={{"margin-left":"20px"}} src="static/images/efpia-logo.png" />
+            <img style={{"marginLeft":"20px"}} src="static/images/efpia-logo.png" />
             </a>
             <a href="http://europa.eu/">
-            <img style={{"margin-left":"20px"}}  src="static/images/eu-logo.png" />
+            <img style={{"marginLeft":"20px"}}  src="static/images/eu-logo.png" />
             </a>
             <a href="http://www.imi.europa.eu/">
-            <img style={{"margin-left":"20px"}} src="static/images/imi-logo.png" />
+            <img style={{"marginLeft":"20px"}} src="static/images/imi-logo.png" />
             </a>
 
           </footer>

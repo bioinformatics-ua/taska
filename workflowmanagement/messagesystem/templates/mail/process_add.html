@@ -1,0 +1,18 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+One or more tasks of the study {{ object.title }} were assigned to you
+{% endblock %}
+
+{% block body %}
+Dear {{ user }},<br /><br />
+
+This email is meant to inform you that one or more tasks of the study {{ object.title }} requires your collaboration.
+<br /><br />
+
+You can check the list of your current task at this <a href="{{link_open_plataform}}">link</a>.
+
+<br /><br />
+Best Regards,<br />
+Taska
+{% endblock %}

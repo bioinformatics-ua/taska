@@ -80,7 +80,10 @@ class Process(models.Model):
         tasks = self.tasks()
         for task in tasks:
             tmp += task.getAllUsersEnvolved(notification)
-        return tmp
+
+        # Remove duplicates
+        seq = set(tmp)
+        return list(seq)
 
     @transaction.atomic
     def cancel(self):
@@ -160,7 +163,7 @@ class Process(models.Model):
                     for puser in pusers:
                         History.new(event=History.RUN, actor=puser.user, object=puser, authorized=[puser.user], related=[ptask.process])
 
-            if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:
+            if ptasks.filter(Q(status=ProcessTask.WAITING) | Q(status=ProcessTask.RUNNING) | Q(status=ProcessTask.IMPROVING)).count() == 0:# and self.status != Process.FINISHED:
                 self.status = Process.FINISHED
                 self.end_date = timezone.now()
 
@@ -377,7 +380,7 @@ class ProcessTask(models.Model):
         tmp = []
         for taskUser in ProcessTaskUser.all(processtask=self):
             if taskUser.getUser() not in tmp:
-                if (notification and taskUser.getUser().profile.notification == True) or notification==False:
+                if ((notification and taskUser.getUser().profile.notification == True) or notification==False) and taskUser.status != ProcessTaskUser.REJECTED:
                     tmp += [taskUser.getUser()]
         return tmp
 
@@ -485,8 +488,14 @@ class ProcessTaskUser(models.Model):
             Q(processtaskuser=self)
             | Q(processtaskuser__processtask=self.processtask, public=True)
             )
+
     def getUser(self):
         return self.user
+
+    def getEnvolvedUser(self):
+        if self.status != ProcessTaskUser.REJECTED:
+            return self.user
+        return None
 
     def getResult(self):
         from result.models import Result
@@ -503,7 +512,7 @@ class ProcessTaskUser(models.Model):
         self.status=ProcessTaskUser.WAITING
         self.save()
 
-    def reassign(self, finishTask=True):
+    def reassign(self, finishTask=False):
         self.reassigned=True
         self.reassign_date = timezone.now()
         self.save()

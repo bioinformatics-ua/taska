@@ -5,6 +5,7 @@ class MessageTemplate(MailTemplate):
     subjecttemplate="mail/generic_mail_subject.html"
     template="mail/generic_mail.html"
 
+#Process section
 class ProcessCancelTemplate(MailTemplate):
     subjecttemplate="mail/process_cancel_subject.html"
     template="mail/process_cancel.html"
@@ -13,18 +14,36 @@ class ProcessDoneTemplate(MailTemplate):
     subjecttemplate="mail/process_done_subject.html"
     template="mail/process_done.html"
 
-class ProcessTaskAddTemplate(MailTemplate):
-    subjecttemplate="mail/processtask_add_subject.html"
-    template="mail/processtask_add.html"
+class ProcessAddTemplate(MailTemplate):
+    subjecttemplate="mail/process_add_subject.html"
+    template="mail/process_add.html"
 
 class ProcessWaitingAddTemplate(MailTemplate):
     subjecttemplate="mail/process_confirmation_subject.html"
     template="mail/process_confirmation.html"
 
+#ProcessTaskUser section
 class ProcessTaskUserRejectTemplate(MailTemplate):
-    subjecttemplate="mail/processtaskuser_reject_subject.html"
-    template="mail/processtaskuser_reject.html"
+    subjecttemplate = "mail/processtaskuser_reject_subject.html"
+    template = "mail/processtaskuser_reject.html"
 
+
+class ProcessTaskUserRemainderTemplate(MailTemplate):
+    subjecttemplate = "mail/processtaskuser_remainder_subject.html"
+    template = "mail/processtaskuser_remainder.html"
+
+
+class ProcessTaskUserLateTemplate(MailTemplate):
+    subjecttemplate = "mail/processtaskuser_late_subject.html"
+    template = "mail/processtaskuser_late.html"
+
+
+class ProcessTaskUserRunTemplate(MailTemplate):
+    subjecttemplate = "mail/processtaskuser_run_subject.html"
+    template = "mail/processtaskuser_run.html"
+
+
+#Request
 class RequestClarificationAskTemplate(MailTemplate):
     subjecttemplate="mail/request_clarification_add_subject.html"
     template="mail/request_clarification_add.html"
@@ -41,18 +60,9 @@ class RequestReassignAnswerTemplate(MailTemplate):
     subjecttemplate="mail/request_reassign_edit_subject.html"
     template="mail/request_reassign_edit.html"
 
-class ProcessTaskUserRemainderTemplate(MailTemplate):
-    subjecttemplate="mail/processtaskuser_remainder_subject.html"
-    template="mail/processtaskuser_remainder.html"
 
-class ProcessTaskUserLateTemplate(MailTemplate):
-    subjecttemplate="mail/processtaskuser_late_subject.html"
-    template="mail/processtaskuser_late.html"
 
-class ProcessTaskUserRunTemplate(MailTemplate):
-    subjecttemplate="mail/processtaskuser_run_subject.html"
-    template="mail/processtaskuser_run.html"
-
+#....
 class ResultAddTemplate(MailTemplate):
     pass #Comment because for now, we don't want to send emails when a user ends a task (only send for the manager but change this later)
     #subjecttemplate="mail/result_add_subject.html"

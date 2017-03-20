@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-[TASKA] You have a reassign request to {{ task }}
+Your reassignment request about {{ task }} was answered
 {% endblock %}
 
 {% block body %}
@@ -9,7 +9,7 @@
 Dear {{ user }},<br /> <br />
 
 
-{{ leaderName }} has answered to your reassign request concerning the task {{ task }}.
+{{ leaderName }} answered to your reassignment request about the task {{ task }}.
 
 <br /><br />
 Best Regards,<br />

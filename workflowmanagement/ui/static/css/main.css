@@ -203,16 +203,19 @@ table {
   width: 260px;
 }
 .task-repr-td{
-   width: 260px;
+   width: 255px;
 }
 .process-repr-td{
-   width: 260px;
+   width: 250px;
 }
 .complete-process-repr-td{
    width: 48%;
 }
 .process-executioner-td{
   width: 130px;
+}
+.task-status-td{
+  width: 110px;
 }
 .deadline-td{
   width: 130px;

@@ -1,14 +1,16 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-{{object}} has finished
+{{object}} is completed
 {% endblock %}
 
 {% block body %}
 Dear {{ user }},<br /><br />
 
-This email is meant to inform you that the study {{ object.title }}, that you were part of, has finished. This study will no longer need your collaboration.
+This email is meant to inform you that the study {{ object.title }}, that you were part of, is now completed.
+<br /><br />
+If you want to check in TASKA the list of studies you are currently part of, please follow this <a href="{{link_delegate}}">link</a>
 <br /><br />
 Best Regards,<br />
-Taska (on behalf of {{ object.executioner.get_full_name }})
+Taska (on behalf of {{ sender }})
 {% endblock %}

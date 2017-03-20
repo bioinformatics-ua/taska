@@ -1,7 +1,7 @@
 {% extends "mail/common.html" %}
 
 {% block header %}
-[TASKA] You have a clarification request for {{ task }}
+Your clarification request about {{ task }} was answered
 {% endblock %}
 
 {% block body %}
@@ -9,7 +9,7 @@
 Dear {{ user }},<br /> <br />
 
 
-{{ leaderName }} has already answered to your clarification request regarding the task: {{ task }}.
+{{ leaderName }} answered to your clarification request about the task {{ task }}.
 
 <br /><br />
 Best Regards,<br />

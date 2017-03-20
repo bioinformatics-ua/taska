@@ -49,6 +49,11 @@ var UserDropdown = React.createClass({
       return <span key="loggedout"></span>;
     }
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
+        {/*<li>
+                        <Tab to='ExternalAccess' className="boldit"><i className="fa fa-tasks"></i> TEMP BUTTON</Tab>
+                    </li>*/}
+
+
                     <li>
                         <Tab to='MyTasks' className="boldit"><i className="fa fa-tasks"></i> TASKS</Tab>
                     </li>

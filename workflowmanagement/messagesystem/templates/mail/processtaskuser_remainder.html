@@ -7,13 +7,12 @@
 {% block body %}
 Dear {{ user }},<br /><br />
 
-This email is meant to inform you that the task {{object.processtask}} to which you have been assigned to, is approaching its deadline.
-
-{% if settings.INCLUDE_EMAIL_LINKS and link_delegate %}
-<br /> <br />
-You can complete this task <a href="{{link_delegate}}">here</a>
-{% endif %}
-
+This email is meant to inform you that the task {{object.processtask}} of the study {{object.processtask.process}}, is approaching its deadline that is scheduled for {{object.processtask.deadline}}.
+<br /><br />
+You can complete this task <a href="{{link_delegate}}">here</a>.
+<br /><br />
+However, if you want to ask for reassignement of this task to another user, or wish to renegotiate its deadline, or need any other clarification with respect to this task, please access the task
+    from the link above and use the "Ask for reassignement" or the "Ask for clarification" button. This will send a message to the study manager, who will address your request.
 <br /><br />
 Best Regards,<br />
 Taska

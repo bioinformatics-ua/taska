@@ -57,7 +57,7 @@ const LoggedInHome = React.createClass({
 
             <div className=" row">
                 <h3>What is TASKA?</h3>
-                <p style={{"text-align":"justify"}}>
+                <p style={{"textAlign":"justify"}}>
                     Taska is a <b>workflow management system</b> where users can create workflow templates which can be reused by distinct groups and for different purposes.
                 </p>
                 <h3>What can you do?</h3>
