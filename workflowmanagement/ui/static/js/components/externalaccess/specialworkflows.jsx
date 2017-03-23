@@ -15,14 +15,27 @@ import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 
 const SpecialWorkflowTable = React.createClass({
     getInitialState: function () {
-        return {};
+        return {
+            study: undefined,
+            allStudies: [{ value: 'one', label: 'One' },
+	                     { value: 'two', label: 'Two' }]
+        };
     },
     update: function (data) {
         this.setState(this.getState());
     },
-    render: function () {
+    selectStudy(){
 
-        return <span></span>;
+    },
+    render: function () {
+        console.log(this.state);
+        return <span>
+            <Select placeholder="Search for users to reassigning"
+                    onChange={this.selectStudy}
+                    value={this.state.study}
+                    name="form-field-name"
+                    options={this.state.allStudies}/>
+        </span>;
     }
 });
 

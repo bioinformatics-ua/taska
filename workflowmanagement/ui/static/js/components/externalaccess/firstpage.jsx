@@ -22,6 +22,9 @@ const LoggedInHome = React.createClass({
             message: "Write something there (Optional)"
         }
     },
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     getInitialState(){
         return this.__getState();
     },
@@ -32,6 +35,8 @@ const LoggedInHome = React.createClass({
         console.log("Go to the study");
     },
     render: function () {
+        let params = this.context.router.getCurrentParams();
+        console.log(params);
         return (<span>
             <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">

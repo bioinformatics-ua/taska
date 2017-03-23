@@ -3,10 +3,15 @@ import Reflux from 'reflux';
 import React from 'react';
 import Griddle from 'griddle-react';
 
+import UserGridStore from '../../stores/UserGridStore.jsx';
+import UserGridActions from '../../actions/UserGridActions.jsx';
+
+import {TableComponentMixin} from '../../mixins/component.jsx';
+
 const ExternalUserTable = React.createClass({
-    //tableAction: WorkflowActions.load,
-    //tableStore: WorkflowStore,
-    //mixins: [Reflux.listenTo(WorkflowStore, 'update'), TableComponentMixin],
+    tableAction: UserGridActions.load,
+    tableStore: UserGridStore,
+    mixins: [Reflux.listenTo(UserGridStore, 'update'), TableComponentMixin],
     getInitialState: function() {
         return {};
     },
@@ -20,11 +25,11 @@ const ExternalUserTable = React.createClass({
                 <i className="fa fa-sitemap pull-left"></i>
                 <h3 className="text-center panel-title"> Users</h3>
                </div>
-        {/*<Griddle
+            <Griddle
                   noDataMessage={<center>You don't have user to select.</center>}
                   {...this.commonTableSettings(false)}
-                  columns={["title", "owner_repr", "hash"]}
-                  columnMetadata={columnMeta} />*/}
+                  columns={["user"]}
+                  columnMetadata={columnMeta} />
             </div>;
   }
 });
