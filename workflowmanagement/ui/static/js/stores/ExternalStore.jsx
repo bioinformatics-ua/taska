@@ -33,7 +33,36 @@ export default Reflux.createStore({
     },
     dummy(s){},
     init(){
-        this.answer = {};
+        this.__detaildata = {
+            studyTemplates: []
+        };
 
+    },
+    onCalibrate(){
+        this.init();
+
+        this.onMethodDetail('',
+                            null,
+                            'GET')
+            .then(
+            (result) => {
+                let map = result.results.map(
+                                        entry => {
+                                            console.log(entry);
+                                            return {
+                                                value: entry.hash,
+                                                label: entry.title
+                                            }
+                                        }
+                            );
+
+                this.__detaildata.studyTemplates = map;
+
+                this.trigger();
+            }
+        );
+    },
+    getTemplates(){
+        return this.__detaildata.studyTemplates;
     }
 });

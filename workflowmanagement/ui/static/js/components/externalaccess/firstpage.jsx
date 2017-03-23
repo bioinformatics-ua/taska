@@ -19,7 +19,8 @@ const LoggedInHome = React.createClass({
     __getState(){
         return {
             user: UserStore.getUser(),
-            message: "Write something there (Optional)"
+            message: "Write something there (Optional)",
+            studyTemplate: undefined
         }
     },
     contextTypes: {
@@ -33,6 +34,10 @@ const LoggedInHome = React.createClass({
     },
     goToStudySetup(){
         console.log("Go to the study");
+        console.log(this.state);
+    },
+    setStudyTemplate(e){
+        this.setState({studyTemplate: e});
     },
     render: function () {
         let params = this.context.router.getCurrentQuery();
@@ -43,7 +48,7 @@ const LoggedInHome = React.createClass({
                 <ExternalUserTable />
               </div>
               <div className="col-md-6 flex-container flex-row">
-                <SpecialWorkflowTable user={this.state.user}/>
+                <SpecialWorkflowTable user={this.state.user} setStudyTemplate={this.setStudyTemplate}/>
               </div>
           </div>
           <div className="row flex-container">
