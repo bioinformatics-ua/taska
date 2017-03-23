@@ -23,7 +23,7 @@ module.exports = (
 
         <Route name="MyTasks" handler={require('./components/MyTasks.jsx')}/>
 
-        <Route name="ExternalAccess" path="externalaccess/:object" handler={require('./components/externalaccess/firstpage.jsx')}/>
+        <Route name="ExternalAccess" handler={require('./components/externalaccess/firstpage.jsx')}/>
 
         <Route name="login" path="login" handler={require('./components/login.jsx')}/>
 

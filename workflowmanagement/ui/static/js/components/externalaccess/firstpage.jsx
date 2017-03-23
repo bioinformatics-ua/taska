@@ -35,7 +35,7 @@ const LoggedInHome = React.createClass({
         console.log("Go to the study");
     },
     render: function () {
-        let params = this.context.router.getCurrentParams();
+        let params = this.context.router.getCurrentQuery();
         console.log(params);
         return (<span>
             <div className="row flex-container">
