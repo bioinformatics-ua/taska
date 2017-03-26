@@ -5,11 +5,12 @@ from rest_framework.response import Response
 import requests
 
 class ProxyView(APIView):
-    def get(self, request, *args, **kw):
-        url = 'http://127.0.0.1:8001/api/account/m/getExternalUsers/'
+    def get(self, request, *args, **kwargs):
+        print "Entrou no meu proxy"
+        url = request.query_params['url']
 
         params = {}
-        req = requests.get(url, auth=('john', '12345'), params=params)
+        req = requests.get(url, auth=('john', '12345'), params=params) #ERRADISSIMO
         users = req.json()
 
-        return Response({'users': users['users']})
+        return Response({"results": users['users']})
