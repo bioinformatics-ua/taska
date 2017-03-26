@@ -10,7 +10,8 @@ class ProxyView(APIView):
         url = request.query_params['url']
 
         params = {}
-        req = requests.get(url, auth=('john', '12345'), params=params) #ERRADISSIMO
+        req = requests.get(url, params=params)
+        #req = requests.get(url, auth=('john', '12345'), params=params) #ERRADISSIMO
         users = req.json()
 
         return Response({"results": users['users']})
