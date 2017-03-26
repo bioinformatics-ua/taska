@@ -7,30 +7,21 @@ import ResultStore from './ResultStore.jsx';
 import {depmap} from '../map.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
-import {ListLoader, DetailLoader} from '../actions/api.jsx'
+import {ListLoader} from '../actions/api.jsx'
 
-let loader = new ListLoader({model: 'process/my/finishedstudies', dontrepeat: true});
+let loader;
 
 
 export default Reflux.createStore({
-    statics: {
-        DETAIL: 0,
-        LIST: 1
-    },
     merge: true,
-    mixins: [TableStoreMixin, Reflux.connect(ResultStore, "dummy"),
-        DetailStoreMixin.factory(
-            new DetailLoader({model: 'process/my/finishedstudies'}),
-            'hash',
-            UserGridActions
-        )
-    ],
+    mixins: [TableStoreMixin],
     listenables: [UserGridActions],
-    load: function (state) {
-        if(state.currentPage == 0 )
-            this.reload(state);
-
+    load: function (state, hash) {//I used hash, but it is not a hash. it is an url
+        //let url = "";
+        console.log(hash);
+        console.log(state);
         let self = this;
+        loader  = new ListLoader({model: hash, dontrepeat: true});
         loader.load(function(data){
             self.updatePaginator(state);
             UserGridActions.loadSuccess(data);
@@ -38,16 +29,8 @@ export default Reflux.createStore({
     },
     dummy(s){},
     init(){
-        this.answer = {};
-        this.dversion = 0;
-        this.v=1;
     },
-    reload(state){
-        this.__list = [];
-        state.currentPage = 0;
-        state.reload = true;
-    },
-    getDepVersion(){
-        return this.dversion;
-    },
+    onCalibrate(){
+
+    }
 });

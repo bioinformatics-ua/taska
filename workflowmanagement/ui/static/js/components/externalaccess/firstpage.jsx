@@ -7,6 +7,8 @@ import UserStore from '../../stores/UserStore.jsx';
 
 import {Authentication} from '../../mixins/component.jsx';
 
+import {DetailHistoryTable} from '../reusable/history.jsx';
+
 export default React.createClass({
     displayName: "Studies",
     mixins: [Authentication],
@@ -41,11 +43,11 @@ const LoggedInHome = React.createClass({
     },
     render: function () {
         let params = this.context.router.getCurrentQuery();
-        console.log(params);
+        console.log(params.url);
         return (<span>
             <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
-                <ExternalUserTable />
+                <ExternalUserTable hash={params.url}/>
               </div>
               <div className="col-md-6 flex-container flex-row">
                 <SpecialWorkflowTable user={this.state.user} setStudyTemplate={this.setStudyTemplate}/>

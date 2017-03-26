@@ -14,6 +14,7 @@ const DetailHistoryStore = Reflux.createStore({
     load: function (state, hash) {
         console.log('DETAIL HISTORY');
         console.log(hash);
+
         if(hash !== undefined){
             let self = this;
             dloader = new ListLoader({model: `history/${hash}`, dontrepeat: false});

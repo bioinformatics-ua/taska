@@ -9,9 +9,40 @@ import UserGridActions from '../../actions/UserGridActions.jsx';
 import {TableComponentMixin} from '../../mixins/component.jsx';
 
 const ExternalUserTable = React.createClass({
+    /*tableAction: UserGridActions.load,
+    tableStore: UserGridStore,
+    mixins: [Reflux.listenTo(UserGridStore, 'update'), TableComponentMixin],
+    statics: {
+        fetch(params) {
+            return new Promise(function (fulfill, reject){
+                ExternalStore.init();
+                fulfill({});
+            });
+        }
+    },
+    __getState() {
+        return {
+            url: undefined
+        };
+    },
+    getInitialState(){
+        return this.__getState();
+    },
+    componentWillMount(){
+        this.setState({
+            url: this.props.url
+        });
+    },
+    update: function(data){
+        this.setState(this.__getState());
+    },*/
+
     tableAction: UserGridActions.load,
     tableStore: UserGridStore,
     mixins: [Reflux.listenTo(UserGridStore, 'update'), TableComponentMixin],
+    componentWillMount(){
+        UserGridActions.calibrate();
+    },
     getInitialState: function() {
         return {};
     },
@@ -19,6 +50,7 @@ const ExternalUserTable = React.createClass({
         this.setState(this.getState());
     },
   render: function () {
+        console.log(this.props.ur);
     const columnMeta = [];
     return  <div className="panel panel-default panel-overflow griddle-pad">
               <div className="panel-heading">

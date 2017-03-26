@@ -48,7 +48,6 @@ export default Reflux.createStore({
             (result) => {
                 let map = result.results.map(
                                         entry => {
-                                            console.log(entry);
                                             return {
                                                 value: entry.hash,
                                                 label: entry.title

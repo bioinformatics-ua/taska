@@ -10,6 +10,7 @@ const UserGridActions = Reflux.createActions(
     'loadSuccess':{},
     'load': {},
     'preliminary': {},
+    'calibrate': {}
     }, DetailActionsMixin));
 
 export default UserGridActions;
