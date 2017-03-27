@@ -48,13 +48,13 @@ const SpecialWorkflowTable = React.createClass({
         this.props.setStudyTemplate(e);
     },
     render: function () {
-        return <div className="input-group reassign">
-            <Select placeholder="Search for users to reassigning"
+        return <div className="col-md-12">
+            <Select placeholder="Select study template"
                     onChange={this.selectStudy}
                     value={this.state.study}
                     name="form-field-name"
                     options={this.state.allStudies}/>
-        </div>;
+            </div>;
     }
 });
 

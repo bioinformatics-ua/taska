@@ -2,26 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
-#from MyProject.MyApp import CalcClass
+
 import json
 
 class MyRESTView(APIView):
     authentication_classes = ([])
     permission_classes = ([])
-    #@api_view(['GET'])
-    #@authentication_classes([])
-    #@permission_classes([])
+
     def get(self, request, *args, **kw):
-        # Process any get params that you may need
-        # If you don't need to process get params,
-        # you can skip this part
-
-        #get_arg1 = request.GET.get('arg1', None)
-        #get_arg2 = request.GET.get('arg2', None)
-
-        # Any URL parameters get passed in **kw
-        #myClass = CalcClass(get_arg1, get_arg2, *args, **kw)
-        print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         data = {
                 "community": {"name": "EMIF EHR"},
                 "users": [

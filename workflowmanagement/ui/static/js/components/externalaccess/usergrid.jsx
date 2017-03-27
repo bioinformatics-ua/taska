@@ -21,8 +21,12 @@ const ExternalUserTable = React.createClass({
     update: function (data) {
         this.setState(this.getState());
     },
+    addNewUser(){
+      console.log("AAAAAAAADDDDDDDDDDDDDDD");
+    },
     render: function () {
         console.log(this.props.ur);
+
         const columnMeta = [
             {
                 "columnName": "firstName",
@@ -52,17 +56,32 @@ const ExternalUserTable = React.createClass({
                 "displayName": "Email"
             },
         ];
-        return <div className="panel panel-default panel-overflow griddle-pad">
-            <div className="panel-heading">
-                <i className="fa fa-sitemap pull-left"></i>
-                <h3 className="text-center panel-title"> Users</h3>
+        return <span>
+
+                <div className="form-group">
+                            <div className="input-group">
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>Email</strong>
+                                </span>
+                                <input className="form-control" onChange={this.addNewUser} defaultValue={"AAAA"} />
+                                <span className="input-group-btn">
+                                    <button onClick={this.addNewUser} className="btn btn-success"><i className="fa fa-plus"></i></button>
+                                  </span>
+                            </div>
+                        </div>
+
+            <div className="panel panel-default panel-overflow griddle-pad">
+                <div className="panel-heading">
+                    <i className="fa fa-sitemap pull-left"></i>
+                    <h3 className="text-center panel-title"> Users</h3>
+                </div>
+                <Griddle
+                    noDataMessage={<center>You don't have user to select.</center>}
+                    {...this.commonTableSettings(false)}
+                    columns={["firstName", "lastName", "email"]}
+                    columnMetadata={columnMeta}/>
             </div>
-            <Griddle
-                noDataMessage={<center>You don't have user to select.</center>}
-                {...this.commonTableSettings(false)}
-                columns={["firstName", "lastName", "email"]}
-                columnMetadata={columnMeta}/>
-        </div>;
+        </span>;
     }
 });
 

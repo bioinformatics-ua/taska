@@ -45,32 +45,45 @@ const LoggedInHome = React.createClass({
         let params = this.context.router.getCurrentQuery();
         console.log(params.url);
         return (<span>
-            <div className="row flex-container">
+          <div className="row flex-container">
+              <div className="col-md-12 flex-container flex-row">
+                Information about the questionaire TODO
+                  <br/>
+              </div>
+          </div>
+
+          <div className="row flex-container">
               <div className="col-md-6 flex-container flex-row">
                 <ExternalUserTable hash={params.url}/>
               </div>
-              <div className="col-md-6 flex-container flex-row">
-                <SpecialWorkflowTable user={this.state.user} setStudyTemplate={this.setStudyTemplate}/>
-              </div>
-          </div>
-          <div className="row flex-container">
-              <div className="col-md-12 flex-container flex-row">
-                <textarea onChange={this.setMessage} rows="7"
-                          className="form-control" defaultValue={this.state.message}/>
-              </div>
-          </div>
-          <br/>
-          <div className="row">
-              <div className="col-md-10">
-
-              </div>
-              <div className="col-md-2">
-                <div className="btn-group" role="group">
-                    <button type="button" onClick={this.goToStudySetup} className="btn btn-primary btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-arrow-right"></i> Next Step</button>
+              <div className="col-md-6 flex-row">
+                <div className="row">
+                    <SpecialWorkflowTable user={this.state.user} setStudyTemplate={this.setStudyTemplate}/>
                 </div>
+                <br/>
+                <div className="row">
+                    <div className="col-md-12">
+                    <textarea onChange={this.setMessage} rows="7"
+                          className="form-control" defaultValue={this.state.message}/>
+                        </div>
+                </div>
+                <br/>
+                <div className="row">
+                  <div className="col-md-8">
+
+                  </div>
+                  <div className="col-md-4">
+                    <div className="btn-group" role="group">
+                        <button type="button" onClick={this.goToStudySetup} className="btn btn-primary btn-default">
+                                                <i style={{marginTop: '3px'}} className="pull-left fa fa-arrow-right"></i> Next Step</button>
+                    </div>
+                  </div>
+              </div>
               </div>
           </div>
+
+          <br/>
+
           <br/>
         </span>
         );

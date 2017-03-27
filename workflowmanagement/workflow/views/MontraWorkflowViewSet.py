@@ -29,5 +29,4 @@ class MontraWorkflowViewSet(generics.ListAPIView):
 
     # we must override queryset to filter by authenticated user
     def get_queryset(self):
-        return Workflow.all().filter(
-            Q(workflowpermission__visibility=WorkflowPermission.MONTRA))
+        return Workflow.all(user=self.request.user)#.filter(Q(workflowpermission__visibility=WorkflowPermission.INTERNAL))
