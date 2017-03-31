@@ -1,6 +1,7 @@
 'use strict';
 import Reflux from 'reflux';
 import UserGridActions from '../actions/UserGridActions.jsx';
+import StateActions from '../actions/StateActions.jsx';
 
 import ResultStore from './ResultStore.jsx';
 
@@ -18,7 +19,7 @@ export default Reflux.createStore({
     listenables: [UserGridActions],
     load: function (state, hash) {//I used hash, but it is not a hash. it is an url
         let url = hash;
-
+        StateActions.loadingStart();
         //Remove the last / if exists because the listloader will add it to add the parameters(page and order)
         if(url.endsWith("/"))
             url = url.slice(0, -1);
@@ -28,6 +29,7 @@ export default Reflux.createStore({
         loader.load(function(data){
             self.updatePaginator(state);
             UserGridActions.loadSuccess(data);
+            StateActions.loadingEnd();
         }, state);
     },
     dummy(s){},

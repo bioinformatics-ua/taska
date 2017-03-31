@@ -24,6 +24,36 @@ class MyRESTView(APIView):
                         "lastName": "Manel",
                         "email": "zemanel@mail.com",
                         "entry": {"name": "IPCI", "uid": "entry uid"}
+                    },
+                    {
+                        "firstName": "Rita",
+                        "lastName": "Almeida",
+                        "email": "rita@mail.com",
+                        "entry": {"name": "IPCI", "uid": "entry uid"}
+                    },
+                    {
+                        "firstName": "Marco",
+                        "lastName": "Taska",
+                        "email": "marco@taska.com",
+                        "entry": {"name": "IPCI", "uid": "entry uid"}
+                    },
+                    {
+                        "firstName": "Maria",
+                        "lastName": "Taska",
+                        "email": "maria@taska.com",
+                        "entry": {"name": "IPCI", "uid": "entry uid"}
+                    },
+                    {
+                        "firstName": "Sofia",
+                        "lastName": "Taska",
+                        "email": "sofia@taska.com",
+                        "entry": {"name": "IPCI", "uid": "entry uid"}
+                    },
+                    {
+                        "firstName": "Jenifer",
+                        "lastName": "Taska",
+                        "email": "jenifer@taska.com",
+                        "entry": {"name": "IPCI", "uid": "entry uid"}
                     }
                    ]
             }

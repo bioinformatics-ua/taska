@@ -43,7 +43,7 @@ const LoggedInHome = React.createClass({
     },
     render: function () {
         let params = this.context.router.getCurrentQuery();
-        console.log(params.url);
+
         return (<span>
           <div className="row flex-container">
               <div className="col-md-12 flex-container flex-row">
@@ -81,10 +81,6 @@ const LoggedInHome = React.createClass({
               </div>
               </div>
           </div>
-
-          <br/>
-
-          <br/>
         </span>
         );
     }
