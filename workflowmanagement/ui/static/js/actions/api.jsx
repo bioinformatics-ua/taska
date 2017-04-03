@@ -11,6 +11,60 @@ $.ajaxSetup({
     }
 });
 
+/*
+class LoaderE{
+    constructor(options) {
+    }
+
+    load(url, callback, unsuccessful_callback=null, type="GET", serialized={}){
+      let headers = {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+          'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Header'
+      };
+      if(type != 'GET'){
+        /*$.ajax({
+            headers: {
+                'X-HTTP-Method-Override': 'PATCH'
+            },
+            type : "POST",
+        ...
+        });*//*
+        headers = {
+          'X-HTTP-Method-Override': type
+        };
+
+        type="POST";
+      }
+
+      return new Promise(function(fulfill, reject){
+        $.ajax({
+            headers: headers,
+            url: url,
+            type: type,
+            data: serialized,
+            dataType: 'jsonp',
+            contentType: "application/json",
+            success: function(data) {
+                console.log(data);
+              if(callback){
+                  console.log(callback);
+                callback(data);}
+                fulfill(data);
+            }.bind(this),
+            error: function(xhr, status, err) {
+                if(unsuccessful_callback != null)
+                    unsuccessful_callback();
+
+                console.error(`Unable to load ${url}`);
+                reject(xhr);
+            }.bind(this)
+      });
+    });
+    }
+}*/
+
+
 class Loader{
     constructor(options) {
     }
@@ -56,6 +110,18 @@ class Loader{
     });
     }
 }
+/*
+class ExternalLoader extends LoaderE{
+    constructor(options) {
+        this.__loaded = {};
+        this.url = options.url;
+        this.dontrepeat = options.dontrepeat || false;
+    }
+
+    load(callback, state){
+      return super.load(this.url, callback);
+    }
+}*/
 
 class ListLoader extends Loader{
     constructor(options) {
@@ -145,4 +211,4 @@ class Login extends Loader{
   }
 }
 
-export default {ListLoader,SimpleListLoader, DetailLoader, Login}
+export default {ListLoader, SimpleListLoader, DetailLoader, Login}

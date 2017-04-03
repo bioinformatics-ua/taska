@@ -8,7 +8,8 @@ import {DetailActionsMixin} from '../mixins/actions.jsx';
 const ExternalActions = Reflux.createActions(
     $.extend({
     'loadSuccess':{},
-    'load': {}
+    'load': {},
+    'calibrate': {}
     }, DetailActionsMixin));
 
 export default ExternalActions;
