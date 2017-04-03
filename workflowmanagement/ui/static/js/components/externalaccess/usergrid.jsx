@@ -14,9 +14,7 @@ import {LayeredComponentMixin} from '../../mixins/component.jsx';
 
 const RemoveButton = React.createClass({
     remove(){
-        console.log(this.props);
         this.props.metadata.removeUser(this.props.rowData);
-        console.log(this.props.rowData);
     },
     render: function () {
         return <span>
@@ -143,6 +141,7 @@ const ExternalUserTable = React.createClass({
     },
     update: function (data) {
         this.setState(this.getState());
+        this.props.setUsers(this.state.entries);
     },
     addNewUserToState(e){
         this.setState({new_user: e.target.value});
@@ -157,7 +156,8 @@ const ExternalUserTable = React.createClass({
         let new_user = {
             "email": this.state.new_user,
             "firstName": this.state.new_firstname,
-            "lastName": this.state.new_lastname
+            "lastName": this.state.new_lastname,
+            "exists": true
         };
         let new_entries = this.state.entries;
         new_entries.push(new_user);
@@ -167,6 +167,7 @@ const ExternalUserTable = React.createClass({
             new_firstname: "",
             new_lastname: "",
         });
+        this.props.setUsers(new_entries);
     },
     removeUser(user){
         let new_entries = [];
@@ -175,6 +176,7 @@ const ExternalUserTable = React.createClass({
                 new_entries.push(this.state.entries[index]);
 
         this.setState({entries: new_entries});
+        this.props.setUsers(new_entries);
     },
     getModalBody(){
         return <span>
@@ -193,7 +195,7 @@ const ExternalUserTable = React.createClass({
                       defaultValue={this.state.new_lastname}/>
         </span>;
     },
-    render: function () {
+    render() {
         const columnMeta = [
             {
                 "columnName": "firstName",
@@ -248,7 +250,6 @@ const ExternalUserTable = React.createClass({
                             extraCss={"btn btn-success"}
                             title={"User information"}
                             onChange={this.addNewUserToState}
-                            firstName={this.state.comment}
                             icon={"fa fa-plus"}
                             showmodal={true}
                             new_user={this.state.new_user}
