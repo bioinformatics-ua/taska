@@ -18,3 +18,4 @@ openpyxl==2.2.2
 raven==5.1.1
 dealer==2.0.4
 django-wkhtmltopdf==2.0.3
+requests==2.10.0
