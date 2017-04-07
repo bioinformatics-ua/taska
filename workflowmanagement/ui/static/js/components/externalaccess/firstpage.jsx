@@ -30,6 +30,8 @@ const LoggedInHome = React.createClass({
     contextTypes: {
         router: React.PropTypes.func.isRequired
     },
+    componentWillMount(){
+    },
     getInitialState(){
         return this.__getState();
     },
@@ -58,6 +60,7 @@ const LoggedInHome = React.createClass({
         this.setState({studyTemplate: e});
     },
     setUsers(list){
+        this.setState({users: []});
         this.setState({users: list});
     },
     render: function () {

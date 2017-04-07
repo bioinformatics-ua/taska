@@ -53,6 +53,7 @@ class History(models.Model):
     RUN             = 11
     REMAINDER       = 12
     REJECT          = 13
+    INVITE          = 14
 
     EVENTS          = (
             (ADD,       'Add'),
@@ -67,7 +68,8 @@ class History(models.Model):
             (LATE,      'Late'),
             (RUN,       'Run'),
             (REMAINDER, 'Remainder'),
-            (REJECT,    'Reject')
+            (REJECT,    'Reject'),
+            (INVITE,    'Invite')
         )
 
     event           = models.PositiveSmallIntegerField(choices=EVENTS, default=ADD)

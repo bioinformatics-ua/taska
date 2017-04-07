@@ -345,6 +345,50 @@ class UserViewSet(viewsets.ModelViewSet):
             'error': "Email and password are mandatory fields on registering a new user"
         })
 
+    @list_route(methods=['post'])#, permission_classes=[permissions.AllowAny]
+    def invite(self, request):
+        '''
+            Allows a user to register anothers users. Being then put on a waiting list to be approved.
+        '''
+        email = request.data.get('email', None)
+        password = "12345" #Default password, the user will be notice to change it
+
+        if email != None:
+            email = email.lower()
+
+            try:
+                usr = User.objects.get(email=email)
+
+                return Response({
+                    'error': "An user with this email already exists"
+                })
+            except User.DoesNotExist:
+                request.data['username'] = email[:30]
+                request.data['email'] = email
+                serializer = UserSerializer(data=request.data, context={'request': request})
+
+                valid = serializer.is_valid(raise_exception=True)
+
+                if valid:
+                    new_user = serializer.save()
+
+                    new_user.set_password(password)
+                    new_user.is_active = True  #I decide let the userbe active in the first place because this is a invite
+                    new_user.save()
+
+                    History.new(event=History.INVITE, actor=request.user,
+                                object=new_user, authorized=User.objects.filter(is_staff=True))
+
+                    return Response(serializer.data)
+
+                return Response({
+                    'error': "User details invalid"
+                })
+
+        return Response({
+            'error': "Email and password are mandatory fields on registering a new user"
+        })
+
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def recover(self, request):
         ''' Allows users to ask for password recovery(which needs to be confirmed).
