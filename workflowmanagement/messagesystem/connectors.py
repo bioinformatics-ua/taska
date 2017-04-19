@@ -56,6 +56,7 @@ def newHistoryNotifications(sender, instance, **kwargs):
 def defineHistoryTci(instance, tc):
     tci = None
 
+    # Old code
     # USER
     if isinstance(instance.object, User) or isinstance(instance.object, UserRecovery):
         # User events always are emailed to everyone involved, no matter their notification preferences, because they are very important
@@ -64,6 +65,11 @@ def defineHistoryTci(instance, tc):
         tci = tc(instance, instance.authorized.filter(profile__notification=True))
 
     # Set receivers based on template
+    # USER
+    if isinstance(instance.object, User):
+        if instance.event == History.INVITE:
+            return tc(instance, [instance.object])
+
     # PROCESS
     if isinstance(instance.object, Process):
         if instance.event == History.CANCEL \
@@ -122,10 +128,10 @@ def buildTemplate(instance):
         tcn += 'Template'
         tcn = tcn.replace(' ', '')
 
-        return tcn;
+        return tcn
 
     # Event + template
     tcn += dict(instance.__class__.EVENTS)[instance.event].title() + 'Template'
     tcn = tcn.replace(' ', '')
 
-    return tcn;
+    return tcn

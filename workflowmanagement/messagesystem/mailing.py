@@ -53,6 +53,11 @@ class MailTemplate:
                 pass
 
             # Some adjustments for each template
+            # User
+            if isinstance(self.instance.object, User):
+                sender = self.instance
+                user = self.instance.object
+
             # Process
             if isinstance(self.instance.object, Process):
                 if self.instance.event == History.CANCEL: #process_cancel
@@ -69,11 +74,11 @@ class MailTemplate:
 
             #Request
             if isinstance(self.instance.object, Request):
-
                 task = self.instance.object.processtaskuser.processtask.task.title
                 executioner = self.instance.object.processtaskuser.processtask.process.executioner
                 user = self.instance.object.processtaskuser.user
                 link_delegate = "request/" + self.instance.object.hash
+
 
             # Define the first and last name of the send it it exists
             if sender != None:

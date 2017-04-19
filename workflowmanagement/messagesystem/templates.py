@@ -78,6 +78,10 @@ class UserAddTemplate(MailTemplate):
     subjecttemplate="mail/user_add_subject.html"
     template="mail/user_add.html"
 
+class UserInviteTemplate(MailTemplate):
+    subjecttemplate="mail/user_invite_subject.html"
+    template="mail/user_invite.html"
+
 class UserApproveTemplate(MailTemplate):
     subjecttemplate="mail/user_approve_subject.html"
     template="mail/user_approve.html"

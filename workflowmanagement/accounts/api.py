@@ -350,44 +350,43 @@ class UserViewSet(viewsets.ModelViewSet):
         '''
             Allows a user to register anothers users. Being then put on a waiting list to be approved.
         '''
-        email = request.data.get('email', None)
-        password = "12345" #Default password, the user will be notice to change it
+        for usr in request.data:
+            email = usr.get('email', None)
+            password = "12345" #Default password, the user will be notice to change it. This needs to be changed
 
-        if email != None:
-            email = email.lower()
+            if email != None:
+                email = email.lower()
 
-            try:
-                usr = User.objects.get(email=email)
+                try:
+                    usr = User.objects.get(email=email)
+                except User.DoesNotExist:
+                    try:
+                        usr['first_name'] = usr['firstName']
+                        usr['last_name'] = usr['lastName']
+                    except:
+                        pass #The user could not pass this informations so it will be empty and raises a exception
 
+                    usr['username'] = email[:30]
+                    usr['email'] = email
+                    usr['profile'] = {'detail_mode': Profile.get_default_detail_mode()}
+
+                    serializer = UserSerializer(data=usr)
+                    valid = serializer.is_valid(raise_exception=True)
+
+                    if valid:
+                        new_user = serializer.save()
+
+                        new_user.set_password(password)
+                        new_user.is_active = True  #I decide let the userbe active in the first place because this is a invite
+                        new_user.save()
+
+                        History.new(event=History.INVITE, actor=request.user,
+                                    object=new_user, authorized=User.objects.filter(is_staff=True))
+            else:
                 return Response({
-                    'error': "An user with this email already exists"
-                })
-            except User.DoesNotExist:
-                request.data['username'] = email[:30]
-                request.data['email'] = email
-                serializer = UserSerializer(data=request.data, context={'request': request})
-
-                valid = serializer.is_valid(raise_exception=True)
-
-                if valid:
-                    new_user = serializer.save()
-
-                    new_user.set_password(password)
-                    new_user.is_active = True  #I decide let the userbe active in the first place because this is a invite
-                    new_user.save()
-
-                    History.new(event=History.INVITE, actor=request.user,
-                                object=new_user, authorized=User.objects.filter(is_staff=True))
-
-                    return Response(serializer.data)
-
-                return Response({
-                    'error': "User details invalid"
-                })
-
-        return Response({
-            'error': "Email and password are mandatory fields on registering a new user"
-        })
+                        'error': "Email are mandatory fields on registering a new user"
+                    })
+        return Response({'success': True})
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def recover(self, request):

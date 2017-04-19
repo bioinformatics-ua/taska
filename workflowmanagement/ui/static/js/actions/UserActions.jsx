@@ -19,7 +19,8 @@ const UserActions = Reflux.createActions($.extend({
     'registerUser': {},
     'approve': {},
     'recoverPassword': {},
-    'changePassword': {}
+    'changePassword': {},
+    'invite': {}
 }, DetailActionsMixin, ListActionsMixin));
 
 export default UserActions;
