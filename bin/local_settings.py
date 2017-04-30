@@ -21,6 +21,8 @@ SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'taska')
 
 EMAIL_URL = os.environ.get('EMAIL_URL', WEBPAGE_URL)
 ALLOWED_HOSTS = [
+    'bioinformatics.ua.pt', 
+    'biodatacenter.ieeta.pt',
     '.127.0.0.1',  # Allow domain and subdomains
     '.127.0.0.1.',  # Also allow FQDN and subdomains,
     'localhost',
@@ -36,3 +38,5 @@ FORCE_SCRIPT_NAME = os.environ.get('BASE_DIR', '')+'/'
 RAVEN_URL = os.environ.get('RAVEN_URL', 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13')
 
 WKHTMLTOPDF_CMD = '/usr/local/bin/wkhtmltopdf'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
