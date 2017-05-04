@@ -134,7 +134,7 @@ const UserTable = React.createClass({
     componentWillMount(){
         UserGridActions.calibrate();
     },
-    getInitialState: function () {
+    getInitialState () {
         return {
             new_user: "",
             new_firstname: "",
@@ -160,7 +160,8 @@ const UserTable = React.createClass({
                         this.setState(
                             {
                                 users: map,
-                                allUser: users
+                                allUser: users,
+                                entries: []
                             }
                         );
                     }

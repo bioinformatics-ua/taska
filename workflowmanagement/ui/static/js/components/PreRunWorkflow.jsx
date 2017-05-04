@@ -27,7 +27,6 @@ export default React.createClass({
         return this.props.detail[detail];
     },
     setUsers(list){
-        this.setState({users: []});
         this.setState({users: list});
     },
     setMessage(e){
