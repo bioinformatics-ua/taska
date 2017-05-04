@@ -531,6 +531,7 @@ const PermissionsBar = React.createClass({
     },
     render(){
         let canedit = !this.props.editable && !this.props.runnable && !this.props.confirmable && this.props.showEdit;
+
         return (<span>
                 {this.props.owner ?
                 <div className="row">
@@ -564,7 +565,7 @@ const PermissionsBar = React.createClass({
                       :''}
                       {!this.props.runnable && !this.props.confirmable && !this.props.editable && this.props.showRun?
                           <Link title="Configure study template as a study" className="btn btn-sm btn-primary" to={this.props.link}
-                          params={{object: this.props.object, mode:'run'}}>
+                          params={{object: this.props.object, mode:'prerun'}}>
                           <i className="fa fa-play"></i>
                           </Link>
                       :''}
@@ -706,6 +707,11 @@ const ProcessDetailBar = React.createClass({
         var optionsAfterDeadline = optionsBeforeDeadline;
 
         return(<div>
+                <div className="row">
+                    <div className="col-md-12">
+                        {/* MESSAGE THERE */}
+                    </div>
+                </div>
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">

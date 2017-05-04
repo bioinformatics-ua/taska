@@ -50,7 +50,9 @@ class SimpleTask extends SimpleState {
         let self = this;
         const SimpleFields = React.createClass({
             getState(){
+                console.log(this.props.main);
                 return {
+                    filteredUsers: this.props.main.props.filteredUsers,
                     parent: this.props.main
                 };
             },
@@ -300,9 +302,21 @@ class SimpleTaskRun extends SimpleTask{
                     alreadyusers = [];
                 }
 
+                let filteredUsers = [];
+                if(this.props.main.props.filteredUsers != undefined){
+                    filteredUsers = this.props.main.props.filteredUsers.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
+                                        }
+                            );
+                }
+
                 return {
                     parent: this.props.main,
-                    users: [],
+                    users: filteredUsers,
                     new_assignee: undefined,
                     new_reassigning: undefined,
                     oldUser: undefined,
@@ -650,6 +664,7 @@ class SimpleTaskRun extends SimpleTask{
                             }
                         }
                 );
+                console.log(this);
 
                 if(!this.parent().deadline)
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));

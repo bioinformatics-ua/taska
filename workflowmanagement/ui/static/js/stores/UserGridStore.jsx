@@ -19,18 +19,21 @@ export default Reflux.createStore({
     listenables: [UserGridActions],
     load: function (state, hash) {//I used hash, but it is not a hash. it is an url
         let url = hash;
-        StateActions.loadingStart();
-        //Remove the last / if exists because the listloader will add it to add the parameters(page and order)
-        if(url.endsWith("/"))
-            url = url.slice(0, -1);
+        if(url != undefined) //Use a different condition there to avoid 500 error
+        {
+            StateActions.loadingStart();
+            //Remove the last / if exists because the listloader will add it to add the parameters(page and order)
+            if (url.endsWith("/"))
+                url = url.slice(0, -1);
 
-        let self = this;
-        loader  = new ListLoader({model: 'account/externalservice/getUsers/?url='+url, dontrepeat: true});
-        loader.load(function(data){
-            self.updatePaginator(state);
-            UserGridActions.loadSuccess(data);
-            StateActions.loadingEnd();
-        }, state);
+            let self = this;
+            loader = new ListLoader({model: 'account/externalservice/getUsers/?url=' + url, dontrepeat: true});
+            loader.load(function (data) {
+                self.updatePaginator(state);
+                UserGridActions.loadSuccess(data);
+                StateActions.loadingEnd();
+            }, state);
+        }
     },
     dummy(s){},
     init(){

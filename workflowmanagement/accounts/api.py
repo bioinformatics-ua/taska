@@ -350,6 +350,7 @@ class UserViewSet(viewsets.ModelViewSet):
         '''
             Allows a user to register anothers users. Being then put on a waiting list to be approved.
         '''
+        userList = []
         for usr in request.data:
             email = usr.get('email', None)
             password = "12345" #Default password, the user will be notice to change it. This needs to be changed
@@ -359,6 +360,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
                 try:
                     usr = User.objects.get(email=email)
+                    userList += [usr]
                 except User.DoesNotExist:
                     try:
                         usr['first_name'] = usr['firstName']
@@ -379,6 +381,7 @@ class UserViewSet(viewsets.ModelViewSet):
                         new_user.set_password(password)
                         new_user.is_active = True  #I decide let the userbe active in the first place because this is a invite
                         new_user.save()
+                        userList += [new_user]
 
                         History.new(event=History.INVITE, actor=request.user,
                                     object=new_user, authorized=User.objects.filter(is_staff=True))
@@ -386,7 +389,11 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({
                         'error': "Email are mandatory fields on registering a new user"
                     })
-        return Response({'success': True})
+        serializer_context = {
+                'request': request,
+            }
+        serializerAll = UserSerializer(userList, many=True, context=serializer_context)
+        return Response(serializerAll.data)
 
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def recover(self, request):

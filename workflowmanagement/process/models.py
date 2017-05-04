@@ -49,6 +49,7 @@ class Process(models.Model):
         )
     workflow        = models.ForeignKey(Workflow)
     title           = models.CharField(max_length=200, null=True)
+    description     = models.CharField(max_length=2000, null=True, default="")
     executioner     = models.ForeignKey(User)
     hash            = models.CharField(max_length=50, unique=True)
     start_date      = models.DateTimeField(auto_now_add=True)

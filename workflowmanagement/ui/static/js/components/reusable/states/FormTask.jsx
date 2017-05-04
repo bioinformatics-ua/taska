@@ -225,10 +225,21 @@ class FormTaskRun extends FormTask{
                 {
                     alreadyusers = [];
                 }
+                let filteredUsers = [];
+                if(this.props.main.props.filteredUsers != undefined){
+                    filteredUsers = this.props.main.props.filteredUsers.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
+                                        }
+                            );
+                }
 
                 return {
                     parent: this.props.main,
-                    users: [],
+                    users: filteredUsers,
                     new_assignee: undefined,
                     new_reassigning: undefined,
                     oldUser: undefined,
