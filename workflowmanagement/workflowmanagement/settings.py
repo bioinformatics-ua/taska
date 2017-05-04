@@ -56,7 +56,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 ADMINS = (
-    ('Ricardo Ribeiro', 'ribeiro.r@ua.pt'),
+    ('Joao Almeida', 'joao.rafael.almeida@ua.pt'),
 )
 
 # Application definition
@@ -200,8 +200,9 @@ REST_FRAMEWORK = {
 }
 
 # this will be needed on production server
-#SESSION_COOKIE_SECURE = True
-#CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 TEMPLATE_LOADERS = (
 
     'django.template.loaders.filesystem.Loader',
@@ -226,7 +227,7 @@ EMAIL_URL  = "http://localhost:8000"
 #API_ACTIVATE_URL = "api/account/activate/?email="
 API_ACTIVATE_URL = "activate/"
 
-DEFAULT_FROM_EMAIL = 'ribeiro.r@ua.pt'
+DEFAULT_FROM_EMAIL = 'joao.rafael.almeida@ua.pt'
 
 RAVEN_URL = 'http://98b4d9f7df4740918645908651a72734:f90b482497474347aac765cea8803a09@bioinformatics.ua.pt/sentry/13'
 

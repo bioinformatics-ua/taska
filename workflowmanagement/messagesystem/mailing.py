@@ -60,10 +60,10 @@ class MailTemplate:
 
             # Process
             if isinstance(self.instance.object, Process):
-                if self.instance.event == History.CANCEL: #process_cancel
-                    link_delegate = "MyStudies"
-                if self.instance.event == History.DONE: #process_done
-                    link_delegate = "MyStudies"
+                # process_cancel or process_done
+                if self.instance.event == History.CANCEL \
+                    or self.instance.event == History.DONE:
+                    link_delegate = link_open_plataform + "MyStudies"
 
                 sender = self.instance.object.executioner
 
@@ -77,7 +77,7 @@ class MailTemplate:
                 task = self.instance.object.processtaskuser.processtask.task.title
                 executioner = self.instance.object.processtaskuser.processtask.process.executioner
                 user = self.instance.object.processtaskuser.user
-                link_delegate = "request/" + self.instance.object.hash
+                link_delegate = link_open_plataform + "request/" + self.instance.object.hash
 
 
             # Define the first and last name of the send it it exists
