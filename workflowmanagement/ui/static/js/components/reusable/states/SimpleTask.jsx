@@ -2,6 +2,8 @@ import Reflux from 'reflux';
 import React from 'react';
 import {Link} from 'react-router';
 
+import ButtonToAddUsersModal from './ButtonToAddUsersModal.jsx';
+
 import {SimpleState} from '../../../react-statemachine/classes.jsx';
 
 import Select from 'react-select';
@@ -50,7 +52,6 @@ class SimpleTask extends SimpleState {
         let self = this;
         const SimpleFields = React.createClass({
             getState(){
-                console.log(this.props.main);
                 return {
                     filteredUsers: this.props.main.props.filteredUsers,
                     parent: this.props.main
@@ -664,7 +665,6 @@ class SimpleTaskRun extends SimpleTask{
                             }
                         }
                 );
-                console.log(this);
 
                 if(!this.parent().deadline)
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
@@ -694,6 +694,15 @@ class SimpleTaskRun extends SimpleTask{
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, true);
+            },
+            setUsers(list){
+                let map = list.map(entry => {
+                                    return {
+                                        value: ''+entry.id,
+                                        label: entry.fullname
+                                    }
+                    });
+                this.setState({users: map});
             },
             render(){
                 let users;
@@ -729,9 +738,16 @@ class SimpleTaskRun extends SimpleTask{
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
                             {this.state.users.length > 0?
-                                <Select onChange={this.setAssignee} placeholder="Search for assignees"
-                                    value={this.parent().assignee} name="form-field-name"
-                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                <span>
+                                    <ButtonToAddUsersModal text={"Add another user"}
+                                                     icon={"fa fa-plus"}
+                                                     extraCss={"btn-xs btn-success pull-right"}
+                                                     receivedUser={this.state.users}
+                                                     setUsers={this.setUsers} />
+                                    <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                                                    value={this.parent().assignee} name="form-field-name"
+                                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                </span>
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">

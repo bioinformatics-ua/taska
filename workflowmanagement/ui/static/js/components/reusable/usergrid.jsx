@@ -145,7 +145,7 @@ const UserTable = React.createClass({
         };
     },
     componentWillMount(){
-        if (this.state.users.length == 0)
+        if (this.state.users.length == 0 || this.props.receivedUser != undefined)
             UserActions.loadSimpleListIfNecessary.triggerPromise().then(
                 (users) => {
                     let map = users.results.map(
@@ -164,6 +164,35 @@ const UserTable = React.createClass({
                                 entries: []
                             }
                         );
+
+                        if (this.props.receivedUser != undefined)
+                        {
+                            let new_entries = [];
+                            //Prepare the users to be added
+                            for(var i = 0; i < this.props.receivedUser.length; i += 1)
+                            {
+                                let tmp_user = this.getUserInformation(this.props.receivedUser[i].value);
+                                new_entries.push(tmp_user);
+                            }
+
+                            let tmpSelectedUsers = "";
+                            for(var i = 0; i < this.props.receivedUser.length; i+=1) {
+                                tmpSelectedUsers += this.props.receivedUser[i].value;
+                                if(i < this.props.receivedUser.length-1)
+                                    tmpSelectedUsers += ",";
+                            }
+
+                            //Remove selected users from available users
+                            let filterUsers = this.state.users;
+                            filterUsers = filterUsers.filter(user => (tmpSelectedUsers.indexOf(user.value) === -1));
+
+                            this.setState({
+                                entries: new_entries,
+                                users: filterUsers,
+                                selectedUsers: []
+                            });
+                            this.props.setUsers(new_entries);
+                        }
                     }
                 }
             );
@@ -287,6 +316,7 @@ const UserTable = React.createClass({
     },
     getDefaultProps(){
         return {
+            receivedUser: undefined,
             tableSettings:
                 {   noDataMessage: <center>There are currently no associated resources.</center>,
                     bodyHeight:375,
@@ -306,8 +336,6 @@ const UserTable = React.createClass({
                 "order": 1,
                 "locked": false,
                 "visible": true,
-                //"customComponent": ProcessLink,
-                //"cssClassName": "mystudies-process-title-td",
                 "displayName": "First name"
             },
             {
@@ -315,8 +343,6 @@ const UserTable = React.createClass({
                 "order": 2,
                 "locked": false,
                 "visible": true,
-                //"customComponent": ProcessLink,
-                //"cssClassName": "mystudies-process-title-td",
                 "displayName": "Last name"
             },
             {
@@ -324,8 +350,6 @@ const UserTable = React.createClass({
                 "order": 3,
                 "locked": false,
                 "visible": true,
-                //"customComponent": ProcessLink,
-                //"cssClassName": "mystudies-process-title-td",
                 "displayName": "Email"
             },
             {
@@ -335,7 +359,6 @@ const UserTable = React.createClass({
                 "visible": true,
                 "removeUser": this.removeUser,
                 "customComponent": RemoveButton,
-                //"cssClassName": "mystudies-process-title-td",
                 "displayName": ""
             },
         ];
@@ -384,4 +407,4 @@ const UserTable = React.createClass({
     }
 });
 
-export default {UserTable};
+export default UserTable;

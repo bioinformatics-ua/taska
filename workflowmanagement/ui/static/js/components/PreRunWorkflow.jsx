@@ -5,7 +5,7 @@ import Router from 'react-router';
 import {Link} from 'react-router';
 
 import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
-import {UserTable} from './reusable/usergrid.jsx';
+import UserTable from './reusable/usergrid.jsx';
 import StateActions from '../actions/StateActions.jsx';
 import UserActions from '../actions/UserActions.jsx';
 

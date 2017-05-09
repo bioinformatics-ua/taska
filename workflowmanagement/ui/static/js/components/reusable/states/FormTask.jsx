@@ -2,6 +2,8 @@ import Reflux from 'reflux';
 import React from 'react';
 import {Link} from 'react-router';
 
+import ButtonToAddUsersModal from './ButtonToAddUsersModal.jsx';
+
 import {SimpleTask, dummy} from './SimpleTask.jsx';
 
 import Select from 'react-select';
@@ -45,6 +47,7 @@ class FormTask extends SimpleTask {
         const FormFields = React.createClass({
             getState(){
                 return {
+                    filteredUsers: this.props.main.props.filteredUsers,
                     parent: this.props.main,
                     forms: [],
                 };
@@ -565,25 +568,26 @@ class FormTaskRun extends FormTask{
             componentDidMount(){
                 // For some reason i was getting a refresh loop, when getting the action result from the store...
                 // so exceptionally, i decided to do it directly, the result is still cached anyway
-                UserActions.loadSimpleListIfNecessary.triggerPromise().then(
-                    (users) => {
-                        let map = users.results.map(
-                                    entry => {
-                                        return {
-                                            value: ''+entry.id,
-                                            label: entry.fullname
+                if(this.state.users.length == 0)
+                    UserActions.loadSimpleListIfNecessary.triggerPromise().then(
+                        (users) => {
+                            let map = users.results.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
                                         }
-                                    }
-                        );
-                        if(this.isMounted()){
-                            this.setState(
-                                {
-                                    users: map
-                                }
                             );
+                            if(this.isMounted()){
+                                this.setState(
+                                    {
+                                        users: map
+                                    }
+                                );
+                            }
                         }
-                    }
-                );
+                    );
 
                 if(!this.parent().deadline)
                     this.setDeadline(moment().add(10, 'days').format('YYYY-MM-DDTHH:mm'));
@@ -617,6 +621,15 @@ class FormTaskRun extends FormTask{
 
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, true);
+            },
+            setUsers(list){
+                let map = list.map(entry => {
+                                    return {
+                                        value: ''+entry.id,
+                                        label: entry.fullname
+                                    }
+                    });
+                this.setState({users: map});
             },
             render(){
                 let users;
@@ -652,9 +665,16 @@ class FormTaskRun extends FormTask{
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
 
                             {this.state.users.length > 0?
-                            <Select onChange={this.setAssignee} placeholder="Search for assignees"
-                            value={this.parent().assignee} name="form-field-name"
-                            multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                <span>
+                                    <ButtonToAddUsersModal text={"Add another user"}
+                                                     icon={"fa fa-plus"}
+                                                     extraCss={"btn-xs btn-success pull-right"}
+                                                     receivedUser={this.state.users}
+                                                     setUsers={this.setUsers} />
+                                    <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                                                    value={this.parent().assignee} name="form-field-name"
+                                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                </span>
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">
