@@ -26,6 +26,7 @@ def newNotification(tcn, sender, instance, **kwargs):
         sendEmail.apply_async([tci], countdown=5)  # Descomentar esta linha
         #sendEmail(tci) #Usado para enviar emails pelo djnago sem usar o celery
     except AttributeError as e:
+        #print e
         # print e #Used to help when I want to do debug
         # Silently ignore, when the template is not defined we just don't send the notification
         # i personally  think it makes sense not sending an email notification if theres no template
@@ -63,6 +64,11 @@ def defineHistoryTci(instance, tc):
         tci = tc(instance, instance.authorized.all())
     else:
         tci = tc(instance, instance.authorized.filter(profile__notification=True))
+
+    # UserRecovery
+    if isinstance(instance.object, UserRecovery):
+        if instance.event == History.INVITE:
+            return tc(instance, [instance.object.user])
 
     # Set receivers based on template
     # USER

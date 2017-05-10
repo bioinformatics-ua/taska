@@ -350,11 +350,6 @@ export default React.createClass({
                         </div>
                         :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
                     }
-/*
-                    saveLabel={params.mode === 'run'?
-                        <span><i className="fa fa-play"></i> Run</span>
-                            :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
-                    }*/
                     initialSm={sm}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}

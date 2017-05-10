@@ -366,7 +366,8 @@ class UserViewSet(viewsets.ModelViewSet):
                         usr['first_name'] = usr['firstName']
                         usr['last_name'] = usr['lastName']
                     except:
-                        pass #The user could not pass this informations so it will be empty and raises a exception
+                        usr['first_name'] = ""
+                        usr['last_name'] = ""
 
                     usr['username'] = email[:30]
                     usr['email'] = email
@@ -383,8 +384,11 @@ class UserViewSet(viewsets.ModelViewSet):
                         new_user.save()
                         userList += [new_user]
 
+                        ur = UserRecovery(user=new_user)
+                        ur.save()
+
                         History.new(event=History.INVITE, actor=request.user,
-                                    object=new_user, authorized=User.objects.filter(is_staff=True))
+                                    object=ur, authorized=[new_user])
             else:
                 return Response({
                         'error': "Email are mandatory fields on registering a new user"

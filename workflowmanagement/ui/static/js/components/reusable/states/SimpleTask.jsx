@@ -696,6 +696,7 @@ class SimpleTaskRun extends SimpleTask{
                 this.props.dataChange(self.getIdentificator(), data, true);
             },
             setUsers(list){
+                console.log(this.props);
                 let map = list.map(entry => {
                                     return {
                                         value: ''+entry.id,
@@ -726,7 +727,7 @@ class SimpleTaskRun extends SimpleTask{
                 catch(ex){
                     allow_sbe = false;
                 }
-
+                console.log(this.state.users);
                 return <span>
                     <label title="Choose if the task can run without all the users having finished their dependent tasks.">Users can start tasks independently</label>
                         <div className="form-group">
@@ -737,17 +738,17 @@ class SimpleTaskRun extends SimpleTask{
                         </div>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-                            {this.state.users.length > 0?
-                                <span>
-                                    <ButtonToAddUsersModal text={"Add another user"}
+                            {!this.parent().disabled ?
+                                <ButtonToAddUsersModal text={"Add another user"}
                                                      icon={"fa fa-plus"}
                                                      extraCss={"btn-xs btn-success pull-right"}
                                                      receivedUser={this.state.users}
                                                      setUsers={this.setUsers} />
+                                : ''}
+                            {this.state.users.length > 0?
                                     <Select onChange={this.setAssignee} placeholder="Search for assignees"
                                                     value={this.parent().assignee} name="form-field-name"
                                                     multi={true} options={this.state.users} disabled={this.parent().disabled} />
-                                </span>
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">

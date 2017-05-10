@@ -663,18 +663,17 @@ class FormTaskRun extends FormTask{
                         </div>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
-
-                            {this.state.users.length > 0?
-                                <span>
-                                    <ButtonToAddUsersModal text={"Add another user"}
+                            {!this.parent().disabled ?
+                                <ButtonToAddUsersModal text={"Add another user"}
                                                      icon={"fa fa-plus"}
                                                      extraCss={"btn-xs btn-success pull-right"}
                                                      receivedUser={this.state.users}
                                                      setUsers={this.setUsers} />
-                                    <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                            : ''}
+                            {this.state.users.length > 0?
+                                <Select onChange={this.setAssignee} placeholder="Search for assignees"
                                                     value={this.parent().assignee} name="form-field-name"
                                                     multi={true} options={this.state.users} disabled={this.parent().disabled} />
-                                </span>
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">
