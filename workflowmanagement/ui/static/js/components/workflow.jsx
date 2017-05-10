@@ -365,6 +365,7 @@ export default React.createClass({
                     selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run' ? true: false}
 
                     filteredUsers={this.state.filteredUsers}
+                    setFilteredUsers={this.setFilteredUsers}
 
 
                     {...this.props}/>

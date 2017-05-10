@@ -623,7 +623,8 @@ class FormTaskRun extends FormTask{
                 this.props.dataChange(self.getIdentificator(), data, true);
             },
             setUsers(list){
-                let map = list.map(entry => {
+                this.props.main.props.setFilteredUsers(list);
+                let map = this.props.main.props.filteredUsers.map(entry => {
                                     return {
                                         value: ''+entry.id,
                                         label: entry.fullname
