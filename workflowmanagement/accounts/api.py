@@ -345,6 +345,60 @@ class UserViewSet(viewsets.ModelViewSet):
             'error': "Email and password are mandatory fields on registering a new user"
         })
 
+    @list_route(methods=['post'])#, permission_classes=[permissions.AllowAny]
+    def invite(self, request):
+        '''
+            Allows a user to register anothers users. Being then put on a waiting list to be approved.
+        '''
+        userList = []
+        for usr in request.data:
+            email = usr.get('email', None)
+            password = "12345" #Default password, the user will be notice to change it. This needs to be changed
+
+            if email != None:
+                email = email.lower()
+
+                try:
+                    usr = User.objects.get(email=email)
+                    userList += [usr]
+                except User.DoesNotExist:
+                    try:
+                        usr['first_name'] = usr['firstName']
+                        usr['last_name'] = usr['lastName']
+                    except:
+                        usr['first_name'] = ""
+                        usr['last_name'] = ""
+
+                    usr['username'] = email[:30]
+                    usr['email'] = email
+                    usr['profile'] = {'detail_mode': Profile.get_default_detail_mode()}
+
+                    serializer = UserSerializer(data=usr)
+                    valid = serializer.is_valid(raise_exception=True)
+
+                    if valid:
+                        new_user = serializer.save()
+
+                        new_user.set_password(password)
+                        new_user.is_active = True  #I decide let the userbe active in the first place because this is a invite
+                        new_user.save()
+                        userList += [new_user]
+
+                        ur = UserRecovery(user=new_user)
+                        ur.save()
+
+                        History.new(event=History.INVITE, actor=request.user,
+                                    object=ur, authorized=[new_user])
+            else:
+                return Response({
+                        'error': "Email are mandatory fields on registering a new user"
+                    })
+        serializer_context = {
+                'request': request,
+            }
+        serializerAll = UserSerializer(userList, many=True, context=serializer_context)
+        return Response(serializerAll.data)
+
     @list_route(methods=['post'], permission_classes=[permissions.AllowAny])
     def recover(self, request):
         ''' Allows users to ask for password recovery(which needs to be confirmed).

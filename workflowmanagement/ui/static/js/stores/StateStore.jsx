@@ -46,6 +46,7 @@ export default Reflux.createStore({
     },
 
     onAlert(options){
+        console.log(options);
         this.__alert_queue.push(options);
         this.trigger();
     },

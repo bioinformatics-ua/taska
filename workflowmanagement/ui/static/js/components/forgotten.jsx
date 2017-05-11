@@ -49,11 +49,11 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.recovered==true){
-            this.context.router.transitionTo('default');
             StateActions.alert({
                 'title': 'Password sent',
                 'message': 'An email has been sent, with the new password. Please consult your email.'
-            })
+            });
+            this.context.router.transitionTo('home');
         }
     },
     render: function () {

@@ -2,6 +2,8 @@ import Reflux from 'reflux';
 import React from 'react';
 import {Link} from 'react-router';
 
+import ButtonToAddUsersModal from './ButtonToAddUsersModal.jsx';
+
 import {SimpleState} from '../../../react-statemachine/classes.jsx';
 
 import Select from 'react-select';
@@ -43,7 +45,7 @@ class SimpleTask extends SimpleState {
         return 'Simple Task';
     }
     static title(){
-        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
+        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -51,6 +53,7 @@ class SimpleTask extends SimpleState {
         const SimpleFields = React.createClass({
             getState(){
                 return {
+                    filteredUsers: this.props.main.props.filteredUsers,
                     parent: this.props.main
                 };
             },
@@ -300,9 +303,21 @@ class SimpleTaskRun extends SimpleTask{
                     alreadyusers = [];
                 }
 
+                let filteredUsers = [];
+                if(this.props.main.props.filteredUsers != undefined){
+                    filteredUsers = this.props.main.props.filteredUsers.map(
+                                        entry => {
+                                            return {
+                                                value: ''+entry.id,
+                                                label: entry.fullname
+                                            }
+                                        }
+                            );
+                }
+
                 return {
                     parent: this.props.main,
-                    users: [],
+                    users: filteredUsers,
                     new_assignee: undefined,
                     new_reassigning: undefined,
                     oldUser: undefined,
@@ -680,6 +695,16 @@ class SimpleTaskRun extends SimpleTask{
                 this.state.parent.setState(data);
                 this.props.dataChange(self.getIdentificator(), data, true);
             },
+            setUsers(list){
+                this.props.main.props.setFilteredUsers(list);
+                let map = this.props.main.props.filteredUsers.map(entry => {
+                                    return {
+                                        value: ''+entry.id,
+                                        label: entry.fullname
+                                    }
+                    });
+                this.setState({users: map});
+            },
             render(){
                 let users;
                 try{
@@ -713,10 +738,17 @@ class SimpleTaskRun extends SimpleTask{
                         </div>
                     <div key="state-assignee" className="form-group">
                         <label for="state-assignee">Assignees <i title="This field is mandatory" className=" text-danger fa fa-asterisk" /></label>
+                            {!this.parent().disabled ?
+                                <ButtonToAddUsersModal text={"Add another user"}
+                                                     icon={"fa fa-plus"}
+                                                     extraCss={"btn-xs btn-success pull-right"}
+                                                     receivedUser={this.state.users}
+                                                     setUsers={this.setUsers} />
+                                : ''}
                             {this.state.users.length > 0?
-                                <Select onChange={this.setAssignee} placeholder="Search for assignees"
-                                    value={this.parent().assignee} name="form-field-name"
-                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
+                                    <Select onChange={this.setAssignee} placeholder="Search for assignees"
+                                                    value={this.parent().assignee} name="form-field-name"
+                                                    multi={true} options={this.state.users} disabled={this.parent().disabled} />
                             :''}
                     </div>
                     <div key="state-deadline" className="form-group">

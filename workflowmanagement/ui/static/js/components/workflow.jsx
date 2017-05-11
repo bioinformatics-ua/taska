@@ -26,6 +26,8 @@ import {SimpleTask, SimpleTaskRun} from './reusable/states/SimpleTask.jsx';
 
 import {FormTask, FormTaskRun} from './reusable/states/FormTask.jsx';
 
+import PreRunWorkflow from './PreRunWorkflow.jsx';
+
 const RunLabel = React.createClass({
     render(){
         return <span>
@@ -111,6 +113,9 @@ export default React.createClass({
             user: UserStore.getUser(),
             notificationsDetail: this.getDefaultNotificationsDetail(),
             editedWorkflow: WorkflowStore.getWorkflowEditFinished(),
+            filteredUsers:[],
+            message:"",
+            mode: undefined
         }
     },
     getDefaultNotificationsDetail(){
@@ -195,6 +200,15 @@ export default React.createClass({
     save(data){
         WorkflowActions.setWorkflow(data);
     },
+    setMessage(message){
+        this.setState({message:message});
+    },
+    setFilteredUsers(users){
+        this.setState({filteredUsers: users});
+    },
+    transitToWorkflowRun(){
+        this.setState({mode:'run'});
+    },
     setPublic(e){
         WorkflowActions.setPublic(e.target.checked);
     },
@@ -264,11 +278,16 @@ export default React.createClass({
 
         let params = this.context.router.getCurrentParams();
 
-        if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run'))
+        if (this.state.mode != undefined)
+            params.mode = this.state.mode;
+
+        if(params.mode && !(params.mode === 'edit' || params.mode === 'view' || params.mode === 'run' || params.mode === 'prerun'))
             this.context.router.replaceWith('/404');
 
         let sm = this.load(params.mode === 'run' );
-
+        if(params.mode === 'prerun')
+            return <PreRunWorkflow transitToWorkflowRun={this.transitToWorkflowRun} setMessage={this.setMessage} setFilteredUsers={this.setFilteredUsers} {...this.state} {...this.props}/>;
+        else
         return (
             <span>
                 {this.state.missing.length > 0?
@@ -331,11 +350,6 @@ export default React.createClass({
                         </div>
                         :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
                     }
-/*
-                    saveLabel={params.mode === 'run'?
-                        <span><i className="fa fa-play"></i> Run</span>
-                            :<span><i className="fa fa-floppy-o"></i> &nbsp;Save Study</span>
-                    }*/
                     initialSm={sm}
                     detailMode={this.state.user.profile['detail_mode']}
                     detailHelp={this.helpMap(params.mode).detail}
@@ -349,6 +363,9 @@ export default React.createClass({
                     savebar={!params.mode || params.mode === 'view'? false: true}
 
                     selectFirst={!params.mode || params.mode === 'view' || params.mode === 'run' ? true: false}
+
+                    filteredUsers={this.state.filteredUsers}
+                    setFilteredUsers={this.setFilteredUsers}
 
 
                     {...this.props}/>

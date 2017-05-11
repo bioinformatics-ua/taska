@@ -74,7 +74,7 @@ export default React.createClass({
             this.context.router.transitionTo('default');
             StateActions.alert({
                 'title': 'User registered with success',
-                'message': 'The user has been registered successfully, and the decision about approval will be briefly communicated by email by the administrators.'
+                'message': 'Your registration has ben submitted successfully. The approval decision will be briefly communicated by the administrators to your e-mail.'
             })
         }
     },

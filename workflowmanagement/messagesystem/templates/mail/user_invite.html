@@ -1,0 +1,21 @@
+{% extends "mail/common.html" %}
+
+{% block header %}
+{{object.email}} invited
+{% endblock %}
+
+{% block body %}
+Dear {{ user }},<br /><br />
+
+You have been invited by {{ sender }} to join TASKA.
+<br /><br />
+
+TASKA is a system for creating and managing studies. A study is a running instance of a workflow. The workflow is designated in the system as a study template.
+<br /><br />
+
+You can complete your registration through this <a href="{{settings.EMAIL_URL}}/changepassword/{{object.hash}}">link</a>.
+<br /><br />
+
+Best Regards,<br />
+Taska
+{% endblock %}

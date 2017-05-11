@@ -35,6 +35,10 @@ class Profile(models.Model):
         '''
         return u"User profile for %s" % self.user
 
+    @staticmethod
+    def get_default_detail_mode():
+        return Profile.LEFT
+
 @receiver(models.signals.post_save, sender=User)
 def __generate_profile(sender, instance, created, *args, **kwargs):
     '''This method uses the post_save signal to automatically generate a profile for new users.

@@ -26,6 +26,7 @@ export default Reflux.createStore({
         this.__loginfail = false;
         this.__success_register = false;
         this.__success_recover = false;
+        this.__userInvitated = false;
     },
     getUser(){
 
@@ -106,8 +107,8 @@ export default Reflux.createStore({
         if(pass && pass.trim() != ''
             && pass != this.__detaildata['confirm_password'].trim()){
             StateActions.alert({
-                'title':"Password doesn't match",
-                'message': "The password and the confirmation of password entered don't match."
+                'title':"The passwords don't match",
+                'message': "The entered password and confirmation password don't match."
             });
         } else {
             let data = {
@@ -129,6 +130,30 @@ export default Reflux.createStore({
     },
     isEmail(email){
             return /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/.test( email );
+    },
+    onInvite(users, setFilteredUsers, transitToWorkflowRun){
+        // Remove entry field
+        for(var index = 0; index < users.length ; index ++)
+            delete users[index].entry;
+
+        if(users.length > 0)
+        {
+            this.onMethodDetail('invite', undefined, 'POST', users).then(
+                (data) => {
+                    this.__userInvitated = true;
+                    setFilteredUsers(data);
+                    this.trigger();
+                    transitToWorkflowRun();
+            });
+        }
+    },
+    getUserInvitationResult(){
+        if(this.__userInvitated)
+        {
+            this.__userInvitated = false; //I did this to avoid problems when i do go back on pages
+            return true;
+        }
+        return this.__userInvitated;
     },
     onRegisterUser(){
 

@@ -58,11 +58,11 @@ export default React.createClass({
     },
     componentDidUpdate(){
         if(this.state.recovered==true){
-            this.context.router.transitionTo('default');
             StateActions.alert({
                 'title': 'Password changed',
                 'message': 'The password has been changed. Please login with the new password.'
-            })
+            });
+            this.context.router.transitionTo('home');
         }
     },
     render: function () {

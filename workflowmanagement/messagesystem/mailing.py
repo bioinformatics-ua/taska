@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 import html2text
 
+from accounts.models import *
 from process.models import Process, Request, ProcessTaskUser
 from history.models import *
 from messagesystem.models import Message
@@ -53,6 +54,17 @@ class MailTemplate:
                 pass
 
             # Some adjustments for each template
+            # User
+            if isinstance(self.instance.object, User):
+                sender = self.instance.actor
+                user = self.instance.object
+
+            #UserRecovery
+            if isinstance(self.instance.object, UserRecovery):
+                if self.instance.event == History.INVITE:
+                    sender = self.instance.actor
+                    user = self.instance.object.user
+
             # Process
             if isinstance(self.instance.object, Process):
                 # process_cancel or process_done
@@ -69,7 +81,6 @@ class MailTemplate:
 
             #Request
             if isinstance(self.instance.object, Request):
-
                 task = self.instance.object.processtaskuser.processtask.task.title
                 executioner = self.instance.object.processtaskuser.processtask.process.executioner
                 user = self.instance.object.processtaskuser.user

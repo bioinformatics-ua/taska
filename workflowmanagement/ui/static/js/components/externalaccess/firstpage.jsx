@@ -4,6 +4,7 @@ import React from 'react/addons';
 import {SpecialWorkflowTable} from './specialworkflows.jsx';
 import {ExternalUserTable} from './usergrid.jsx';
 import UserStore from '../../stores/UserStore.jsx';
+import UserActions from '../../actions/UserActions.jsx';
 import StateActions from '../../actions/StateActions.jsx';
 
 import {Authentication} from '../../mixins/component.jsx';
@@ -24,11 +25,13 @@ const LoggedInHome = React.createClass({
             user: UserStore.getUser(),
             message: "",
             users: [],
-            studyTemplate: ""
+            studyTemplate: "",
         }
     },
     contextTypes: {
         router: React.PropTypes.func.isRequired
+    },
+    componentWillMount(){
     },
     getInitialState(){
         return this.__getState();
@@ -51,13 +54,19 @@ const LoggedInHome = React.createClass({
             });
         }
         else {
-            this.context.router.transitionTo('WorkflowEdit', {object: this.state.studyTemplate, mode:'run'});
+            UserActions.invite(this.state.users);
+            console.log("invited");
         }
+    },
+    componentDidUpdate(){
+        if(UserStore.getUserInvitationResult())
+            this.context.router.transitionTo('WorkflowEdit', {object: this.state.studyTemplate, mode:'run'});
     },
     setStudyTemplate(e){
         this.setState({studyTemplate: e});
     },
     setUsers(list){
+        this.setState({users: []});
         this.setState({users: list});
     },
     render: function () {
