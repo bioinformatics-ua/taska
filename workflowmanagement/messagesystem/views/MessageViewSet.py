@@ -17,6 +17,6 @@ class MessageViewSet(CreateAPIView):
     def perform_create(self, serializer):
         if serializer.is_valid():
             serializer.save(sender=self.request.user)
-            
+
 
 

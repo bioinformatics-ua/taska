@@ -47,7 +47,7 @@ module.exports = (
             
         <Route name="StudyRequests" path="studyRequests/:object" handler={require('./components/requests/StudyRequests.jsx')} />
 
-        <Route name="MessageSender" path="messageSender/:hash/:object" handler={require('./components/requests/RequestCreator.jsx')} />
+        <Route name="MessageSender" path="messageSender/:hash/:object" handler={require('./components/messages/messenger.jsx')} />
 
         <Route name="MyRequests" handler={require('./components/requests/MyRequests.jsx')} />
             

@@ -128,21 +128,33 @@ class ListLoader extends Loader{
         this.__loaded = {};
         this.model = options.model;
         this.dontrepeat = options.dontrepeat || false;
+        this.withparams = options.withparams || false;
     }
 
     load(callback, state){
         if(state.reload == true)
             this.__loaded = {};
+        console.log(callback);
+        if(this.withparams){
+            this.__loaded[state.currentPage] = true;
+
+            let order = (state.externalSortAscending)? '':'-';
+
+            return super.load(
+                `api/${this.model}&page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
+                callback
+                );
+        }
 
         if(!this.dontrepeat || this.__loaded[state.currentPage] === undefined || (this.dontrepeat && !(state.reload === undefined))){
-                this.__loaded[state.currentPage] = true;
+            this.__loaded[state.currentPage] = true;
 
-                let order = (state.externalSortAscending)? '':'-';
+            let order = (state.externalSortAscending)? '':'-';
 
-                return super.load(
-                    `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
-                    callback
-                    );
+            return super.load(
+                `api/${this.model}/?page=${state.currentPage+1}&ordering=${order}${state.externalSortColumn}`,
+                callback
+                );
         }
     }
 }

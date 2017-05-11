@@ -156,7 +156,7 @@ export default React.createClass({
                                       identificator = {false}
                                       deleteLabel= {<span><i className="fa fa-ban" /> Cancel</span>}
                                       title={`Cancel ${this.state.process['object_repr']}`}
-                                      message={`Are you sure you want to cancel  ${this.state.process['object_repr']} ?`}  />
+                                      message={`Are you sure you want to cancel the study ${this.state.process['object_repr']} ?`}  />
                                       : this.state.process.status === 5 ?
                                     <div className="btn-group" role="group">
                                         <DeleteButton

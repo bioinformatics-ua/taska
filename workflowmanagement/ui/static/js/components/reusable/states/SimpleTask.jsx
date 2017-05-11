@@ -45,7 +45,7 @@ class SimpleTask extends SimpleState {
         return 'Simple Task';
     }
     static title(){
-        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
+        return "Do you know what is a simple tasks? It is a task that have inputs and outputs files, descriptions and comments.";
     }
 
     detailRender(editable=true, ChildComponent=dummy){
@@ -727,7 +727,7 @@ class SimpleTaskRun extends SimpleTask{
                 catch(ex){
                     allow_sbe = false;
                 }
-                console.log(this.state.users);
+
                 return <span>
                     <label title="Choose if the task can run without all the users having finished their dependent tasks.">Users can start tasks independently</label>
                         <div className="form-group">

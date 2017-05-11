@@ -107,8 +107,8 @@ export default Reflux.createStore({
         if(pass && pass.trim() != ''
             && pass != this.__detaildata['confirm_password'].trim()){
             StateActions.alert({
-                'title':"Password doesn't match",
-                'message': "The password and the confirmation of password entered don't match."
+                'title':"The passwords don't match",
+                'message': "The entered password and confirmation password don't match."
             });
         } else {
             let data = {
