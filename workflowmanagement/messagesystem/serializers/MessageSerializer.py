@@ -4,7 +4,7 @@ from messagesystem.models import Message
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
-from accounts.api import UserSerializer
+from accounts.serializers.UserSerializer import UserSerializer
 
 from messagesystem.views.MessageListUsersView import MessageListUsersView
 

@@ -7,13 +7,13 @@
 from django.conf.urls import patterns, include, url
 from rest_framework import routers
 
-import api
+#import api
+from views.UserViewSet import UserViewSet
 
-from userstest import *
 from proxy import ProxyView
 
 router = routers.DefaultRouter()
-router.register(r'', api.UserViewSet)
+router.register(r'', UserViewSet)
 
 # trick to add root to the router generated urls
 router_tricks = router.urls
@@ -21,10 +21,7 @@ router_tricks = router.urls
 urlpatterns = patterns('',
     url(r'^', include(router_tricks)),
     url(r'^/externalservice/getUsers/$', ProxyView.as_view({'get':'get_users'})),
-    url(r'^/externalservice/getQuestionnaire/$', ProxyView.as_view({'get':'get_questionnaire'})),
-
-    #Temp, delete after use it
-    url(r'^/m/getExternalUsers/$', MyRESTView.as_view()),
+    url(r'^/externalservice/getQuestionnaire/$', ProxyView.as_view({'get':'get_questionnaire'}))
 )
 
 
