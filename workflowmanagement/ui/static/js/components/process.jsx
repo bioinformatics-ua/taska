@@ -208,7 +208,7 @@ export default React.createClass({
                                         </small>
                                         <small>
                                             <Link to="MessageSender" params={{hash: params.object, object: 'process'}}>
-                                                 <i className="fa fa-envelope"></i> Send message
+                                                 <i className="fa fa-envelope"></i> Messages
                                             </Link>
                                         </small>
                                     </span>}

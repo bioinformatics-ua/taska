@@ -199,6 +199,9 @@ table {
 .date-td{
   width: 120px;
 }
+.messgae-date-td{
+  width: 160px;
+}
 .status-td{
   width: 260px;
 }

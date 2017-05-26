@@ -104,12 +104,6 @@ const RequestTable = React.createClass({
                     <div className="panel-heading">
                         <i className="fa fa-life-ring pull-left"></i>
                         <h3 className="text-center panel-title">Received Requests</h3>
-                        <Link style={{position: 'absolute', right: '10px', top: '7px', zIndex: 1002}}
-                              to="MessageSender"
-                              params={{hash: this.props.hash, object: 'process'}}
-                              className="pull-right btn btn-xs btn-success">
-                             <i className="fa fa-envelope"></i> Send message
-                        </Link>
                       </div>
                     <Griddle
                         noDataMessage={<center>You have no requests made by assignees.</center>}

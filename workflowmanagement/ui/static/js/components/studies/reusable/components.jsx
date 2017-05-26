@@ -76,7 +76,7 @@ const ProcessLinkSendMessage = React.createClass({
         const row = this.props.rowData;
         return this.props.rowData.owner ? <small>
                     <Link to="MessageSender" params={{hash: row.hash, object: 'process'}}>
-                        <i className="fa fa-envelope"></i> Send message
+                        <i className="fa fa-envelope"></i> Messages
                     </Link>
                 </small>:<span></span>;
     }
