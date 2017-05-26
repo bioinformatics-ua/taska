@@ -6,11 +6,11 @@
 
 {% block body %}
 
-Dear {% if user.first_name %}{{ user.first_name}} {{ user.last_name}}{% else %}{{user.email}}{% endif %},<br /><br />
+Dear {{ user }},<br /><br />
 
 This email is meant to inform you that the user {{object.email}} has just registered and is waiting approval from one of the administrators.
 <br /><br />
-{% if user.is_staff or user.is_superuser %}
+{% if userObj.is_staff or userObj.is_superuser %}
 To approve this user please click <a href="{{settings.EMAIL_URL}}/{{settings.API_ACTIVATE_URL}}{{object.email}}">here</a>.
 {% endif %}
 Best Regards,<br />
