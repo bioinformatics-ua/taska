@@ -166,7 +166,7 @@ const CurrentTaskTable = React.createClass({
                 "order": 8,
                 "locked": true,
                 "visible": true,
-                "cssClassName": 'deadline-td',
+                "cssClassName": 'requests-td',
                 "customComponent": TaskRequests,
                 "displayName": "Requests"
             },

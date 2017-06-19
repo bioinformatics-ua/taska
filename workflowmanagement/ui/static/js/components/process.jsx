@@ -9,7 +9,9 @@ import moment from 'moment';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal, ProcessStatus, DeleteButton, RunButton, ProcessLabel} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 

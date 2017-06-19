@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, Affix} from './reusable/component.jsx';
+import {Modal, Affix} from './reusable/component.jsx';
 
 import FormActions from '../actions/FormActions.jsx';
 

@@ -223,6 +223,9 @@ table {
 .deadline-td{
   width: 130px;
 }
+.requests-td{
+  width: 80px;
+}
 .start-date-td{
   width: 130px;
 }

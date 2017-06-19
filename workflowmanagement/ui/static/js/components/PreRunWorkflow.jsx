@@ -4,7 +4,8 @@ import React from 'react';
 import Router from 'react-router';
 import {Link} from 'react-router';
 
-import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal} from './reusable/component.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 import UserTable from './reusable/usergrid.jsx';
 import StateActions from '../actions/StateActions.jsx';
 import UserActions from '../actions/UserActions.jsx';

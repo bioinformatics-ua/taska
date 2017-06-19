@@ -8,7 +8,9 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import StateActions from '../actions/StateActions.jsx';

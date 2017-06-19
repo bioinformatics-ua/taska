@@ -8,7 +8,7 @@ import {Link, browserHistory} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, AcceptRejectButton, Affix} from './reusable/component.jsx';
+import {Modal, AcceptRejectButton, Affix} from './reusable/component.jsx';
 
 import StateActions from '../actions/StateActions.jsx';
 

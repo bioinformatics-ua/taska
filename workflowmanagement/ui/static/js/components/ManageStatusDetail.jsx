@@ -5,7 +5,9 @@ import React from 'react/addons';
 import Reflux from 'reflux';
 
 import {StatusDetailTable} from './tasks/statusdetail.jsx';
-import {ReassigningButton, ProcessLabel, ProcessDetailBar, PermissionsBar} from './reusable/component.jsx';
+import {ReassigningButton, ProcessLabel} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import ProcessStore from '../stores/ProcessStore.jsx';
 import WorkflowStore from '../stores/WorkflowStore.jsx';
