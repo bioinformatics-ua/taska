@@ -5,6 +5,7 @@ import Router from 'react-router';
 import {Link} from 'react-router';
 
 import {Modal} from './reusable/component.jsx';
+import Reminders from './reusable/Reminders.jsx'
 import PermissionsBar from './process/PermissionsBar.jsx';
 import UserTable from './reusable/usergrid.jsx';
 import StateActions from '../actions/StateActions.jsx';
@@ -17,7 +18,12 @@ export default React.createClass({
     __getState(){
         return {
             message: "",
-            users: []
+            users: [],
+            reminders: {
+                before: "",
+                after: "",
+                repeatUpTo: null
+            }
         }
     },
     getInitialState(){
@@ -30,6 +36,9 @@ export default React.createClass({
     setUsers(list){
         this.setState({users: list});
     },
+    setReminders(reminders){
+        this.setState({reminders: reminders});
+    },
     setMessage(e){
         this.setState({message: e.target.value});
     },
@@ -41,14 +50,21 @@ export default React.createClass({
                 'message': "Add some users to participate in the study before heading to next step."
             });
         }
-        else {
+        else if((this.state.reminders.after != 0 && this.state.reminders.repeatUpTo == null) || (this.state.reminders.after == 0 && this.state.reminders.repeatUpTo != null)){
+            StateActions.alert({
+                'title': "Reminders were selected incorrectly",
+                'message': "To set up a reminder after deadline you need to fill both fields"
+            });
+        }
+        else{
             this.props.setMessage(this.state.message);
+            this.props.setRemindersConfig(this.state.reminders);
             UserActions.invite(this.state.users, this.props.setFilteredUsers, this.props.transitToWorkflowRun);
         }
     },
     render(){
         let params = this.context.router.getCurrentParams();
-        return <span><div>
+        return <span><div className="status-detail">
                 <div className="row">
                     <div className="col-md-12">
                         <div className="form-group">
@@ -78,16 +94,21 @@ export default React.createClass({
                 <hr />
 
                 <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-6">
                         <UserTable hash={""} setUsers={this.setUsers}/>
                     </div>
-                    {/*<div className="col-md-6">
-
-                        <textarea onChange={this.setMessage} rows="7"
-                              className="form-control" value={this.state.message}
-                              placeholder="Write a study introduction there (Optional)"/>
-
-                    </div>*/}
+                    <div className="col-md-6">
+                        <div className="row">
+                            {/*<div>
+                                <p>You can write a small introduction to help users to understand the purpose of the study.</p>
+                            </div>
+                            <textarea onChange={this.setMessage} rows="7"
+                                  className="form-control" value={this.state.message}
+                                  placeholder="Write a study introduction there (Optional)"/>
+                            <br />*/}
+                        </div>
+                        <Reminders setReminders={this.setReminders}/>
+                    </div>
                 </div>
                 <div className="row">
                     <div className="col-md-12">

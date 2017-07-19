@@ -181,6 +181,12 @@ class Process(models.Model):
         except ZeroDivisionError:
             return 0
 
+    def changeReminders(self, reminders):
+        self.days_after_delay = reminders.get('after')
+        self.send_notification_until = reminders.get('repeatUpTo')
+        self.days_before_delay = reminders.get('before')
+        self.save()
+
     def start(self):
         ptasks = self.tasks()
 

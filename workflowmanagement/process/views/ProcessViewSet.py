@@ -265,6 +265,19 @@ class ProcessViewSet(mixins.CreateModelMixin,
         return Response(ProcessSerializer(self.get_object()).data)
 
     @detail_route(methods=['post'])
+    def changereminders(self, request, hash=None):
+        """
+        Change reminders configs
+        """
+        process = self.get_object()
+
+        reminders = request.data['reminders']
+
+        process.changeReminders(reminders)
+
+        return Response(ProcessSerializer(self.get_object()).data)
+
+    @detail_route(methods=['post'])
     def refine(self, request, hash=None):
         """
             Reverts a specific user task on a process task.

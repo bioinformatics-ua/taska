@@ -160,7 +160,7 @@ export default React.createClass({
                     toggleDisabled={true}
                     numDaysBefore={this.state.process['days_before_delay']}
                     numDaysAfter={this.state.process['days_after_delay']}
-                    defaultDate={moment(this.state.process['send_notification_until']).toDate()}
+                    sendNotificationUntil={moment(this.state.process['send_notification_until']).toDate()}
 
                     startDate={this.state.process['start_date']}
                     endDate={this.state.process['end_date'] || '---'}

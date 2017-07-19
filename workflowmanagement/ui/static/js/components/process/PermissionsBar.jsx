@@ -2,6 +2,8 @@
 import Router from 'react-router';
 import React from 'react';
 import Toggle from 'react-toggle';
+import {Link} from 'react-router';
+import {DeleteButton} from '../reusable/component.jsx';
 
 
 export default  React.createClass({

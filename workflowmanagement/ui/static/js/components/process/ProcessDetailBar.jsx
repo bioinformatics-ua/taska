@@ -4,8 +4,10 @@ import Router from 'react-router';
 import React from 'react';
 import Select from 'react-select';
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
+import moment from 'moment';
 
 import {ProcessStatus} from '../reusable/component.jsx'
+import ReminderButton from '../reusable/buttons/ReminderButton.jsx'
 
 export default React.createClass({
     getDefaultProps() {
@@ -21,7 +23,6 @@ export default React.createClass({
         };
     },
     getState(){
-        console.log(this.props.numDaysAfter);
         return {
             numDaysBefore: this.props.numDaysBefore != 0 ? this.props.numDaysBefore.toString() : this.props.numDaysBefore,
             numDaysAfter: this.props.numDaysAfter != 0 ? this.props.numDaysAfter.toString() : this.props.numDaysAfter,
@@ -53,6 +54,9 @@ export default React.createClass({
         this.setState({ sendNotificationUntil: e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm') });
         this.props.setNotification(this.state.numDaysBefore, this.state.numDaysAfter, e==null ? null : moment(e).format('YYYY-MM-DDTHH:mm'));
     },
+    openReminders(){
+        console.log(this.state);
+    },
     render(){
         var optionsBeforeDeadline = [
             { value: "1", label: '1 day' },
@@ -65,7 +69,12 @@ export default React.createClass({
         ];
         //I did it that way because in the future I can change the options more easily
         var optionsAfterDeadline = optionsBeforeDeadline;
-
+        console.log(this.state);
+        var processReminderConfigs = {
+            before: this.state.numDaysBefore,
+            after: this.state.numDaysAfter,
+            repeatUpTo: this.state.sendNotificationUntil
+        };
         return(<div>
                 <div className="row">
                     <div className="col-md-12">
@@ -76,104 +85,42 @@ export default React.createClass({
                     <div className="col-md-6">
                         <div className="form-group">
                             <div className="input-group">
-                                            <span className="input-group-addon" id="startdate">
-                                                <strong>Start Date</strong>
-                                            </span>
+                                <span className="input-group-addon" id="startdate">
+                                    <strong>Start Date</strong>
+                                </span>
                                 <input className="form-control" readOnly value={this.state.startDate}/>
                             </div>
                         </div>
                     </div>
-                </div>
-                {this.state.numDaysBefore != 0 || this.props.createProcess ?
-                    <div className="row">
-                        <div className="col-md-2"></div>
-                        <div className="col-md-8">
-                            <div className="form-group">
-                                <div className="input-group">
-                                    <span className="delay-notification input-group-addon"
-                                          id="remainder-before"><strong>Reminder before deadline</strong></span>
-                                    <Select placeholder="Nº of days"
-                                            name="form-field-name"
-                                            value={this.state.numDaysBefore}
-                                            options={optionsBeforeDeadline}
-                                            onChange={this.setNumDaysBefore}
-                                            disabled={this.state.disabled}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div> : ''}
-
-                <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
                             <div className="input-group">
-                                <span className="input-group-addon" id="enddate"><strong>End Date</strong></span>
+                                <span className="input-group-addon" id="enddate">
+                                    <strong>End Date</strong>
+                                </span>
                                 <input className="form-control" readOnly value={this.state.endDate}/>
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-4"></div>
-                    {this.state.numDaysAfter == 0 ?
-                        <div className="col-md-2">
-                            <div className="form-group">
-                                <div className="input-group">
-                                    {!this.props.createProcess ?
-                                        <ProcessStatus label="True" rowData={{status: this.state.status}}/> : ''}
-
-                                </div>
-                            </div>
-                        </div> : ''}
-
                 </div>
-
-                {this.state.numDaysAfter != 0 || this.props.createProcess ?
-                    <div>
-                        <div className="row">
-                            <div className="col-md-2"></div>
-                            <div className="col-md-8">
-                                <div className="form-group">
-                                    <div className="input-group">
-                                        <span className="delay-notification input-group-addon"
-                                              id="remainder-after"><strong>Reminder after deadline every</strong></span>
-                                        <Select placeholder="Nº of days"
-                                                name="form-field-name"
-                                                value={this.state.numDaysAfter}
-                                                options={optionsAfterDeadline}
-                                                onChange={this.setNumDaysAfter}
-                                                disabled={this.state.disabled}
-                                                selectValue={this.state.numDaysAfter}/>
-                                    </div>
-                                </div>
-
+                { !this.props.createProcess ?
+                <div className="row">
+                    <div className="col-md-3">
+                        <ReminderButton existentReminders={processReminderConfigs}
+                                        text={"Reminders"}
+                                        icon={"fa fa-sticky-note-o"}
+                                        extraCss={"pull-left btn-md btn-default"} />
+                    </div>
+                    <div className="col-md-7">
+                    </div>
+                    <div className="col-md-2">
+                        <div className="form-group">
+                            <div className="input-group">
+                                 <ProcessStatus label="True" rowData={{status: this.state.status}}/>
                             </div>
                         </div>
-
-                        <div className="row">
-                            <div className="col-md-2"></div>
-                            <div className="col-md-8">
-                                <div className="form-group">
-                                    <div className="input-group">
-                                <span className="delay-notification input-group-addon"
-                                      id="remainder-until"><strong>Repeat up to</strong></span>
-                                        <DateTimePicker onChange={this.setNotificationsDeadline}
-                                                        defaultValue={this.props.defaultDate}
-                                                        format={"yyyy-MM-dd"}
-                                                        time={false}
-                                                        disabled={this.state.disabled}/>
-                                    </div>
-                                </div>
-                            </div>
-                            {!this.props.createProcess ?
-                                <div className="col-md-2">
-                                    <div className="form-group">
-                                        <div className="input-group">
-                                            <ProcessStatus label="True" rowData={{status: this.state.status}}/>
-                                        </div>
-                                    </div>
-                                </div> : ''}
-                        </div>
-                    </div> : ''}
-
+                    </div>
+                </div> : ''}
 
                 {!this.props.createProcess ?
                     <div style={{backgroundColor: '#CFCFCF', width: '100%', height: '10px'}}>
