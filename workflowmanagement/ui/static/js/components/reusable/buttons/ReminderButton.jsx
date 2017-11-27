@@ -63,13 +63,18 @@ const ReminderButton = React.createClass({
                 </span>;
     },
     success(){
-        if((this.state.reminders.after != 0 && this.state.reminders.repeatUpTo == null) || (this.state.reminders.after == 0 && this.state.reminders.repeatUpTo != null)){
+        console.log(this.state);
+        if(this.validateReminders()){
             this.setState({showErrorMessage: true});
         }
         else{
             ProcessActions.changeReminders(this.state.reminders);
             this.handleClose();
         }
+    },
+    validateReminders(){
+        return true;
+        //(this.state.reminders.after != 0 && this.state.reminders.repeatUpTo == null) || (this.state.reminders.after == 0 && this.state.reminders.repeatUpTo != null))
     },
     closeErrorMessage(){
         this.setState({showErrorMessage: false});
