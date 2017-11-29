@@ -67,7 +67,7 @@
     "workflow",
     "collaboration"
   ],
-  "author": "Ricardo Ribeiro <ribeiro.r@ua.pt>",
+  "author": "João Rafael ALmeida <joao.rafael.almeida@ua.pt>",
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/bioinformatics-ua/workflow-management/issues"
