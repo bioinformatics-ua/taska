@@ -55,11 +55,11 @@
 	<!-- Home Section -->
 	<section id="home" class="tt-fullHeight" data-stellar-vertical-offset="50" data-stellar-background-ratio="0.2">
 		<div class="intro">
-    <img src="assets/images/TASKA symbol.png" alt="">
+    
 			<h1>TASK</h1><h4><span>A</span></h4>
-			<p>Something cool about TASKA 
-      <br>This tool is very useful
-      <br>and should be used in every company</p>
+			<p>A modular task management 
+      		<br>system to support
+      		<br>health research studies</p>
 		</div>
 
 		<div class="mouse-icon">
@@ -90,7 +90,6 @@
 						<li><a href="#about">About</a></li>
 						<li><a href="#resume">Resume</a></li>
 						<li><a href="#works">Demo</a></li>
-            <li><a href="#contact">Contact</a></li>
 					</ul>
 				</div>
 			</div><!-- .container -->
@@ -106,20 +105,28 @@
         <div class="row">
           <div>
             <div class="short-info wow fadeInUp">
-              <h3>Objective</h3>
+              <h3>The system</h3>
+
               <p>Taska is an open-source web-based, SaaS proposal for a modular and easily extendable workflow-oriented system designed for managing processes of data extraction and data-handling on multi-user environments where cooperation matters.</p>
 
-              <p>A state-of-the-art default client for the web service API based on reactJS is also included to demonstrate the capabilities of such system.</p>
+              <p>This system was developed in the context of EMIF (http://www.emif.eu), a European project that aims to create a common technical and governance framework to facilitate the reuse of health data. </p>
             </div>
 
             <div class="short-info wow fadeInUp">
-              <h3>What can you do With TASKA?</h3>
-              <p>Texto usado na seçao do artigo taska 2</p>
+              <h3>What can you do with TASKA?</h3>
+              <p>The system allows any user to create a study template. A study template is a composition of inter-related tasks, structured in a sequenced way to accomplish specific goals.</p>
+
+              <p>After the user select or create a study template, he can run a study. In which users are assigned to tasks with specific deadlines. Each user that runs a study will assume the study manager role.</p>
+
+              <p>The task is th basi unit of the system. Everything is a composition of at least one or more tasks.</p>
+
+              <p>There are more features assembled to the system, which improve the performance and usability of it. We highlight the following features:</p>
 
               <ul class="list-check">
                 <li>Repeatable Workflow Processes via Workflow Templates</li>
                 <li>Simple tasks with I/O and dependencies</li>
                 <li>Form Tasks</li>
+                <li>Processing Tasks</li>
                 <li>Requests management</li>
                 <li>Message system to support the interactions</li>
                 <li>reactJS client interface, with easy-to-use Workflow visual editor</li>
@@ -226,12 +233,25 @@
     <!-- Works Section -->
     <section id="works" class="works-section section-padding">
       <div class="container">
-        <h2 class="section-title wow fadeInUp">Demo</h2>
+          <div class="row">
+	        <h2 class="section-title wow fadeInUp">Demo</h2>
 
-        <img src="assets/images/taskaExample.png" alt="">
-        <div class="blog-more text-center">
-          <a href="https://bioinformatics.ua.pt/taska/" class="btn btn-primary">Launch TASKA</a>
-        </div>
+	        <img style="width: 100%" src="assets/images/taskaExample.png" alt="">
+	      </div>
+
+          <div class="row">
+	        <div class="blog-more text-center">
+<div class="panel panel-default">
+            <div class="panel-body">
+            <p>Username: <b>demo</b></p>
+            <p>Password: <b>Demo123</b></p>
+
+            <p>This demo system resets itself periodically. If it is temporarily unavailable, please try again in a few minutes.</p>
+            </div></div>
+
+	          <a href="https://bioinformatics.ua.pt/demo/taska/" class="btn btn-primary">Launch TASKA</a>
+	        </div>
+	      </div>  
       </div><!-- /.container -->
     </section><!-- End Works Section -->
 
@@ -255,75 +275,27 @@
     <!-- Contact Section -->
     <section id="contact" class="contact-section section-padding">
       <div class="container">
-        <h2 class="section-title wow fadeInUp">Get in touch</h2>
+		<h3 class="section-title wow fadeInUp">Endorsement</h3>
+			<div class="row">
+		        <p>This work has received support from the EU/EFPIA Innovative Medicines Initiative Joint Undertaking (EMIF grant n. 115372).</p>
 
-        <div class="row">
-          <div class="col-md-6">
-            <div class="contact-form">
-              <strong>Send me a message</strong>
-              <form name="contact-form" id="contactForm" action="sendemail.php" method="POST">
-
-                <div class="form-group">
-                  <label for="name">Name</label>
-                  <input type="text" name="name" class="form-control" id="name" required="">
-                </div>
-
-                <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" name="email" class="form-control" id="email" required="">
-                </div>
-
-                <div class="form-group">
-                  <label for="subject">Subject</label>
-                  <input type="text" name="subject" class="form-control" id="subject">
-                </div>
-
-                <div class="form-group">
-                  <label for="message">Message</label>
-                  <textarea name="message" class="form-control" id="message" rows="5" required=""></textarea>
-                </div>
-
-                <button type="submit" name="submit" class="btn btn-primary">Send Message</button>
-              </form>
-            </div><!-- /.contact-form -->
-          </div><!-- /.col-md-6 -->
-
-          <div class="col-md-6">
-            <div class="row center-xs">
-              <div class="col-sm-6">
-                <i class="fa fa-map-marker"></i>
-                <address>
-                  <strong>Address/Street</strong>
-                  239/2 Awesome Street,<br>
-                  Boston, USA<br>
-                </address>
-              </div>
-
-              <div class="col-sm-6">
-                <i class="fa fa-mobile"></i>
-                <div class="contact-number">
-                  <strong>Phone Number</strong>
-                  (001) 0123 111222<br>
-                  (001) 0123 333444
-                </div>
-              </div>
-            </div>
-
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="location-map">
-                <div id="mapCanvas" class="map-canvas"></div>
-              </div>
-            </div>
-          </div>
-
-          </div>
-        </div><!-- /.row -->
-
-        <h3 class="section-title wow fadeInUp">Endorsement</h3>
-
-        The development of TASKA is being supported by the following institutions and projects.
-        ...
+				<p>We are also grateful to the many EMIF colleagues that helped shape the current version of this software.</p>
+			</div>
+			<div class="row">
+				<p>Development team: </p>
+				<ul class="list-check">
+			      <li>João Rafael Almeida</li>
+			      <li>José Luís Oliveira</li>
+			    </ul> 
+			</div>
+			<div class="row">
+			    <p>Partners: </p>
+				<ul class="list-check">
+			      <li>Rosa Gini</li>
+			      <li>Giuseppe Roberto</li>
+			      <li>Peter Rijnbeek</li>
+			    </ul> 
+		    </div>
       </div><!-- /.container -->
     </section><!-- End Contact Section -->
 
@@ -333,8 +305,12 @@
       <div class="container">
         <div class="row">
           <div class="col-md-12">
-            <div class="copyright text-center">
-              <p>&copy; TrendyTheme 2015. All rights reserved.</p>
+            <div class="copyright text-center footer">
+              <span>Developed at: </span>
+	              <a href="http://bioinformatics.ua.pt" target="_blank">
+	              	<img src="assets/images/bioinformatics.png" title="Go to Bioinformatics.ua.pt's Website">
+	              </a>
+              
             </div>
           </div>
         </div>

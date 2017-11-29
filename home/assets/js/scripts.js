@@ -368,14 +368,14 @@ jQuery(function ($) {
                 disableDefaultUI: true,
                 styles: styles
             }
-            var map = new google.maps.Map(document.getElementById('mapCanvas'), mapOptions);
+            //var map = new google.maps.Map(document.getElementById('mapCanvas'), mapOptions);
 
-            var marker = new google.maps.Marker({
+            /*var marker = new google.maps.Marker({
                 position: myLatlng,
                 map: map,
                 animation: google.maps.Animation.DROP,
                 title: 'Hello World!'
-            });
+            });*/
 
             var contentString = '' +
                     '' +
@@ -385,9 +385,9 @@ jQuery(function ($) {
                 content: contentString
             });
 
-            google.maps.event.addListener(marker, 'click', function () {
+            /*google.maps.event.addListener(marker, 'click', function () {
                 infowindow.open(map, marker);
-            });
+            });*/
 
     }());
 

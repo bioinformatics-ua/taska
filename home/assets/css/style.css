@@ -247,7 +247,7 @@ button:focus {
 
 /*IMAGES*/
 img {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 hr {
@@ -1527,7 +1527,7 @@ Icon for all respective meta
 
 /* === Footer Wrapper === */
 .footer-wrapper {
-    background: #1a1e23;
+    background: #ecf0f0;
     padding: 36px 0;
     color: #fff;
   
@@ -1536,7 +1536,15 @@ Icon for all respective meta
     margin: 0;
 }
 
+.footer span{
+    color: #999;
+    font-weight: 500;
+}
 
+.footer a{
+    opacity: 0.5;
+    margin: 0px 15px 0px 15px;
+}
 
 
 
