@@ -41,7 +41,7 @@ const ReminderButton = React.createClass({
     getModalBody(){
         return <div className="status-detail">
                     <div className="col-md-12">
-                        <Reminders setReminders={this.setReminders} reminders={this.props.existentReminders} />
+                        <Reminders disabled={true} setReminders={this.setReminders} reminders={this.props.existentReminders} />
                     </div>
                     <div className="row">
                         <div className="col-md-12">
@@ -57,6 +57,7 @@ const ReminderButton = React.createClass({
                 </div>;
     },
     getModalFooter(){
+        return <span></span>; //Provisorio
         return <span>
                     <button type="button" onClick={this.handleClose} className="btn btn-default" data-dismiss="modal">{'Cancel'}</button>
                     <button type="button" onClick={this.success} className="btn btn-primary">{'Ok'}</button>
