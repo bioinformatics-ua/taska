@@ -210,7 +210,7 @@ export default React.createClass({
                           </span>
                         </div>
                       </div>
-          }
+
         </form>*/}
                     <UserDropdown url="api/account/me/" />
 
