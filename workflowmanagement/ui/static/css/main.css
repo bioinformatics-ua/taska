@@ -35,6 +35,18 @@ footer {
     text-align: center;
     background-color: #ecf0f1;
 }
+div.homePageSection{
+    margin-bottom: 70px;
+}
+div.repositorySection{
+    margin-bottom: 50px;
+    margin-top: 50px;
+    text-align: center;
+}
+div.homeStepByStep{
+    margin-left: 0px;
+    margin-right: 0px;
+}
 
 .breadbar{
   padding-top:10px;

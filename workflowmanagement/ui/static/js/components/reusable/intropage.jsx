@@ -26,9 +26,9 @@ export default React.createClass({
                 </p>
                 <h3>What can you do?</h3>
                 <br />
-            </div>
 
-            <div >
+
+            <div className="homeStepByStep row homePageSection">
 
                 <div ref="taskbar" className="clearfix home-taskbar col-md-3 table-col">
                     <center>
@@ -105,59 +105,61 @@ export default React.createClass({
 
                     </div>
                 </div>
+
+            </div>
             </div>
 
             <div>
-                <h3>Video Introducing</h3>
-                <iframe src="https://www.youtube.com/embed/j9xmd_SYztw" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen
-                style={{display: "block", width: "100%", height: "480", border: "none"}}></iframe>
-                <br/>
-            </div>
-
-            <div ref="taskbar" className="clearfix home-taskbar">
-                <center>
-                <h3>You can contribute in this project now</h3>
-                    <button className="btn btn-lg btn-info" onClick={this.openGithub}>
-                        <i className="fa fa-github" />&ensp;Go to github
-                    </button>
-                </center>
-                <br/>
-            </div>
-
-            <div>
-                <h3>Endorsements</h3>
-                <div class="row">
-                    <p>
-                        This work has received support from the EU/EFPIA Innovative Medicines Initiative Joint Undertaking (EMIF grant n. 115372).
-                    </p>
-
-                    <p>
-                        We are also grateful to the many EMIF colleagues that helped shape the current version of this software.
-                    </p>
-                </div>
-                <div class="row">
-                    <p>Core team: </p>
-                    <ul class="list-check">
-                        <li>João Rafael Almeida<sup>1</sup></li>
-                        <li>Ricardo Ribeiro<sup>1</sup></li>
-                        <li>Luís Bastião Silva<sup>1</sup></li>
-                        <li>José Luís Oliveira<sup>1</sup></li>
-                    </ul>
-                    <sup>1. University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DETI / IEETA)</sup>
-
+                <div className="homePageSection">
+                    <h3>Video Introducing</h3>
+                    <iframe src="https://www.youtube.com/embed/j9xmd_SYztw" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen
+                    style={{ width: "100%", height: "480", border: "none"}}></iframe>
+                    <br/>
                 </div>
 
-                <div class="row">
-                    <p>Partners: </p>
-                    <ul class="list-check">
-                        <li>Rosa Gini<sup>2</sup></li>
-                        <li>Giuseppe Roberto<sup>2</sup></li>
-                        <li>Peter Rijnbeek<sup>3</sup></li>
-                    </ul>
-                    <sup>2. Agenzia Regionale di Sanità della Toscana, Florence, Italy</sup><br/>
-                    <sup>3. Erasmus MC, Rotterdam, Netherlands</sup>
+                <div ref="taskbar" className="homePageSection clearfix home-taskbar">
+                    <div className="repositorySection">
+                    <h3>You can contribute in this project now</h3>
+                        <button className="btn btn-lg btn-info" onClick={this.openGithub}>
+                            <i className="fa fa-github" />&ensp;Go to github
+                        </button>
+                    </div>
+                </div>
+
+                <div className="homePageSection">
+                    <h3>Endorsements</h3>
+                    <div class="row">
+                        <p>
+                            This work has received support from the EU/EFPIA Innovative Medicines Initiative Joint Undertaking (EMIF grant n. 115372).
+                        </p>
+
+                        <p>
+                            We are also grateful to the many EMIF colleagues that helped shape the current version of this software.
+                        </p>
+                    </div>
+                    <div class="row">
+                        <p>Core team: </p>
+                        <ul class="list-check">
+                            <li>João Rafael Almeida<sup>1</sup></li>
+                            <li>Ricardo Ribeiro<sup>1</sup></li>
+                            <li>Luís Bastião Silva<sup>1</sup></li>
+                            <li>José Luís Oliveira<sup>1</sup></li>
+                        </ul>
+                        <sup>1. University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DETI / IEETA)</sup>
+
+                    </div>
+
+                    <div class="row">
+                        <p>Partners: </p>
+                        <ul class="list-check">
+                            <li>Rosa Gini<sup>2</sup></li>
+                            <li>Giuseppe Roberto<sup>2</sup></li>
+                            <li>Peter Rijnbeek<sup>3</sup></li>
+                        </ul>
+                        <sup>2. Agenzia Regionale di Sanità della Toscana, Florence, Italy</sup><br/>
+                        <sup>3. Erasmus MC, Rotterdam, Netherlands</sup>
+                    </div>
                 </div>
             </div>
-        </div>);
-    }
+        </div>);}
 });
