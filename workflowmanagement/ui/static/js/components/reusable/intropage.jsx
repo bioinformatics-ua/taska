@@ -4,6 +4,11 @@ import React from 'react';
 import {RouteHandler, Link, Router} from 'react-router';
 
 export default React.createClass({
+    getDefaultProps(){
+        return {
+            buttonsDisabled: false
+        }
+    }
     __getState(){
         return {}
     },
@@ -22,7 +27,7 @@ export default React.createClass({
                     Taska is a <b>workflow management system</b> where users can create workflow templates which can be reused by distinct groups and for different purposes.
                 </p>
                 <p>
-                    This system was developed in the context of EMIF (http://www.emif.eu), a European project that aims to create a common technical and governance framework to facilitate the reuse of health data.
+                    This system was developed in the context of EMIF (http://www.emif.eu), an European project that aims to create a common technical and governance framework to facilitate the reuse of health data.
                 </p>
                 <h3>What can you do?</h3>
                 <br />
@@ -45,7 +50,7 @@ export default React.createClass({
                             <p>The purpose of a study template is to define a schema that can be reused to create studies (workflows).</p>
                         </div>
 
-                        <Link to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className=" btn btn-sm btn-info home-button"><i
+                        <Link disabled={this.props.buttonsDisabled} to="WorkflowEdit" params={{object: 'add', mode: 'edit'}} className=" btn btn-sm btn-info home-button"><i
                             className="fa fa-plus"></i> Create </Link>
                     </center>
                     <br />
@@ -73,7 +78,7 @@ export default React.createClass({
                                     <p>Each user that runs a study will assume the study manager role.</p>
                                 </div>
 
-                                <Link to="StudyTemplates" className=" btn btn-sm btn-info home-button"><i className="fa fa-play"></i> Run </Link>
+                                <Link disabled={this.props.buttonsDisabled} to="StudyTemplates" className=" btn btn-sm btn-info home-button"><i className="fa fa-play"></i> Run </Link>
                             </center>
                             <br />
                         </div>
@@ -98,7 +103,7 @@ export default React.createClass({
                                     <p>Each user can find in this area, all the assigned tasks (pending and completed).</p>
                                 </div>
 
-                                <Link to="MyTasks" className=" btn btn-sm btn-info home-button"><i className="fa fa-tasks"></i> Show </Link>
+                                <Link disabled={this.props.buttonsDisabled} to="MyTasks" className=" btn btn-sm btn-info home-button"><i className="fa fa-tasks"></i> Show </Link>
                             </center>
                             <br />
                         </div>
@@ -110,8 +115,9 @@ export default React.createClass({
             </div>
 
             <div>
+                <hr/>
                 <div className="homePageSection">
-                    <h3>Video Introducing</h3>
+                    <h3>Quick demo</h3>
                     <iframe src="https://www.youtube.com/embed/j9xmd_SYztw" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen
                     style={{ width: "100%", height: "480", border: "none"}}></iframe>
                     <br/>
@@ -119,7 +125,7 @@ export default React.createClass({
 
                 <div ref="taskbar" className="homePageSection clearfix home-taskbar">
                     <div className="repositorySection">
-                    <h3>You can contribute in this project now</h3>
+                    <h3>You can contribute to this project now</h3>
                         <button className="btn btn-lg btn-info" onClick={this.openGithub}>
                             <i className="fa fa-github" />&ensp;Go to github
                         </button>

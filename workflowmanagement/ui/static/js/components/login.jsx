@@ -20,7 +20,7 @@ export default React.createClass({
     render: function() {
       return (
           <span>
-          <IntroPage/>
+          <IntroPage buttonsDisabled={true}/>
           </span>);
       }
 });
