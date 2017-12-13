@@ -4,7 +4,7 @@ from messagesystem.models import Message
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
-from accounts.api import UserSerializer
+from accounts.serializers.UserSerializer import UserSerializer
 
 from messagesystem.views.MessageListUsersView import MessageListUsersView
 
@@ -16,6 +16,7 @@ class MessageListSerializer(serializers.ModelSerializer):
 
     '''
     receiver = UserSerializer(many=True)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
@@ -26,3 +27,9 @@ class MessageListSerializer(serializers.ModelSerializer):
             'date',
         ]
         permission_classes = [permissions.IsAuthenticated, TokenHasScope]
+
+    def get_date(self, obj):
+        '''
+            Returns a ISO 8601 formatted date representation for this process start date
+        '''
+        return obj.date.strftime("%Y-%m-%d %H:%M")

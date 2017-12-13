@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
 from messagesystem.models import Message
-from accounts.api import UserSerializer
+from accounts.serializers.UserSerializer import UserSerializer
 from process.models import *
 
 import json

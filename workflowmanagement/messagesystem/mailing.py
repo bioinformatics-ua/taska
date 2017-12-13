@@ -56,8 +56,9 @@ class MailTemplate:
             # Some adjustments for each template
             # User
             if isinstance(self.instance.object, User):
-                sender = self.instance.actor
-                user = self.instance.object
+                if self.instance.event != History.ADD:
+                    sender = self.instance.actor
+                    user = self.instance.object
 
             #UserRecovery
             if isinstance(self.instance.object, UserRecovery):
@@ -91,6 +92,7 @@ class MailTemplate:
                 if len(sender.first_name) > 0:
                     sender = sender.first_name + " " + sender.last_name
 
+            userObj = user
             if len(user.first_name) > 0:
                 user = user.first_name + " " + user.last_name
 
@@ -122,6 +124,7 @@ class MailTemplate:
                                        'leaderName' : executioner,
                                        'sender' : sender,
                                        'user': user,
+                                       'userObj': userObj,
                                        'title': title,
                                        'message': message_content
                                    })

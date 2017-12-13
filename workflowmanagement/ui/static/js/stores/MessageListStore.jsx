@@ -5,12 +5,12 @@ import MessageListActions from '../actions/MessageListActions.jsx';
 import ResultStore from './ResultStore.jsx';
 
 import {TableStoreMixin, DetailStoreMixin} from '../mixins/store.jsx';
-import {ListLoader} from '../actions/api.jsx'
+import {ListLoader, DetailLoader} from '../actions/api.jsx'
 
 let loader;
 
 export default Reflux.createStore({
-    mixins: [TableStoreMixin],
+    mixins: [TableStoreMixin , Reflux.connect(ResultStore, "dummy")],
     listenables: [MessageListActions],
     load: function (state, hash) {
         let self = this;

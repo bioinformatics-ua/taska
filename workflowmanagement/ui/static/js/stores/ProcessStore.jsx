@@ -102,6 +102,21 @@ export default Reflux.createStore({
             }
         );
     },
+    onChangeReminders(reminders){
+        this.onMethodDetail('changereminders',
+                            this.__detaildata.hash,
+                            'POST', {
+                                reminders: reminders
+                            })
+            .then(
+            (data) => {
+                this.__detaildata = data;
+                this.__v++;
+
+                this.trigger(this.DETAIL);
+            }
+        );
+    },
     onCancelTask(ptask){
         this.onMethodDetail('canceltask',
                             this.__detaildata.hash,

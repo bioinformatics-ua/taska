@@ -9,7 +9,9 @@ import moment from 'moment';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessStatus, DeleteButton, RunButton, ProcessLabel, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal, ProcessStatus, DeleteButton, RunButton, ProcessLabel} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 
@@ -45,7 +47,7 @@ export default React.createClass({
                                 (Workflow) => {
                                     fulfill({
                                         process: Process,
-                                        ***REMOVED*** Workflow
+                                        workflow: Workflow
                                     });
                                 }
                             ).catch(ex=>reject(ex));
@@ -68,7 +70,7 @@ export default React.createClass({
     __getState(){
         return {
             process: ProcessStore.getDetail(),
-            ***REMOVED*** WorkflowStore.getDetail(),
+            workflow: WorkflowStore.getDetail(),
             workflowrepr: ProcessStore.getRepr(),
             missing: ProcessStore.getMissing(),
             version: ProcessStore.getVersion(),
@@ -186,7 +188,7 @@ export default React.createClass({
                                 toggleDisabled={true}
                                 numDaysBefore={this.state.process['days_before_delay']}
                                 numDaysAfter={this.state.process['days_after_delay']}
-                                defaultDate={moment(this.state.process['send_notification_until']).toDate()}
+                                sendNotificationUntil={moment(this.state.process['send_notification_until']).toDate()}
                                 
                                 startDate={this.state.process['start_date']}
                                 endDate={this.state.process['end_date'] || '---'}
@@ -208,7 +210,7 @@ export default React.createClass({
                                         </small>
                                         <small>
                                             <Link to="MessageSender" params={{hash: params.object, object: 'process'}}>
-                                                 <i className="fa fa-envelope"></i> Send message
+                                                 <i className="fa fa-envelope"></i> Messages
                                             </Link>
                                         </small>
                                     </span>}

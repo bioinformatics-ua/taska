@@ -8,7 +8,7 @@ import {Link, browserHistory} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, AcceptRejectButton, Affix} from './reusable/component.jsx';
+import {Modal, AcceptRejectButton, Affix} from './reusable/component.jsx';
 
 import StateActions from '../actions/StateActions.jsx';
 
@@ -426,22 +426,34 @@ export default React.createClass({
                                                       onChange={this.handleFieldChange}
                                                       comment={this.state.comment} />
                                                     </div> :''}</span>
-                                        <Link to="RequestAdd" params={{
-                                            object: 'add',
-                                            process: this.state.task.processtask.process,
-                                            task: this.state.task.processtask.task,
-                                            default: 1
-                                        }} className="btn btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-retweet" /> Ask for reassignment
-                                        </Link>
-                                        <Link to="RequestAdd" params={{
-                                            object: 'add',
-                                            process: this.state.task.processtask.process,
-                                            task: this.state.task.processtask.task,
-                                            default: 2
-                                        }} className="btn btn-default">
-                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-question"></i> Ask for clarification
-                                        </Link>
+                                           <div className="btn-group">
+                                                <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i style={{marginTop: '3px'}} className="fa fa-question" /> Ask for <span className="caret"></span>
+                                                </button>
+                                                <ul className="dropdown-menu">
+                                                    <li><Link to="RequestAdd" params={{
+                                                            object: 'add',
+                                                            process: this.state.task.processtask.process,
+                                                            task: this.state.task.processtask.task,
+                                                            default: 1
+                                                        }} className="btn">
+                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-retweet" /> Reassignment
+                                                        </Link>
+                                                    </li>
+                                                    <li><Link to="RequestAdd" params={{
+                                                            object: 'add',
+                                                            process: this.state.task.processtask.process,
+                                                            task: this.state.task.processtask.task,
+                                                            default: 2
+                                                        }} className="btn">
+                                                            <i style={{marginTop: '3px'}} className="pull-left fa fa-question" /> Clarification
+                                                        </Link>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+
+
                                     </div>
                                     ):(
                                         <div></div>

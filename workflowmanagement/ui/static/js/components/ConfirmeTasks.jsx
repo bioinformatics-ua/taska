@@ -34,12 +34,10 @@ export default React.createClass({
     },
     accept(){
         let params = this.context.router.getCurrentParams();
-        console.log(params.hash);
         ProcessActions.accept(params.hash);
     },
     reject(){
         let params = this.context.router.getCurrentParams();
-        
         ProcessActions.reject(params.hash);
     },
     render() {

@@ -2,10 +2,8 @@
 import React from 'react';
 import Router from 'react-router';
 import Reflux from 'reflux';
-import Select from 'react-select';
 
 import {Authentication} from '../../mixins/component.jsx';
-
 import MessageActions from '../../actions/MessageActions.jsx';
 import MessageStore from '../../stores/MessageStore.jsx';
 
@@ -24,29 +22,26 @@ const MessageCreator = React.createClass({
     getState(){
         return {
             message: MessageStore.getMessage(),
-            users: MessageStore.getUsers(),
             sended: false
         };
     },
     getInitialState(){
         return this.getState();
     },
+    update(status){
+        this.setState(this.getState());
+    },
     componentWillMount(){
         let params = this.context.router.getCurrentParams();
 
         MessageActions.calibrate(params.object, params.hash);
 
+        //This switch exists because the message system has a relation with a generic object
+        //but right now only the process is used
         switch (params.object){
             case 'process':
                 this.setState({
                     objectType: 15,
-                    usersSelectPlaceholder: "Leave empty to send message to all users involved in this study",
-                });
-                break;
-            case 'processTask':
-                this.setState({
-                    objectType: 16,
-                    usersSelectPlaceholder: "Leave empty to send message to all users involved in this task",
                 });
                 break;
         }
@@ -56,31 +51,20 @@ const MessageCreator = React.createClass({
             this.goBackAndClean();
         }
     },
-    update(status){
-        this.setState(this.getState());
-    },
-    setReqMessage(e){
+    setMessage(e){
         MessageActions.setMessage(e.target.value);
     },
-    setReqTitle(e){
+    setSubject(e){
         MessageActions.setTitle(e.target.value);
     },
     goBackAndClean(){
         this.goBack();
     },
-    setRequest(e){
+    sendMessage(e){
         let hash = this.context.router.getCurrentParams().hash;
         MessageActions.setObjectType(this.state.objectType, hash);
         MessageActions.send();
         this.setState({sended: true});
-
-    },
-    setReceivers(val){
-        let receivers = [];
-        let users = val.split(",");
-        for( var index = 0; index < users.length ;  index++)
-            receivers[index] = parseInt(users[index]);
-        MessageActions.setReceivers(receivers);
     },
     render(){
         return (
@@ -98,21 +82,8 @@ const MessageCreator = React.createClass({
                                 <div className="col-md-12">
                                     <div className="form-group">
                                         <div className="input-group">
-                                            <span className="input-group-addon"><strong>To</strong></span>
-                                            <Select onChange={this.setReceivers} placeholder={this.state.usersSelectPlaceholder}
-                                                defaultValue={this.state.message.receivers} name="form-field-name"
-                                                multi={true} 
-                                                options={this.state.users}/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="form-group">
-                                        <div className="input-group">
                                             <span className="input-group-addon"><strong>Subject</strong></span>
-                                            <input onChange={this.setReqTitle} className="form-control"
+                                            <input onChange={this.setSubject} className="form-control"
                                                    defaultValue={this.state.message.title}/>
                                         </div>
                                     </div>
@@ -123,7 +94,7 @@ const MessageCreator = React.createClass({
                                     <div className="form-group">
                                         <div className="input-group">
                                             <span className="input-group-addon"><strong>Message</strong></span>
-                                                <textarea onChange={this.setReqMessage} rows="7"
+                                                <textarea onChange={this.setMessage} rows="7"
                                                           className="form-control" defaultValue={this.state.message.message}/>
                                         </div>
                                     </div>
@@ -139,7 +110,7 @@ const MessageCreator = React.createClass({
                                                 className="btn btn-danger btn-default">
                                             <i style={{marginTop: '3px'}} className="pull-left fa fa-ban"></i> Cancel
                                         </button>
-                                        <button type="button" onClick={this.setRequest}
+                                        <button type="button" onClick={this.sendMessage}
                                                 className="btn btn-primary btn-default">
                                             <i style={{marginTop: '3px'}} className="pull-left fa fa-envelope"></i> Send
                                             message

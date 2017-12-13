@@ -39,7 +39,7 @@ RUN     apt-get update && \
         apt-get install -y -q xfonts-75dpi && \
         rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
-RUN     wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb && \
+RUN     wget https://downloads.wkhtmltopdf.org/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb && \
         dpkg -i wkhtmltox-0.12.2.1_linux-jessie-amd64.deb
 
 #RUN     mv /usr/bin/wkhtmltopdf /usr/bin/wkhtmltopdf2  && \

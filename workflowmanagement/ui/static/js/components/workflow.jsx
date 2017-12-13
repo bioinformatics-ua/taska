@@ -8,7 +8,9 @@ import {Link} from 'react-router';
 
 import {Authentication} from '../mixins/component.jsx';
 
-import {Modal, PermissionsBar, ProcessDetailBar} from './reusable/component.jsx';
+import {Modal} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import WorkflowActions from '../actions/WorkflowActions.jsx';
 import StateActions from '../actions/StateActions.jsx';
@@ -108,7 +110,7 @@ export default React.createClass({
         return {
             addedProcess: WorkflowStore.getProcessAddFinished(),
             addedWorkflow: WorkflowStore.getWorkflowAddFinished(),
-            ***REMOVED*** WorkflowStore.getWorkflow(),
+            workflow: WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing(),
             user: UserStore.getUser(),
             notificationsDetail: this.getDefaultNotificationsDetail(),
@@ -206,6 +208,15 @@ export default React.createClass({
     setFilteredUsers(users){
         this.setState({filteredUsers: users});
     },
+    setRemindersConfig(reminders){
+        console.log("AAAAAAAAAAAAAAAAQUI!");
+        this.setState({
+            notificationsDetail: {
+                numDaysBefore: reminders.before,
+                numDaysAfter: reminders.after,
+                sendNotificationUntil: reminders.repeatUpTo
+            }});
+    },
     transitToWorkflowRun(){
         this.setState({mode:'run'});
     },
@@ -247,7 +258,6 @@ export default React.createClass({
             (this.state.notificationsDetail.numDaysAfter == 0 && this.state.notificationsDetail.sendNotificationUntil != null))
             return false;
         return true;
-        return true;
     },
     changeData(data){
         data.notificationsDetail= this.state.notificationsDetail;
@@ -285,10 +295,15 @@ export default React.createClass({
             this.context.router.replaceWith('/404');
 
         let sm = this.load(params.mode === 'run' );
+        console.log(this.state);
         if(params.mode === 'prerun')
-            return <PreRunWorkflow transitToWorkflowRun={this.transitToWorkflowRun} setMessage={this.setMessage} setFilteredUsers={this.setFilteredUsers} {...this.state} {...this.props}/>;
+            return <PreRunWorkflow transitToWorkflowRun={this.transitToWorkflowRun}
+                                   setMessage={this.setMessage}
+                                   setFilteredUsers={this.setFilteredUsers}
+                                   setRemindersConfig={this.setRemindersConfig}
+                                   {...this.state} {...this.props}/>;
         else
-        return (
+            return (
             <span>
                 {this.state.missing.length > 0?
                     <Modal title="Missing information"

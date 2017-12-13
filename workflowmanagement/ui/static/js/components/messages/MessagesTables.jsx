@@ -2,29 +2,19 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Griddle from 'griddle-react';
-import {MessageLink, MessageActions} from './TableComponents.jsx';
 
+import {TableComponentMixin} from '../../mixins/component.jsx';
 import MessageListActions from '../../actions/MessageListActions.jsx';
 import MessageListStore from '../../stores/MessageListStore.jsx';
-import {TableComponentMixin} from '../../mixins/component.jsx';
+
+import {MessageLink} from './TableComponents.jsx';
 
 const MessagesTable = React.createClass({
     tableAction: MessageListActions.load,
     tableStore: MessageListStore,
     mixins: [Reflux.listenTo(MessageListStore, 'update'), TableComponentMixin],
-    getDefaultProps(){
-        return {
-            tableSettings:
-                {
-                    bodyHeight:375,
-                    tableClassName: "table table-striped",
-                    useGriddleStyles: false,
-                    nextClassName: "table-prev",
-                    previousClassName: "table-next",
-                    sortAscendingComponent: <i className="pull-right fa fa-sort-asc"></i>,
-                    sortDescendingComponent: <i className="pull-right fa fa-sort-desc"></i>
-                },
-        };
+    update: function (data) {
+        this.setState(this.getState());
     },
     render(){
         const columnMeta = [
@@ -33,7 +23,7 @@ const MessagesTable = React.createClass({
                 "order": 1,
                 "locked": false,
                 "visible": true,
-                //"customComponent": MessageLink,
+                "customComponent": MessageLink,
                 "displayName": "Title"
             },
             {
@@ -41,26 +31,10 @@ const MessagesTable = React.createClass({
                 "order": 2,
                 "locked": false,
                 "visible": true,
+                "cssClassName": "messgae-date-td",
                 "displayName": "Date"
-            },
-           /* {
-                "columnName": "reiceiver",
-                "order": 3,
-                "locked": false,
-                "visible": true,
-                "displayName": "Receivers"
-            },*/
-            {
-                "columnName": "actions",
-                "order": 4,
-                "locked": false,
-                "visible": true,
-                "customComponent": MessageActions,
-                "displayName": " "
-            },
+            }
         ];
-
-
 
         return <div className="panel panel-default panel-overflow griddle-pad">
                 <div style={{zIndex: 0}} className="panel-heading">
@@ -71,8 +45,7 @@ const MessagesTable = React.createClass({
                 <Griddle
                     noDataMessage={<center>You have no messages sent in this study.</center>}
                     {...this.commonTableSettings(false)}
-                    {...this.props.tableSettings}
-                    columns={["title", "date", "actions"]}
+                    columns={["title", "date"]}
                     columnMetadata={columnMeta}/>
             </div>;
     }

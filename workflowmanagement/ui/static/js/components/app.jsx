@@ -210,7 +210,7 @@ export default React.createClass({
                           </span>
                         </div>
                       </div>
-          }
+
         </form>*/}
                     <UserDropdown url="api/account/me/" />
 
@@ -238,7 +238,7 @@ export default React.createClass({
             </div>
           </div>
           {headless == 'true' ? '':
-          <footer>
+          <footer style={{"position": "fixed;", "bottom": "0;"}}>
             <a href="http://www.ua.pt/">
             <img style={{"marginLeft":"20px"}} src="static/images/logo-ua2.png" />
             </a>

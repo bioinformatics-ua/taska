@@ -5,6 +5,7 @@ import {RouteHandler, Link} from 'react-router';
 import Router from 'react-router';
 import UserActions from '../../actions/UserActions.jsx';
 import UserStore from '../../stores/UserStore.jsx';
+import LoginComponent from './logincomponent.jsx';
 
 var Tab = React.createClass({
   contextTypes: {
@@ -46,8 +47,10 @@ var UserDropdown = React.createClass({
     },
   render: function () {
     if(this.state.user.authenticated === false){
-      return <span key="loggedout"></span>;
+        console.log("LOGIN");
+        return <LoginComponent />;
     }
+    console.log("LOGGED");
     return <ul key="loggedin" className="nav navbar-nav navbar-right">
         {/*<li>
                         <Tab to='ExternalAccess' className="boldit"><i className="fa fa-tasks"></i> TEMP BUTTON</Tab>

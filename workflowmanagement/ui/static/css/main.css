@@ -35,6 +35,18 @@ footer {
     text-align: center;
     background-color: #ecf0f1;
 }
+div.homePageSection{
+    margin-bottom: 70px;
+}
+div.repositorySection{
+    margin-bottom: 50px;
+    margin-top: 50px;
+    text-align: center;
+}
+div.homeStepByStep{
+    margin-left: 0px;
+    margin-right: 0px;
+}
 
 .breadbar{
   padding-top:10px;
@@ -199,6 +211,9 @@ table {
 .date-td{
   width: 120px;
 }
+.messgae-date-td{
+  width: 160px;
+}
 .status-td{
   width: 260px;
 }
@@ -219,6 +234,9 @@ table {
 }
 .deadline-td{
   width: 130px;
+}
+.requests-td{
+  width: 80px;
 }
 .start-date-td{
   width: 130px;

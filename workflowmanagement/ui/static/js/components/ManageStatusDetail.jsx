@@ -5,7 +5,9 @@ import React from 'react/addons';
 import Reflux from 'reflux';
 
 import {StatusDetailTable} from './tasks/statusdetail.jsx';
-import {ReassigningButton, ProcessLabel, ProcessDetailBar, PermissionsBar} from './reusable/component.jsx';
+import {ReassigningButton, ProcessLabel} from './reusable/component.jsx';
+import ProcessDetailBar from './process/ProcessDetailBar.jsx';
+import PermissionsBar from './process/PermissionsBar.jsx';
 
 import ProcessStore from '../stores/ProcessStore.jsx';
 import WorkflowStore from '../stores/WorkflowStore.jsx';
@@ -34,7 +36,7 @@ export default React.createClass({
                             (Workflow) => {
                                 fulfill({
                                     process: Process,
-                                    ***REMOVED*** Workflow
+                                    workflow: Workflow
                                 });
                             }
                         ).catch(ex=>reject(ex));
@@ -49,7 +51,7 @@ export default React.createClass({
     getState(){
         return {
             process: ProcessStore.getDetail(),
-            ***REMOVED*** WorkflowStore.getDetail(),
+            workflow: WorkflowStore.getDetail(),
             showReassign: false,
             users: [],
             new_reassigning: undefined,
@@ -158,7 +160,7 @@ export default React.createClass({
                     toggleDisabled={true}
                     numDaysBefore={this.state.process['days_before_delay']}
                     numDaysAfter={this.state.process['days_after_delay']}
-                    defaultDate={moment(this.state.process['send_notification_until']).toDate()}
+                    sendNotificationUntil={moment(this.state.process['send_notification_until']).toDate()}
 
                     startDate={this.state.process['start_date']}
                     endDate={this.state.process['end_date'] || '---'}
@@ -174,7 +176,7 @@ export default React.createClass({
                                 </small>
                                 <small>
                                     <Link to="MessageSender" params={{hash: params.object, object: 'process'}}>
-                                        <i className="fa fa-envelope"></i> Send message
+                                        <i className="fa fa-envelope"></i> Messages
                                     </Link>
                                 </small>
                             </span>}/>
