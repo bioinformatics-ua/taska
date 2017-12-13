@@ -110,7 +110,7 @@ export default React.createClass({
         return {
             addedProcess: WorkflowStore.getProcessAddFinished(),
             addedWorkflow: WorkflowStore.getWorkflowAddFinished(),
-            ***REMOVED*** WorkflowStore.getWorkflow(),
+            workflow: WorkflowStore.getWorkflow(),
             missing: WorkflowStore.getMissing(),
             user: UserStore.getUser(),
             notificationsDetail: this.getDefaultNotificationsDetail(),

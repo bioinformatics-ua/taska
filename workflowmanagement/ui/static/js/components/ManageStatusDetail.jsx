@@ -36,7 +36,7 @@ export default React.createClass({
                             (Workflow) => {
                                 fulfill({
                                     process: Process,
-                                    ***REMOVED*** Workflow
+                                    workflow: Workflow
                                 });
                             }
                         ).catch(ex=>reject(ex));
@@ -51,7 +51,7 @@ export default React.createClass({
     getState(){
         return {
             process: ProcessStore.getDetail(),
-            ***REMOVED*** WorkflowStore.getDetail(),
+            workflow: WorkflowStore.getDetail(),
             showReassign: false,
             users: [],
             new_reassigning: undefined,

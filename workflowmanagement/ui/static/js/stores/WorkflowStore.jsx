@@ -171,7 +171,7 @@ const WorkflowStore = Reflux.createStore({
     {
         console.log(data);
         let process = {
-            ***REMOVED*** this.__detaildata.hash,
+            workflow: this.__detaildata.hash,
             tasks: [],
             title: data.title,
             status: 5
@@ -207,7 +207,7 @@ const WorkflowStore = Reflux.createStore({
     },
     onRunProcess(data){
         let process = {
-            ***REMOVED*** this.__detaildata.hash,
+            workflow: this.__detaildata.hash,
             tasks: [],
             title: data.title,
             status: 1,
