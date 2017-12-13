@@ -8,7 +8,7 @@ export default React.createClass({
         return {
             buttonsDisabled: false
         }
-    }
+    },
     __getState(){
         return {}
     },
