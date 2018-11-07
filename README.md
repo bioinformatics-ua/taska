@@ -1,9 +1,9 @@
-# TASKA
+# <img src="http://bioinformatics.ua.pt/wp-content/uploads/2017/10/Taska-icon.png" height="150"/>
 #### A modular and easily extendable system for repeatable workflows
 
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://github.com/bioinformatics-ua/taska/tree/master)
-
+ 
 Task management systems are crucial tools in modern organizations, by simplifying the coordination of teams and their work. Those tools were developed mainly for task scheduling, assignment, follow-up, and accountability. On the other hand, scientific workflow systems also appeared to help putting together a set of computational processes through the pipeline of inputs and outputs from each, creating in the end a more complex processing workflow. However, there is sometimes a lack of solutions that combine both manually operated tasks with automatic processes, in the same workflow system.
 
 TASKA is a web-based platform that incorporates some of the best functionalities of both systems, addressing the collaborative needs of a task manager with well-structured computational pipelines.
@@ -80,11 +80,30 @@ $ make run
 
 ### Scientific contributions
 
-<pre>
-J. Almeida, R. Ribeiro, and J. L. Oliveira, “A modular workflow management framework”, in Proceedings of the 11th International Conference on Health Informatics (HealthInf 2018), 2018.
 
-J. R. Almeida, T. M. Godinho, L. Bastião Silva, C. Costa, and J. L. Oliveira, “Services orchestration and workflow management in distributed medical imaging environments”, in Computer-Based Medical Systems (CBMS), 2018 IEEE 31th International Symposium on, IEEE, 2018.
-</pre>
+* J. Almeida, R. Ribeiro, and J. L. Oliveira, “A modular workflow management framework”, in Proceedings of the 11th International Conference on Health Informatics (HealthInf 2018), 2018.
+
+* J. R. Almeida, T. M. Godinho, L. Bastião Silva, C. Costa, and J. L. Oliveira, “Services orchestration and workflow management in distributed medical imaging environments”, in Computer-Based Medical Systems (CBMS), 2018 IEEE 31th International Symposium on, IEEE, 2018.
+
+
+### Core Team
+* João Rafael Almeida<sup id="a1">[1](#f1)</sup>
+* Ricardo Ribeiro<sup id="a1">[1](#f1)</sup>
+* Luís Bastião Silva<sup id="a2">[2](#f2)</sup>
+* José Luís Oliveira<sup id="a1">[1](#f1)</sup>
+
+
+
+ 1. <small id="f1"> University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DETI / IEETA), Aveiro, Portugal </small> [↩](#a1)
+ 2. <small id="f2"> BMD Software, Aveiro, Portugal  </small> [↩](#a2)
+
+### Patners
+* Rosa Gini<sup id="a3">[3](#f3)</sup>
+* Giuseppe Roberto<sup id="a3">[3](#f3)</sup>
+* Peter Rijnbeek<sup id="a4">[4](#f4)</sup>
+
+3. <small id="f3"> Agenzia Regionale di Sanità della Toscana, Florence, Italy  </small> [↩](#a3)
+4. <small id="f4"> Erasmus MC, Rotterdam, Netherlands  </small> [↩](#a4)
 
 ### Todos
 
