@@ -9,6 +9,12 @@ Task management systems are crucial tools in modern organizations, by simplifyin
 TASKA is a web-based platform that incorporates some of the best functionalities of both systems, addressing the collaborative needs of a task manager with well-structured computational pipelines.
 The system is currently being used by EMIF (European Medical Information Framework) for the coordination of clinical studies.
 
+A demo installation of TASKA is available online at https://bioinformatics.ua.pt/taska. Please use the following credentials to login:
+
+```
+User: demo
+Password: demo
+```
 
 ### Tech
 
@@ -30,15 +36,15 @@ Taska requires Docker, Docker-compose and Make to run.
 
 Install Docker
 
-<pre>
-* Full instructions [here](https://docs.docker.com/install/)
-</pre>
+```
+* Full instructions at https://docs.docker.com/install/
+```
 
 Install docker-compose
 
-<pre>
-* Full instructions [here](https://docs.docker.com/compose/install/)
-</pre>
+```
+* Full instructions at https://docs.docker.com/compose/install/
+```
 
 Edit docker-compose.yml with deploy specific details. The varibles that should be configured are the following:
 
