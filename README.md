@@ -31,13 +31,13 @@ Taska requires Docker, Docker-compose and Make to run.
 Install Docker
 
 <pre>
-* Full instructions here https://docs.docker.com/install/
+* Full instructions [here](https://docs.docker.com/install/)
 </pre>
 
 Install docker-compose
 
 <pre>
-* Full instructions here https://docs.docker.com/compose/install/
+* Full instructions [here](https://docs.docker.com/compose/install/)
 </pre>
 
 Edit docker-compose.yml with deploy specific details. The varibles that should be configured are the following:
@@ -97,7 +97,7 @@ $ make run
  1. <small id="f1"> University of Aveiro, Dept. Electronics, Telecommunications and Informatics (DETI / IEETA), Aveiro, Portugal </small> [↩](#a1)
  2. <small id="f2"> BMD Software, Aveiro, Portugal  </small> [↩](#a2)
 
-### Patners
+### Partners
 * Rosa Gini<sup id="a3">[3](#f3)</sup>
 * Giuseppe Roberto<sup id="a3">[3](#f3)</sup>
 * Peter Rijnbeek<sup id="a4">[4](#f4)</sup>
@@ -105,9 +105,4 @@ $ make run
 3. <small id="f3"> Agenzia Regionale di Sanità della Toscana, Florence, Italy  </small> [↩](#a3)
 4. <small id="f4"> Erasmus MC, Rotterdam, Netherlands  </small> [↩](#a4)
 
-### Todos
-
- - Write the todos
-
-License
-----
+---
