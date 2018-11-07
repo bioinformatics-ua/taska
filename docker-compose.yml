@@ -1,0 +1,55 @@
+# Configuring postgres as postgres persistence
+dbdata:
+  image: busybox
+  volumes:
+    - ../persistence_prod_sql:/var/lib/postgresql/data
+  command: true
+
+db:
+  image: postgres:9.3
+  environment:
+    - POSTGRES_USER=workflow
+    - POSTGRES_PASS=12345
+  volumes:
+    - ../persistence_prod_sql:/var/lib/postgresql/data
+  ports:
+    - "8080:5432"
+
+workflow:
+  links:
+    - db
+  image: bioinformatics-ua/workflow-management:latest
+  environment:
+    # ATTENTION: only change this postgres settings if you pretend to use a remote database,
+    # created by youself instead of the deployed by the orchestrator, it will work fine without messing with it !
+    - DOCKER_POSTGRES_USER=workflow
+    - DOCKER_POSTGRES_PASS=12345
+    - DOCKER_POSTGRES_DB=workflow
+    - DOCKER_POSTGRES_HOST=db
+    - DOCKER_POSTGRES_PORT=5432
+    # ATTENTION : Below are settings you have to set for you own deploy as they will be different for all deploys
+    - DOCKER_SECRET=place_your_secret_here # secret salted used on passwords
+    - EMAIL_USE_TLS=True
+    - EMAIL_HOST=mail.email.pt
+    - EMAIL_PORT=25
+    - EMAIL_HOST_USER=email@email.com
+    - EMAIL_HOST_PASSWORD=password
+    - EMAIL_URL=http://127.0.0.1/                # full path url to be used on emails links sent through the system
+    - DEFAULT_FROM_EMAIL=email@email.com
+                                    # (can be different from public_ip if there are http redirects in between).
+                                    # defaults to PUBLIC_IP, when deleted
+
+    - PUBLIC_IP=http://127.0.0.1/ # the  associated domain must be specified, to prevent fake HTTP Host headers
+
+    # base dir must be / or be surrounded by / like p.e. /subdir/
+    - BASE_DIR=/taska # if the page wont run on root but on a subdirectory instead it must be specified here
+
+    # raven url for error logging
+    - RAVEN_URL=http://127.0.0.1:9999/
+    - SESSION_COOKIE_NAME=taska
+    # ATTENTION : End Of deploy specific configurations
+  volumes:
+    - ../persistence/uploads:/workflow-management/workflowmanagement/upload
+    - ../persistence/media:/workflow-management/collectedmedia
+  ports:
+    - "41235:80"
