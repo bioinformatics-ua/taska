@@ -26,7 +26,7 @@ TASKA uses a number of open source projects to work properly, such as:
 
 ### Installation
 
-GenericCDSS requires Docker, Docker-compose and Make to run.
+Taska requires Docker, Docker-compose and Make to run.
 
 Install Docker
 
