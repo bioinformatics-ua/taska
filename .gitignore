@@ -5,3 +5,6 @@ documentation/build
 workflowmanagement/upload/file
 workflowmanagement/workflowmanagement/local_settings.py
 /env
+workflowmanagement/ui/static/bundle.js
+workflowmanagement/ui/static/bundle.min.css
+npm-debug.log
