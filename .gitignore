@@ -4,3 +4,4 @@ documentation/build
 /node_modules
 workflowmanagement/upload/file
 workflowmanagement/workflowmanagement/local_settings.py
+/env
